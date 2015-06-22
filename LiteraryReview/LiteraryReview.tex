@@ -195,4 +195,18 @@ Algorithms for for finding cycles are called \textit{cycle detection} algorithms
 
 Cycle detection utilizes two operations: trim and mark. Trimming identifies and discards elements which are not in cycles. At the beginning of cycle detection, graphs are trimmied in the downwind direction, then the remaining graphs are trimmed in the upwind direction. A pivot vertex is then selected in each graph. Graph vertices are then marked as upwind, downwind, or unmarked. Then, if any vertices are both upwind and downwind, the cycle is these vertices plus the pivot vertex. An edge is removed between 2 cycle vertices, and 4 new graphs are created: a new cycle, the upwind vertices without the cycle, the downwind vertices without the cycle, and a set of unmarked vertices. This recursively continues until all cycles are eliminated.
 
+\newpage
+
+\section*{Sweep Example}
+
+Here I will cover an example of a 2D processor layout with different aggregation factors, graphically and mathematically verifying the performance models for different partitioning parameters. It is important to note that in 2D, with $P_z$ and $A_z$ equal to 1, Eqs. \ref{nfill}, and \ref{ntasks} change slightly due to the lack of $z$ dependence. Equation \ref{updaten} shows the new expressions for $N_{\text{fill}}$ and $N_{\text{tasks}}$:
+\begin{align}
+N_{\text{fill}} &= \frac{P_x + \delta_x}{2} - 1 + \frac{P_y + \delta_y}{2} - 1 \\
+N_{\text{tasks}} &= 4 N_m N_g\\
+\label{updaten}
+\end{align}
+where we see that in $N_{\text{tasks}}$ we only multiply $N_m$ by 4 instead of 8, because we now deal with quadrants, not with octants.
+
+\includepdf[fitpaper,pages={1-16}]{SweepExamples.pdf}
+
 \end{document}
