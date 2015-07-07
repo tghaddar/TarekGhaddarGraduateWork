@@ -40,6 +40,8 @@
 \renewcommand{\thesubsubsection}{\thesection\Alph{subsection}.\arabic{subsubsection}}
 %Include a pdf file
 \usepackage{pdfpages}
+%Using the .bib file
+\usepackage[superscript,biblabel]{cite}
 
 \begin{document}
 
@@ -100,7 +102,6 @@ It follows that each process owns $N_k$ cell-sets (each of which is $A_z$ planes
 One task contains $A_x A_y A_z$ cells, $A_m$ directions, and $A_g$ groups. Equivalently, a task is the computation of one cellset, one groupset, and one angleset. One task takes a stage to complete.  This is particularly important when comparing sweeps to the performance models. 
 
 The minimum possible number of stages for given partitioning parameters $P_i$ and $A_j$ is $2 N_{\text{fill}}+N_{\text{tasks}}$. $N_{\text{fill}}$ is both the minimum number of stages before a sweepfront can reach the center-most processors and the number needed to finish a direction's sweep after the center-most processors have finished. Equations \ref{nfill}, \ref{nidle}, and \ref{ntasks} define $N_{\text{fill}}$, $N_{\text{idle}}$, and $N_{\text{tasks}}$:
-
 \begin{equation}
 N_{\text{fill}} = \frac{P_x + \delta_x}{2} - 1 + \frac{P_y + \delta_y}{2} - 1 + N_k (\frac{P_z + \delta_z}{2} - 1)
 \label{nfill}
@@ -115,15 +116,15 @@ N_{\text{tasks}} = 8 N_m N_g N_k
 \end{equation}
 where $\delta_u$ is 1 for $P_u$ odd, and 0 for $P_u$ even.
 
-Equation \ref{paralleleff} approximately defines parallel parallel sweep efficiency. This can be calculated for specific machinery and partitioning parameters by substituting in values calculated using Eqs \ref{nfill},\ref{nidle}, and \ref{ntasks}.
-
-\begin{equation}
-\epsilon = \frac{1}{[1+\frac{N_{\text{idle}}}{N_{\text{tasks}}}][1 + \frac{T_{\text{comm}}}{T_{\text{task}}}]}
-\label{paralleleff}
+Equation \ref{paralleleff} approximately defines parallel parallel sweep efficiency. This can be calculated for specific machinery and partitioning parameters by substituting in values calculated using Eqs. \ref{nfill},\ref{nidle}, and \ref{ntasks}.
+\begin{equation}\label{paralleleff}
+\begin{split}
+\epsilon &= \frac{T_{\text{task}} N_{\text{tasks}}}{[N_{\text{stages}}] [T_{\text{task}} + T_{\text{comm}}]} \\
+            &=\frac{1}{[1+\frac{N_{\text{idle}}}{N_{\text{tasks}}}][1 + \frac{T_{\text{comm}}}{T_{\text{task}}}]}
+\end{split}
 \end{equation}
 
 Equations \ref{Tcomm} and \ref{Ttask} show how $T_{\text{comm}}$ and $T_{\text{task}}$ are calculated:
-
 \begin{equation}
 T_{\text{comm}} = M_L T_{\text{latency}} + T_{\text{byte}} N_{\text{bytes}}
 \label{Tcomm}
@@ -132,10 +133,9 @@ T_{\text{comm}} = M_L T_{\text{latency}} + T_{\text{byte}} N_{\text{bytes}}
 T_{\text{task}} = A_x A_y A_z A_m A_g T_{\text{grind}}
 \label{Ttask}
 \end{equation}
-where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the additional time to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group.
+where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the additional time to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. If a high value of $M_L$ is necessary for the model to match computational results, improvements should be made in code implementation.
 
 Scheduling utilizes an algorithm to assign priority to tasks. An example of this is the ``depth-of-graph'' algorithm, which gives priority to the task that has the longest chain of dependencies. In general, a quantity $D$ is defined, which is simply the number of downstream dependents each task has. Then a simple series of logicals determines which task has priority and should be executed first:
-
 \begin{enumerate}
 \item Tasks with higher $D$ have higher priority,
 \item If multiple tasks have the same $D$, then tasks with $\Omega_x > 0$ have priority,
@@ -144,7 +144,6 @@ Scheduling utilizes an algorithm to assign priority to tasks. An example of this
 \end{enumerate}
 
 Another optimal scheduling algorithm (not proved) is the ``push-to-central'' algorithm. This algorithm prioritizes tasks that advance wavefronts to central planes in the processor layout. A few definitions are necessary to understand the push-to-central algorithm:
-
 \begin{itemize}
 \item $i \; \varepsilon \; (1,P_x) = $ the $x$ index into the processor array, with similar definitions for y and z indices, j and k,
 \item $X = \frac{P_x + \delta_x}{2}$,
@@ -153,14 +152,12 @@ Another optimal scheduling algorithm (not proved) is the ``push-to-central'' alg
 \end{itemize}
 
 With these definitions, The push-to-central algorithm prioritizes the following tasks accordingly:
-
 \begin{enumerate}
 \item If $i \leq X$, then tasks with $\Omega_x > 0$ have priority, while for $i > X$, tasks with $\Omega_x < 0$ have priority.
 \item If multiple ready tasks have the same sign on $\Omega_x$, apply rule 1 to $j,Y,\Omega_y$.
 \item If multiple ready tasks have the same sign on $\Omega_x$ and $\Omega_y$, apply rul 1 to $k,Z, \Omega_z$.
 \end{enumerate}
-
-This schedule pushes tasks toward the $i = X$ central processor plane with top priority, followed by pushing toward the $j = Y$ central processor plane, followed by pushing toward the $k = Z$ central processing plane.
+This schedule pushes tasks toward the $i = X$ central processor plane with top priority, followed by pushing toward the $j = Y$ central processor plane, followed by pushing toward the $k = Z$ central processing plane\cite{mpadams2013}.
 
 
 \section*{The Unstructured Transport Sweep}
@@ -195,6 +192,47 @@ Algorithms for for finding cycles are called \textit{cycle detection} algorithms
 
 Cycle detection utilizes two operations: trim and mark. Trimming identifies and discards elements which are not in cycles. At the beginning of cycle detection, graphs are trimmied in the downwind direction, then the remaining graphs are trimmed in the upwind direction. A pivot vertex is then selected in each graph. Graph vertices are then marked as upwind, downwind, or unmarked. Then, if any vertices are both upwind and downwind, the cycle is these vertices plus the pivot vertex. An edge is removed between 2 cycle vertices, and 4 new graphs are created: a new cycle, the upwind vertices without the cycle, the downwind vertices without the cycle, and a set of unmarked vertices. This recursively continues until all cycles are eliminated.
 
+\section*{Provable algorithms for parallel generalized sweep scheduling}
+
+Given an unstructured mesh consisting of $n$ cells, $k$ directions, and $m$ processors, the mesh induces a natural graph $G(V,E)$: where cells of the mesh correspond to vertices, and edges between vertices correspond to a shared boundary between two cells. If a direction, $i$, is present, it inducese a directed graph with an identical vertex set $V$, and a directed edge from $u$ to $v$ being present if and only if $u$ and $v$ are adjacent in $G$ and the sweep direction requires $u$ to be solved before $v$. Assuming all cycles are broken, this produces $k$ directed acyclic graphs (DAG), one for each direction $i$. 
+
+An instance of a sweep scheduling (SS) problem is given by a vertex set $V$ (or the cells in the unstructured mesh), $k$ DAGs $G_i(V_i,E_i)$, and $m$ processors. A feasible solution to this problem is a schedule that processes the $k$ DAGs, so that the following constraints are satisfied:
+\begin{enumerate}
+\item The precedence constraints for each DAG $G_i(V_i,E_i)$ must be satisfied. If a directed edge goes from $u$ to $v$, task $(u,i)$ must be processed before task $(v,i)$ can be started.
+\item Each processor can process one task at a time, and a task cannot be pre-empted.
+\item Every copy of vertex $v$ must be processed on the same processor for each direction $i$. 
+\end{enumerate}
+
+\subsection*{Levels}
+
+Given $k$ DAGs $G_i(V_i,E_i)$, levels (or layers) can be formed where in DAG $G_i(V_i,E_i)$, layer $L_{i,j}$ is the set of vertices with no predecessors after vertices $L_{i,1}\cup\cdots\cup L_{i,j-1}$ have been deleted. Figure \ref{levels} shows how levels are formed from DAG $G_{i}$. It's clear that vertex (7,$i$) is a leaf (has an out-degree of 0), and vertex (1,$i$) is a root (has an in-degree of 0).
+
+\bigskip
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 1]{Levels.png}
+\captionof{figure}{Levels of DAG $G_{i}$.}
+\label{levels}
+\end{minipage}
+
+\subsection*{List Scheduling}
+
+In list scheduling, a priority may be assigned to each task (recall that a task is defined as the computation of a cell-direction pair). If no priorities are assigned to tasks, then all tasks have the same priority. A task is ready if it has not been processed yet, but all of it's ancestors in the dependence graph have been processed. For a timestep $t$, $R(t)\subset V\text{x}\{1,\ldots,k\}$ denotes the subset of tasks that are ready. $R_P(t)\subset R(t)$ denote the subset of tasks that are ready and allowed to be processed by processor $P$. The list scheduling algorithm proceeds such that for each timestep $t$, it assigns to each processor $P$ the task of highest (or lowest) priority in $R_P(t)$, with ties broken arbitrarily. Processor $P$ is idle at time $t$ if $R_P(t)$ is empty. 
+
+\subsection*{Improved random delay algorithm O(log $m$ log log log $m$)}
+\begin{enumerate}
+\item \textbf{Preprocessing}: Construct a new set of levels $L_i^{\prime}$ for each direction $i$ as follows:
+\begin{itemize}
+\item Construct new DAG $H$, that combines all $G_i$'s, and viewing all copies of $(v,i)$ of vertex $v$ as distinct.
+\item Run standard list schedulingi algorithm on $H$ with $m$ identical parallel machines, with $T$ being the makespan of this schedule.
+\end{itemize}
+\item For all $i$, choose $X_i \varepsilon \{0,\ldots,k-1\}$ uniformly at random.
+\item Form a combined DAG $G^{\prime\prime}$ as follows: $\forall r \varepsilon \{1,\ldots,T+k-1\}$, define $L_r^{\prime\prime} = \bigcup_{\{i:X_i<r\}}L^\prime_{i,r-X_i}$.
+\item For each vertex $v$, choose a processor uniformly at random from \{1,\ldots,$m$\}.
+\item Construct a schedule by processing layers $L_1^{\prime\prime},L_2^{\prime\prime},\ldots$ sequentially in that order.
+\end{enumerate}
+
 \newpage
 
 \section*{Sweep Example}
@@ -207,6 +245,9 @@ N_{\text{tasks}} &= 4 N_m N_g\\
 \end{align}
 where we see that in $N_{\text{tasks}}$ we only multiply $N_m$ by 4 instead of 8, because we now deal with quadrants, not with octants.
 
-\includepdf[fitpaper,pages={1-16}]{SweepExamples.pdf}
+%\includepdf[fitpaper,pages={1-16}]{SweepExamples.pdf}
+
+\bibliographystyle{plain}
+\bibliography{LiteraryReview}
 
 \end{document}

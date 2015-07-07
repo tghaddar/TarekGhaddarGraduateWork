@@ -1,4 +1,4 @@
-function [eff,P_total] = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,A,M,G)
+function [eff,P_total] = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P)
 %PERFORMANCEMODEL: Function accepts 6 parameters
 %M_L: Latency factor, a function of increased and decreased latency
 %T_latency: The message latency times
@@ -11,6 +11,7 @@ function [eff,P_total] = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,A
 %   order: A_x,A_y,A_z,A_m,A_g
 %N: The number of cells in each direction in a vector stored in the
 %   following order N_x, N_y, N_z
+%P is the number of processors 
 
 %The time to communicate between processors
 T_comm = M_L*T_latency + T_byte*N_bytes;
@@ -21,17 +22,6 @@ for i = 1:length(A)
 end
 %The time to communicate a task
 T_task = aggregation_product*T_grind;
-%Filling out the processor arrays
-P_z = 2;
-P = zeros(15,2);
-P(:,2) = P_z;
-P_total = zeros(15,1);
-P_total(1) = 8;
-P(1,1) = P_total(1) - P_z;
-for i = 2:15
-    P_total(i) = P_total(i-1)*2;
-    P(i,1) = P_total(i) - 2;
-end
 
 %The aggregation in Z
 A_z = A(3);
