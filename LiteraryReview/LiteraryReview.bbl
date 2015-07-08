@@ -6,4 +6,10 @@ Michael P.~Adams et~al.
 \newblock In {\em International Conference on Mathematics and Computational
   Methods Applied to Nuclear Science \& Engineering}, 2013.
 
+\bibitem{kumar}
+V.S. Anil~Kumar et~al.
+\newblock Provable algorithms for parallel generalized sweep scheduling.
+\newblock {\em Journal of Parallel and Distributed Computing}, 66:807--821,
+  2006.
+
 \end{thebibliography}

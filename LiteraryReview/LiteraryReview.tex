@@ -12,7 +12,6 @@
 \usepackage{xcolor,graphicx}
 \usepackage{float}
 \usepackage{amsmath}
-\usepackage[T1]{fontenc}
 \usepackage{mathptmx}
 \usepackage{lipsum}
 %One and half spacing
@@ -42,6 +41,9 @@
 \usepackage{pdfpages}
 %Using the .bib file
 \usepackage[superscript,biblabel]{cite}
+%Changing spacing in itemized lists
+\usepackage{enumitem}
+\setlist{itemsep=0.1pt}
 
 \begin{document}
 
@@ -71,7 +73,7 @@ The left hand side of the equation represents loss terms: $\vec{\Omega}_{m}\cdot
 
 The preferred way to solve the $S_n$ form of the transport equation is source iteration. An initial guess is made, which occupies the right hand side of Eq. \ref{transportequation}, and the next iteration of $\psi_{m,g}$ is calculated from this. This process is repeated until $\psi_{m,g}$ converges within a user-specified tolerance. The method of solving the $S_n$ transport equation on a domain discretized in space, energy, and angle is the tranpsort sweep.
 
-\section*{The Structured Transport Sweep}
+\section*{The Structured Transport Sweep (PDT)}
 
 A sweep algorithm is defined by three properties:
 
@@ -143,6 +145,12 @@ Scheduling utilizes an algorithm to assign priority to tasks. An example of this
 \item The next tiebreaker is $\Omega_z > 0$,
 \end{enumerate}
 
+Equation \ref{D} shows how to calculate the quantity $D$ for an example octant (-x,+y,-z):
+\begin{equation}
+D(-+-) = (i-1) + (P_y-j) + (k-1)
+\label{D}
+\end{equation}
+
 Another optimal scheduling algorithm (not proved) is the ``push-to-central'' algorithm. This algorithm prioritizes tasks that advance wavefronts to central planes in the processor layout. A few definitions are necessary to understand the push-to-central algorithm:
 \begin{itemize}
 \item $i \; \varepsilon \; (1,P_x) = $ the $x$ index into the processor array, with similar definitions for y and z indices, j and k,
@@ -155,9 +163,18 @@ With these definitions, The push-to-central algorithm prioritizes the following 
 \begin{enumerate}
 \item If $i \leq X$, then tasks with $\Omega_x > 0$ have priority, while for $i > X$, tasks with $\Omega_x < 0$ have priority.
 \item If multiple ready tasks have the same sign on $\Omega_x$, apply rule 1 to $j,Y,\Omega_y$.
-\item If multiple ready tasks have the same sign on $\Omega_x$ and $\Omega_y$, apply rul 1 to $k,Z, \Omega_z$.
+\item If multiple ready tasks have the same sign on $\Omega_x$ and $\Omega_y$, apply rule 1 to $k,Z, \Omega_z$.
 \end{enumerate}
 This schedule pushes tasks toward the $i = X$ central processor plane with top priority, followed by pushing toward the $j = Y$ central processor plane, followed by pushing toward the $k = Z$ central processing plane\cite{mpadams2013}.
+
+\subsection*{KBA Algorithm}
+
+The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. With the KBA algorithm, $2MN_k$ are pipelined from a given corner of the 2D processor layout. The far corner processor remains idle for the first $P_x + P_y - 2 $ stages, which means that a 2 octant sweep completes in $2MN_K + P_x + P_y - 2$ stages. If an octant-pair sweep does not begin until the previous pair's finishes, the full sweep requires $8MN_k + 4(P_x+P_y-2)$ stages, which means the KBA parallel efficiency is:
+
+\begin{equation}
+\varepsilon_{KBA} = \frac{1}{[1+\frac{4(P_x+P_y-2)}{8MN_k}][1+\frac{T_{\text{comm}}}{T_{\text{task}}}]}
+\label{eKBA}
+\end{equation}
 
 
 \section*{The Unstructured Transport Sweep}
@@ -192,7 +209,7 @@ Algorithms for for finding cycles are called \textit{cycle detection} algorithms
 
 Cycle detection utilizes two operations: trim and mark. Trimming identifies and discards elements which are not in cycles. At the beginning of cycle detection, graphs are trimmied in the downwind direction, then the remaining graphs are trimmed in the upwind direction. A pivot vertex is then selected in each graph. Graph vertices are then marked as upwind, downwind, or unmarked. Then, if any vertices are both upwind and downwind, the cycle is these vertices plus the pivot vertex. An edge is removed between 2 cycle vertices, and 4 new graphs are created: a new cycle, the upwind vertices without the cycle, the downwind vertices without the cycle, and a set of unmarked vertices. This recursively continues until all cycles are eliminated.
 
-\section*{Provable algorithms for parallel generalized sweep scheduling}
+\section*{Provable algorithms for parallel generalized sweep scheduling\cite{kumar}}
 
 Given an unstructured mesh consisting of $n$ cells, $k$ directions, and $m$ processors, the mesh induces a natural graph $G(V,E)$: where cells of the mesh correspond to vertices, and edges between vertices correspond to a shared boundary between two cells. If a direction, $i$, is present, it inducese a directed graph with an identical vertex set $V$, and a directed edge from $u$ to $v$ being present if and only if $u$ and $v$ are adjacent in $G$ and the sweep direction requires $u$ to be solved before $v$. Assuming all cycles are broken, this produces $k$ directed acyclic graphs (DAG), one for each direction $i$. 
 
@@ -245,7 +262,7 @@ N_{\text{tasks}} &= 4 N_m N_g\\
 \end{align}
 where we see that in $N_{\text{tasks}}$ we only multiply $N_m$ by 4 instead of 8, because we now deal with quadrants, not with octants.
 
-%\includepdf[fitpaper,pages={1-16}]{SweepExamples.pdf}
+\includepdf[fitpaper,pages={1-16}]{SweepExamples.pdf}
 
 \bibliographystyle{plain}
 \bibliography{LiteraryReview}
