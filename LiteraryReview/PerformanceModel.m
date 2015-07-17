@@ -1,4 +1,4 @@
-function [eff,P_total] = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P)
+function [eff] = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P,A,N)
 %PERFORMANCEMODEL: Function accepts 6 parameters
 %M_L: Latency factor, a function of increased and decreased latency
 %T_latency: The message latency times
@@ -29,12 +29,7 @@ A_z = A(3);
 N_z = P_z*A_z*4;
 N_k = N_z/(P_z*A_z);
 %The parallel efficiency
-eff = zeros(15,1);
-for i = 1:15
-    eff(i) = ((1 + (P(i,1)-4 + N_k*(P_z-2))/((8*M*G*N_k)/(A(4)*A(5))))*(1+T_comm/T_task)) ^(-1);
-end
-
-plot(P_total,eff);
+eff = ;
 
 
 end

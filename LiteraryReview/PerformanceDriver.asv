@@ -1,8 +1,6 @@
-function [] = PerformanceDriver(M_L)
+function [] = PerformanceDriver()
 %A code that optimizes the performance model for each processor layout
 %INPUT: 
-%M_L = A latency factor that dictates whether the model is high or low
-%overhead.
 %P: A 15x3 matrix that stores the breakdown of processors in x, y,
 %          and z for each total processor count.
 P = [1,1,1;2,2,2;8,4,2;16,16,2;32,16,2;32,32,2;64,32,2;64,64,2;128,64,2;128,128,2;256,128,0;256,256,2;512,256,2;512,512,2;1024,512,2];
@@ -22,26 +20,11 @@ N_bytes = [0 1280 960 640 480 480 480 320 320 320 160 160 160 80 80];
 %The parallel efficiency for a serial case is obviously 1.
 RealEff(1) = 1.0;
 for i = 2:size(P,1)
-    %This is the iterative processess to determine the optimized
-    %aggregation factors for the current cell and processor layouts.
-    %In each direction, the start point is A_u = 1, and the end point is
-    %A_u = N_u/P_u for u = x,y, or z.
+    %This is the iterative processess to determine the appropriate
+    %aggregation factors for 
     Ax_start = 1; Ax_end = N(i,1)/P(i,1);
     Ay_start = 1; Ay_end = N(i,2)/P(i,2);
     Az_start = 1; Az_end = N(i,3)/P(i,3);
-    %A dummy starting optimal efficiency
-    opt_eff = 0;
-    for a = Ax_start:Ax_end
-       for b = Ay_start:Ay_end
-           for c = Az_start:Az_end
-               A = [a b c];
-               eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes(i),T_grind,P,A,N);
-               if (eff >= opt_eff)
-                  opt_eff = eff; 
-               end
-           end
-       end
-    end
 end
 
 end
