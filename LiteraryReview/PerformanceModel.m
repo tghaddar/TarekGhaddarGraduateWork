@@ -18,7 +18,7 @@ T_comm = M_L*T_latency + T_byte*N_bytes;
 %The product of all aggregation factors multiplied together
 aggregation_product = 1;
 for i = 1:length(A)
-   aggregation_product = aggregation_product*A(i); 
+    aggregation_product = aggregation_product*A(i);
 end
 %The time to communicate a task
 T_task = aggregation_product*T_grind;

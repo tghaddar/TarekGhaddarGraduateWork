@@ -1,6 +1,6 @@
 function [RealEff] = PerformanceDriver(M_L)
 %A code that optimizes the performance model for each processor layout
-%INPUT: 
+%INPUT:
 %M_L = A latency factor that dictates whether the model is high or low
 %overhead.
 %P: A 15x3 matrix that stores the breakdown of processors in x, y,
@@ -17,7 +17,7 @@ T_byte = 4.47;
 T_grind = 3292;
 %The latency time (ns)
 T_latency = 4114.74;
-%Looping over processor counts to optimize 
+%Looping over processor counts to optimize
 N_bytes = [0 1280 960 640 480 480 480 320 320 320 160 160 160 80 80];
 %The parallel efficiency for a serial case is obviously 1.
 RealEff(1) = 1.0;
@@ -34,23 +34,23 @@ for i = 2:size(P,1)
     %A dummy starting optimal efficiency
     opt_eff = 0;
     for a = Ax_start:Ax_end
-       for b = Ay_start:Ay_end
-           for c = Az_start:Az_end
-               A = [a b c 10 1];
-               N_Current = N(i,:);
-               P_Current = P(i,:);
-               eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes(i),T_grind,P_Current,A,N_Current);
-               if (eff >= opt_eff)
-                  opt_eff = eff;
-                  RealEff(i) = opt_eff;
-               end
-           end
-       end
+        for b = Ay_start:Ay_end
+            for c = Az_start:Az_end
+                A = [a b c 10 1];
+                N_Current = N(i,:);
+                P_Current = P(i,:);
+                eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes(i),T_grind,P_Current,A,N_Current);
+                if (eff >= opt_eff)
+                    opt_eff = eff;
+                    RealEff(i) = opt_eff;
+                end
+            end
+        end
     end
 end
 
-plot(P_total,RealEff);
-title('Parallel Efficiency of PDTs Performance Model');
+semilogx(P_total,RealEff,'+-k');
+title('Parallel Efficiency of PDT''s Performance Model');
 xlabel('Processors');
 ylabel('Parallel Efficiency');
 ylim([0,1]);
