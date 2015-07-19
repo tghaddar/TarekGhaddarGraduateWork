@@ -1,4 +1,4 @@
-function [eff] = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P,A,N)
+function [eff] = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P,A,N,M)
 %PERFORMANCEMODEL: Function accepts 6 parameters
 %M_L: Latency factor, a function of increased and decreased latency
 %T_latency: The message latency times
@@ -12,6 +12,7 @@ function [eff] = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P,A,N)
 %N: The number of cells in each direction in a vector stored in the
 %   following order N_x, N_y, N_z
 %P: The P_x, P_y, P_z processors
+%M: The number of directions per octant
 
 %The time to communicate between processors
 T_comm = M_L*T_latency + T_byte*N_bytes;
@@ -27,7 +28,6 @@ A_z = A(3);
 %The number of cellsets
 N_z = N(3);
 N_k = N_z/(P(3)*A_z);
-M = 10;
 %The parallel efficiency
 eff = ((1 + (P(1)+ P(2) - 4 + N_k*(P(3)-2))/(8*M*N_k/(A(4)*A(5)))) * (1+T_comm/T_task) )^(-1);
 
