@@ -1,4 +1,4 @@
-function [RealEff,A_final,RealEff_KBA,A_finalKBA] = PerformanceDriver(M_L,n)
+function [RealEff,A_final,RealEff_KBA,A_finalKBA,A_finalVolumetric,RealEff_Volumetric] = PerformanceDriver(M_L,n)
 %A code that optimizes the performance model for each processor layout
 %INPUT:
 %M_L = A latency factor that dictates whether the model is high or low
@@ -11,6 +11,8 @@ P = [1,1,1;2,2,2;8,4,2;16,16,2;32,16,2;32,32,2;64,32,2;64,64,2;128,64,2;128,128,
 %P_KBA: A 15x3 matrix that stores the breakdown of processors for KBA
 %partitioning.
 P_KBA = [1,1,1;4,2,1;8,8,1;32,16,1;32,32,1;64,32,1;64,64,1;128,64,1;128,128,1;256,128,1;256,256,1;512,256,1;512,512,1;1024,512,1;1024,1024,1];
+%P_Volumetric
+P_Volumetric = [1,1,1;2,2,2;4,4,4;8,8,8;10,10,10;12,12,12;16,16,16;20,20,20;26,26,26;32,32,32;40,40,40;50,50,50;64,64,64;80,80,80;100,100,100];
 %N: A 15x3 matrix that stores the breakdown of cells in x,y, and z.
 N = [16,16,16;32,32,32;64,64,64;128,128,128;128,128,256;256,128,256;256,256,256;256,256,512;512,256,512;512,512,512;512,512,1024;1024,512,1024;1024,1024,1024;1024,1024,2048;2048,1024,2048];
 %The processor array, stores the breakdown of processors in x, y, and z.
@@ -63,7 +65,7 @@ for i = 2:size(P,1)
                 if (eff > opt_eff)
                     opt_eff = eff;
                     RealEff(i) = opt_eff;
-                    A_finalKBA(i,:) = [a b c];
+                    A_final(i,:) = [a b c];
                 end
             end
         end
@@ -89,16 +91,36 @@ for i = 2:size(P,1)
         N_Current = N(i,:);
         P_Current = P_KBA(i,:);
         N_bytes = 8*4*(A(1)+A(2))*A(3)*A(4)*A(5);
-        eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M/2);
+        eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M);
         if (eff > opt_eff)
             opt_eff = eff;
             RealEff_KBA(i) = opt_eff;
-            A_final(i,:) = [a b c];
+            A_finalKBA(i,:) = [a b c];
         end
     end
 end
 
-semilogx(P_total,RealEff,'+-k',P_total,RealEff_KBA,'o--r');
+%For Volumetric
+P_totalVolumetric = zeros(size(P,1),1);
+P_totalVolumetric(1) = 1;
+RealEff_Volumetric(1) = 1.0;
+A_finalVolumetric(1,:) = [1 1 1];
+for i = 2:size(P,1)
+    P_totalVolumetric(i) = P_Volumetric(i,1)*P_Volumetric(i,2)*P_Volumetric(i,3);
+    %Volumetric takes all A_u = N_u/P_u.
+    A_x = N(i,1)/P_Volumetric(i,1);
+    A_y = N(i,2)/P_Volumetric(i,2);
+    A_z = N(i,3)/P_Volumetric(i,3);
+    A = [A_x A_y A_z M 1];
+    N_Current = N(i,:);
+    P_Current = P_Volumetric(i,:);
+    N_bytes = 8*4*(A(1)+A(2))*A(3)*A(4)*A(5);
+    eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M);
+        RealEff_Volumetric(i) = opt_eff;
+        A_finalVolumetric(i,:) = [a b c];
+end
+
+semilogx(P_total,RealEff,'+-k',P_total,RealEff_KBA,'o--r',P_totalVolumetric,RealEff_Volumetric,'x:b');
 title('Parallel Efficiency of PDT''s Performance Model');
 xlabel('Processors');
 ylabel('Parallel Efficiency');
