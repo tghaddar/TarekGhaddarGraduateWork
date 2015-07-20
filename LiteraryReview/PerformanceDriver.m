@@ -62,7 +62,7 @@ for i = 2:size(P,1)
                 eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M);
                 if (eff > opt_eff)
                     opt_eff = eff;
-                    RealEff_KBA(i) = opt_eff;
+                    RealEff(i) = opt_eff;
                     A_finalKBA(i,:) = [a b c];
                 end
             end
@@ -89,10 +89,10 @@ for i = 2:size(P,1)
         N_Current = N(i,:);
         P_Current = P_KBA(i,:);
         N_bytes = 8*4*(A(1)+A(2))*A(3)*A(4)*A(5);
-        eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M);
+        eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M/2);
         if (eff > opt_eff)
             opt_eff = eff;
-            RealEff(i) = opt_eff;
+            RealEff_KBA(i) = opt_eff;
             A_final(i,:) = [a b c];
         end
     end
