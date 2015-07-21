@@ -104,7 +104,7 @@ end
 %For Volumetric
 P_totalVolumetric = zeros(size(P,1),1);
 P_totalVolumetric(1) = 1;
-RealEff_Volumetric = zeros(15,1);
+RealEff_Volumetric
 RealEff_Volumetric(1) = 1.0;
 A_finalVolumetric(1,:) = [1 1 1];
 for i = 2:size(P,1)
@@ -114,11 +114,12 @@ for i = 2:size(P,1)
     A_y = N_Volumetric(i,2)/P_Volumetric(i,2);
     A_z = N_Volumetric(i,3)/P_Volumetric(i,3);
     A = [A_x A_y A_z M 1];
+    A
     N_Current = N_Volumetric(i,:);
     P_Current = P_Volumetric(i,:);
     N_bytes = 8*4*(A(1)+A(2))*A(3)*A(4)*A(5);
     eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M);
-        RealEff_Volumetric(i) = eff;
+        RealEff_Volumetric(i) = opt_eff;
         A_finalVolumetric(i,:) = [a b c];
 end
 
@@ -127,7 +128,6 @@ title('Parallel Efficiency of PDT''s Performance Model');
 xlabel('Processors');
 ylabel('Parallel Efficiency');
 ylim([0,1]);
-legend('PDT Partioning','KBA Partitioning','Volumetric Partitioning');
 
 end
 
