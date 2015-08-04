@@ -44,6 +44,8 @@ M = n*(n+2)/8;
 if (mod(n*(n+2),8) ~= 0)
     error('M must be an integer for this performance model to work, change the value of n to an even number');
 end
+
+figure(10); clf;
 for i = 2:size(P,1)
     P_total(i) = P(i,1)*P(i,2)*P(i,3);
     %This is the iterative processess to determine the optimized
@@ -55,14 +57,16 @@ for i = 2:size(P,1)
     Az_start = 1; Az_end = N(i,3)/P(i,3);
     %A dummy starting optimal efficiency
     opt_eff = 0;
+    aux_eff{i}=zeros(0,4);
     for a = Ax_start:Ax_end
         for b = Ay_start:Ay_end
             for c = Az_start:Az_end
-                A = [a b c M 1];
+                A = [a b c 1 1];
                 N_Current = N(i,:);
                 P_Current = P(i,:);
                 N_bytes = 8*4*(A(1)+A(2))*A(3)*A(4)*A(5);
                 eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M);
+                aux_eff{i}(end+1,1:4)=[a b c eff];
                 if (eff > opt_eff)
                     opt_eff = eff;
                     RealEff(i) = opt_eff;
@@ -101,6 +105,7 @@ for i = 2:size(P,1)
     end
 end
 
+
 %For Volumetric
 P_totalVolumetric = zeros(size(P,1),1);
 P_totalVolumetric(1) = 1;
@@ -113,15 +118,16 @@ for i = 2:size(P,1)
     A_x = N_Volumetric(i,1)/P_Volumetric(i,1);
     A_y = N_Volumetric(i,2)/P_Volumetric(i,2);
     A_z = N_Volumetric(i,3)/P_Volumetric(i,3);
-    A = [A_x A_y A_z M 1];
+    A = [A_x A_y A_z 1 1];
     N_Current = N_Volumetric(i,:);
     P_Current = P_Volumetric(i,:);
     N_bytes = 8*4*(A(1)+A(2))*A(3)*A(4)*A(5);
     eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M);
-        RealEff_Volumetric(i) = eff;
-        A_finalVolumetric(i,:) = [a b c];
+    RealEff_Volumetric(i) = eff;
+    A_finalVolumetric(i,:) = [a b c];
 end
 
+figure(1)
 semilogx(P_total,RealEff,'+-k',P_total,RealEff_KBA,'o--r',P_totalVolumetric,RealEff_Volumetric,'x:b');
 title('Parallel Efficiency of PDT''s Performance Model');
 xlabel('Processors');
