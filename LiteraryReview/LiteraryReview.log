@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.9.24)  8 JUL 2015 12:25
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.9.24)  12 AUG 2015 09:01
 entering extended mode
 **LiteraryReview.tex
 
@@ -428,331 +428,39 @@ LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10.95> not available
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 170.
  [4]
-[5] <Levels.png, id=29, 283.81032pt x 194.97844pt>
+[5] [6] <Levels.png, id=33, 283.81032pt x 194.97844pt>
 File: Levels.png Graphic file (type png)
  <use Levels.png>
-Package pdftex.def Info: Levels.png used on input line 231.
+Package pdftex.def Info: Levels.png used on input line 233.
 (pdftex.def)             Requested size: 283.80962pt x 194.97795pt.
 
-Overfull \hbox (30.0pt too wide) in paragraph at lines 229--235
+Overfull \hbox (30.0pt too wide) in paragraph at lines 231--237
 $[]$ 
  []
 
-[6]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 240.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 242.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 240.
- [7 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview/
-Levels.png>] [8] <SweepExamples.pdf, id=43, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf>
-Package pdftex.def Info: SweepExamples.pdf used on input line 265.
-(pdftex.def)             Requested size: 963.59766pt x 542.02367pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf>
-Package pdftex.def Info: SweepExamples.pdf used on input line 265.
-(pdftex.def)             Requested size: 963.59766pt x 542.02367pt.
- [9]
-<SweepExamples.pdf, id=49, page=1, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 1>
-Package pdftex.def Info: SweepExamples.pdf, page1 used on input line 265.
-(pdftex.def)             Requested size: 963.59766pt x 542.02367pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 1>
-Package pdftex.def Info: SweepExamples.pdf, page1 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 1>
-Package pdftex.def Info: SweepExamples.pdf, page1 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 1>
-Package pdftex.def Info: SweepExamples.pdf, page1 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 1>
-Package pdftex.def Info: SweepExamples.pdf, page1 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [10 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=69, page=2, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 2>
-Package pdftex.def Info: SweepExamples.pdf, page2 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 2>
-Package pdftex.def Info: SweepExamples.pdf, page2 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 2>
-Package pdftex.def Info: SweepExamples.pdf, page2 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [11 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=74, page=3, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 3>
-Package pdftex.def Info: SweepExamples.pdf, page3 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 3>
-Package pdftex.def Info: SweepExamples.pdf, page3 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 3>
-Package pdftex.def Info: SweepExamples.pdf, page3 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [12 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=112, page=4, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 4>
-Package pdftex.def Info: SweepExamples.pdf, page4 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 4>
-Package pdftex.def Info: SweepExamples.pdf, page4 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 4>
-Package pdftex.def Info: SweepExamples.pdf, page4 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [13 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=117, page=5, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 5>
-Package pdftex.def Info: SweepExamples.pdf, page5 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 5>
-Package pdftex.def Info: SweepExamples.pdf, page5 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 5>
-Package pdftex.def Info: SweepExamples.pdf, page5 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [14 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=122, page=6, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 6>
-Package pdftex.def Info: SweepExamples.pdf, page6 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 6>
-Package pdftex.def Info: SweepExamples.pdf, page6 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 6>
-Package pdftex.def Info: SweepExamples.pdf, page6 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [15 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=127, page=7, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 7>
-Package pdftex.def Info: SweepExamples.pdf, page7 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 7>
-Package pdftex.def Info: SweepExamples.pdf, page7 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 7>
-Package pdftex.def Info: SweepExamples.pdf, page7 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [16 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=132, page=8, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 8>
-Package pdftex.def Info: SweepExamples.pdf, page8 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 8>
-Package pdftex.def Info: SweepExamples.pdf, page8 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 8>
-Package pdftex.def Info: SweepExamples.pdf, page8 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [17 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=137, page=9, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 9>
-Package pdftex.def Info: SweepExamples.pdf, page9 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 9>
-Package pdftex.def Info: SweepExamples.pdf, page9 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 9>
-Package pdftex.def Info: SweepExamples.pdf, page9 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [18 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=143, page=10, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 10>
-Package pdftex.def Info: SweepExamples.pdf, page10 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 10>
-Package pdftex.def Info: SweepExamples.pdf, page10 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 10>
-Package pdftex.def Info: SweepExamples.pdf, page10 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [19 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=148, page=11, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 11>
-Package pdftex.def Info: SweepExamples.pdf, page11 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 11>
-Package pdftex.def Info: SweepExamples.pdf, page11 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 11>
-Package pdftex.def Info: SweepExamples.pdf, page11 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [20 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=153, page=12, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 12>
-Package pdftex.def Info: SweepExamples.pdf, page12 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 12>
-Package pdftex.def Info: SweepExamples.pdf, page12 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 12>
-Package pdftex.def Info: SweepExamples.pdf, page12 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [21 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=158, page=13, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 13>
-Package pdftex.def Info: SweepExamples.pdf, page13 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 13>
-Package pdftex.def Info: SweepExamples.pdf, page13 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 13>
-Package pdftex.def Info: SweepExamples.pdf, page13 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [22 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=163, page=14, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 14>
-Package pdftex.def Info: SweepExamples.pdf, page14 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 14>
-Package pdftex.def Info: SweepExamples.pdf, page14 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 14>
-Package pdftex.def Info: SweepExamples.pdf, page14 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [23 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=168, page=15, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 15>
-Package pdftex.def Info: SweepExamples.pdf, page15 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 15>
-Package pdftex.def Info: SweepExamples.pdf, page15 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 15>
-Package pdftex.def Info: SweepExamples.pdf, page15 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [24 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
-<SweepExamples.pdf, id=174, page=16, 963.6pt x 542.025pt>
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 16>
-Package pdftex.def Info: SweepExamples.pdf, page16 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
- <use SweepExamples.pdf, page 16>
-Package pdftex.def Info: SweepExamples.pdf, page16 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
-File: SweepExamples.pdf Graphic file (type pdf)
-
-<use SweepExamples.pdf, page 16>
-Package pdftex.def Info: SweepExamples.pdf, page16 used on input line 265.
-(pdftex.def)             Requested size: 963.62706pt x 542.0402pt.
- [25 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview
-/SweepExamples.pdf>]
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 242.
+[7 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview/L
+evels.png>] [8]
 (C:\Users\tghaddar\Documents\GitHub\TarekGhaddarMastersWork\LiteraryReview\Lite
 raryReview.bbl)
 
 Package caption Warning: Unused \captionsetup[table] on input line 26.
 See the caption package documentation for explanation.
 
-[26]
+[9]
 (C:\Users\tghaddar\Documents\GitHub\TarekGhaddarMastersWork\LiteraryReview\Lite
 raryReview.aux) ) 
 Here is how much of TeX's memory you used:
- 5853 strings out of 493706
- 85295 string characters out of 3144574
+ 5799 strings out of 493706
+ 83889 string characters out of 3144574
  265265 words of memory out of 3000000
- 9055 multiletter control sequences out of 15000+200000
+ 9003 multiletter control sequences out of 15000+200000
  45091 words of font info for 97 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
- 39i,20n,43p,831b,434s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 36i,20n,43p,831b,416s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<
 C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Progr
 am Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files
@@ -763,9 +471,9 @@ rw/symbol/usyr.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/symbol/usyr.pfb
 ><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program File
 s/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/font
 s/type1/urw/times/utmri8a.pfb>
-Output written on LiteraryReview.pdf (27 pages, 280972 bytes).
+Output written on LiteraryReview.pdf (10 pages, 141926 bytes).
 PDF statistics:
- 215 PDF objects out of 1000 (max. 8388607)
+ 79 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 101 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
 

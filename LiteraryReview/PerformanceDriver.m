@@ -52,25 +52,39 @@ for i = 2:size(P,1)
     %aggregation factors for the current cell and processor layouts.
     %In each direction, the start point is A_u = 1, and the end point is
     %A_u = N_u/P_u for u = x,y, or z.
-    Ax_start = 1; Ax_end = N(i,1)/P(i,1);
-    Ay_start = 1; Ay_end = N(i,2)/P(i,2);
-    Az_start = 1; Az_end = N(i,3)/P(i,3);
-    %A dummy starting optimal efficiency
-    opt_eff = 0;
-    aux_eff{i}=zeros(0,4);
-    for a = Ax_start:Ax_end
-        for b = Ay_start:Ay_end
-            for c = Az_start:Az_end
-                A = [a b c 1 1];
-                N_Current = N(i,:);
-                P_Current = P(i,:);
-                N_bytes = 8*4*(A(1)+A(2))*A(3)*A(4)*A(5);
-                eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M);
-                aux_eff{i}(end+1,1:4)=[a b c eff];
-                if (eff > opt_eff)
-                    opt_eff = eff;
-                    RealEff(i) = opt_eff;
-                    A_final(i,:) = [a b c];
+    for dim = 1:3
+       if (dim == 1)
+                Ax_start = 1; Ax_end = N(i,1)/P(i,1);
+                Ay_start = N(i,2)/P(i,2); Ay_end = N(i,2)/P(i,2);
+                Az_start = N(i,3)/P(i,3); Az_end = N(i,3)/P(i,3);
+       elseif (dim == 2)
+                Ax_start = N(i,1)/P(i,1); Ax_end = N(i,1)/P(i,1);
+                Ay_start = 1; Ay_end = N(i,2)/P(i,2);
+                Az_start = N(i,3)/P(i,3); Az_end = N(i,3)/P(i,3); 
+       else
+                Ax_start = N(i,1)/P(i,1); Ax_end = N(i,1)/P(i,1);
+                Ay_start = N(i,2)/P(i,2); Ay_end = N(i,2)/P(i,2);
+                Az_start = 1; Az_end = N(i,3)/P(i,3);
+       end
+        %A dummy starting optimal efficiency
+        opt_eff = 0;
+        aux_eff{i}=zeros(0,4);
+        for a = Ax_start:Ax_end
+            for b = Ay_start:Ay_end
+                for c = Az_start:Az_end
+                    if(mod((N(i,1)/P(i,1)),a) == 0 && mod((N(i,2)/P(i,2)),b) == 0 && mod((N(i,3)/P(i,3)),c) == 0)
+                        A = [a b c 1 1];
+                        N_Current = N(i,:);
+                        P_Current = P(i,:);
+                        N_bytes = 8*4*(A(1)+A(2))*A(3)*A(4)*A(5);
+                        eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M);
+                        aux_eff{i}(end+1,1:4)=[a b c eff];
+                        if (eff > opt_eff)
+                            opt_eff = eff;
+                            RealEff(i) = opt_eff;
+                            A_final(i,:) = [a b c];
+                        end
+                    end
                 end
             end
         end
