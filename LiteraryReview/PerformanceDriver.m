@@ -53,19 +53,19 @@ for i = 2:size(P,1)
     %In each direction, the start point is A_u = 1, and the end point is
     %A_u = N_u/P_u for u = x,y, or z.
     for dim = 1:3
-       if (dim == 1)
-                Ax_start = 1; Ax_end = N(i,1)/P(i,1);
-                Ay_start = N(i,2)/P(i,2); Ay_end = N(i,2)/P(i,2);
-                Az_start = N(i,3)/P(i,3); Az_end = N(i,3)/P(i,3);
-       elseif (dim == 2)
-                Ax_start = N(i,1)/P(i,1); Ax_end = N(i,1)/P(i,1);
-                Ay_start = 1; Ay_end = N(i,2)/P(i,2);
-                Az_start = N(i,3)/P(i,3); Az_end = N(i,3)/P(i,3); 
-       else
-                Ax_start = N(i,1)/P(i,1); Ax_end = N(i,1)/P(i,1);
-                Ay_start = N(i,2)/P(i,2); Ay_end = N(i,2)/P(i,2);
-                Az_start = 1; Az_end = N(i,3)/P(i,3);
-       end
+        if (dim == 1)
+            Ax_start = 1; Ax_end = N(i,1)/P(i,1);
+            Ay_start = N(i,2)/P(i,2); Ay_end = N(i,2)/P(i,2);
+            Az_start = N(i,3)/P(i,3); Az_end = N(i,3)/P(i,3);
+        elseif (dim == 2)
+            Ax_start = N(i,1)/P(i,1); Ax_end = N(i,1)/P(i,1);
+            Ay_start = 1; Ay_end = N(i,2)/P(i,2);
+            Az_start = N(i,3)/P(i,3); Az_end = N(i,3)/P(i,3);
+        else
+            Ax_start = N(i,1)/P(i,1); Ax_end = N(i,1)/P(i,1);
+            Ay_start = N(i,2)/P(i,2); Ay_end = N(i,2)/P(i,2);
+            Az_start = 1; Az_end = N(i,3)/P(i,3);
+        end
         %A dummy starting optimal efficiency
         opt_eff = 0;
         aux_eff{i}=zeros(0,4);
