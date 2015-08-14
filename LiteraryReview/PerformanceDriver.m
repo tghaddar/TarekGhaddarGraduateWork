@@ -52,6 +52,8 @@ for i = 2:size(P,1)
     %aggregation factors for the current cell and processor layouts.
     %In each direction, the start point is A_u = 1, and the end point is
     %A_u = N_u/P_u for u = x,y, or z.
+    
+    % this if statement is to ensure we do a planar sweep in a cell-set
     for dim = 1:3
         if (dim == 1)
             Ax_start = 1; Ax_end = N(i,1)/P(i,1);
@@ -66,6 +68,7 @@ for i = 2:size(P,1)
             Ay_start = N(i,2)/P(i,2); Ay_end = N(i,2)/P(i,2);
             Az_start = 1; Az_end = N(i,3)/P(i,3);
         end
+        
         %A dummy starting optimal efficiency
         opt_eff = 0;
         aux_eff{i}=zeros(0,4);
@@ -76,6 +79,12 @@ for i = 2:size(P,1)
                         A = [a b c 1 1];
                         N_Current = N(i,:);
                         P_Current = P(i,:);
+                        % 8 bytes per real
+                        % 4 unknowns per cell face in DFEM
+                        % because with hybrid, Pz is 1 or 2 (maybe 4 at
+                        % most), the is almost never a communication need
+                        % along z so the number of element faces for which
+                        % comminucation is required is Ax*Az + Ay*Az
                         N_bytes = 8*4*(A(1)+A(2))*A(3)*A(4)*A(5);
                         eff = PerformanceModel(M_L,T_latency,T_byte,N_bytes,T_grind,P_Current,A,N_Current,M);
                         aux_eff{i}(end+1,1:4)=[a b c eff];
