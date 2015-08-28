@@ -37,3 +37,4 @@
 *.gz
 .DS_Store
 *.txt
+Thumbs.db
