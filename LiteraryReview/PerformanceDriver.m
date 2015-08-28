@@ -45,7 +45,6 @@ if (mod(n*(n+2),8) ~= 0)
     error('M must be an integer for this performance model to work, change the value of n to an even number');
 end
 
-figure(10); clf;
 for i = 2:size(P,1)
     P_total(i) = P(i,1)*P(i,2)*P(i,3);
     %This is the iterative processess to determine the optimized

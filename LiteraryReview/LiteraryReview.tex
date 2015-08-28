@@ -178,6 +178,51 @@ The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_
 
 \subsection*{Overloaded Volumetric Partitioning}
 
+The overloaded volumetric partitioning proceeds as follows:
+
+\begin{enumerate}
+\item In a 2D (3D) domain, cellsets are divided into 4 (8) spatial quadrants (octants), with an equal number of cellsets in each  SQO (SQO is defined as a spatial quadrant or octant).
+\item Assign 1/4 of the processors (1/8) in 3D to each SQO. 
+\item Choose the individual overload factors $\omega_x, \omega_y, and \omega_z$ and individual processor counts $P_x, P_y, and P_z$, such that $\omega_x \omega_y \omega_z = \omega_r$ and $P_x P_y P_z = P$, with all $P_u$ even. $\omega_u$ is defined as the number of cellsets assigned to each $P_u$.
+\item An array of $\omega_x\cdot\omega_y\cdot\omega_z$ ``tiles'' in each SQO. Each tile is an array of $1/2 P_x \cdot 1/2 P_y \cdot 1/2 P_z$ cellsets. These cellsets are mapped one-to-one to the $1/2 P_x \cdot 1/2 P_y \cdot 1/2 P_z$ procesors assigned to the SQO, using the same mapping in each tile.
+\end{enumerate}
+
+Each tile has a logically identical layout of cellsets, and each processor owns exactly one cellset in each tile in its SQO, making each processor responsible for $\omega_r$ cellsets. Figure \ref{partitioning} shows three different partitioning schemes in 2D.
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 1]{Partitioning.png}
+\captionof{figure}{Three different partitioning schemes in 2D, from left to right: hybrid KBA, volumetric non-overloaded, and volumetric overloaded.}
+\label{partitioning}
+\end{minipage}
+
+The optimal scheduling algorithm rules are as follows:
+\begin{enumerate}
+\item If $i \leq X$, then tasks with $\Omega_x > 0$ have priority, while for $i > X$, tasks with $\Omega_x < 0$ have priority.
+\item If multiple ready tasks have the same sign on $\Omega_x$, apply rule 1 to $j,Y,\Omega_y$.
+\item If multiple ready tasks have the same sign on $\Omega_x$ and $\Omega_y$, apply rule 1 to $k,Z, \Omega_z$. 
+\item If multiple tasks are ready in the same octant, then priority goes to the cellset for which the priority octant has greatest downstream depth.
+\item If multiple ready tasks are in the same octant and have the same downstream depth of graph in $x$, then priority goes to the cellset for which the priority octant has greatest downstream depth of graph in $y$.
+\item If multiple ready tasks are in the same octant and have the same downstream depth of graph in $x$ and $y$, then priority goes to the cellset for which priority octant has greatest depth of graph in $z$.
+\end{enumerate}
+This ensures that each SQO orders the octants: the one it can start right away ($A$), three that have one sign difference from$ A (B,C,$ and $D)$, three that have two sign differences ($\bar D, \bar C, \bar B$), and one in opposition to its primary ($\bar A$).
+
+There are three constraints in order to achieve the optimal stage count. In these constraints, $M = \omega_g \omega_m/8$, which is the number of tasks per octant per cellset.
+
+\begin{enumerate}
+\item $ M \geq 2(Z-1)$
+\item $\omega_z M \geq 2(Y-1)$
+\item If $\omega_x > 1$, then $\omega_y \omega_z M \geq X$
+\end{enumerate}
+
+These conditions ensure there are no idle time in a variety of situations. At large processor counts, the product $\omega_m \omega_g$ must be large. This means that a weak scaling series refined only in space, but only coarsely refined in angle and energy, will eventually fail the constraints.
+
+The optimal efficiency formula changes slightly from the KBA and hybrid KBA partitioning method in order to account for the overload factors. The only change is in the $\frac{N_{idle}}{N_{tasks}}$ term, as shown in Eq. \ref{overloadpartitioning}.
+
+\begin{equation}
+\varepsilon_{opt} = \frac{1}{[1+\frac{P_x+P_y+P_z-6}{\omega_g \omega_m \omega_r}][1+\frac{T_{\text{comm}}}{T_{\text{task}}}]}
+\label{overloadpartitioning}
+\end{equation}
 
 \section*{The Unstructured Transport Sweep}
 
