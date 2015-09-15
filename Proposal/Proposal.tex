@@ -1,4 +1,7 @@
 \documentclass[11pt, letterpaper,titlepage,oneside]{article}
+%One inch margins
+\usepackage[margin=1in]{geometry}
+%Header/footer stuff
 \usepackage{titlesec}
 \usepackage{fancyhdr}
 \fancyhf{}
@@ -9,8 +12,10 @@
 \usepackage[parfill]{parskip}
 \parskip = \baselineskip
 \setlength{\parindent}{0in}
+%Graphic Stuff
 \usepackage{xcolor,graphicx}
 \usepackage{float}
+%Math tools
 \usepackage{amsmath}
 \usepackage{mathptmx}
 \usepackage{lipsum}
@@ -18,8 +23,10 @@
 \usepackage{setspace}
 \onehalfspacing
 %End one and a half spacing
+%Algorithm
+\usepackage{algorithm}
+\usepackage{algorithmic}
 \renewcommand{\arraystretch}{1}
-\usepackage[margin=1in]{geometry}
 % Caption Formatting
 \usepackage{caption}
 \captionsetup[figure]{labelsep=period}
@@ -27,7 +34,8 @@
 \renewcommand{\tablename}{TABLE}
 \renewcommand{\thetable}{\Roman{table}}
 \usepackage{fixltx2e}
-\newcommand{\titles}{\LARGE \textbf{Literary Review}}
+%Title Page
+\newcommand{\titles}{\LARGE \textbf{Load Balancing Unstructured Meshes for Massively Parallel Transport Sweeps in PDT}}
 \newcommand{\authors}{\normalsize Tarek Ghaddar \\ Dr. Jean Ragusa}
 \newcommand{\department}{\normalsize Nuclear Engineering Department}
 \newcommand{\university}{\normalsize Texas A\&M University}
@@ -45,6 +53,7 @@
 \usepackage{enumitem}
 \setlist{nosep}
 
+
 \begin{document}
 
 \begin{titlepage}
@@ -60,23 +69,19 @@
 \end{center}
 \end{titlepage}
 
-\section*{The Transport Equation}
 
-Equation \ref{transportequation} represents the discrete ordinates ($S_n$) form of the Boltzmann transport equation, where the angular flux is discretized into a set of energy groups $g$ and angular directions $m$,
+\section{Introduction}
 
+PDT is a massively deterministic transport code that uses the transport sweep technique to solve the discrete ordinates form of the transport equation, shown in Eq. \ref{transport}:
 \begin{equation}
-\vec{\Omega}_{m}\cdot \vec\nabla \psi^{(l+1)}_{m,g} + \Sigma_{t,g}\psi_{m,g}^{(l+1)} = S_{m,g}^{(l)} + \sum_{g^\prime}\sum_{m^{\prime}}\omega_m\Sigma_{s,g^{\prime}\to g,m^\prime\to m}\psi_{m^\prime g^\prime}^{(l)}.
-\label{transportequation}
+\vec{\Omega}_{m}\cdot \vec\nabla \psi^{(l+1)}_{m,g} + \Sigma_{t,g}\psi_{m,g}^{(l+1)} = S_{m,g}^{(l)} + \sum_{g^\prime}\sum_{m^{\prime}}\omega_m\Sigma_{s,g^{\prime}\to g,m^\prime\to m}\psi_{m^\prime g^\prime}^{(l)},
+\label{transport}
 \end{equation}
+where the left hand side of the equation represents the loss terms, and the right hand side represents the gain terms. The angular flux is discretized into a set of energy groups $g$ and angular directions $m$. On the left hand side, $\vec{\Omega}_{m}\cdot \vec\nabla$ is the leakage operator and $\Sigma_{t,g}$ is the collision operator (absorption and outscatter). On the right hand sind, $S_{m,g}$ represents the external source, $\Sigma_{s,g^{\prime}\to g,m^\prime\to m}$ represents the inscatter operator, and $\omega_m$ is a weighting factor for angular direction $m$. 
 
-The left hand side of the equation represents loss terms: $\vec{\Omega}_{m}\cdot \vec\nabla$ is the leakage operator, and $\Sigma_{(t,g)}$ is the collision operator (absorption and outscatter). The right hand side represents the total source: $S_{m,g}$ represents the external source, $\Sigma_{s,g^{\prime}\to g,m^\prime\to m}$ represents the inscatter operator, and $\omega_m$ is a weighting factor for angular direction $m$. 
-
-The preferred way to solve the $S_n$ form of the transport equation is source iteration. An initial guess is made, which occupies the right hand side of Eq. \ref{transportequation}, and the next iteration of $\psi_{m,g}$ is calculated from this. This process is repeated until $\psi_{m,g}$ converges within a user-specified tolerance. The method of solving the $S_n$ transport equation on a domain discretized in space, energy, and angle is the tranpsort sweep.
-
-\section*{The Structured Transport Sweep (PDT)}
+\subsection{The Structured Transport Sweep in PDT}
 
 A sweep algorithm is defined by three properties:
-
 \begin{itemize}
 \item partitioning: dividing the domain among available processors
 \item aggregation: grouping cells, directions, and energy groups into tasks
@@ -90,10 +95,9 @@ In a regular grid, we have the  number of cells in each Cartesian direction: $N_
 If $M$ is the total number of angular directions, $G$ is the total number of energy groups, and $N$ is the total number of cells, then the total fine grain work units is $8MGN$. The factor of 8 is present as $M$ directions are swept for all 8 octants of the domain. The finest grain work unit is the calculation of a single direction and energy groups unknowns in a single cell, or $\psi_{m,g}$ for a single cell.
 
 Fine grain work units are aggregated into coarser-grained units called \textit{tasks}. A few terms are defined that describe how each variable is aggregated.
-
 \begin{itemize}
-\item $A_x = \frac{N_x}{P_x}$, where $N_x$ is the number of subsets in $x$ and $P_x$ is the number of processors in $x$
-\item $A_y = \frac{N_y}{P_y}$, where $N_y$ is the number of subsets in $y$ and $P_y$ is the number of processors in $y$
+\item $A_x = \frac{N_x}{P_x}$, where $N_x$ is the number of cells in $x$ and $P_x$ is the number of processors in $x$
+\item $A_y = \frac{N_y}{P_y}$, where $N_y$ is the number of cells in $y$ and $P_y$ is the number of processors in $y$
 \item $N_g = \frac{G}{A_g}$
 \item $N_m = \frac{M}{A_m}$
 \item $N_k = \frac{N_z}{P_z A_z}$
@@ -137,46 +141,14 @@ T_{\text{task}} = A_x A_y A_z A_m A_g T_{\text{grind}}
 \end{equation}
 where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the additional time to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. If a high value of $M_L$ is necessary for the model to match computational results, improvements should be made in code implementation.
 
-Scheduling utilizes an algorithm to assign priority to tasks. An example of this is the ``depth-of-graph'' algorithm, which gives priority to the task that has the longest chain of dependencies. In general, a quantity $D$ is defined, which is simply the number of downstream dependents each task has. Then a simple series of logicals determines which task has priority and should be executed first:
-\begin{enumerate}
-\item Tasks with higher $D$ have higher priority,
-\item If multiple tasks have the same $D$, then tasks with $\Omega_x > 0$ have priority,
-\item The next tiebreaker is $\Omega_y > 0$,
-\item The next tiebreaker is $\Omega_z > 0$,
-\end{enumerate}
+Figure \ref{partitioning} shows three different partitioning schemes used in transport sweeps. 
 
-Equation \ref{D} shows how to calculate the quantity $D$ for an example octant (-x,+y,-z):
-\begin{equation}
-D(-+-) = (i-1) + (P_y-j) + (k-1)
-\label{D}
-\end{equation}
-
-Another optimal scheduling algorithm (not proved) is the ``push-to-central'' algorithm. This algorithm prioritizes tasks that advance wavefronts to central planes in the processor layout. A few definitions are necessary to understand the push-to-central algorithm:
-\begin{itemize}
-\item $i \; \varepsilon \; (1,P_x) = $ the $x$ index into the processor array, with similar definitions for y and z indices, j and k,
-\item $X = \frac{P_x + \delta_x}{2}$,
-\item $Y = \frac{P_y + \delta_y}{2}$,
-\item $Z = \frac{P_z + \delta_z}{2}$.
-\end{itemize}
-
-With these definitions, The push-to-central algorithm prioritizes the following tasks accordingly:
-\begin{enumerate}
-\item If $i \leq X$, then tasks with $\Omega_x > 0$ have priority, while for $i > X$, tasks with $\Omega_x < 0$ have priority.
-\item If multiple ready tasks have the same sign on $\Omega_x$, apply rule 1 to $j,Y,\Omega_y$.
-\item If multiple ready tasks have the same sign on $\Omega_x$ and $\Omega_y$, apply rule 1 to $k,Z, \Omega_z$.
-\end{enumerate}
-This schedule pushes tasks toward the $i = X$ central processor plane with top priority, followed by pushing toward the $j = Y$ central processor plane, followed by pushing toward the $k = Z$ central processing plane\cite{mpadams2013}.
-
-\subsection*{KBA Algorithm}
-
-The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. With the KBA algorithm, $2MN_k$ are pipelined from a given corner of the 2D processor layout. The far corner processor remains idle for the first $P_x + P_y - 2 $ stages, which means that a 2 octant sweep completes in $2MN_K + P_x + P_y - 2$ stages. If an octant-pair sweep does not begin until the previous pair's finishes, the full sweep requires $8MN_k + 4(P_x+P_y-2)$ stages, which means the KBA parallel efficiency is:
-
-\begin{equation}
-\varepsilon_{KBA} = \frac{1}{[1+\frac{4(P_x+P_y-2)}{8MN_k}][1+\frac{T_{\text{comm}}}{T_{\text{task}}}]}
-\label{eKBA}
-\end{equation}
-
-\subsection*{Overloaded Volumetric Partitioning}
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 1]{Partitioning.png}
+\captionof{figure}{Three different partitioning schemes in 2D, from left to right: hybrid KBA, volumetric non-overloaded, and volumetric overloaded.}
+\label{partitioning}
+\end{minipage}
 
 The overloaded volumetric partitioning proceeds as follows:
 
@@ -186,15 +158,7 @@ The overloaded volumetric partitioning proceeds as follows:
 \item Choose the individual overload factors $\omega_x, \omega_y, and \omega_z$ and individual processor counts $P_x, P_y, and P_z$, such that $\omega_x \omega_y \omega_z = \omega_r$ and $P_x P_y P_z = P$, with all $P_u$ even. $\omega_u$ is defined as the number of cellsets assigned to each $P_u$.
 \item An array of $\omega_x\cdot\omega_y\cdot\omega_z$ ``tiles'' in each SQO. Each tile is an array of $1/2 P_x \cdot 1/2 P_y \cdot 1/2 P_z$ cellsets. These cellsets are mapped one-to-one to the $1/2 P_x \cdot 1/2 P_y \cdot 1/2 P_z$ procesors assigned to the SQO, using the same mapping in each tile.
 \end{enumerate}
-
-Each tile has a logically identical layout of cellsets, and each processor owns exactly one cellset in each tile in its SQO, making each processor responsible for $\omega_r$ cellsets. Figure \ref{partitioning} shows three different partitioning schemes in 2D.
-
-\noindent\begin{minipage}{\textwidth}
-\centering
-\includegraphics[scale = 1]{Partitioning.png}
-\captionof{figure}{Three different partitioning schemes in 2D, from left to right: hybrid KBA, volumetric non-overloaded, and volumetric overloaded.}
-\label{partitioning}
-\end{minipage}
+Each tile has a logically identical layout of cellsets, and each processor owns exactly one cellset in each tile in its SQO, making each processor responsible for $\omega_r$ cellsets.
 
 The optimal scheduling algorithm rules are as follows:
 \begin{enumerate}
@@ -208,24 +172,22 @@ The optimal scheduling algorithm rules are as follows:
 This ensures that each SQO orders the octants: the one it can start right away ($A$), three that have one sign difference from$ A (B,C,$ and $D)$, three that have two sign differences ($\bar D, \bar C, \bar B$), and one in opposition to its primary ($\bar A$).
 
 There are three constraints in order to achieve the optimal stage count. In these constraints, $M = \omega_g \omega_m/8$, which is the number of tasks per octant per cellset.
-
 \begin{enumerate}
 \item $ M \geq 2(Z-1)$
 \item $\omega_z M \geq 2(Y-1)$
 \item If $\omega_x > 1$, then $\omega_y \omega_z M \geq X$
 \end{enumerate}
-
 These conditions ensure there are no idle time in a variety of situations. At large processor counts, the product $\omega_m \omega_g$ must be large. This means that a weak scaling series refined only in space, but only coarsely refined in angle and energy, will eventually fail the constraints.
 
 The optimal efficiency formula changes slightly from the KBA and hybrid KBA partitioning method in order to account for the overload factors. The only change is in the $\frac{N_{idle}}{N_{tasks}}$ term, as shown in Eq. \ref{overloadpartitioning}.
-
 \begin{equation}
 \varepsilon_{opt} = \frac{1}{[1+\frac{P_x+P_y+P_z-6}{\omega_g \omega_m \omega_r}][1+\frac{T_{\text{comm}}}{T_{\text{task}}}]}
 \label{overloadpartitioning}
 \end{equation}
-\section*{The Unstructured Transport Sweep}
 
-The development of an algorithm for efficient parallel transport sweeps focuses on obtaining a good sweep ordering. This is called \textit{scheduling}. A new list scheduling algorithm has been constructed for modest levels of parallelism (up to 126 processors).
+\subsection*{The Unstructured Transport Sweep}
+
+While PDT has scaled well out to 750,000 cores, similar levels of parallel scaling have not been achieved using unstructured sweeps yet. As described by Pautz \ref{Pautz}, a new list scheduling algorithm has been constructed for modest levels of parallelism (up to 126 processors).
 
 There are three requirements for a sweep scheduling algorithm to have. First, the algorithm should have low complexity, since millions of individual tasks are swept over in a typical problem. Second, the algorithm should schedule on a set of processors that is small in comparison to the number of tasks in the sweep graph. Last, the algorithm should distribute work in the spatial dimension only, so that there is no need to communicate during the calculation of the scattering source. 
 
@@ -247,7 +209,7 @@ An important part of the algorithm above is the assigning priorities to tasks. S
 
 Nearly linear speedups were obtained on up to 126 processors. Further work is being done for scaling to thousands of processors. 
 
-\subsection*{Cycle Detection}
+\subsubsection{Cycle Detection}
 
 A cycle is a loop in a directed graph. These occur commonly in unstructred meshes. The problem with cycles is that they can cause hang time in the problem, as a processor will wait for a message that might will never come. This means that the computation for one or more elements will never be completed. The solution to this is to ``break'' any cycles that exist by removing an edge of the task dependence graph (TDG). Old flux information is used on a particular element face in the domain. Most of the time, the edge removed is oriented obliquely with respect to the radiation direction. 
 
@@ -255,62 +217,77 @@ Algorithms for for finding cycles are called \textit{cycle detection} algorithms
 
 Cycle detection utilizes two operations: trim and mark. Trimming identifies and discards elements which are not in cycles. At the beginning of cycle detection, graphs are trimmied in the downwind direction, then the remaining graphs are trimmed in the upwind direction. A pivot vertex is then selected in each graph. Graph vertices are then marked as upwind, downwind, or unmarked. Then, if any vertices are both upwind and downwind, the cycle is these vertices plus the pivot vertex. An edge is removed between 2 cycle vertices, and 4 new graphs are created: a new cycle, the upwind vertices without the cycle, the downwind vertices without the cycle, and a set of unmarked vertices. This recursively continues until all cycles are eliminated.
 
-\section*{Provable algorithms for parallel generalized sweep scheduling\cite{kumar}}
+\section{Motivation and Proposed Method for Load Balancing in PDT}
 
-Given an unstructured mesh consisting of $n$ cells, $k$ directions, and $m$ processors, the mesh induces a natural graph $G(V,E)$: where cells of the mesh correspond to vertices, and edges between vertices correspond to a shared boundary between two cells. If a direction, $i$, is present, it inducese a directed graph with an identical vertex set $V$, and a directed edge from $u$ to $v$ being present if and only if $u$ and $v$ are adjacent in $G$ and the sweep direction requires $u$ to be solved before $v$. Assuming all cycles are broken, this produces $k$ directed acyclic graphs (DAG), one for each direction $i$. 
+When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to ``balance'' the number of cells. Ideally, each processor will be responsible for an equal number of cells. 
 
-An instance of a sweep scheduling (SS) problem is given by a vertex set $V$ (or the cells in the unstructured mesh), $k$ DAGs $G_i(V_i,E_i)$, and $m$ processors. A feasible solution to this problem is a schedule that processes the $k$ DAGs, so that the following constraints are satisfied:
-\begin{enumerate}
-\item The precedence constraints for each DAG $G_i(V_i,E_i)$ must be satisfied. If a directed edge goes from $u$ to $v$, task $(u,i)$ must be processed before task $(v,i)$ can be started.
-\item Each processor can process one task at a time, and a task cannot be pre-empted.
-\item Every copy of vertex $v$ must be processed on the same processor for each direction $i$. 
-\end{enumerate}
+When using the unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). This is a list of vertices and the straight line segments connecting them. The mesh generator being used is the Triangle Mesh Generator \ref{triangle}, so the PSLG input is described by a Triangle .poly file. In order to parallelize the sweep, the user determines how many ``subsets'', he/she would like to subdivide the PSLG into. A series of cut planes in $x$ and $y$ are laid over the PSLG, creating an overlaid regular Cartesian grid. Each convex, orthogonal unit created by the grid is termed a ``subset''. Subsets then become the base structured unit when calculating our parallel efficiency. Subsets are created and meshed in parallel. Within each subset lies an unstructured triangular meshed. Discontinuities along the boundary are fixed by ``stitching'' across hanging nodes, creating degenerate polygons along subset boundaries. Because PDT's spatial discretization employs Piece-wise Linear Discontinuous (PWLD) finite element basis functions, there is no problem solving on degenerate polygons. 
 
-\subsection*{Levels}
-
-Given $k$ DAGs $G_i(V_i,E_i)$, levels (or layers) can be formed where in DAG $G_i(V_i,E_i)$, layer $L_{i,j}$ is the set of vertices with no predecessors after vertices $L_{i,1}\cup\cdots\cup L_{i,j-1}$ have been deleted. Figure \ref{levels} shows how levels are formed from DAG $G_{i}$. It's clear that vertex (7,$i$) is a leaf (has an out-degree of 0), and vertex (1,$i$) is a root (has an in-degree of 0).
-
-\bigskip
+If the number of cells in each subset can be reasonably balanced, then the problem is effectively load balanced. The Load Balance algorithm described on the next page details how the subsets will be load balanced. In summary, the procedure of the algorithm involves moving the initially user specified $x$ and $y$ cut planes, re-meshing, and iterating until a reasonably load balanced problem is obtained. 
 
 \noindent\begin{minipage}{\textwidth}
-\centering
-\includegraphics[scale = 1]{Levels.png}
-\captionof{figure}{Levels of DAG $G_{i}$.}
-\label{levels}
+\textbf{Load Balance:} A load balancing algorithm that equalizes the number of triangles per subset. \\
+\rule{\textwidth}{0.4pt}
+\begin{algorithmic}
+\STATE  $I,J$ subsets specified by user
+
+\STATE Mesh all subsets
+
+\STATE  $N_{tot} = $ total number of triangles
+\STATE  $N_{ij} = $ number of triangles in subset $ij$
+
+\STATE $f =\underset{ij}{\text{max}}(N_{ij})/\frac{N_{tot}}{I\cdot J}$
+
+\COMMENT {//Check if all subsets meet the tolerance}
+\IF {$f < \text{tol}_{\text{subset}}$}
+	\STATE DONE with load balancing
+\ELSE
+	\STATE $f_I = \underset{i}{\text{max}}[\sum_{j} N_{ij}]/\frac{N_{tot}}{I}$
+	
+	\STATE $f_J = \underset{j}{\text{max}}[\sum_{i} N_{ij}]/\frac{N_{tot}}{J}$
+	
+	\IF {$f_I > \text{tol}_{\text{row}}$}
+		\STATE \textbf{Redistribute}($X_i$)
+	\ENDIF
+	
+	\IF{$f_J > \text{tol}_{\text{col}}$}
+		\STATE \textbf{Redistribute}($Y_j$)
+	\ENDIF 
+	
+	\IF {redistribution occured}
+		\STATE REMESH and repeat algorithm
+	\ENDIF
+	
+\ENDIF
+
+\IF {There is still a discrepancy amongst subsets}
+     \STATE Move cutplane segments on the subset level and remesh (may require changes to scheduling algorithm)
+\ENDIF
+\end{algorithmic}
+\rule{\textwidth}{0.4pt}
 \end{minipage}
 
-\subsection*{List Scheduling}
 
-In list scheduling, a priority may be assigned to each task (recall that a task is defined as the computation of a cell-direction pair). If no priorities are assigned to tasks, then all tasks have the same priority. A task is ready if it has not been processed yet, but all of it's ancestors in the dependence graph have been processed. For a timestep $t$, $R(t)\subset V\text{x}\{1,\ldots,k\}$ denotes the subset of tasks that are ready. $R_P(t)\subset R(t)$ denote the subset of tasks that are ready and allowed to be processed by processor $P$. The list scheduling algorithm proceeds such that for each timestep $t$, it assigns to each processor $P$ the task of highest (or lowest) priority in $R_P(t)$, with ties broken arbitrarily. Processor $P$ is idle at time $t$ if $R_P(t)$ is empty. 
+\section{Preliminary Results}
 
-\subsection*{Improved random delay algorithm O(log $m$ log log log $m$)}
-\begin{enumerate}
-\item \textbf{Preprocessing}: Construct a new set of levels $L_i^{\prime}$ for each direction $i$ as follows:
+Unstructured meshing capability has been placed in PDT, Figure coming to showcase it (probably C5G7 reactor mesh). 
+
+\section{Goals and Proposed Plan}
+
+\subsection{Completed Work}
 \begin{itemize}
-\item Construct new DAG $H$, that combines all $G_i$'s, and viewing all copies of $(v,i)$ of vertex $v$ as distinct.
-\item Run standard list schedulingi algorithm on $H$ with $m$ identical parallel machines, with $T$ being the makespan of this schedule.
+\item Unstructured meshing capability in PDT.
 \end{itemize}
-\item For all $i$, choose $X_i \varepsilon \{0,\ldots,k-1\}$ uniformly at random.
-\item Form a combined DAG $G^{\prime\prime}$ as follows: $\forall r \varepsilon \{1,\ldots,T+k-1\}$, define $L_r^{\prime\prime} = \bigcup_{\{i:X_i<r\}}L^\prime_{i,r-X_i}$.
-\item For each vertex $v$, choose a processor uniformly at random from \{1,\ldots,$m$\}.
-\item Construct a schedule by processing layers $L_1^{\prime\prime},L_2^{\prime\prime},\ldots$ sequentially in that order.
-\end{enumerate}
 
-\newpage
+\subsection{Planned Work}
+\begin{itemize}
+\item Implement load balancing algorithm for unstructured meshes in PDT.
+\end{itemize}
 
-\section*{Sweep Example}
+\subsection{Possibly achieved tasks}
+\begin{itemize}
+\item Propose a scaling study for unstructured meshes in PDT, similar to the infamous Zerr problem.
+\end{itemize}
 
-Here I will cover an example of a 2D processor layout with different aggregation factors, graphically and mathematically verifying the performance models for different partitioning parameters. It is important to note that in 2D, with $P_z$ and $A_z$ equal to 1, Eqs. \ref{nfill}, and \ref{ntasks} change slightly due to the lack of $z$ dependence. Equation \ref{updaten} shows the new expressions for $N_{\text{fill}}$ and $N_{\text{tasks}}$:
-\begin{align}
-N_{\text{fill}} &= \frac{P_x + \delta_x}{2} - 1 + \frac{P_y + \delta_y}{2} - 1 \\
-N_{\text{tasks}} &= 4 N_m N_g\\
-\label{updaten}
-\end{align}
-where we see that in $N_{\text{tasks}}$ we only multiply $N_m$ by 4 instead of 8, because we now deal with quadrants, not with octants.
-
-%\includepdf[fitpaper,pages={1-16}]{SweepExamples.pdf}
-
-\bibliographystyle{plain}
-\bibliography{LiteraryReview}
 
 \end{document}

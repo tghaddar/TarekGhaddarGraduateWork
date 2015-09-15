@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.9.24)  28 AUG 2015 08:59
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.9.24)  15 SEP 2015 15:39
 entering extended mode
 **LiteraryReview.tex
 
@@ -427,8 +427,8 @@ LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10.95> not available
  [1] [2] [3]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 170.
- [4]
-<Partitioning.png, id=25, 344.03531pt x 118.19156pt>
+
+<Partitioning.png, id=22, 344.03531pt x 118.19156pt>
 File: Partitioning.png Graphic file (type png)
  <use Partitioning.png>
 Package pdftex.def Info: Partitioning.png used on input line 194.
@@ -438,8 +438,8 @@ Overfull \hbox (30.0pt too wide) in paragraph at lines 192--198
 $[]$ 
  []
 
-[5 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview/P
-artitioning.png>] [6] [7] <Levels.png, id=39, 283.81032pt x 194.97844pt>
+[4] [5 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryRevi
+ew/Partitioning.png>] [6] [7] <Levels.png, id=39, 283.81032pt x 194.97844pt>
 File: Levels.png Graphic file (type png)
 
 <use Levels.png>
@@ -450,43 +450,46 @@ Overfull \hbox (30.0pt too wide) in paragraph at lines 275--281
 $[]$ 
  []
 
-[8]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 286.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 286.
- [9 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview/
-Levels.png>] [10]
+[8 <C:/Users/tghaddar/Documents/GitHub/TarekGhaddarMastersWork/LiteraryReview/L
+evels.png>] [9]
 (C:\Users\tghaddar\Documents\GitHub\TarekGhaddarMastersWork\LiteraryReview\Lite
 raryReview.bbl)
 
 Package caption Warning: Unused \captionsetup[table] on input line 26.
 See the caption package documentation for explanation.
 
-[11]
+[10]
 (C:\Users\tghaddar\Documents\GitHub\TarekGhaddarMastersWork\LiteraryReview\Lite
-raryReview.aux) ) 
+raryReview.aux)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
 Here is how much of TeX's memory you used:
  5806 strings out of 493706
  84024 string characters out of 3144574
- 265283 words of memory out of 3000000
+ 265267 words of memory out of 3000000
  9009 multiletter control sequences out of 15000+200000
  45091 words of font info for 97 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
- 36i,20n,43p,831b,350s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<
-C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Progr
-am Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files
-/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2
-.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts
-/type1/public/amsfonts/cm/cmtt10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/u
-rw/symbol/usyr.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/symbol/usyr.pfb
-><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program File
-s/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/font
-s/type1/urw/times/utmri8a.pfb>
-Output written on LiteraryReview.pdf (12 pages, 173983 bytes).
+ 36i,20n,43p,831b,410s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/fontname/8r.enc}<C:/Program File
+s/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Program Files/MiKTeX
+ 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MiKTeX 2.9/fon
+ts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/
+public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/a
+msfonts/cm/cmtt10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/symbol/usyr.
+pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/symbol/usyr.pfb><C:/Program Fi
+les/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fo
+nts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/tim
+es/utmri8a.pfb>
+Output written on LiteraryReview.pdf (11 pages, 173337 bytes).
 PDF statistics:
- 87 PDF objects out of 1000 (max. 8388607)
+ 84 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  11 words of extra memory for PDF output out of 10000 (max. 10000000)
 
