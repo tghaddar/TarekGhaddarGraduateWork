@@ -187,7 +187,7 @@ The optimal efficiency formula changes slightly from the KBA and hybrid KBA part
 
 \subsection*{The Unstructured Transport Sweep}
 
-While PDT has scaled well out to 750,000 cores, similar levels of parallel scaling have not been achieved using unstructured sweeps yet. As described by Pautz \ref{Pautz}, a new list scheduling algorithm has been constructed for modest levels of parallelism (up to 126 processors).
+While PDT has scaled well out to 750,000 cores, similar levels of parallel scaling have not been achieved using unstructured sweeps yet. As described by Dr. Shawn Pautz \cite{Pautz}, a new list scheduling algorithm has been constructed for modest levels of parallelism (up to 126 processors).
 
 There are three requirements for a sweep scheduling algorithm to have. First, the algorithm should have low complexity, since millions of individual tasks are swept over in a typical problem. Second, the algorithm should schedule on a set of processors that is small in comparison to the number of tasks in the sweep graph. Last, the algorithm should distribute work in the spatial dimension only, so that there is no need to communicate during the calculation of the scattering source. 
 
@@ -267,6 +267,35 @@ If the number of cells in each subset can be reasonably balanced, then the probl
 \rule{\textwidth}{0.4pt}
 \end{minipage}
 
+\bigskip
+
+\noindent\begin{minipage}{\textwidth}
+\textbf{Redistribute:} A function that moves cut lines in either X or Y. \\
+\rule{\textwidth}{0.4pt}
+\begin{algorithmic}
+\STATE \textbf{Input:}CutLines (X or Y vector that stores cut lines). 
+\STATE \textbf{Input:} num\_tri\_row or num\_tri\_col, a pArray containing number of triangles in each row or column 
+\STATE \textbf{Input:} The total number of triangles in the domain, $N_{tot}$
+
+\STATE stapl::array\_view num\_tri\_view, over num\_tri\_row/column
+\STATE stapl::array\_vew offset\_view
+
+\STATE stapl::partial\_sum(num\_tri\_view) \COMMENT {Perform prefix sum}
+
+\COMMENT {We now have a cumulative distribution stored in offset\_view}
+
+\FOR {$i = 1$ :CutLines.size()-1}
+
+	\STATE vector <double> pt1 = [CutLines(i-1), offset\_view(i-1)]
+	\STATE vector <double> pt2 = [CutLines(i), offset\_view(i)]
+	\STATE ideal\_value = $i\cdot \frac{N_{tot}}{\text{CutLines.size()}-1}$
+	\STATE X-intersect(pt1,pt2,ideal\_value) \COMMENT{Calculates the X-intersect of the line formed by pt1 and pt2 and the line y = ideal\_value.}
+	\STATE CutLines(i) = X-intersect
+\ENDFOR
+\end{algorithmic}
+\rule{\textwidth}{0.4pt}
+\end{minipage}
+
 
 \section{Preliminary Results}
 
@@ -289,5 +318,7 @@ Unstructured meshing capability has been placed in PDT, Figure coming to showcas
 \item Propose a scaling study for unstructured meshes in PDT, similar to the infamous Zerr problem.
 \end{itemize}
 
+\bibliographystyle{plain}
+\bibliography{./Proposal}
 
 \end{document}
