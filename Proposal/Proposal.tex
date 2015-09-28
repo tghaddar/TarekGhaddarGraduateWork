@@ -53,8 +53,11 @@
 \usepackage{enumitem}
 \setlist{nosep}
 
+\newcommand{\tcr}[1]{\textcolor{red}{#1}}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{titlepage}
 \begin{center}
@@ -70,7 +73,17 @@
 \end{titlepage}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tcr{don't talk about PDT here\\
+TE first, one-speed, non SN form keep the integro-differential aspects\\
+then introduce SI, ell, q =rhs= total src = scat from prev iter+ext\\
+then introduce directions, m\\
+discont approx, Reed LANL 1973}
 
 PDT is a massively deterministic transport code that uses the transport sweep technique to solve the discrete ordinates form of the transport equation, shown in Eq. \ref{transport}:
 \begin{equation}
@@ -79,14 +92,36 @@ PDT is a massively deterministic transport code that uses the transport sweep te
 \end{equation}
 where the left hand side of the equation represents the loss terms, and the right hand side represents the gain terms. The angular flux is discretized into a set of energy groups $g$ and angular directions $m$. On the left hand side, $\vec{\Omega}_{m}\cdot \vec\nabla$ is the leakage operator and $\Sigma_{t,g}$ is the collision operator (absorption and outscatter). On the right hand sind, $S_{m,g}$ represents the external source, $\Sigma_{s,g^{\prime}\to g,m^\prime\to m}$ represents the inscatter operator, and $\omega_m$ is a weighting factor for angular direction $m$. 
 
-\subsection{The Structured Transport Sweep in PDT}
+\tcr{brief intro to PDT, mostly the parallel aspects}
 
-A sweep algorithm is defined by three properties:
+\section{lit review}
+
+\tcr{simpler introduction sweep: solve on a cell-by-cell basis}
+
+A \tcr{parallel} sweep algorithm is defined by three properties:
 \begin{itemize}
 \item partitioning: dividing the domain among available processors
 \item aggregation: grouping cells, directions, and energy groups into tasks
 \item scheduling: choosing which task to execute if more than one is available
 \end{itemize}
+
+\tcr{and the others ... lit review\\
+PARTISN manual KBA, Denovo KBA\\
+Pautz}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{SWEEPS}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tcr{motivate why we talk about structured sweeps first}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Structured Transport Sweep in PDT}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 If $M$ is the total number of angular directions, $G$ is the total number of energy groups, and $N$ is the total number of cells, then the total fine grain work units is $8MGN$. The factor of 8 is present as $M$ directions are swept for all 8 octants of the domain. The finest grain work unit is the calculation of a single direction and energy groups unknowns in a single cell, or $\psi_{m,g}$ for a single cell.
 
@@ -185,7 +220,12 @@ The optimal efficiency formula changes slightly from the KBA and hybrid KBA part
 \label{overloadpartitioning}
 \end{equation}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{The Unstructured Transport Sweep}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tcr{avoid repeats from intro}
+
 
 While PDT has scaled well out to 750,000 cores, similar levels of parallel scaling have not been achieved using unstructured sweeps yet. As described by Dr. Shawn Pautz \cite{Pautz}, a new list scheduling algorithm has been constructed for modest levels of parallelism (up to 126 processors).
 
@@ -303,17 +343,23 @@ Unstructured meshing capability has been placed in PDT, Figure coming to showcas
 
 \section{Goals and Proposed Plan}
 
-\subsection{Completed Work}
+%\subsection{Completed Work}
 \begin{itemize}
-\item Unstructured meshing capability in PDT.
+\item Unstructured meshing capability in PDT.\tcr{2D + 2D extruded}
+\item {Parallel meshing: ...}
+\item {Stitching between meshed subdomains}
+%\end{itemize}
+
+%\subsection{Planned Work}
+%\begin{itemize}
+\item Implement load balancing algorithm for unstructured meshes in PDT. \tcr{Metric definition}
+\item Code verification, testing
+\item Parallel sweep results 
 \end{itemize}
 
-\subsection{Planned Work}
-\begin{itemize}
-\item Implement load balancing algorithm for unstructured meshes in PDT.
-\end{itemize}
+%\subsection{Possibly achieved tasks}
+\tcr{possible outlook for the research}
 
-\subsection{Possibly achieved tasks}
 \begin{itemize}
 \item Propose a scaling study for unstructured meshes in PDT, similar to the infamous Zerr problem.
 \end{itemize}
