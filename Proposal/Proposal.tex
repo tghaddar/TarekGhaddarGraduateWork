@@ -36,7 +36,7 @@
 \usepackage{fixltx2e}
 %Title Page
 \newcommand{\titles}{\LARGE \textbf{Load Balancing Unstructured Meshes for Massively Parallel Transport Sweeps in PDT}}
-\newcommand{\authors}{\normalsize Tarek Ghaddar \\ Dr. Jean Ragusa}
+\newcommand{\authors}{\normalsize Tarek Ghaddar \\ Chair: Dr. Jean Ragusa \\ Committee: Dr. Jim Morel, Dr. Bojan Popov}
 \newcommand{\department}{\normalsize Nuclear Engineering Department}
 \newcommand{\university}{\normalsize Texas A\&M University}
 \newcommand{\locations}{\normalsize College Station, TX, 77843-3133}
@@ -85,44 +85,54 @@ then introduce SI, ell, q =rhs= total src = scat from prev iter+ext\\
 then introduce directions, m\\
 discont approx, Reed LANL 1973}
 
-PDT is a massively deterministic transport code that uses the transport sweep technique to solve the discrete ordinates form of the transport equation, shown in Eq. \ref{transport}:
+The steady-state neutron transport equation describes the behavior of neutrons in a medium, and is given by Eq. \ref{continuous transport}:
+\begin{equation}
+\vec{\Omega}\cdot \vec\nabla \psi +\Sigma_t\psi  = S_{ext} + \frac{\chi}{4\pi}\int_{0}^{\infty}dE_i \nu\Sigma_f\phi + \int_{0}^{\infty}dE_i \int\int_{4\pi}d\Omega_i \Sigma_s(E_i\to E, \Omega_i\to\Omega)\psi,
+\label{continuous transport}
+\end{equation}
+where $\vec{\Omega}_{m}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the collision term (absorption and outscatter). These are the loss terms of the neutron transport equation. The right hand side of Eq. \ref{continuous transport} represent the gain terms, where $S_{ext}$ is the external source of neutrons, $\frac{\chi}{4\pi}\int_{0}^{\infty}dE_i \nu\Sigma_f\phi$ is the fission term, and $\int_{0}^{\infty}dE_i \int\int_{4\pi}d\Omega_i \Sigma_s(E_i\to E, \Omega_i\to\Omega)\psi$ is the inscatter term, which represents all neutrons scattering in from energy $E_i$, as well as neutrons scattering in from energy $\Omega_i$.
+
+Often, we like to solve the transport equation just for one group and one direction of neutrons. This results in the inscatter term dropping from the equation, as we've made the assumption that all neutrons will exist at one energy. As a result, we only care about neutrons that will no longer be at that energy. Thus our only neutron gain is from the external source and from fission. However, we also often wish to solve for several groups of neutrons, and Eq. \ref{multigroup} is used for this multigroup approach:
+\begin{equation}
+\vec{\Omega}\cdot \vec\nabla\psi_g + \Sigma_{t,g}\psi_g = S_g + \sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}\psi_{g},
+\label{multigroup}
+\end{equation}
+where for convenience, we have combined the fission term and external source term into one source term, $S_g$. The subscript $g$ represents the current energy group. The last term on the right hand side we see represents the summation of neutrons scattered in from all groups $g^{\prime}$ into current group $g$.
+
+All that's left is to add in the consideration of inscatter from neutrons traveling in different directions, shown in Eq. \ref{discretetransport}:
 \begin{equation}
 \vec{\Omega}_{m}\cdot \vec\nabla \psi^{(l+1)}_{m,g} + \Sigma_{t,g}\psi_{m,g}^{(l+1)} = S_{m,g}^{(l)} + \sum_{g^\prime}\sum_{m^{\prime}}\omega_m\Sigma_{s,g^{\prime}\to g,m^\prime\to m}\psi_{m^\prime g^\prime}^{(l)},
-\label{transport}
+\label{discretetransport}
 \end{equation}
-where the left hand side of the equation represents the loss terms, and the right hand side represents the gain terms. The angular flux is discretized into a set of energy groups $g$ and angular directions $m$. On the left hand side, $\vec{\Omega}_{m}\cdot \vec\nabla$ is the leakage operator and $\Sigma_{t,g}$ is the collision operator (absorption and outscatter). On the right hand sind, $S_{m,g}$ represents the external source, $\Sigma_{s,g^{\prime}\to g,m^\prime\to m}$ represents the inscatter operator, and $\omega_m$ is a weighting factor for angular direction $m$. 
+where we have added the subscript $m$ and an extra summation of all directions $m^{\prime}$ scattering into direction $m$. Also shown is the superscript $l$, which introduces the concept of source iteration. Source iteration is a fundamental concept of the transport sweeps. The total source term is calculated, a sweep is performed, and is repeated until the $\psi^{(l+1)}-\psi^{(l)}$ converges to a specified tolerance.
+
+Transport sweeps on unstructured meshes would not be possible without the work on the discontinuous finite element approximation performed by Reed and Willis at Los Alamos and the University of California\cite{Reed}. 
 
 \tcr{brief intro to PDT, mostly the parallel aspects}
 
-\section{lit review}
+PDT is Texas A\&M University's massively parallel deterministic transport code. It is capable of multi-group simulations, and employs discrete ordinates for angular discretization. Types of simulations include steady-state, time-dependent, criticality, and depletion simulations. It solves the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation. PDT  has been shown to scale on logically Cartesian grids out to 750,000 cores. All work proposed in this document has been and will be implemented in PDT. 
 
-\tcr{simpler introduction sweep: solve on a cell-by-cell basis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Previous work and Transport Sweeps}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tcr{motivate why we talk about structured sweeps first}
 
-A \tcr{parallel} sweep algorithm is defined by three properties:
+A transport sweep is set up by overlaying a domain with a finite element mesh. This divides the domain into a mesh of cells. The sweep then solves the transport equation cell by cell using a discontinuous finite element approach.
+
+A parallel sweep algorithm is defined by three properties:
 \begin{itemize}
 \item partitioning: dividing the domain among available processors
 \item aggregation: grouping cells, directions, and energy groups into tasks
 \item scheduling: choosing which task to execute if more than one is available
 \end{itemize}
 
-\tcr{and the others ... lit review\\
-PARTISN manual KBA, Denovo KBA\\
-Pautz}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{SWEEPS}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\tcr{motivate why we talk about structured sweeps first}
+The basic concepts of parallel transport sweeps, partitioning, aggregation, and scheduling, are most easily described in the context of a structured transport sweep. A structured transport sweep takes place on a quadrilateral cartesian mesh. Furthermore, the work proposed utilizes aspects of the structured transport sweep.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Structured Transport Sweep in PDT}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
 If $M$ is the total number of angular directions, $G$ is the total number of energy groups, and $N$ is the total number of cells, then the total fine grain work units is $8MGN$. The factor of 8 is present as $M$ directions are swept for all 8 octants of the domain. The finest grain work unit is the calculation of a single direction and energy groups unknowns in a single cell, or $\psi_{m,g}$ for a single cell.
 
 In a regular grid, we have the  number of cells in each Cartesian direction: $N_x, N_y, N_z$. These cells are aggregated into ``cellsets''. However, in an unstructured mesh, the number of cells cannot be described as such. In PDT specifically we initially subdivide the domain into subsets, which are just rectangular subdomains. Within each subset, an unstructured mesh is created. This creates a pseudo-regular grid. These subsets become the $N_x, N_y, N_z$ equivalent for an unstructured mesh. The spatial aggregation in a PDT unstructured mesh is done by aggregating subsets into cellsets. 
@@ -218,6 +228,16 @@ The optimal efficiency formula changes slightly from the KBA and hybrid KBA part
 \begin{equation}
 \varepsilon_{opt} = \frac{1}{[1+\frac{P_x+P_y+P_z-6}{\omega_g \omega_m \omega_r}][1+\frac{T_{\text{comm}}}{T_{\text{task}}}]}
 \label{overloadpartitioning}
+\end{equation}
+
+\subsection*{KBA Partitioning}
+
+Several parallel transport sweep codes use KBA partitioning in their sweeping, such as Denovo \cite{denovo} and PARTISAN\cite{partisan}.
+
+The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. With the KBA algorithm, $2MN_k$ are pipelined from a given corner of the 2D processor layout. The far corner processor remains idle for the first $P_x + P_y - 2 $ stages, which means that a 2 octant sweep completes in $2MN_K + P_x + P_y - 2$ stages. If an octant-pair sweep does not begin until the previous pair's finishes, the full sweep requires $8MN_k + 4(P_x+P_y-2)$ stages, which means the KBA parallel efficiency is:
+\begin{equation}
+\varepsilon_{KBA} = \frac{1}{[1+\frac{4(P_x+P_y-2)}{8MN_k}][1+\frac{T_{\text{comm}}}{T_{\text{task}}}]}
+\label{eKBA}
 \end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -345,21 +365,21 @@ Unstructured meshing capability has been placed in PDT, Figure coming to showcas
 
 %\subsection{Completed Work}
 \begin{itemize}
-\item Unstructured meshing capability in PDT.\tcr{2D + 2D extruded}
-\item {Parallel meshing: ...}
-\item {Stitching between meshed subdomains}
+\item Unstructured meshing capability in PDT for 2D and 2D extruded problems.\tcr{2D + 2D extruded}
+\item {Unstructured meshing is generated in parallel using the same partitioning scheme and number of processors as the sweep.}
+\item {Stitching between meshed subdomains to preserve interface continuity.}
 %\end{itemize}
 
 %\subsection{Planned Work}
 %\begin{itemize}
-\item Implement load balancing algorithm for unstructured meshes in PDT. \tcr{Metric definition}
-\item Code verification, testing
-\item Parallel sweep results 
+\item Implement load balancing algorithm for unstructured meshes in PDT. A load balanced problem would be defined by $f$ in the pseudocode, or the subset with the maximum number of cells, divided by the average number of cells per subset.\tcr{Metric definition}
+\item Code verification and testing to prove load balancing algorithm effectiveness. 
+\item Results of the parallel transport sweeps for benchmark problems.
 \end{itemize}
 
-%\subsection{Possibly achieved tasks}
 \tcr{possible outlook for the research}
 
+\subsection{Possibly Outlook for Research}
 \begin{itemize}
 \item Propose a scaling study for unstructured meshes in PDT, similar to the infamous Zerr problem.
 \end{itemize}
