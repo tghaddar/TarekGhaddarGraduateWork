@@ -81,52 +81,63 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\tcr{don't talk about PDT here\\
-TE first, one-speed, non SN form keep the integro-differential aspects\\
-then introduce SI, ell, q =rhs= total src = scat from prev iter+ext\\
-then introduce directions, m\\
-discont approx, Reed LANL 1973}
-
 The steady-state neutron transport equation describes the behavior of neutrons in a medium, and is given by Eq. \ref{continuous transport}:
 \begin{equation}
 \vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  =
-\int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo') 
+\int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo') 
 + S_{ext}(\vr,E,\vo) ,
 \label{continuous transport}
 \end{equation}
 where $\vec{\Omega}_{m}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption and outscatter). These are the loss terms of the neutron transport equation. The right hand side of Eq. \ref{continuous transport} represent the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into energy $dE$ about $E$ and $d\Omega$ about direction $\vo$.
-\tcr{in your version you called $\Omega_i$ an energy. Why?}
 
-Often, we like to solve the transport equation just for one group and one direction of neutrons \tcr{no}. 
-This results in the inscatter term dropping from the equation \tcr{you need to spend some time on my sweep tasks and report your progress and ask questions, what you are saying here is very incorrect}, as we've \tcr{do not use contraction} made the assumption that all neutrons will exist at one energy. As a result, we only care about neutrons that will no longer be at that energy. Thus our only neutron gain is from the external source and from fission \tcr{I removed fission. It does not contribute to the clarity of the document, nor is it relevant to the problem at hand}. \tcr{that was a long and convoluted sentence to arrive at the multigroup expression. Think this over} However, we also often wish to solve for several groups of neutrons, and Eq. \ref{multigroup} is used for this multigroup approach:
+In order to solve this equation, a couple of assumptions and approximations are used. First, we assume isotropic scattering, which turns Eq. \ref{continuous transport} into:
 \begin{equation}
-\vec{\Omega}\cdot \vec\nabla\psi_g + \Sigma_{t,g}\psi_g = S_g + \sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}\psi_{g},
+\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  =
+\frac{1}{4\pi}\int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E)\psi(\vr,E',\vo') 
++ S_{ext}(\vr,E,\vo) ,
+\label{isotropic}
+\end{equation}
+where the inscatter term is simplified. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, no longer depends on direction, and is divided by $4\pi$ to reflect isotropic behavior. The next step to solving the transport equation is to discretize in energy, yielding Eq. \ref{multigroup} the multigroup transport equation:
+\begin{equation}
+\vo \cdot \vec \nabla \psi_g(\vr,\vo) +\Sigma_{t,g}(\vr) \psi_g(\vr,\vo) = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g}(\vr,\vo),
 \label{multigroup}
 \end{equation}
-\tcr{explain how an approximation on the energy variable removes the angular integral...}
-where for convenience, we have combined the fission term and external source term into one source term, $S_g$. The subscript $g$ represents the current energy group. The last term on the right hand side we see represents the summation of neutrons scattered in from all groups $g^{\prime}$ into current group $g$.
+where the transport equation becomes a coupled system of equations, with each energy group having an equation. We also notice that once the energy integral is discretized and the energy dependence removed from the angular flux, we are left with the scalar flux because $\int_{4\pi}d\Omega'\psi_g(\vr,\vo') \equiv \phi_g(\vr)$.
 
-All that's left is to add in the consideration of inscatter from neutrons traveling in different directions, shown in Eq. \ref{discretetransport}:
+Next, we discretize in angle, introducing another coupled system of equations, with each equation represented by Eq. \ref{angle}:
 \begin{equation}
-\vec{\Omega}_{m}\cdot \vec\nabla \psi^{(l+1)}_{m,g} + \Sigma_{t,g}\psi_{m,g}^{(l+1)} = S_{m,g}^{(l)} + \sum_{g^\prime}\sum_{m^{\prime}}\omega_m\Sigma_{s,g^{\prime}\to g,m^\prime\to m}\psi_{m^\prime g^\prime}^{(l)},
-\label{discretetransport}
+\vo \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr),
+\label{angle}
 \end{equation}
-\tcr{I would not introduce the anglar discretization, index m, at the same time as the iterative index l; it's confusing}
-where we have added the subscript $m$ and an extra summation of all directions $m^{\prime}$ scattering into direction $m$. Also shown is the superscript $l$, which introduces the concept of source iteration. Source iteration is a fundamental concept of the transport sweeps. The total source term is calculated, a sweep is performed, and is repeated until the \tcr{the what? noun is missing}$\psi^{(l+1)}-\psi^{(l)}$ converges to a specified tolerance.
+where the subscript $m$ is introduced to describe the angular flux in direction $m$. We notice that the subscript is not added to our inscatter term because of the isotropic scattering assumption, and because the scalar flux does not depend on angle.
 
-\tcr{after all of this, a bit of simplicity would be refreshing. for one direction m, the TE, accounting for the total source $q_m$ in direction m, defined as the sum of the external source in that direction and the contribution of the collision source computed with the previous scalar flux, is simply}
-\[
-\vo_m \cdot \nabla \psi_m + \Sigma_t \psi_m = q_m
-\]
-\tcr{ now that the energy and angle variables have been treated, it is time to discuss the spatial discretization. Its discontinuous nature, due to the use of finite differences or discontinuous finite elements WITH upwind is the reason why the above equation can be solved one spatial cell at a time ....}
+In order for this discrete form of the transport equation to yield an accurate solution, a technique called source iteration is introduced. This is shown by a simplified transport equation Eq. \ref{iteration}:
+\begin{equation}
+\vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
+\label{iteration}
+\end{equation}
+where the right hand side terms of Eq.\ref{angle} have been combined into one general source term, $q_m$. In addition, only the angular subscript is shown, and the group discretization is understood. The angular flux of iteration $(l+1)$ are calculated using the $(l^{th})$ value of the scalar flux and external source in that direction. 
 
-Transport sweeps on unstructured meshes would not be possible without the work on the discontinuous finite element approximation performed by Reed and Willis at Los Alamos and the University of California\cite{Reed}. \tcr{pompous}
-\tcr{some graphics explaining sweeps on structured and unstructured meshes are welcome here}
+We notice that after the angular and energy dependence have been accounted for, the problem must be discretized in space as well. This is done by meshing the domain, and solving the spatial problem one cell at a time for a given direction. Cells are connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Sweeping the mesh and solving one cell at a time would not be possible without the work on the discontinuous finite element approximation performed by Reed and Willis at Los Alamos National Laboratory and the University of California\cite{Reed}. Figure \ref{sweeps} demonstrates this concept. 
 
-\tcr{you will be using the term graph later on, here is a good place to make the connection between a sweep and a graph}
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.27]{UnstructureMesh.pdf}
+\includegraphics[scale = 0.27]{StructuredMesh.pdf}
+\captionof{figure}{A demonstration of a sweep on a structured and unstructured mesh. }
+\label{sweeps}
+\end{minipage}
+\smallskip
 
+The number in each cell represents the ordering with which the cells are solved. All cells must receive the solution downwind from them before solving for their own solution. This dependency can be represented and stored as a task dependence graph, shown by Fig. \ref{tdg}.
 
-\tcr{brief intro to PDT, mostly the parallel aspects}
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.5]{tdg.pdf}
+\captionof{figure}{A task dependence graph of Fig. \ref{sweeps}.}
+\label{tdg}
+\end{minipage}
+\smallskip
 
 PDT is Texas A\&M University's massively parallel deterministic transport code. It is capable of multi-group simulations, and employs discrete ordinates for angular discretization. Types of simulations include steady-state, time-dependent, criticality, and depletion simulations. It solves the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation. PDT  has been shown to scale on logically Cartesian grids out to 750,000 cores. All work proposed in this document has been and will be implemented in PDT. 
 
@@ -139,8 +150,6 @@ PDT is Texas A\&M University's massively parallel deterministic transport code. 
 
 A transport sweep is set up by overlaying a domain with a finite element mesh. This divides the domain into a mesh of cells. The sweep then solves the transport equation cell by cell using a discontinuous finite element approach. \tcr{this is not the intro I was looking for}
 
-\tcr{this is where KBA and others should be profusely cited and explained}
-
 A parallel sweep algorithm is defined by three properties:
 \begin{itemize}
 \item partitioning: dividing the domain among available processors
@@ -150,10 +159,7 @@ A parallel sweep algorithm is defined by three properties:
 
 The basic concepts of parallel transport sweeps, partitioning, aggregation, and scheduling, are most easily described in the context of a structured transport sweep. A structured transport sweep takes place on a quadrilateral cartesian mesh. Furthermore, the work proposed utilizes aspects of the structured transport sweep.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{The Structured Transport Sweep in PDT}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-If $M$ is the total number of angular directions, $G$ is the total number of energy groups, and $N$ is the total number of cells, then the total fine grain work units is $8MGN$. The factor of 8 is present as $M$ directions are swept for all 8 octants of the domain. The finest grain work unit is the calculation of a single direction and energy groups unknowns in a single cell, or $\psi_{m,g}$ for a single cell.
+If $M$ is the number of angular directions per octant, $G$ is the total number of energy groups, and $N$ is the total number of cells, then the total fine grain work units is $8MGN$. The factor of 8 is present as $M$ directions are swept for all 8 octants of the domain. The finest grain work unit is the calculation of a single direction and energy groups unknowns in a single cell, or $\psi_{m,g}$ for a single cell.
 
 In a regular grid, we have the  number of cells in each Cartesian direction: $N_x, N_y, N_z$. These cells are aggregated into ``cellsets''. However, in an unstructured mesh, the number of cells cannot be described as such. In PDT specifically we initially subdivide the domain into subsets, which are just rectangular subdomains. Within each subset, an unstructured mesh is created. This creates a pseudo-regular grid. These subsets become the $N_x, N_y, N_z$ equivalent for an unstructured mesh. The spatial aggregation in a PDT unstructured mesh is done by aggregating subsets into cellsets. 
 
@@ -171,21 +177,6 @@ Fine grain work units are aggregated into coarser-grained units called \textit{t
 It follows that each process owns $N_k$ cell-sets (each of which is $A_z$ planes of $A_x A_y$ cells), $8N_m$ direction-sets, and $N_g$ group-sets for a total of $8N_m N_g N_k$ tasks.
 
 One task contains $A_x A_y A_z$ cells, $A_m$ directions, and $A_g$ groups. Equivalently, a task is the computation of one cellset, one groupset, and one angleset. One task takes a stage to complete.  This is particularly important when comparing sweeps to the performance models. 
-
-The minimum possible number of stages for given partitioning parameters $P_i$ and $A_j$ is $2 N_{\text{fill}}+N_{\text{tasks}}$. $N_{\text{fill}}$ is both the minimum number of stages before a sweepfront can reach the center-most processors and the number needed to finish a direction's sweep after the center-most processors have finished. Equations \ref{nfill}, \ref{nidle}, and \ref{ntasks} define $N_{\text{fill}}$, $N_{\text{idle}}$, and $N_{\text{tasks}}$:
-\begin{equation}
-N_{\text{fill}} = \frac{P_x + \delta_x}{2} - 1 + \frac{P_y + \delta_y}{2} - 1 + N_k (\frac{P_z + \delta_z}{2} - 1)
-\label{nfill}
-\end{equation}
-\begin{equation}
-N_{\text{idle}} = 2 N_{\text{fill}}
-\label{nidle}
-\end{equation}
-\begin{equation}
-N_{\text{tasks}} = 8 N_m N_g N_k
-\label{ntasks}
-\end{equation}
-where $\delta_u$ is 1 for $P_u$ odd, and 0 for $P_u$ even.
 
 Equation \ref{paralleleff} approximately defines parallel sweep efficiency. This can be calculated for specific machinery and partitioning parameters by substituting in values calculated using Eqs. \ref{nfill},\ref{nidle}, and \ref{ntasks}.
 \begin{equation}\label{paralleleff}
@@ -205,6 +196,36 @@ T_{\text{task}} = A_x A_y A_z A_m A_g T_{\text{grind}}
 \label{Ttask}
 \end{equation}
 where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the additional time to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. If a high value of $M_L$ is necessary for the model to match computational results, improvements should be made in code implementation.
+
+\subsection{KBA Partitioning}
+
+Several parallel transport sweep codes use KBA partitioning in their sweeping, such as Denovo \cite{denovo} and PARTISAN\cite{partisan}. The KBA partitioning scheme and algorithm was developed by Koch, Baker, and Alcouffe \cite{KBA}.
+
+The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. With the KBA algorithm, $2MN_k$ are pipelined from a given corner of the 2D processor layout. The far corner processor remains idle for the first $P_x + P_y - 2 $ stages, which means that a 2 octant sweep completes in $2MN_k + P_x + P_y - 2$ stages. If an octant-pair sweep does not begin until the previous pair's finishes, the full sweep requires $8MN_k + 4(P_x+P_y-2)$ stages, which means the KBA parallel efficiency is:
+\begin{equation}
+\varepsilon_{KBA} = \frac{1}{[1+\frac{4(P_x+P_y-2)}{8MN_k}][1+\frac{T_{\text{comm}}}{T_{\text{task}}}]}
+\label{eKBA}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Structured Transport Sweep in PDT}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The minimum possible number of stages for given partitioning parameters $P_i$ and $A_j$ is $2 N_{\text{fill}}+N_{\text{tasks}}$. $N_{\text{fill}}$ is both the minimum number of stages before a sweepfront can reach the center-most processors and the number needed to finish a direction's sweep after the center-most processors have finished. Equations \ref{nfill}, \ref{nidle}, and \ref{ntasks} define $N_{\text{fill}}$, $N_{\text{idle}}$, and $N_{\text{tasks}}$:
+\begin{equation}
+N_{\text{fill}} = \frac{P_x + \delta_x}{2} - 1 + \frac{P_y + \delta_y}{2} - 1 + N_k (\frac{P_z + \delta_z}{2} - 1)
+\label{nfill}
+\end{equation}
+\begin{equation}
+N_{\text{idle}} = 2 N_{\text{fill}}
+\label{nidle}
+\end{equation}
+\begin{equation}
+N_{\text{tasks}} = 8 N_m N_g N_k
+\label{ntasks}
+\end{equation}
+where $\delta_u$ is 1 for $P_u$ odd, and 0 for $P_u$ even.
+
+
 
 Figure \ref{partitioning} shows three different partitioning schemes used in transport sweeps. 
 
@@ -250,15 +271,6 @@ The optimal efficiency formula changes slightly from the KBA and hybrid KBA part
 \label{overloadpartitioning}
 \end{equation}
 
-\subsection*{KBA Partitioning}
-
-Several parallel transport sweep codes use KBA partitioning in their sweeping, such as Denovo \cite{denovo} and PARTISAN\cite{partisan}.
-
-The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. With the KBA algorithm, $2MN_k$ are pipelined from a given corner of the 2D processor layout. The far corner processor remains idle for the first $P_x + P_y - 2 $ stages, which means that a 2 octant sweep completes in $2MN_K + P_x + P_y - 2$ stages. If an octant-pair sweep does not begin until the previous pair's finishes, the full sweep requires $8MN_k + 4(P_x+P_y-2)$ stages, which means the KBA parallel efficiency is:
-\begin{equation}
-\varepsilon_{KBA} = \frac{1}{[1+\frac{4(P_x+P_y-2)}{8MN_k}][1+\frac{T_{\text{comm}}}{T_{\text{task}}}]}
-\label{eKBA}
-\end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{The Unstructured Transport Sweep}
@@ -297,15 +309,24 @@ A cycle is a loop in a directed graph. These occur commonly in unstructred meshe
 
 Algorithms for for finding cycles are called \textit{cycle detection} algorithms. This must be done efficiently in parallel, both because the task dependence graph is distributed, and because the finite element grid may be deforming every timestep and changing the associated TDG.
 
-Cycle detection utilizes two operations: trim and mark. Trimming identifies and discards elements which are not in cycles. At the beginning of cycle detection, graphs are trimmied in the downwind direction, then the remaining graphs are trimmed in the upwind direction. A pivot vertex is then selected in each graph. Graph vertices are then marked as upwind, downwind, or unmarked. Then, if any vertices are both upwind and downwind, the cycle is these vertices plus the pivot vertex. An edge is removed between 2 cycle vertices, and 4 new graphs are created: a new cycle, the upwind vertices without the cycle, the downwind vertices without the cycle, and a set of unmarked vertices. This recursively continues until all cycles are eliminated.
+Cycle detection utilizes two operations: trim and mark. Trimming identifies and discards elements which are not in cycles. At the beginning of cycle detection, graphs are trimmed in the downwind direction, then the remaining graphs are trimmed in the upwind direction. A pivot vertex is then selected in each graph. Graph vertices are then marked as upwind, downwind, or unmarked. Then, if any vertices are both upwind and downwind, the cycle is these vertices plus the pivot vertex. An edge is removed between 2 cycle vertices, and 4 new graphs are created: a new cycle, the upwind vertices without the cycle, the downwind vertices without the cycle, and a set of unmarked vertices. This recursively continues until all cycles are eliminated.
 
-\section{Motivation and Proposed Method for Load Balancing in PDT}
+\section{Motivation and Proposed Method for Load Balancing Unstructured Meshes in PDT}
+
+The capability for PDT to generate and run on an unstructured mesh is important because it allows us to run problems without having to conform our mesh to the problem as much. When using the unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). This is a list of vertices and the straight line segments connecting them. Before the mesh is built, the user determines how many ``subsets'', he/she would like to subdivide the PSLG into. The unstructured mesh is built using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator. A series of cut planes in $x$ and $y$ are laid over the PSLG, creating an overlaid regular Cartesian grid. Each convex, orthogonal unit created by the grid is termed a ``subset''. Figure \ref{grid} demonstrates this functionality.
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.5]{lattice.png}
+\includegraphics[scale = 0.5]{subsetlattice.png}
+\captionof{figure}{A PSLG describing a fuel lattice, and with a orthogonal ``subset" grid imposed on on the PSLG.}
+\label{grid}
+\end{minipage}
+\smallskip
+
+This orthogonal grid is superimposed in parallel, and each ``subset" is meshed using Triangle in parallel.  Subsets are now the base structured unit when calculating our parallel efficiency. Discontinuities along the boundary are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, there is no problem solving on degenerate polygons. A 2D mesh can extruded in the $z$ dimension in order to give us the capability to run on 3D problems. Obviously, this is not as good as a unstructured tetrahedral mesh, but for many problems, it is a great capability to have. 
 
 When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to ``balance'' the number of cells. Ideally, each processor will be responsible for an equal number of cells. 
-
-\tcr{input geometry : we are in the weeds here. Let's see the big picture first. unstructured grids -why are they useful, why do we want them? then how can we use unstructured grids, many people use tets, explain our logic, 2D unstructured triangular, excluded in 3rd D; then, maybe, you can explain that the 2D unstructured triangular grids will come from the use of the triangle mesh generator. The we can talk about 2D geometries being described using PSLG. But there is still no need to use the words input file.}
-
-When using the unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). This is a list of vertices and the straight line segments connecting them. The mesh generator being used is the Triangle Mesh Generator \ref{triangle}, so the PSLG input is described by a Triangle .poly file. In order to parallelize the sweep, the user determines how many ``subsets'', he/she would like to subdivide the PSLG into. A series of cut planes in $x$ and $y$ are laid over the PSLG, creating an overlaid regular Cartesian grid \tcr{would a graph be nice to illustrate this here?}. Each convex, orthogonal unit created by the grid is termed a ``subset''. Subsets then become the base structured unit when calculating our parallel efficiency. Subsets are created and meshed in parallel. Within each subset lies an unstructured triangular meshed. Discontinuities along the boundary are fixed by ``stitching'' across hanging nodes, creating degenerate polygons along subset boundaries. Because PDT's spatial discretization employs Piece-wise Linear Discontinuous (PWLD) finite element basis functions, there is no problem solving on degenerate polygons. 
 
 If the number of cells in each subset can be reasonably balanced, then the problem is effectively load balanced. The Load Balance algorithm described on the next page details how the subsets will be load balanced. In summary, the procedure of the algorithm involves moving the initially user specified $x$ and $y$ cut planes, re-meshing, and iterating until a reasonably load balanced problem is obtained. 
 
@@ -389,20 +410,17 @@ Unstructured meshing capability has been placed in PDT, Figure coming to showcas
 
 %\subsection{Completed Work}
 \begin{itemize}
-\item Unstructured meshing capability in PDT for 2D and 2D extruded problems.\tcr{2D + 2D extruded}
+\item Unstructured meshing capability in PDT for 2D and 2D extruded problems.
 \item {Unstructured meshing is generated in parallel using the same partitioning scheme and number of processors as the sweep.}
 \item {Stitching between meshed subdomains to preserve interface continuity.}
 %\end{itemize}
 
 %\subsection{Planned Work}
 %\begin{itemize}
-\item Implement load balancing algorithm for unstructured meshes in PDT. A load balanced problem would be defined by $f$ in the pseudocode, or the subset with the maximum number of cells, divided by the average number of cells per subset.\tcr{Metric definition}
+\item Implement load balancing algorithm for unstructured meshes in PDT. A load balanced problem would be defined by $f$ in the pseudocode, or the subset with the maximum number of cells, divided by the average number of cells per subset.
 \item Code verification and testing to prove load balancing algorithm effectiveness. 
 \item Results of the parallel transport sweeps for benchmark problems.
 \end{itemize}
-
-\tcr{possible outlook for the research}
-
 \subsection{Possibly Outlook for Research}
 \begin{itemize}
 \item Propose a scaling study for unstructured meshes in PDT, similar to the infamous Zerr problem.
