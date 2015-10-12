@@ -94,7 +94,7 @@ In order to solve this equation, a couple of assumptions and approximations are 
 \begin{equation}
 \vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  =
 \frac{1}{4\pi}\int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E)\psi(\vr,E',\vo') 
-+ S_{ext}(\vr,E,\vo) ,
++ S_{ext}(\vr,E,\vo)
 \label{isotropic}
 \end{equation}
 where the inscatter term is simplified. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, no longer depends on direction, and is divided by $4\pi$ to reflect isotropic behavior. The next step to solving the transport equation is to discretize in energy, yielding Eq. \ref{multigroup} the multigroup transport equation:
@@ -102,7 +102,7 @@ where the inscatter term is simplified. The double differential scattering cross
 \vo \cdot \vec \nabla \psi_g(\vr,\vo) +\Sigma_{t,g}(\vr) \psi_g(\vr,\vo) = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g}(\vr,\vo),
 \label{multigroup}
 \end{equation}
-where the transport equation becomes a coupled system of equations, with each energy group having an equation. We also notice that once the energy integral is discretized and the energy dependence removed from the angular flux, we are left with the scalar flux because $\int_{4\pi}d\Omega'\psi_g(\vr,\vo') \equiv \phi_g(\vr)$.
+where the transport equation becomes a coupled system of equations, with each energy group having an equation. We also note that because the cross section no longer has angular dependence,  we are left with the scalar flux because $\int_{4\pi}d\Omega'\psi(\vr,\vo') \equiv \phi(\vr)$.
 
 Next, we discretize in angle, introducing another coupled system of equations, with each equation represented by Eq. \ref{angle}:
 \begin{equation}
@@ -116,9 +116,9 @@ In order for this discrete form of the transport equation to yield an accurate s
 \vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
 \label{iteration}
 \end{equation}
-where the right hand side terms of Eq.\ref{angle} have been combined into one general source term, $q_m$. In addition, only the angular subscript is shown, and the group discretization is understood. The angular flux of iteration $(l+1)$ are calculated using the $(l^{th})$ value of the scalar flux and external source in that direction. 
+where the right hand side terms of Eq. \ref{angle} have been combined into one general source term, $q_m$. In addition, only the angular subscript is shown, and the group discretization is understood. The angular flux of iteration $(l+1)$ are calculated using the $(l^{th})$ value of the scalar flux and external source in that direction. 
 
-We notice that after the angular and energy dependence have been accounted for, the problem must be discretized in space as well. This is done by meshing the domain, and solving the spatial problem one cell at a time for a given direction. Cells are connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Sweeping the mesh and solving one cell at a time would not be possible without the work on the discontinuous finite element approximation performed by Reed and Willis at Los Alamos National Laboratory and the University of California\cite{Reed}. Figure \ref{sweeps} demonstrates this concept. 
+We notice that after the angular and energy dependence have been accounted for, the problem must be discretized in space as well. This is done by meshing the domain, and solving the spatial problem one cell at a time for a given direction. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Sweeping the mesh and solving one cell at a time is possible utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fv}, or discontinuous finite element\cite{Reed}. Figure \ref{sweeps} demonstrates solving one cell at a time in a transport sweep. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -134,21 +134,20 @@ The number in each cell represents the ordering with which the cells are solved.
 \noindent\begin{minipage}{\textwidth}
 \centering
 \includegraphics[scale = 0.5]{tdg.pdf}
-\captionof{figure}{A task dependence graph of Fig. \ref{sweeps}.}
+\captionof{figure}{A task dependence graph of the unstructured mesh example in Fig. \ref{sweeps}.}
 \label{tdg}
 \end{minipage}
 \smallskip
 
-PDT is Texas A\&M University's massively parallel deterministic transport code. It is capable of multi-group simulations, and employs discrete ordinates for angular discretization. Types of simulations include steady-state, time-dependent, criticality, and depletion simulations. It solves the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation. PDT  has been shown to scale on logically Cartesian grids out to 750,000 cores. All work proposed in this document has been and will be implemented in PDT. 
+The concepts presented in this introduction are used to varying degrees by PDT, Texas A\&M University's massively parallel deterministic transport code. It is capable of multi-group simulations, and employs discrete ordinates for angular discretization. Types of simulations include steady-state, time-dependent, criticality, and depletion simulations. It solves the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation. PDT  has been shown to scale on logically Cartesian grids out to 750,000 cores. All work proposed in this document has been and will be implemented in PDT. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Previous work and Transport Sweeps}
+\section{Parallelization of Transport Sweeps}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\tcr{motivate why we talk about structured sweeps first}
 
-A transport sweep is set up by overlaying a domain with a finite element mesh. This divides the domain into a mesh of cells. The sweep then solves the transport equation cell by cell using a discontinuous finite element approach. \tcr{this is not the intro I was looking for}
+As mentioned in the previous section, a transport sweep is set up by overlaying a domain with a finite element mesh.The sweep then solves the transport equation cell by cell using a discontinuous finite element approach. The order of which cell to solve first is given by a task dependence graph, as shown in Fig. \ref{tdg}.
 
 A parallel sweep algorithm is defined by three properties:
 \begin{itemize}
@@ -225,8 +224,6 @@ N_{\text{tasks}} = 8 N_m N_g N_k
 \end{equation}
 where $\delta_u$ is 1 for $P_u$ odd, and 0 for $P_u$ even.
 
-
-
 Figure \ref{partitioning} shows three different partitioning schemes used in transport sweeps. 
 
 \noindent\begin{minipage}{\textwidth}
@@ -273,13 +270,9 @@ The optimal efficiency formula changes slightly from the KBA and hybrid KBA part
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection*{The Unstructured Transport Sweep}
+\subsection{The Unstructured Transport Sweep}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\tcr{avoid repeats from intro}
-
-
-While PDT has scaled well out to 750,000 cores, similar levels of parallel scaling have not been achieved using unstructured sweeps yet. As described by Dr. Shawn Pautz \cite{Pautz}, a new list scheduling algorithm has been constructed for modest levels of parallelism (up to 126 processors).
+While PDT has scaled well out to 750,000 cores, similar levels of parallel scaling have not been achieved using unstructured sweeps yet. Pautz proposed a new list scheduling algorithm has been constructed for modest levels of parallelism (up to 126 processors)\cite{Pautz} .
 
 There are three requirements for a sweep scheduling algorithm to have. First, the algorithm should have low complexity, since millions of individual tasks are swept over in a typical problem. Second, the algorithm should schedule on a set of processors that is small in comparison to the number of tasks in the sweep graph. Last, the algorithm should distribute work in the spatial dimension only, so that there is no need to communicate during the calculation of the scattering source. 
 
@@ -303,9 +296,9 @@ Nearly linear speedups were obtained on up to 126 processors. Further work is be
 
 \subsubsection{Cycle Detection}
 
-\tcr{I do not understand the purpose of this section here}
+A cycle is a loop in a directed graph and they can occur commonly in unstructured meshes. However, they don't exist in 2D triangular extruded problems, and because our domain partitioning is convex arbitrary degenerate polygons appearing on subdomain boundaries will not produce cycles. Even though they are not applicable to this application of unstructured transport sweeps, they are discussed here for completeness.
 
-A cycle is a loop in a directed graph. These occur commonly in unstructred meshes. The problem with cycles is that they can cause hang time in the problem, as a processor will wait for a message that might will never come. This means that the computation for one or more elements will never be completed. The solution to this is to ``break'' any cycles that exist by removing an edge of the task dependence graph (TDG). Old flux information is used on a particular element face in the domain. Most of the time, the edge removed is oriented obliquely with respect to the radiation direction. 
+Cycles can cause hang time in the problem, as a processor will wait for a message that might will never come. This means that the computation for one or more elements will never be completed. The solution to this is to ``break'' any cycles that exist by removing an edge of the task dependence graph (TDG). Old flux information is used on a particular element face in the domain. Most of the time, the edge removed is oriented obliquely with respect to the radiation direction. 
 
 Algorithms for for finding cycles are called \textit{cycle detection} algorithms. This must be done efficiently in parallel, both because the task dependence graph is distributed, and because the finite element grid may be deforming every timestep and changing the associated TDG.
 
@@ -410,20 +403,20 @@ Unstructured meshing capability has been placed in PDT, Figure coming to showcas
 
 %\subsection{Completed Work}
 \begin{itemize}
-\item Unstructured meshing capability in PDT for 2D and 2D extruded problems.
-\item {Unstructured meshing is generated in parallel using the same partitioning scheme and number of processors as the sweep.}
-\item {Stitching between meshed subdomains to preserve interface continuity.}
+\item Implment unstructured meshing capability in PDT for 2D and 2D extruded problems.
+\item Generate unstructured mesh in parallel using the same partitioning scheme and number of processors as the sweep.
+\item {Perform stitching between meshed subdomains to preserve interface continuity.}
 %\end{itemize}
 
 %\subsection{Planned Work}
 %\begin{itemize}
 \item Implement load balancing algorithm for unstructured meshes in PDT. A load balanced problem would be defined by $f$ in the pseudocode, or the subset with the maximum number of cells, divided by the average number of cells per subset.
-\item Code verification and testing to prove load balancing algorithm effectiveness. 
-\item Results of the parallel transport sweeps for benchmark problems.
+\item Verify and test code to prove load balancing algorithm effectiveness. 
+\item Show results of the parallel transport sweeps for benchmark problems.
 \end{itemize}
-\subsection{Possibly Outlook for Research}
+\subsection{Possible Outlook for Research}
 \begin{itemize}
-\item Propose a scaling study for unstructured meshes in PDT, similar to the infamous Zerr problem.
+\item Propose a scaling study for unstructured meshes in PDT, similar to PDT's Zerr problem.
 \end{itemize}
 
 \bibliographystyle{plain}
