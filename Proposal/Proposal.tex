@@ -35,7 +35,7 @@
 \renewcommand{\thetable}{\Roman{table}}
 \usepackage{fixltx2e}
 %Title Page
-\newcommand{\titles}{\LARGE \textbf{Load Balancing Unstructured Meshes for Massively Parallel Transport Sweeps in PDT}}
+\newcommand{\titles}{\LARGE \textbf{Load Balancing Unstructured Meshes for Massively Parallel Transport Sweeps}}
 \newcommand{\authors}{\normalsize Tarek Ghaddar \\ Chair: Dr. Jean Ragusa \\ Committee: Dr. Jim Morel, Dr. Bojan Popov}
 \newcommand{\department}{\normalsize Nuclear Engineering Department}
 \newcommand{\university}{\normalsize Texas A\&M University}
@@ -81,37 +81,52 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The steady-state neutron transport equation describes the behavior of neutrons in a medium, and is given by Eq. \ref{continuous transport}:
+The steady-state neutron transport equation describes the behavior of neutrons in a medium, and is given by Eq.~\eqref{continuous transport}:
+\tcr{use tilde+eqref, not just ref, for your equations, see how i did it here}
 \begin{equation}
 \vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  =
 \int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo') 
 + S_{ext}(\vr,E,\vo) ,
 \label{continuous transport}
 \end{equation}
-where $\vec{\Omega}_{m}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption and outscatter). These are the loss terms of the neutron transport equation. The right hand side of Eq. \ref{continuous transport} represent the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into energy $dE$ about $E$ and $d\Omega$ about direction $\vo$.
+where $\vec{\Omega}_{m}\cdot \vec\nabla\psi$ \tcr{remove direction subscript} is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption and outscatter). These are the loss terms of the neutron transport equation. The right hand side of Eq. \ref{continuous transport} represent the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into energy $dE$ about energy $E$ and $d\Omega$ about direction $\vo$.
 
 In order to solve this equation, a couple of assumptions and approximations are used. First, we assume isotropic scattering, which turns Eq. \ref{continuous transport} into:
-\begin{equation}
-\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  =
-\frac{1}{4\pi}\int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E)\psi(\vr,E',\vo') 
-+ S_{ext}(\vr,E,\vo)
+\tcr{\\ My version: Without loss of generality for the research problem at hand, we assume isotropic scattering for simplicity. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, no longer depends on direction, and is divided by $4\pi$ to reflect isotropic behavior. This yields:}
+\begin{align}
 \label{isotropic}
-\end{equation}
-where the inscatter term is simplified. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, no longer depends on direction, and is divided by $4\pi$ to reflect isotropic behavior. The next step to solving the transport equation is to discretize in energy, yielding Eq. \ref{multigroup} the multigroup transport equation:
+\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  
+& = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \int_{4\pi}d\Omega' \psi(\vr,E',\vo')  + S_{ext}(\vr,E,\vo) \nonumber \\
+& = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \phi(\vr,E')  + S_{ext}(\vr,E,\vo) 
+\end{align}
+where we introduced the scalar flux as the integral of the angular flux:
 \begin{equation}
-\vo \cdot \vec \nabla \psi_g(\vr,\vo) +\Sigma_{t,g}(\vr) \psi_g(\vr,\vo) = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g}(\vr,\vo),
+\label{def_scalar_flux}
+\phi(\vr,E') = \int_{4\pi}d\Omega' \psi(\vr,E',\vo')
+\end{equation}
+The next step to solving the transport equation is to discretize in energy, yielding Eq. \ref{multigroup} the multigroup transport equation:
+\begin{equation}
+\vo \cdot \vec \nabla \psi_g(\vr,\vo) +\Sigma_{t,g}(\vr) \psi_g(\vr,\vo) = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g}(\vr,\vo), \quad \text{for } 1 \le g \le G
 \label{multigroup}
 \end{equation}
-where the transport equation becomes a coupled system of equations, with each energy group having an equation. We also note that because the cross section no longer has angular dependence,  we are left with the scalar flux because $\int_{4\pi}d\Omega'\psi(\vr,\vo') \equiv \phi(\vr)$.
+where the transport equation becomes a coupled system of equations. 
 
-Next, we discretize in angle, introducing another coupled system of equations, with each equation represented by Eq. \ref{angle}:
+Next, we discretize in angle using the discrete oridnate method (\text{find references}), whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of 
+directions $\vo_m$:
 \begin{equation}
 \vo \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr),
 \label{angle}
 \end{equation}
-where the subscript $m$ is introduced to describe the angular flux in direction $m$. We notice that the subscript is not added to our inscatter term because of the isotropic scattering assumption, and because the scalar flux does not depend on angle.
+where the subscript $m$ is introduced to describe the angular flux in direction $m$. We notice that the subscript is not added to our inscatter term because of the isotropic scattering assumption, and because the scalar flux does not depend on angle. \tcr{However, in order to evaluate the scalar flux, we employ the angular weights $w_m$ and the angular flux solutions
+$\psi_m$ to numerically perform the angular integration:
+\begin{equation}
+\label{def_scalar_flux_2}
+\phi_g(\vr) \approx \sum_{m=1}^{m=M} w_m \psi_g,m(\vr)
+\end{equation}
+}
 
-In order for this discrete form of the transport equation to yield an accurate solution, a technique called source iteration is introduced. This is shown by a simplified transport equation Eq. \ref{iteration}:
+In order for this discrete form of the transport equation to yield an accurate solution \tcr{No. it is not to yield an accurate solution, it
+is an iterative process to obtain the solution. Fix}, a technique called source iteration is introduced. This is shown by a simplified transport equation Eq. \ref{iteration}:
 \begin{equation}
 \vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
 \label{iteration}
