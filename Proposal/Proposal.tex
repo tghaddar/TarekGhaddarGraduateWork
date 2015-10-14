@@ -109,10 +109,14 @@ The next step to solving the transport equation is to discretize in energy, yiel
 \end{equation}
 where the transport equation becomes a coupled system of equations. 
 
+<<<<<<< HEAD
 Next, we discretize in angle using the discrete ordinates method\cite{denovo}, whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of 
+=======
+Next, we discretize in angle using the discrete ordinate method (\text{find references}), whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of 
+>>>>>>> ad905b8d862a86a18061dd9782dc91fa30fc9de7
 directions $\vo_m$:
 \begin{equation}
-\vo \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr),
+\vo_m \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr),
 \label{angle}
 \end{equation}
 where the subscript $m$ is introduced to describe the angular flux in direction $m$. We notice that the subscript is not added to our inscatter term because of the isotropic scattering assumption, and because the scalar flux does not depend on angle. However, in order to evaluate the scalar flux, we employ the angular weights $w_m$ and the angular flux solutions
@@ -121,13 +125,25 @@ $\psi_m$ to numerically perform the angular integration:
 \label{def_scalar_flux_2}
 \phi_g(\vr) \approx \sum_{m=1}^{m=M} w_m \psi_g,m(\vr).
 \end{equation}
+<<<<<<< HEAD
+=======
+}
+From Equation~\eqref{multigroup}, it is clear that we are solving a sequence of transport equations, one equation per group. Thus, with the inscattering contributions from other groups given, one may omit the group index and simply write any of the multigroup transport equation as follows:
+\begin{equation}
+\vo_m \cdot \vec \nabla \psi_{m}(\vr) +\Sigma_{t}(\vr) \psi_{m}(\vr)  = \frac{1}{4\pi}\Sigma_{s}(\vr)\phi(\vr) + q^{ext+inscat}_m(\vr) .
+\end{equation}
+>>>>>>> ad905b8d862a86a18061dd9782dc91fa30fc9de7
 
 In order to obtain the solution for this discrete form of the transport equation, an iterative process called source iteration is introduced. This is shown by a simplified transport equation Eq. ~\eqref{iteration}:
 \begin{equation}
 \vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
 \label{iteration}
 \end{equation}
+<<<<<<< HEAD
 where the right hand side terms of Eq. ~\eqref{angle} have been combined into one general source term, $q_m$. In addition, only the angular subscript is shown, and the group discretization is understood. The angular flux of iteration $(l+1)$ are calculated using the $(l^{th})$ value of the scalar flux and external source in that direction. 
+=======
+where the right hand side terms of Eq. \ref{angle} have been combined into one general source term, $q_m$, containing the external source, the inscattering source from other groups, and the within group scattering. In addition, only the angular subscript is shown, and the group discretization is understood. The angular fluxes at iteration $(l+1)$ are calculated using the $(l^{th})$ value of the scalar flux and external source in that direction. 
+>>>>>>> ad905b8d862a86a18061dd9782dc91fa30fc9de7
 
 We notice that after the angular and energy dependence have been accounted for, the problem must be discretized in space as well. This is done by meshing the domain, and solving the spatial problem one cell at a time for a given direction. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Sweeping the mesh and solving one cell at a time is possible utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}. Figure \ref{sweeps} demonstrates solving one cell at a time in a transport sweep. 
 
