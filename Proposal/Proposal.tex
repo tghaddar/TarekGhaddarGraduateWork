@@ -412,7 +412,14 @@ If the number of cells in each subset can be reasonably balanced, then the probl
 
 \section{Preliminary Results}
 
-Unstructured meshing capability has been placed in PDT, Figure coming to showcase it (probably C5G7 reactor mesh). 
+Figure \ref{lattice} is an example of a triangular mesh of a lattice run through PDT. It is meshed using the coarsest possible mesh settings of the Triangle Mesh Generator. This is lattice is meshed using 16 orthogonal subsets, which can be clearly seen in the figure. As can be seen however, this problem is not balanced at all. There are subsets with only 2 triangles, and some with order 100 triangles. This will kill our sweep times, as some processors will be doing way more work than others, increasing our idle time, and thus our sweep times.
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = .75]{proposal_lattice.pdf}
+\captionof{figure}{A reactor lattice, meshed and run in PDT.}
+\label{lattice}
+\end{minipage}
 
 \section{Goals and Proposed Plan}
 
