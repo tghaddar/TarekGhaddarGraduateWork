@@ -88,16 +88,16 @@ The steady-state neutron transport equation describes the behavior of neutrons i
 + S_{ext}(\vr,E,\vo) ,
 \label{continuous transport}
 \end{equation}
-where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption and outscatter). These are the loss terms of the neutron transport equation. The right hand side of Eq.~\eqref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into energy $dE$ about energy $E$ and $d\Omega$ about direction $\vo$.
+where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption and outscatter \tcr{so where's within group scattering?}). These are the loss terms of the neutron transport equation. The right hand side of Eq.~\eqref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into energy $dE$ about energy $E$ and $d\Omega$ about direction $\vo$.
 
-Without loss of generality for the research problem at hand, we assume isotropic scattering for simplicity. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, no longer depends on direction, and is divided by $4\pi$ to reflect isotropic behavior. This yields:
+Without loss of generality for the research problem at hand, we assume isotropic scattering for simplicity. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, no longer depends on direction, \tcr{should this comma stay?} and is divided by $4\pi$ to reflect isotropic behavior. This yields:
 \begin{align}
 \label{isotropic}
 \vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  
 & = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \int_{4\pi}d\Omega' \psi(\vr,E',\vo')  + S_{ext}(\vr,E,\vo) \nonumber \\
 & = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \phi(\vr,E')  + S_{ext}(\vr,E,\vo) ,
 \end{align}
-where we introduced the scalar flux as the integral of the angular flux:
+where we \tcr{have} introduced the scalar flux as the integral of the angular flux:
 \begin{equation}
 \label{def_scalar_flux}
 \phi(\vr,E') = \int_{4\pi}d\Omega' \psi(\vr,E',\vo').
@@ -163,7 +163,7 @@ The concepts presented in this introduction are used to by PDT, Texas A\&M Unive
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-As mentioned in the previous section, a transport sweep is set up by overlaying a domain with a finite element mesh. The sweep then solves the transport equation cell by cell using a discontinuous finite element approach. The order of which cell to solve first is given by a task dependence graph, as shown in Fig. \ref{tdg}. The transport sweep can be solved in parallel in order to obtain the solution faster, as well as distribute the memory to many processors for memory intensive cases. In PDT, a transport sweep can be performed on both a structured and unstructured mesh, and the work proposed utilizes transport sweeps on an unstructured mesh.
+As mentioned in the previous section, a transport sweep is set up by overlaying a domain with a finite element mesh. The sweep then solves the transport equation cell by cell using a discontinuous finite element approach. The order of which cell to solve first is given by a task dependence graph, as shown in Fig. \ref{tdg}. The transport sweep can be solved in parallel in order to obtain the solution faster, as well as distribute the memory to many processors for memory intensive cases. In PDT, a transport sweep can be performed on both a structured and unstructured mesh \tcr{so, if it is done, you don't have anything to propose in your proposal ... you should rewrite this a bit to keep the suspense} and the work proposed utilizes transport sweeps on an unstructured mesh.\tcr{what I am really looking for is a couple of sentence stating that parallel sweeps on unstructured meshes is a big deal, say why it is hard, i think it is hard for various reasons: first, because it is parallel and it should be done efficiently, second, because we use many many cores, not just 20, third, because of the nature of the sweep itself and the fact that we think we will need to keep non-concave sub-domain/ this last point is transport-specific. Then you should say that PDT already do massively // transport, but on structured grids. As part of previous efforts in PDT, researchers have come to outline 3 important properties for // sweeps ... and now you are back to your text }
 
 A parallel sweep algorithm is defined by three properties:
 \begin{itemize}
@@ -277,7 +277,7 @@ There are three constraints in order to achieve the optimal stage count. In thes
 \item $\omega_z M \geq 2(Y-1)$
 \item If $\omega_x > 1$, then $\omega_y \omega_z M \geq X$
 \end{enumerate}
-Constraint 1 ensures that there is no idle time between: a processor finishing an octant's work in one tile and beginning that octant's work on the next tile in the same tile-column; processor $P(1,Y,1)$ finishing its tile $T(1,\omega_y,1)$ octant $C$ work and beginning its octant $B$ work; processor $P(X,1,1)$ finishing its tile $T(\omega_x,1,1)$ octant $D$ work and beginning its octant $B$ work. Constraint 2 ensures that there is no idle time time between: a processor finishing an octant's work for one $z$ column of tiles and beginning that octant's work on the next column; processor $P(X,1,1)$ finishing its tile $T(\omega_x,1,1)$ octant D work available to it and beginning its octant $C$ work. Constraint 3 ensures that there is no idle time between a processor finishing an octant's work for one $yz$ plane of tiles and beginning that octant's work in the next plane.
+Constraint 1 ensures that there is no idle time between a processor finishing an octant's work in one tile and beginning that octant's work on the next tile in the same tile-column; processor $P(1,Y,1)$ finishing its tile $T(1,\omega_y,1)$ octant $C$ work and beginning its octant $B$ work; processor $P(X,1,1)$ finishing its tile $T(\omega_x,1,1)$ octant $D$ work and beginning its octant $B$ work. Constraint 2 ensures that there is no idle time time between a processor finishing an octant's work for one $z$ column of tiles and beginning that octant's work on the next column; processor $P(X,1,1)$ finishing its tile $T(\omega_x,1,1)$ octant D work available to it and beginning its octant $C$ work. Constraint 3 ensures that there is no idle time between a processor finishing an octant's work for one $yz$ plane of tiles and beginning that octant's work in the next plane.
 
 As a result of these constraints, there is no idle time for a variety of situtations. At large processor counts, the product $\omega_m \omega_g$ must be large, which requires $N_m N_g$ be large. This means that a weak scaling series refined only in space, but only coarsely refined in angle and energy, will eventually fail the constraints.
 
@@ -447,6 +447,8 @@ Figure \ref{lattice} is an example of a triangular mesh of a lattice run through
 \begin{itemize}
 \item Propose a scaling study for unstructured meshes in PDT, similar to PDT's Zerr problem.
 \end{itemize}
+
+\tcr{I would have expected to see the mc 2013 and mc 2015 PDT papers in the references...}
 
 \bibliographystyle{plain}
 \bibliography{./Proposal}
