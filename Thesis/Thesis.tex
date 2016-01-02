@@ -417,38 +417,8 @@ If the number of cells in each subset can be reasonably balanced, then the probl
 \end{minipage}
 
 
-\section{Preliminary Results}
-
-Figure \ref{lattice} is an example of a triangular mesh of a lattice run through PDT. It is meshed using the coarsest possible mesh settings of the Triangle Mesh Generator. This is lattice is meshed using 16 orthogonal subsets, which can be clearly seen in the figure. As can be seen however, this problem is not balanced at all. There are subsets with only 2 triangles, and some with order 100 triangles. This will kill our sweep times, as some processors will be doing way more work than others, increasing our idle time, and thus our sweep times.
-
-\noindent\begin{minipage}{\textwidth}
-\centering
-\includegraphics[scale = .75]{proposal_lattice.pdf}
-\captionof{figure}{A reactor lattice, meshed and run in PDT.}
-\label{lattice}
-\end{minipage}
-
-\section{Goals and Proposed Plan}
-
-%\subsection{Completed Work}
-\begin{itemize}
-\item Implement unstructured meshing capability in PDT for 2D and 2D extruded problems.
-\item Generate unstructured mesh in parallel using the same partitioning scheme and number of processors as the sweep.
-\item {Perform stitching between meshed subdomains to preserve interface continuity.}
-%\end{itemize}
-
-%\subsection{Planned Work}
-%\begin{itemize}
-\item Implement load balancing algorithm for unstructured meshes in PDT. A load balanced problem would be defined by $f$ in the pseudocode, or the subset with the maximum number of cells, divided by the average number of cells per subset.
-\item Verify and test code to prove load balancing algorithm effectiveness. 
-\item Show results of the parallel transport sweeps for benchmark problems.
-\end{itemize}
-\subsection{Possible Outlook for Research}
-\begin{itemize}
-\item Propose a scaling study for unstructured meshes in PDT, similar to PDT's Zerr problem.
-\end{itemize}
-
 \bibliographystyle{plain}
 \bibliography{./Proposal}
+
 
 \end{document}
