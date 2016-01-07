@@ -416,6 +416,71 @@ If the number of cells in each subset can be reasonably balanced, then the probl
 \rule{\textwidth}{0.4pt}
 \end{minipage}
 
+\section{Results}
+
+The following sections will showcase the new unstructured meshing capability both in 2D and 3D, the metric behavior and convergence for three test cases, and solution verification for pure absorber and pure scatterer 2D slab problems. 
+
+\subsection{Test Cases for Metric Behavior and Convergence}
+
+In order to showcase the behavior of the load balancing metric, three test cases are presented. Figure \ref{opp} shows the first test case, a large domain with two pins in opposite corners of the domain. This is theoretically a very unbalanced case, 
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.5]{unbalanced_lattice.eps}
+\captionof{figure}{The first .poly file used in order to test effectiveness and convergence of the load balancing metric.}
+\label{opp}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.5]{unbalanced_pins_same_side.eps}
+\captionof{figure}{The second .poly file used in order to test effectiveness and convergence of the load balancing metric.}
+\label{same}
+\end{minipage}
+
+\subsection{Metric Behavior and Convergence}
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale=0.75]{OppNoIter.pdf}
+\captionof{figure}{The metric behavior of the first test case run with no load balancing iterations.}
+\label{same}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale=0.75]{OppIter.pdf}
+\captionof{figure}{The metric behavior of the first test case run with 10 load balancing iterations.}
+\label{same}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale=0.75]{OppDiff.pdf}
+\captionof{figure}{The difference in metric behavior between no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.}
+\label{same}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale=0.75]{SameNoIter.pdf}
+\captionof{figure}{The metric behavior of the second test case run with no load balancing iterations.}
+\label{same}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale=0.75]{SameIter.pdf}
+\captionof{figure}{The metric behavior of the second test case run with 10 load balancing iterations.}
+\label{same}
+\end{minipage}
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale=0.75]{SameDiff.pdf}
+\captionof{figure}{The difference in metric behavior of the second test case with no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.}
+\label{same}
+\end{minipage}
 
 \bibliographystyle{plain}
 \bibliography{./Proposal}
