@@ -422,7 +422,36 @@ The following sections will showcase the new unstructured meshing capability bot
 
 \subsection{Test Cases for Metric Behavior and Convergence}
 
-In order to showcase the behavior of the load balancing metric, three test cases are presented. Figure \ref{opp} shows the first test case, a large domain with two pins in opposite corners of the domain. This is theoretically a very unbalanced case, 
+In order to showcase the behavior of the load balancing metric, three test cases are presented. Figure \ref{opp} shows the first test case, a large domain with two pins in opposite corners of the domain. Figure \ref{same} shows the same size domain but with the pins on the same side.These are two theoretically very unbalanced cases, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to it's denser and repeated geometry, theoretically is a more balanced problem. 
+
+A series of 162 inputs was constructed for each case. Table \ref{study} shows the the parameters that will change in each input. The maximum triangle area varied from the coarsest possible to 0.01, and the number of subsets, $N$, varies from 2x2 to 10x10. 
+
+\noindent\begin{minipage}{\textwidth}
+\captionof{table}{The parameters of the 162 inputs for each case.}
+\centering
+\begin{tabular}{c c c c c c c c c c }
+\textbf{Area} &  N = 4	& N = 9	& N = 16	& N = 25	&N = 36&	N = 49	& N = 64	& N = 81	& N = 100  \\
+\textbf{Coarse} & 		&		& 	        & 		&          &                   &               &             &                \\
+\textbf{1.8	} & 				& 			&         &         &      &          &         &         &          \\
+\textbf{1.6	} & 				& 			&         &         &      &          &         &         &          \\
+\textbf{1.4	} & 				& 			&         &         &      &          &         &         &          \\
+\textbf{1.2	} & 				& 			&         &         &      &          &         &         &          \\
+\textbf{1}    & 				& 		  &         &         &      &          &         &         &          \\
+\textbf{0.8	} & 				& 			&         &         &      &          &         &         &          \\
+\textbf{0.6	} & 				& 			&         &         &      &          &         &         &          \\
+\textbf{0.4	} & 				& 			&         &         &      &          &         &         &          \\
+\textbf{0.2	} & 				& 			&         &         &      &          &         &         &          \\
+\textbf{0.1	} & 				& 			&         &         &      &          &         &         &          \\
+\textbf{0.08} & 				& 			& 	      &         &      &          &         &         &          \\
+\textbf{0.06} & 				& 			& 	      &         &      &          &         &         &          \\
+\textbf{0.05} & 				& 			& 	      &         &      &          &         &         &          \\
+\textbf{0.04} & 				& 			& 	      &         &      &          &         &         &          \\
+\textbf{0.03} & 				& 			& 	      &         &      &          &         &         &          \\
+\textbf{0.02} & 				& 			& 	      &         &      &          &         &         &          \\
+\textbf{0.01} & 				& 			& 	      &         &      &          &         &         &          \\
+\end{tabular}
+\label{study}
+\end{minipage}
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -436,6 +465,14 @@ In order to showcase the behavior of the load balancing metric, three test cases
 \includegraphics[scale = 0.5]{unbalanced_pins_same_side.eps}
 \captionof{figure}{The second .poly file used in order to test effectiveness and convergence of the load balancing metric.}
 \label{same}
+\end{minipage}
+
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.5]{lattice-12-shifted.eps}
+\captionof{figure}{The third .poly file used in order to test effectiveness and convergence of the load balancing metric.}
+\label{lattice}
 \end{minipage}
 
 \subsection{Metric Behavior and Convergence}
