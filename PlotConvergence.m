@@ -15,18 +15,21 @@ surface(x_plot,y_plot,no_iterations);
 xlabel('$\sqrt{N}$ Total Subsets');
 ylabel('Maximum Triangle Area');
 title('Metric Behavior with no Load Balancing Iterations');
+set(gca,'Yscale','log');
 
 figure;
 surface(x_plot,y_plot,iterations);
 xlabel('$\sqrt{N}$ Total Subsets');
 ylabel('Maximum Triangle Area');
 title('Metric Behavior with 10 Load Balancing Iterations');
+set(gca,'Yscale','log');
 
 figure;
 surface(x_plot,y_plot,difference);
 xlabel('$\sqrt{N}$ Total Subsets');
 ylabel('Maximum Triangle Area');
 title('Metric Improvement');
+set(gca,'Yscale','log');
 
 end
 

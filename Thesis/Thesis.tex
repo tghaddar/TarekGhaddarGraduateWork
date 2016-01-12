@@ -430,7 +430,7 @@ A series of 162 inputs was constructed for each case. Table \ref{study} shows th
 \captionof{table}{The parameters of the 162 inputs for each case.}
 \centering
 \begin{tabular}{c c c c c c c c c c }
-\textbf{Area} &  N = 4	& N = 9	& N = 16	& N = 25	&N = 36&	N = 49	& N = 64	& N = 81	& N = 100  \\
+\textbf{Area} &  \textbf{N = 4}	& \textbf{N = 9}	& \textbf{N = 16}	& \textbf{N = 25}	&\textbf{N = 36}&	\textbf{N = 49}	& \textbf{N = 64	}& \textbf{N = 81}	& \textbf{N = 100}  \\
 \textbf{Coarse} & 		&		& 	        & 		&          &                   &               &             &                \\
 \textbf{1.8	} & 				& 			&         &         &      &          &         &         &          \\
 \textbf{1.6	} & 				& 			&         &         &      &          &         &         &          \\
@@ -477,50 +477,74 @@ A series of 162 inputs was constructed for each case. Table \ref{study} shows th
 
 \subsection{Metric Behavior and Convergence}
 
+For each test case, the 162 input parameters outlined in Table \ref{study} are run twice, once with no load balancing iterations, and once with ten load balancing iterations. The best metric is reported and recorded. Three figures for each test cases are presented below: the first figure will show the metric behavior for no iterations, the second figure will show the metric behavior for each input run with ten load balancing iterations, and the third figure will show a ratio of the ten iteration runs over the no iteration runs.
+
+Figure \ref{oppnoiter} shows the metric behavior for Fig. \ref{opp}. The maximum metric value is 24.7650, and occurs when Fig. \ref{opp} is run with 8x8 subsets and a maximum triangle area of 1.6 cm\textsuperscript{2}. The minimum metric value is 1.0016 and occurs when Fig. \ref{opp} is run with 4x4 subsets and a maximum triangle area of 0.04 cm\textsuperscript{2}. 
+
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.75]{OppNoIter.pdf}
+\includegraphics[scale=0.75, trim = 0cm 2cm 0cm 3cm,clip]{OppNoIter.pdf}
 \captionof{figure}{The metric behavior of the first test case run with no load balancing iterations.}
-\label{same}
+\label{oppnoiter}
 \end{minipage}
+
+Figure \ref{oppiter} shows the metric behavior for Fig. \ref{opp}. The maximum metric value is 5.0538 and occurs when Fig. \ref{opp} is run with 10x10 subsets and a maximum triangle area of 1.2 cm\textsuperscript{2}. The minimum metric value is 1.0017 and occurs when Fig. \ref{opp} is run with 4x4 subsets and a maximum triangle area of 0.04 cm\textsuperscript{2}.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.75]{OppIter.pdf}
+\includegraphics[scale=0.83, , trim = 0cm 2cm 0cm 3cm,clip]{OppIter.pdf}
 \captionof{figure}{The metric behavior of the first test case run with 10 load balancing iterations.}
-\label{same}
+\label{oppiter}
 \end{minipage}
+
+Figure \ref{oppdiff} shows the difference in metric behavior for Fig. \ref{opp}. This difference is calculated by dividing the metric with no iterations by the metric with 10 iterations. The maximum improvement has a value of 0.1097 and occurs for Fig. \ref{opp} is run with 8x8 subsets with a maximum triangle area of 1.6 cm\textsuperscript{2}. The minimum improvement has a value of very close to 1.0 and occurs for many of the inputs. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.75]{OppDiff.pdf}
+\includegraphics[scale=0.78, trim = 0cm 2cm 0cm 3cm,clip]{OppDiff.pdf}
 \captionof{figure}{The difference in metric behavior between no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.}
-\label{same}
+\label{oppdiff}
 \end{minipage}
+
+Figure \ref{samenoiter} shows the metric behavior for Fig. \ref{same}. The maximum metric is 22.6654 and occurs when Fig. \ref{same} is run with 8x8 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0024 and occurs when Fig. \ref{same} is run with 2x2 subsets with a maximum triangle are of 0.01 cm\textsuperscript{2}.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.75]{SameNoIter.pdf}
+\includegraphics[scale=0.78, trim = 0cm 2cm 0cm 2cm,clip]{SameNoIter.pdf}
 \captionof{figure}{The metric behavior of the second test case run with no load balancing iterations.}
-\label{same}
+\label{samenoiter}
 \end{minipage}
+
+Figure \ref{sameiter} shows the metric behavior for Fig. \ref{same}. The maximum metric is 3.9929 and occurs when Fig. \ref{same} is run with 10x10 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0024 and occurs when Fig. \ref{same} is run with 2x2 subsets with a maximum triangle are of 0.01 cm\textsuperscript{2}.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.75]{SameIter.pdf}
+\includegraphics[scale=0.80, trim = 0cm 2cm 0cm 2cm,clip]{SameIter.pdf}
 \captionof{figure}{The metric behavior of the second test case run with 10 load balancing iterations.}
-\label{same}
+\label{sameiter}
 \end{minipage}
+
+Figure \ref{samediff} shows the difference in metric behavior for Fig. \ref{same}. The maximum improvement has a value of 0.1090 and occurs for Fig. \ref{same} is run with 8x8 subsets with Triangle's coarsest possible mesh generation settings. The minimum improvement has a value of very close to 1.0 and occurs for many of the inputs. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.75]{SameDiff.pdf}
+\includegraphics[scale=0.75, trim = 0cm 6cm 0cm 7.1cm,clip]{SameDiff.pdf}
 \captionof{figure}{The difference in metric behavior of the second test case with no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.}
-\label{same}
+\label{samediff}
+\end{minipage}
+
+
+\subsection{Solution Verification}
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\hspace*{-3 cm}\includegraphics[scale=0.8,angle=-90]{PureAbsorberSolution.pdf}
+\captionof{figure}{The solution of a pure absorbing slab.}
+\label{pureabsorber}
 \end{minipage}
 
 \bibliographystyle{plain}
-\bibliography{./Proposal}
+\bibliography{./Thesis}
 
 
 \end{document}
