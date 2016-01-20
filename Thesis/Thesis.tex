@@ -80,7 +80,20 @@
 \section{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\tcr{
+\begin{itemize}
+\item 
+The thesis is to be a more complete document than the proposal -reproductability of research is required here- so do not omit tips, tricks, and things that didn't work. Ideally, someone else should be able to re-do this.
+\item
+The Thesis introduction should not typically jump into a deluge of equations, so a long wordy intro is needed. It should explain, in almost layman's terms what problem you are tackling, why is it a problem, given some hints on how it has been done before, give some hints how how you will do it, and conclude with a description of the next chapters (plural). E.g., in Chapter 2, we review the transdport equation and its ..., in Chapter 3, we present ...., and so on.
+\item
+You should also start using the TAMU thesis template. It seperates things into chapters and you can create one latex file per chapter (the latex files can be included int he main tex file using the input or include commands. I like using 1 file per chapter as it physically symbolises a break, so when you write about chapter abc, you only think about topic abc.
+\item 
+do not spend too much time on formatting tables before you look at the TAMU template. You will likely have to reformat them ...
+\item 
+you still have some eps figures. If possible, use only one type of extension for your figures.
+\end{itemize}
+}
 The steady-state neutron transport equation describes the behavior of neutrons in a medium and is given by Eq.~\eqref{continuous transport}:
 \begin{equation}
 \vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  =
@@ -418,9 +431,14 @@ If the number of cells in each subset can be reasonably balanced, then the probl
 
 \section{Results}
 
+\tcr{give the dimension of your domains. I suppose since XS are in 1/cm, the domain and the trinalge areas are in cm2 but say it}
+
 The following sections will showcase the new unstructured meshing capability both in 2D and 3D, the metric behavior and convergence for three test cases, and solution verification for pure absorber and pure scatterer 2D slab problems. 
 
 \subsection{2D and 2D Extruded Meshing Capability}
+
+\tcr{not sure what you want to start with what could be the best results. Why not build up momentum and show this as the grand finale?}
+
 
 Figure \ref{IM12D} showcases the 2D meshing capability, and Fig. \ref{IM13D} showcases the same mesh extruded in the z  direction.
 
@@ -428,7 +446,7 @@ Figure \ref{IM12D} showcases the 2D meshing capability, and Fig. \ref{IM13D} sho
 
 \subsection{Test Cases for Metric Behavior and Convergence}
 
-In order to showcase the behavior of the load balancing metric, three test cases are presented. Figure \ref{opp} shows the first test case, a large domain with two pins in opposite corners of the domain. Figure \ref{same} shows the same size domain but with the pins on the same side.These are two theoretically very unbalanced cases, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to it's denser and repeated geometry, theoretically is a more balanced problem. 
+In order to showcase the behavior of the load balancing metric \tcr{it would be good to provide the equation number for the metric, for clarity}, three test cases are presented. Figure \ref{opp} shows the first test case, a large domain with two pins in opposite corners of the domain. Figure \ref{same} shows the same size domain but with the pins on the same side.These are two theoretically very unbalanced cases, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to it's denser and repeated geometry, theoretically is a more balanced problem. 
 
 A series of 162 inputs was constructed for each case. Table \ref{study} shows the the parameters that will change in each input. The maximum triangle area varied from the coarsest possible to 0.01, and the number of subsets, $N$, varies from 2x2 to 10x10. 
 
@@ -459,7 +477,9 @@ A series of 162 inputs was constructed for each case. Table \ref{study} shows th
 \label{study}
 \end{minipage}
 
-\noindent\begin{minipage}{\textwidth}
+\tcr{do not call first and second poly files. Be creative, come up with names for the examples, be it only Example 1,2,3, or Example I,II,III, or Example A, B, C ....}
+
+  \noindent\begin{minipage}{\textwidth}
 \centering
 \includegraphics[scale = 0.5]{unbalanced_lattice.eps}
 \captionof{figure}{The first .poly file used in order to test effectiveness and convergence of the load balancing metric.}
@@ -542,7 +562,7 @@ Figure \ref{samediff} shows the difference in metric behavior for Fig. \ref{same
 
 \subsection{Solution Verification}
 
-The test problem ran for solution verification is a pure absorbing slab with $\Sigma_a = 0.3 \text{cm}^-1$. It has reflecting boundary conditions on the top and the bottom, an incident isotropic flux on the left, and a vacuum boundary on the left. The reflecting boundaries are implemented to simulate an infinite slab in the y direction. The analytical solution to this problem is exponential, and with the flux placed on a logarithmic scale, we see the flux linearly decrease in the x direction. 
+The test problem ran for solution verification is a pure absorbing slab with $\Sigma_a = 0.3 \text{cm}^{-1}$. It has reflecting boundary conditions on the top and the bottom, an incident isotropic flux on the left, and a vacuum boundary on the left. The reflecting boundaries are implemented to simulate an infinite slab in the y direction. The analytical solution to this problem is exponential \tcr{give the analytical expression and compare the ratio of analytical values (inlet/outlet)  with the numerical ones}, and with the flux placed on a logarithmic scale, we see the flux linearly decrease in the x direction. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -554,5 +574,5 @@ The test problem ran for solution verification is a pure absorbing slab with $\S
 \bibliographystyle{plain}
 \bibliography{./Thesis}
 
-
+\tcr{also use an optically thin domain with a pure scatterer, reflecting top/bottom, isotropic incident left, vacuum right, and verify that the solution is a straight line and compare left/right values with the known analytical solution}
 \end{document}
