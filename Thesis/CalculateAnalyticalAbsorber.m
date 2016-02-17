@@ -1,28 +1,37 @@
-function [flux] = CalculateAnalyticalAbsorber( num_angles_polar,num_angles_az, analyticalX )
+function [flux] = CalculateAnalyticalAbsorber
 %Calculates the analytical solution using quadrature.
+close all; clc;
 
-[nodes,weights] = lgwt(2*num_angles_polar,-1,1);
-psi_incident = 7;
+num_positive_polar=5;
 
-weight_az = 2*pi/(4*num_angles_az);
-weight_az
+psi_incident = 7/2;
+x=(linspace(0,1,1000))';
+scalar_flux = zeros(length(x),1);
+XS=5;
 
-flux = zeros(length(analyticalX),1);
-
-for i = 1:length(analyticalX)
-   x_val = analyticalX(i);
-   flux_val = 0;
-   for j = 1:length(nodes)
-      mu_val = abs(nodes(j));
-      polar_weight = weights(j);
-      flux_val = flux_val +polar_weight*weight_az*exp(-5*x_val/mu_val);
-   end
-   
-   flux(i) = psi_incident * flux_val;
-    %flux(i) = flux_val;
+for i_polar=1:num_positive_polar
+    if(i_polar==1)
+        leg=char(num2str(i_polar));
+    else
+        leg=char(leg,num2str(i_polar));
+    end
+    [mu,w] = lgwt(2*i_polar,-1,1);
+    ind=find(mu>0);
+    mu_positive=mu(ind);
+    scalar_flux = zeros(length(x),1);
+    for j = 1:length(mu_positive)
+        mu_val = mu_positive(j);
+        polar_weight = w(j);
+        scalar_flux = scalar_flux + psi_incident*polar_weight*exp(-XS*x/mu_val);
+    end
+    plot(x,scalar_flux); hold all;
 end
 
+s = psi_incident*expint(2,sym(XS*x));
+exact = vpa(s,10);
+plot(x,exact,'-+');
+leg=char(leg,'Analytical');
 
-
+legend(leg,'Location','Best')
 end
 
