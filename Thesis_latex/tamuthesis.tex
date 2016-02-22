@@ -21,7 +21,25 @@
  \usepackage{appendix}
  \usepackage{tamuconfig}
 \usepackage{rotating}
+%Graphics
 \usepackage{float}
+\usepackage{xcolor,graphicx}
+%Math stuff
+\usepackage{amsmath}
+\usepackage{mathptmx}
+\usepackage[mathscr]{euscript}
+\newcommand{\vr}{\vec{r}}
+\newcommand{\vo}{\vec{\Omega}}
+%Changing spacing in itemized lists
+\usepackage{enumitem}
+\setlist{nosep}
+%Include a pdf file
+\usepackage{pdfpages}
+%Algorithm
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\renewcommand{\arraystretch}{1}
+\usepackage{caption}
 
 % Added to fix issues with pdf searching in some versions of LaTeX
 %\usepackage[T1]{fontenc}\usepackage{lmodern}
@@ -71,15 +89,13 @@
 
 \include{titlepage} % This is simply a file that formats and adds your titlepage, please do not edit this unless you have a specific need. .
 \include{abstract}
-\include{dedication}
 \include{acknowledgements}
 \include{nomenclature}
 
 \include{lists}  % This is simply a file that formats and adds your toc, lof, and lot, please do not edit this unless you have a specific need. .
 
-\include{section1}
-\include{section2}
-\include{section3}
+\include{introduction}
+\include{transporteq}
 
 fix spacing in bibliography, if any...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
