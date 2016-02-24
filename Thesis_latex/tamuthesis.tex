@@ -40,6 +40,9 @@
 \usepackage{algorithmic}
 \renewcommand{\arraystretch}{1}
 \usepackage{caption}
+\usepackage{array}
+\newcolumntype{L}{>{\centering\arraybackslash}m{3cm}}
+\newcommand{\tcr}[1]{\textcolor{red}{#1}}
 
 % Added to fix issues with pdf searching in some versions of LaTeX
 %\usepackage[T1]{fontenc}\usepackage{lmodern}
@@ -84,7 +87,7 @@
 \renewcommand{\tamudepthead}{Dr. Yassin Hassan}
 \renewcommand{\tamugradmonth}{May}
 \renewcommand{\tamugradyear}{2016}
-\renewcommand{\tamudepartment}{Nuclear Engineering}
+\renewcommand{\tamudepartment}{Nuclear Engineering}d
 
 
 \include{titlepage} % This is simply a file that formats and adds your titlepage, please do not edit this unless you have a specific need. .
@@ -96,6 +99,9 @@
 
 \include{introduction}
 \include{transporteq}
+\include{transportsweeps}
+\include{motivationandmethod}
+\include{results}
 
 fix spacing in bibliography, if any...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
