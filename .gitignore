@@ -39,3 +39,7 @@
 *.txt
 Thumbs.db
 *~
+*.aux
+*.bbl
+*.log
+*.blg
