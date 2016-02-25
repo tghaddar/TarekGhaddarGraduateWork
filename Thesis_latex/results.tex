@@ -27,7 +27,7 @@ A series of 162 inputs was constructed for each case. Table \ref{study} shows th
 \captionof{table}{The parameters of the 162 inputs for each case.}
 \centering
 \begin{tabular}{c c c c c c c c c c }
-\textbf{Area test is coarse so fuck it} &  \textbf{N = 4}	& \textbf{N = 9}	& \textbf{N = 16}	& \textbf{N = 25}	&\textbf{N = 36}&	\textbf{N = 49}	& \textbf{N = 64	}& \textbf{N = 81}	& \textbf{N = 100}  \\
+\textbf{Coarse} &  \textbf{N = 4}	& \textbf{N = 9}	& \textbf{N = 16}	& \textbf{N = 25}	&\textbf{N = 36}&	\textbf{N = 49}	& \textbf{N = 64	}& \textbf{N = 81}	& \textbf{N = 100}  \\
 \textbf{Coarse} & 		&		& 	        & 		&          &                   &               &             &                \\
 \textbf{1.8	} & 				& 			&         &         &      &          &         &         &          \\
 \textbf{1.6	} & 				& 			&         &         &      &          &         &         &          \\
@@ -135,7 +135,87 @@ Figure \ref{samediff} shows the difference in metric behavior for Fig. \ref{same
 
 \section{Solution Verification}
 
-The test problem ran for solution verification is a pure absorbing slab with $\Sigma_a = 0.3 \text{cm}^{-1}$. It has reflecting boundary conditions on the top and the bottom, an incident isotropic flux on the left, and a vacuum boundary on the left. The reflecting boundaries are implemented to simulate an infinite slab in the y direction. The analytical solution to this problem is exponential \tcr{give the analytical expression and compare the ratio of analytical values (inlet/outlet)  with the numerical ones}, and with the flux placed on a logarithmic scale, we see the flux linearly decrease in the x direction. 
+For solution verification, two simple problems were chosen: a 1D pure absorber slab and a 1D pure scatterer slab. These problems were chosen because their analytical solutions are easily obtained, thus making a comparison between PDT's solution and the analytical solution easy and informative. The same geometry and mesh were used for both problems, and are shown in Figure \ref{verificationgeometry}.
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.12,trim = 10cm 10cm 0cm 0cm ]{figures/solutionmesh.png}
+\captionof{figure}{The geometry and mesh used in solution verification problems.}
+\label{verificationgeometry}
+\end{minipage}
+\smallskip
+
+The problem geometry is a 1 cm by 1 cm square. In order to simulate a 1D slab, opposing reflecting boundaries were placed on the both y boundaries, effectively forcing the problem to be infinite in the y direction. At the x minimum boundary, an incident isotropic flux was used, and a vacuum boundary was enforced at the x max boundary. No source was used in either problem.
+
+In order to measure how close the numerical and analytical solutions an error estimate, represented by, Eq. ~\eqref{error}, is used:
+\begin{equation}
+\epsilon = \frac{\norm{\text{Analytical} - \text{ Numerical}}_{l2}}{\norm{\text{Analytical}}_{l2}},
+\label{error}
+\end{equation}
+where the $l2$ norm of the absolute error is divided by the $l2$ norm of the analytical solution.
+
+\subsection{The 1D Pure Absorber Slab}
+
+For monoenergetic neutrons, a source free, 1D pure absorber slab, the transport equation is represented by Eq. ~\eqref{absorbertransport}:
+%Absorber transport
+\begin{equation}
+\mu \frac{d\psi}{dx} + \Sigma_a \psi = 0,
+\label{absorbertransport}
+\end{equation}
+where $\psi$ is the angular flux, $\Sigma_a$ is the macroscopic absorption cross section, and $\mu$ is the cosine of the polar angle. Remembering that the scalar flux in a pure absorber is simply the angular flux integrated for $\mu > 0$, the scalar flux with our boundary conditions is represented by Eq. ~\eqref{absorberflux}:
+%Absorber flux
+\begin{equation}
+\phi(x) = \frac{\psi_{inc}}{2} E_{2}(\Sigma_a x),
+\label{absorberflux}
+\end{equation}
+where $\phi$ is the scalar flux, $\psi_{inc}$ is the defined incident isotropic flux, and $E_2$ is the exponential integral function with $n=2$. 
+
+The pure absorber was run with $\psi_{inc} = 7 \frac{\text{n}}{\text{cm}^2\text{-s-ster}}$ and $\Sigma_a = 5 \text{ cm}^{-1}$. Figure \ref{pa_allangles} shows a comparison of the analytical solution with PDT's solution for four different angular refinements. All four PDT runs used only 1 azimuthal angle per quadrant, but varied the number of positive polar angles, because the problem is not azimuthally dependent. The number of positive polar angles used were 1,5,10, and 70. 
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.8]{figures/PureAbsorberAllAngles.eps}
+\captionof{figure}{The pure absorber solution with four different angular refinements.}
+\label{pa_allangles}
+\end{minipage}
+\smallskip
+
+It is immediately clear that not many polar angles are necessary for agreement with the analytical solution. Figure \ref{pa_bestangle} examines the 70 positive polar angle case exclusively in comparison with the analytical solution. It is immediately clear graphically that the solutions are in agreement, and the relative error of the numerical solution is 0.012, as defined by Eq. ~\eqref{error}.
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.8]{figures/PureAbsorberBestangle.eps}
+\captionof{figure}{The pure absorber solution run with 70 positive polar angles.}
+\label{pa_bestangle}
+\end{minipage}
+\smallskip
+
+\subsection{The 1D Pure Scatterer Slab}
+
+For an optically thick, source free 1D pure absorber with monoenergetic neutrons, the transport solution will reach the diffusion limit. The diffusion equation for this problem is represented by Eq. ~\eqref{diffusion}:
+\begin{equation}
+\frac{d^2\phi}{dx^2} = 0.
+\label{diffusion}
+\end{equation}
+
+With a Marshak boundary on the left boundary and an extrapolated vacuum boundary condition on the right, the scalar flux is represented by Eq. ~\eqref{scatterflux}:
+
+\begin{equation}
+\phi(x) = -\frac{\phi_{inc}}{1+ 4D}x + \phi_{inc} - \frac{14D}{1+ 4D},
+\label{scatterflux}
+\end{equation}
+where $\phi$ is the scalar flux, and $D$ is the diffusion coefficient, which is equivalent to $\frac{1}{3 \Sigma_t}$, where $\Sigma_t$ is the total macroscopic cross section. This problem was run with $\Sigma_t = 100 \text{ cm}^{-1}$ and $\phi_{inc} = 7 \frac{\text{n}}{\text{cm}^2\text{-s}}$. Figure \ref{scattersoln} shows the agreement between the analytical solution and PDT's solution. An angular refinement of 40 polar angles was used, with one azimuthal angle in each quadrant.
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.8]{figures/PureScatterer.eps}
+\captionof{figure}{The pure scatterer solution run with 40 positive polar angles.}
+\label{scattersoln}
+\end{minipage}
+\smallskip
+
+It is immediately clear graphically that the two solutions are in agreement, and the relative error of the numerical solution is 4.25E-04, as defined by Eq. ~\eqref{error}.
+
 
 %\noindent\begin{minipage}{\textwidth}
 %\centering
