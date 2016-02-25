@@ -38,3 +38,8 @@
 .DS_Store
 *.txt
 Thumbs.db
+*~
+*.aux
+*.bbl
+*.log
+*.blg
