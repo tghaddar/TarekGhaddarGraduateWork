@@ -52,17 +52,17 @@ A series of 162 inputs was constructed for each case. Table \ref{study} shows th
 
 \tcr{do not call first and second poly files. Be creative, come up with names for the examples, be it only Example 1,2,3, or Example I,II,III, or Example A, B, C ....}
 
-  \noindent\begin{minipage}{\textwidth}
+\noindent\begin{minipage}{\textwidth}
 \centering
 \includegraphics[scale = 0.5]{figures/unbalanced_lattice.eps}
-\captionof{figure}{The first .poly file used in order to test effectiveness and convergence of the load balancing metric.}
+\captionof{figure}{The first test case used in order to test effectiveness and convergence of the load balancing metric.}
 \label{opp}
 \end{minipage}
 
 \noindent\begin{minipage}{\textwidth}
 \centering
 \includegraphics[scale = 0.5]{figures/unbalanced_pins_same_side.eps}
-\captionof{figure}{The second .poly file used in order to test effectiveness and convergence of the load balancing metric.}
+\captionof{figure}{The second test case used in order to test effectiveness and convergence of the load balancing metric.}
 \label{same}
 \end{minipage}
 
@@ -70,7 +70,7 @@ A series of 162 inputs was constructed for each case. Table \ref{study} shows th
 \noindent\begin{minipage}{\textwidth}
 \centering
 \includegraphics[scale = 0.5]{figures/lattice-12-shifted.eps}
-\captionof{figure}{The third .poly file used in order to test effectiveness and convergence of the load balancing metric.}
+\captionof{figure}{The third test case used in order to test effectiveness and convergence of the load balancing metric.}
 \label{lattice}
 \end{minipage}
 
@@ -82,52 +82,57 @@ Figure \ref{oppnoiter} shows the metric behavior for Fig. \ref{opp}. The maximum
 
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.75, trim = 0cm 2cm 0cm 3cm,clip]{figures/OppNoIter.pdf}
+\includegraphics[scale=0.75, trim = 0cm 8cm 0cm 7cm,clip]{figures/OppNoIter.pdf}
 \captionof{figure}{The metric behavior of the first test case run with no load balancing iterations.}
 \label{oppnoiter}
 \end{minipage}
+\smallskip
 
 Figure \ref{oppiter} shows the metric behavior for Fig. \ref{opp}. The maximum metric value is 5.0538 and occurs when Fig. \ref{opp} is run with 10x10 subsets and a maximum triangle area of 1.2 cm\textsuperscript{2}. The minimum metric value is 1.0017 and occurs when Fig. \ref{opp} is run with 4x4 subsets and a maximum triangle area of 0.04 cm\textsuperscript{2}.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.83, , trim = 0cm 2cm 0cm 3cm,clip]{figures/OppIter.pdf}
+\includegraphics[scale=0.83, , trim = 2cm 6cm 2cm 7cm,clip]{figures/OppIter.pdf}
 \captionof{figure}{The metric behavior of the first test case run with 10 load balancing iterations.}
 \label{oppiter}
 \end{minipage}
+\smallskip
 
 Figure \ref{oppdiff} shows the difference in metric behavior for Fig. \ref{opp}. This difference is calculated by dividing the metric with no iterations by the metric with 10 iterations. The maximum improvement has a value of 0.1097 and occurs for Fig. \ref{opp} is run with 8x8 subsets with a maximum triangle area of 1.6 cm\textsuperscript{2}. The minimum improvement has a value of very close to 1.0 and occurs for many of the inputs. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.78, trim = 0cm 2cm 0cm 3cm,clip]{figures/OppDiff.pdf}
+\includegraphics[scale=0.78, trim = 2cm 6cm 2cm 7cm,clip]{figures/OppDiff.pdf}
 \captionof{figure}{The difference in metric behavior between no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.}
 \label{oppdiff}
 \end{minipage}
+\smallskip
 
 Figure \ref{samenoiter} shows the metric behavior for Fig. \ref{same}. The maximum metric is 22.6654 and occurs when Fig. \ref{same} is run with 8x8 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0024 and occurs when Fig. \ref{same} is run with 2x2 subsets with a maximum triangle are of 0.01 cm\textsuperscript{2}.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.78, trim = 0cm 2cm 0cm 2cm,clip]{figures/SameNoIter.pdf}
+\includegraphics[scale=0.78, trim = 2cm 6cm 2cm 7cm,clip]{figures/SameNoIter.pdf}
 \captionof{figure}{The metric behavior of the second test case run with no load balancing iterations.}
 \label{samenoiter}
 \end{minipage}
+\smallskip
 
 Figure \ref{sameiter} shows the metric behavior for Fig. \ref{same}. The maximum metric is 3.9929 and occurs when Fig. \ref{same} is run with 10x10 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0024 and occurs when Fig. \ref{same} is run with 2x2 subsets with a maximum triangle are of 0.01 cm\textsuperscript{2}.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.80, trim = 0cm 2cm 0cm 2cm,clip]{figures/SameIter.pdf}
+\includegraphics[scale=0.80, trim = 2cm 6cm 2cm 7cm,clip]{figures/SameIter.pdf}
 \captionof{figure}{The metric behavior of the second test case run with 10 load balancing iterations.}
 \label{sameiter}
 \end{minipage}
+\smallskip
 
 Figure \ref{samediff} shows the difference in metric behavior for Fig. \ref{same}. The maximum improvement has a value of 0.1090 and occurs for Fig. \ref{same} is run with 8x8 subsets with Triangle's coarsest possible mesh generation settings. The minimum improvement has a value of very close to 1.0 and occurs for many of the inputs. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
-\includegraphics[scale=0.80, trim = 0cm 3cm 0cm 3cm,clip]{figures/SameDiff.pdf}
+\includegraphics[scale=0.80, trim = 2cm 6cm 2cm 7cm,clip]{figures/SameDiff.pdf}
 \captionof{figure}{The difference in metric behavior of the second test case with no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.}
 \label{samediff}
 \end{minipage}
