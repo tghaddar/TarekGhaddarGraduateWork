@@ -3,25 +3,15 @@
 \setcounter{page}{1}
 
 \chapter{\uppercase {Results}}
+\label{ch:results}
 
-\tcr{give the dimension of your domains. I suppose since XS are in 1/cm, the domain and the trinalge areas are in cm2 but say it}
-
-The following sections will showcase the new unstructured meshing capability both in 2D and 3D, the metric behavior and convergence for three test cases, and solution verification for pure absorber and pure scatterer 2D slab problems. 
-
-\section{2D and 2D Extruded Meshing Capability}
-
-\tcr{not sure what you want to start with what could be the best results. Why not build up momentum and show this as the grand finale?}
-
-
-Figure \ref{IM12D} showcases the 2D meshing capability, and Fig. \ref{IM13D} showcases the same mesh extruded in the z  direction.
-
-
+The following sections will showcase the metric behavior and convergence for three test cases, solution verification for pure absorber and pure scatterer 2D slab problems, and the new unstructured meshing capability both in 2D and 3D.
 
 \section{Test Cases for Metric Behavior and Convergence}
+\label{sec:convergence}
+In order to showcase the behavior of the load balancing metric, calculated by Eq. \ref{metric_def} three test cases are presented. Figure \ref{opp} shows the first test case, a 20 cm by 20 cm domain with two pins in opposite corners of the domain. Figure \ref{same} shows the same size domain but with the pins on the same side.These are two theoretically very unbalanced cases, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to it's denser and repeated geometry, theoretically is a more balanced problem. 
 
-In order to showcase the behavior of the load balancing metric \tcr{it would be good to provide the equation number for the metric, for clarity}, three test cases are presented. Figure \ref{opp} shows the first test case, a large domain with two pins in opposite corners of the domain. Figure \ref{same} shows the same size domain but with the pins on the same side.These are two theoretically very unbalanced cases, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to it's denser and repeated geometry, theoretically is a more balanced problem. 
-
-A series of 162 inputs was constructed for each case. Table \ref{study} shows the the parameters that will change in each input. The maximum triangle area varied from the coarsest possible to 0.01, and the number of subsets, $N$, varies from 2x2 to 10x10. 
+A series of 162 inputs was constructed for each case. Table \ref{study} shows the the parameters that will change in each input. The maximum triangle area varied from the coarsest possible to 0.01 cm\textsuperscript{2}, and the number of subsets, $N$, varies from 2x2 to 10x10. 
 
 \noindent\begin{minipage}{\textwidth}
 \captionof{table}{The parameters of the 162 inputs for each case.}
@@ -88,7 +78,7 @@ Figure \ref{oppnoiter} shows the metric behavior for Fig. \ref{opp}. The maximum
 \end{minipage}
 \smallskip
 
-Figure \ref{oppiter} shows the metric behavior for Fig. \ref{opp}. The maximum metric value is 5.0538 and occurs when Fig. \ref{opp} is run with 10x10 subsets and a maximum triangle area of 1.2 cm\textsuperscript{2}. The minimum metric value is 1.0017 and occurs when Fig. \ref{opp} is run with 4x4 subsets and a maximum triangle area of 0.04 cm\textsuperscript{2}.
+Figure \ref{oppiter} shows the metric behavior for Fig. \ref{opp} after 10 load balancing iterations. The maximum metric value is 5.0538 and occurs when Fig. \ref{opp} is run with 10x10 subsets and a maximum triangle area of 1.2 cm\textsuperscript{2}. The minimum metric value is 1.0017 and occurs when Fig. \ref{opp} is run with 4x4 subsets and a maximum triangle area of 0.04 cm\textsuperscript{2}.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -118,7 +108,7 @@ Figure \ref{samenoiter} shows the metric behavior for Fig. \ref{same}. The maxim
 \end{minipage}
 \smallskip
 
-Figure \ref{sameiter} shows the metric behavior for Fig. \ref{same}. The maximum metric is 3.9929 and occurs when Fig. \ref{same} is run with 10x10 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0024 and occurs when Fig. \ref{same} is run with 2x2 subsets with a maximum triangle are of 0.01 cm\textsuperscript{2}.
+Figure \ref{sameiter} shows the metric behavior for Fig. \ref{same} after ten load balancing iterations. The maximum metric is 3.9929 and occurs when Fig. \ref{same} is run with 10x10 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0024 and occurs when Fig. \ref{same} is run with 2x2 subsets with a maximum triangle are of 0.01 cm\textsuperscript{2}.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -136,7 +126,39 @@ Figure \ref{samediff} shows the difference in metric behavior for Fig. \ref{same
 \captionof{figure}{The difference in metric behavior of the second test case with no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.}
 \label{samediff}
 \end{minipage}
+\smallskip
 
+Figure \ref{latticenoiter} shows the metric behavior for Fig. \ref{lattice}. The maximum metric is 2.6489 and occurs when Fig. \ref{lattice} is run with 10x10 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0179 and occurs when Fig. \ref{lattice} is run with 2x2 subsets with a maximum triangle are of 0.08 cm\textsuperscript{2}.
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale=0.80, trim = 2cm 6cm 2cm 7cm,clip]{figures/lattice_no_iter.pdf}
+\captionof{figure}{The difference in metric behavior of the third test case with no load balancing iterations.}
+\label{latticenoiter}
+\end{minipage}
+\smallskip
+
+Figure \ref{latticeiter} shows the metric behavior for Fig. \ref{lattice} after ten load balancing iterations. The maximum metric is 2.2660 and occurs when Fig. \ref{lattice} is run with 10x10 subsets with a maximum triangle area of 0.4 cm\textsuperscript{2}. The minimum metric is 1.0021 and occurs when Fig. \ref{lattice} is run with 2x2 subsets with the Triangle's coarsest possible mesh.
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale=0.80, trim = 2cm 6cm 2cm 7cm,clip]{figures/lattice_iter.pdf}
+\captionof{figure}{The difference in metric behavior of the third test case after ten load balancing iterations.}
+\label{latticeiter}
+\end{minipage}
+\smallskip
+
+Figure \ref{latticediff} shows the difference in metric behavior for Fig. \ref{lattice}. The maximum improvement has a value of 0.4476 and occurs for Fig. \ref{lattice} is run with 2x2 subsets with Triangle's coarsest possible mesh generation settings. The minimum improvement has a value of very close to 1.0 and occurs for many of the inputs. 
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale=0.80, trim = 2cm 6cm 2cm 7cm,clip]{figures/lattice_diff.pdf}
+\captionof{figure}{The difference in metric behavior of the third test case with no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.}
+\label{latticediff}
+\end{minipage}
+\smallskip
+
+Because Fig. \ref{lattice} has more features and is more symmetric of a problem, the initial load balancing metric will not be as large as the load balancing metric of Figs. \ref{same} and \ref{opp}. As a result, the improvement in the load balancing metric after 10 iterations will not be as great in problems similar to Fig. \ref{lattice}. 
 
 \section{Solution Verification}
 
@@ -164,16 +186,35 @@ where the $l2$ norm of the absolute error is divided by the $l2$ norm of the ana
 For monoenergetic neutrons, a source free, 1D pure absorber slab, the transport equation is represented by Eq. ~\eqref{absorbertransport}:
 %Absorber transport
 \begin{equation}
-\mu \frac{d\psi}{dx} + \Sigma_a \psi = 0,
+\mu \frac{d\psi (x,\mu>0)}{dx} + \Sigma_a \psi(x,\mu>0) = 0,
 \label{absorbertransport}
 \end{equation}
-where $\psi$ is the angular flux, $\Sigma_a$ is the macroscopic absorption cross section, and $\mu$ is the cosine of the polar angle. Remembering that the scalar flux in a pure absorber is simply the angular flux integrated for $\mu > 0$, the scalar flux with our boundary conditions is represented by Eq. ~\eqref{absorberflux}:
+where $\psi$ is the angular flux, $\Sigma_a$ is the macroscopic absorption cross section, and $\mu$ is the cosine of the polar angle. The boundary conditions for this problem are expressed in Eq. ~\eqref{boundaryconditions}:
+\begin{align}
+\label{boundaryconditions}
+\psi(0,\mu>0) &= \int_{0}^{2\pi}d\gamma \int_{0}^{1}\frac{\psi_{inc}}{4\pi} d\mu = \frac{\psi_{inc}}{2} \text{ (incident isotropic)} \notag \\
+\psi(x_{\text{max}},\mu<0) &= 0 \text{ (vacuum)},
+\end{align}
+where $\psi_{inc}$ is the defined incident angular flux. Equation ~\eqref{absorber_derivation} solves the transport equation via separation of variables to get the angular flux for this problem:
+%absorber derivation
+\begin{align}
+\label{absorber_derivation}
+\frac{d\psi(x,\mu>0)}{dx} &= -\frac{\Sigma_a}{\mu} x \notag \\
+\frac{d\psi(x,\mu>0)}{\psi(x,\mu>0)} &= -\frac{\Sigma_a}{\mu} x dx \notag \\
+\int_{\psi(0,\mu>0)}^{\psi(x,\mu>0)}\frac{d\psi(x,\mu>0)}{\psi(x,\mu>0)} &= \int_{0}^{x}-\frac{\Sigma_a}{\mu} x' dx' \notag \\
+\ln\frac{\psi(x,\mu>0)}{\psi(0,\mu>0)} &= -\frac{\Sigma_a}{\mu} x \notag \\
+\psi(x,\mu>0) & = \psi(0,\mu>0)\exp(-\frac{\Sigma_a}{\mu} x) \notag \\
+\psi(x,\mu>0) & = \frac{\psi_{inc}}{2}\exp(-\frac{\Sigma_a}{\mu} x) 
+\end{align}
+
+Using the fact that the scalar flux in this pure absorber is simply the angular flux integrated for $\mu > 0$, the scalar flux with our boundary conditions is represented by Eq. ~\eqref{absorberflux}:
 %Absorber flux
-\begin{equation}
-\phi(x) = \frac{\psi_{inc}}{2} E_{2}(\Sigma_a x),
+\begin{align}
+\phi(x) &= \int_{0}^{1}\psi(x,\mu>0) d\mu \notag \\
+&= \int_{0}^{1}\frac{\psi_{inc}}{2}\exp(-\frac{\Sigma_a}{\mu} x) d\mu = \frac{\psi_{inc}}{2} E_{2}(\Sigma_a x),
 \label{absorberflux}
-\end{equation}
-where $\phi$ is the scalar flux, $\psi_{inc}$ is the defined incident isotropic flux, and $E_2$ is the exponential integral function with $n=2$. 
+\end{align}
+where $\phi$ is the scalar flux and $E_2$ is the exponential integral function with $n=2$. 
 
 The pure absorber was run with $\psi_{inc} = 7 \frac{\text{n}}{\text{cm}^2\text{-s-ster}}$ and $\Sigma_a = 5 \text{ cm}^{-1}$. Figure \ref{pa_allangles} shows a comparison of the analytical solution with PDT's solution for four different angular refinements. All four PDT runs used only 1 azimuthal angle per quadrant, but varied the number of positive polar angles, because the problem is not azimuthally dependent. The number of positive polar angles used were 1,5,10, and 70. 
 
@@ -221,6 +262,27 @@ where $\phi$ is the scalar flux, and $D$ is the diffusion coefficient, which is 
 
 It is immediately clear graphically that the two solutions are in agreement, and the relative error of the numerical solution is 4.25E-04, as defined by Eq. ~\eqref{error}.
 
+\section{2D and 2D Extruded Meshing Capability}
+
+To showcase, the newly implemented unstructured meshing capability in PDT, Texas A\&M Nuclear Engineering's Impurity Model 1 (IM1) problem is used. Figure \ref{IM12D} showcases the 2D mesh of the IM1 problem,
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.13]{figures/im12d.png}
+\captionof{figure}{The 2D mesh of the IM1 problem.}
+\label{IM12D}
+\end{minipage}
+\smallskip
+
+In order to get from the 2D mesh to the 2D extruded mesh, an extrusion file is supplied to PDT. This extrusion file supplies two critical pieces of information: the number of z layers and their locations, and how each region of the 2D mesh is mapped to these z layers. The combination of the 2D mesh and the extrusion file yield the full 3D problem, shown in Fig. \ref{IM13D}.
+
+\noindent\begin{minipage}{\textwidth}
+\centering
+\includegraphics[scale = 0.5]{figures/IM1_3D.png}
+\captionof{figure}{The 2D extruded view of the IM1 problem.}
+\label{IM13D}
+\end{minipage}
+\smallskip
 
 %\noindent\begin{minipage}{\textwidth}
 %\centering
