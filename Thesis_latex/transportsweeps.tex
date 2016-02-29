@@ -55,7 +55,7 @@ T_{\text{comm}} = M_L T_{\text{latency}} + T_{\text{byte}} N_{\text{bytes}}
 T_{\text{task}} = A_x A_y A_z A_m A_g T_{\text{grind}}
 \label{Ttask}
 \end{equation}
-where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. If a high value of $M_L$ is necessary for the model to match computational results, improvements should be made in code implementation.
+where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. If a high value of $M_L$ is necessary for the \tcr{performance} model to match computational results, improvements should be made in code implementation.
 
 \section{KBA Partitioning for Structured Grids}
 
@@ -66,6 +66,9 @@ The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_
 \varepsilon_{KBA} = \frac{1}{[1+\frac{4(P_x+P_y-2)}{8MN_k}][1+\frac{T_{\text{comm}}}{T_{\text{task}}}]}
 \label{eKBA}
 \end{equation}
+
+\tcr{in the next section, you talk about stages, minimum number of stages to reach
+the center-most proc, ..., it would be good that to discuss KBA and PDT sweeps with as much as possible the same language. Add a few things here to allow for an easier comparison with the PDT text below}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The Structured Transport Sweep in PDT}
@@ -84,6 +87,10 @@ N_{\text{tasks}} = 8 N_m N_g N_k
 \label{ntasks}
 \end{equation}
 where $\delta_u$ is 1 for $P_u$ odd, and 0 for $P_u$ even.
+
+\tcr{next, you start discussing volumetric overladed and non-overloaded but it feels that the discussion above doesn't naturally lead to this. Can you explain the logic a bit more. 
+First, why do you call it volumetric? Are they not all volumetric? To me, volumetric also implies no long skinny columns ... so is this a got term? Also, you give an efficiency in eq. 3.8 but it may not be clear how you compare it to KBA. I feel there is a bit of a mix in between the MC2013 and MC2015 papers of Michael, but try to get the bottom line to be evident.} 
+\tcr{Later, you say hybrid-KBA but explain how it is related to the SQO discussion below, I was under the impression hybrid was mainly Pz=2...}
 
 Figure \ref{partitioning} shows three different partitioning schemes used in transport sweeps, KBA (which is defined in the previous section), volumetric non-overloaded, and volumetric overloaded. Volumetric non-overloaded requires that all cells owned by a processor are contiguous, where as volumetric non-overloaded partitioning does not have this restriction.  
 
@@ -161,6 +168,7 @@ While (uncompleted tasks)
 An important part of the algorithm above is the assigning priorities to tasks. Specialized prioritization heuristics generate partition boundary data as rapidly as possible in order to minimize the processor idle time. 
 
 Nearly linear speedups were obtained on up to 126 processors. Further work is being done for scaling to thousands of processors. 
+\tcr{I would cite again Pautz here so it is clear that the 126 procs results are part of that study}
 
 \subsection{Cycle Detection}
 

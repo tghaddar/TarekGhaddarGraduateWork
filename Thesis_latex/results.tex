@@ -8,7 +8,7 @@ The following sections will showcase the metric behavior and convergence for thr
 \label{sec:convergence}
 In order to showcase the behavior of the load balancing metric, calculated by Eq. \ref{metric_def} three test cases are presented. Figure \ref{opp} shows the first test case, a 20 cm by 20 cm domain with two pins in opposite corners of the domain. Figure \ref{same} shows the same size domain but with the pins on the same side.These are two theoretically very unbalanced cases, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to it's denser and repeated geometry, theoretically is a more balanced problem. 
 
-A series of 162 inputs was constructed for each case. The tabulated data in Appendix A show the the parameters that will change in each input. The maximum triangle area varied from the coarsest possible to 0.01 cm\textsuperscript{2}, and the number of subsets, $N$, varies from 2x2 to 10x10. 
+A series of 162 inputs was constructed for each case \tcr{the reader may wonder why 162. do not let the reader ever wonder. say why 162, what is the span of parameters that you investigate, thus leading to 162 inputs, so it could be simple as rephrasing it as a parametric study as a function of the max triangle area for each test case}. The tabulated data in Appendix A show the the \tcr{the ???} parameters that will change in each input. The maximum triangle area varied from the coarsest possible to 0.01 cm\textsuperscript{2}, and the number of subsets, $N$, varies from 2x2 to 10x10 \tcr{wouldn't $\times$ be better here?}. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -128,6 +128,9 @@ Figure \ref{latticediff} shows the difference in metric behavior for Fig. \ref{l
 
 Because Fig. \ref{lattice} has more features and is more symmetric of a problem, the initial load balancing metric will not be as large as the load balancing metric of Figs. \ref{same} and \ref{opp}. As a result, the improvement in the load balancing metric after 10 iterations will not be as great in problems similar to Fig. \ref{lattice}. 
 
+\tcr{okay, that was a ton of results, now you need to draw conclusions from all of that before moving on. add them here.}
+
+
 \section{Solution Verification}
 
 For solution verification, two simple problems were chosen: a 1D pure absorber slab and a 1D pure scatterer slab. These problems were chosen because their analytical solutions are easily obtained, thus making a comparison between PDT's solution and the analytical solution easy and informative. The same geometry and mesh were used for both problems, and are shown in Figure \ref{verificationgeometry}.
@@ -158,6 +161,7 @@ For monoenergetic neutrons, a source free, 1D pure absorber slab, the transport 
 \label{absorbertransport}
 \end{equation}
 where $\psi$ is the angular flux, $\Sigma_a$ is the macroscopic absorption cross section, and $\mu$ is the cosine of the polar angle. The boundary conditions for this problem are expressed in Eq. ~\eqref{boundaryconditions}:
+\tcr{this is confusing. why is the angular flux for mu>0 at x=0 equal to Psi inc /2 ? Why not just say it is Psi inc and it is the same value to all positive mu's? I think you are making it harder than it is. }
 \begin{align}
 \label{boundaryconditions}
 \psi(0,\mu>0) &= \int_{0}^{2\pi}d\gamma \int_{0}^{1}\frac{\psi_{inc}}{4\pi} d\mu = \frac{\psi_{inc}}{2} \text{ (incident isotropic)} \notag \\
@@ -225,6 +229,7 @@ where $j_{inc}$ is the incident partial current and $D$ is the diffusion coeffic
 j_{inc} = \int_{0}^{2\pi}d\gamma \int_{0}^{1} \mu \frac{\psi_{inc}}{4\pi} d\mu = \frac{\psi_{inc}}{4}.
 \label{partialcurrent}
 \end{equation}
+\tcr{ there could be different values of jinc due to the angular quadrature. can you add a table to show how jinc converges towards a unique value}
 
 Equation ~\eqref{scalarflux} solves Eq. ~\eqref{diffusion}:
 \begin{align}
@@ -256,6 +261,7 @@ This problem was run with $\Sigma_t = 100 \text{ cm}^{-1}$ and $j_{inc} = \frac{
 \smallskip
 
 It is immediately clear graphically that the two solutions are in agreement, and the relative error of the numerical solution is 4.25E-04, as defined by Eq. ~\eqref{error}.
+\tcr{in the defense, it would be good to show angular convergence as well}
 
 \section{2D and 2D Extruded Meshing Capability}
 

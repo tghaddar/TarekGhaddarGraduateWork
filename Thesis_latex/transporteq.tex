@@ -12,7 +12,7 @@ The steady-state neutron transport equation describes the behavior of neutrons i
 + S_{ext}(\vr,E,\vo) ,
 \label{continuous transport}
 \end{equation}
-where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption, outscatter, and within group scattering). These are the loss terms of the neutron transport equation. The right hand side of Eq.~\eqref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into energy $dE$ about energy $E$ and $d\Omega$ about direction $\vo$.
+where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption, outscatter, and within group scattering). These are the loss terms of the neutron transport equation. The right hand side of Eq.~\eqref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into energy $dE$ about energy $E$ and $d\Omega$ about direction $\vo$. \tcr{the primes are on the starting E and omega, not the ending ones, so your sentence is not entirely correct}
 
 Without loss of generality for the research problem at hand, we assume isotropic scattering for simplicity. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, no longer depends on direction and is divided by $4\pi$ to reflect isotropic behavior. This yields:
 \begin{align}
@@ -33,7 +33,7 @@ The next step to solving the transport equation is to discretize in energy, yiel
 \end{equation}
 where the multigroup transport equations now form a system of coupled equations. 
 
-Next, we discretize in angle using the discrete ordinates method\cite{denovo}, whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of directions $\vo_m$:
+Next, we discretize in angle using the discrete ordinates method \cite{denovo} \tcr{no way, do not cite denovo as the origin of angular quadratures!}, whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of directions $\vo_m$:
 \begin{equation}
 \vo_m \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr),
 \label{angle}
@@ -51,14 +51,14 @@ From Equation~\eqref{multigroup}, it is clear that we are solving a sequence of 
 \end{equation}
 where the group index notation is omitted for brevity.
 
-In order to obtain the solution for this discrete form of the transport equation, an iterative process called source iteration is introduced. This is shown by a simplified transport equation Eq. ~\eqref{iteration}:
+In order to obtain the solution for this discrete form of the transport equation, an iterative process called source iteration is introduced. This is shown below for the one-group transport equation, Eq. ~\eqref{iteration}:
 \begin{equation}
 \vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
 \label{iteration}
 \end{equation}
 where the right hand side terms of Eq.~\eqref{angle} have been combined into one general source term, $q_m$. The angular flux of iteration $(l+1)$ is calculated using the $(l^{th})$ value of the scalar flux.
 
-After the angular and energy dependence have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. This is done by meshing the domain and solving the spatial problem one cell at a time for a given direction. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Sweeping the mesh and solving one cell at a time is possible utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}. Figure \ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
+After the angular and energy dependence have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. This is done by meshing the domain and solving the spatial problem one cell at a time for a given direction \tcr{the "one cell at a time" doesn't make sense if you do not first say that we use a discontinuous Galerkin approximation in space and that upwinding is used to connect cells based on the flow of physical information. THEN, your sentence makes sense. Please fix the order of presentation here}. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Sweeping the mesh and solving one cell at a time is possible utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}. Figure \ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
 
 \noindent\begin{minipage}{\textwidth}
 \centering

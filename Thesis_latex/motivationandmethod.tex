@@ -16,21 +16,23 @@ The capability for PDT to generate and run on an unstructured mesh is important 
 \end{minipage}
 \smallskip
 
+\tcr{describe more the number of subset you want to have in this example. I think it is 3 in x and 4 in y. Also, introduce the notion of cut lines/cut planes here. it seems like it is a good place to do that}
 This orthogonal grid is superimposed and each subset is meshed in parallel.  Subsets are now the base structured unit when calculating our parallel efficiency. Discontinuities along the boundary are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, there is no problem solving on degenerate polygons. 
 
-When using the unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). After superimposing the orthogonal grid, a PSLG is created for each subset, and meshed. Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. Obviously, this is not as good as a unstructured tetrahedral mesh, but for many problems, it is a great capability to have. 
+When using the unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). After superimposing the orthogonal grid, a PSLG is created for each subset, and meshed. Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. Obviously, this is not as good as an unstructured tetrahedral mesh, but for many problems, it is a great capability to have. 
 
 When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to ``balance'' the number of cells. Ideally, each processor will be responsible for an equal number of cells. 
 
 If the number of cells in each subset can be reasonably balanced, then the problem is effectively load balanced. The Load Balance algorithm described below details how the subsets will be load balanced. In summary, the procedure of the algorithm involves moving the initially user specified $x$ and $y$ cut planes, re-meshing, and iterating until a reasonably load balanced problem is obtained.  Equation \ref{metric_def} shows the equation for calculating the load balancing metric, which dictates how balanced or unbalanced the problem is.
 \begin{equation}
-f =\underset{ij}{\text{max}}(N_{ij})/\frac{N_{tot}}{I\cdot J},
+f =\frac{\underset{ij}{\text{max}}(N_{ij})}{\frac{N_{tot}}{I\cdot J}},
 \label{metric_def}
 \end{equation}
-where $f$ is the load balance metric, $N_{ij}$ is the number of cells in subset $i,j$, $N_tot$ is the global number of cells in the problem, and $I$ and $J$ are the total number of in the x and y direction, respectively. The metric is a measure of the maximum number of cells per subset divided by the average number of cells per subset.
+where $f$ is the load balance metric, $N_{ij}$ is the number of cells in subset $i,j$, $N_{tot}$ is the global number of cells in the problem, and $I$ and $J$ are the total number of in the $x$ and $y$ direction, respectively. The metric is a measure of the maximum number of cells per subset divided by the average number of cells per subset.
+\tcr{it would be useful to add two short paragraphs that give the essence of the algorithms rather than having the reader try to determine this on their own}
 
 \noindent\begin{minipage}{\textwidth}
-\textbf{Load Balance:} A load balancing algorithm that equalizes the number of triangles per subset. \\
+\textbf{Load Balance:} A load balancing algorithm that attempts at equalizing the number of triangles per subset. \\
 \rule{\textwidth}{0.4pt}
 \begin{algorithmic}
 \STATE  $I,J$ subsets specified by user

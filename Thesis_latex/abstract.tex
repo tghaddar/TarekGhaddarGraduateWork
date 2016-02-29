@@ -21,7 +21,7 @@
 \setcounter{page}{2}
 
 \indent When running any massively parallel code, load balancing is a priority in order to achieve the best possible parallel efficiency. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do. 
-\indent An unstructured meshing capability was implemented in PDT utilizing the Triangle mesh generator, Texas A\&M University's massively parallel deterministic transport code, allowing the user to define more realistic problem geometries and to define 3D problems through the extrusion of 2D meshes. However, an unstructured triangular mesh is much harder to load balance than a Cartesian rectangular mesh. A load balancing algorithm was implemented in PDT, defining a metric, $f$, that determines how unbalanced a mesh is based on the number of mesh cells per processor. 
+\indent An unstructured meshing capability was implemented in PDT, Texas A\&M University's massively parallel deterministic transport code, utilizing the Triangle mesh generator, hence allowing the user to define more realistic problem geometries and to define 3D problems through the extrusion of 2D meshes. However, unstructured grids are significantly  harder to load balance than Cartesian rectangular meshes. A load balancing algorithm was implemented in PDT to minimize a metric that determines how unbalanced a mesh is based on the number of mesh cells per processor. 
 
  
 
