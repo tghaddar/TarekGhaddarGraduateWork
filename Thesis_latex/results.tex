@@ -8,35 +8,7 @@ The following sections will showcase the metric behavior and convergence for thr
 \label{sec:convergence}
 In order to showcase the behavior of the load balancing metric, calculated by Eq. \ref{metric_def} three test cases are presented. Figure \ref{opp} shows the first test case, a 20 cm by 20 cm domain with two pins in opposite corners of the domain. Figure \ref{same} shows the same size domain but with the pins on the same side.These are two theoretically very unbalanced cases, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to it's denser and repeated geometry, theoretically is a more balanced problem. 
 
-A series of 162 inputs was constructed for each case. Table \ref{study} shows the the parameters that will change in each input. The maximum triangle area varied from the coarsest possible to 0.01 cm\textsuperscript{2}, and the number of subsets, $N$, varies from 2x2 to 10x10. 
-
-\noindent\begin{minipage}{\textwidth}
-\captionof{table}{The parameters of the 162 inputs for each case.}
-\centering
-\begin{tabular}{c c c c c c c c c c }
-\textbf{Coarse} &  \textbf{N = 4}	& \textbf{N = 9}	& \textbf{N = 16}	& \textbf{N = 25}	&\textbf{N = 36}&	\textbf{N = 49}	& \textbf{N = 64	}& \textbf{N = 81}	& \textbf{N = 100}  \\
-\textbf{Coarse} & 		&		& 	        & 		&          &                   &               &             &                \\
-\textbf{1.8	} & 				& 			&         &         &      &          &         &         &          \\
-\textbf{1.6	} & 				& 			&         &         &      &          &         &         &          \\
-\textbf{1.4	} & 				& 			&         &         &      &          &         &         &          \\
-\textbf{1.2	} & 				& 			&         &         &      &          &         &         &          \\
-\textbf{1}    & 				& 		  &         &         &      &          &         &         &          \\
-\textbf{0.8	} & 				& 			&         &         &      &          &         &         &          \\
-\textbf{0.6	} & 				& 			&         &         &      &          &         &         &          \\
-\textbf{0.4	} & 				& 			&         &         &      &          &         &         &          \\
-\textbf{0.2	} & 				& 			&         &         &      &          &         &         &          \\
-\textbf{0.1	} & 				& 			&         &         &      &          &         &         &          \\
-\textbf{0.08} & 				& 			& 	      &         &      &          &         &         &          \\
-\textbf{0.06} & 				& 			& 	      &         &      &          &         &         &          \\
-\textbf{0.05} & 				& 			& 	      &         &      &          &         &         &          \\
-\textbf{0.04} & 				& 			& 	      &         &      &          &         &         &          \\
-\textbf{0.03} & 				& 			& 	      &         &      &          &         &         &          \\
-\textbf{0.02} & 				& 			& 	      &         &      &          &         &         &          \\
-\textbf{0.01} & 				& 			& 	      &         &      &          &         &         &          \\
-\end{tabular}
-\label{study}
-\end{minipage}
-\smallskip
+A series of 162 inputs was constructed for each case. The tabulated data in Appendix A show the the parameters that will change in each input. The maximum triangle area varied from the coarsest possible to 0.01 cm\textsuperscript{2}, and the number of subsets, $N$, varies from 2x2 to 10x10. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -62,7 +34,7 @@ A series of 162 inputs was constructed for each case. Table \ref{study} shows th
 
 \section{Metric Behavior and Convergence}
 
-For each test case, the 162 input parameters outlined in Table \ref{study} are run twice, once with no load balancing iterations, and once with ten load balancing iterations. The best metric is reported and recorded. Three figures for each test cases are presented below: the first figure will show the metric behavior for no iterations, the second figure will show the metric behavior for each input run with ten load balancing iterations, and the third figure will show a ratio of the ten iteration runs over the no iteration runs.
+For each test case, the 162 input inputs are run twice, once with no load balancing iterations, and once with ten load balancing iterations. The best metric is reported and recorded. Three figures for each test cases are presented below: the first figure will show the metric behavior for no iterations, the second figure will show the metric behavior for each input run with ten load balancing iterations, and the third figure will show a ratio of the ten iteration runs over the no iteration runs.
 
 Figure \ref{oppnoiter} shows the metric behavior for Fig. \ref{opp}. The maximum metric value is 24.7650, and occurs when Fig. \ref{opp} is run with 8x8 subsets and a maximum triangle area of 1.6 cm\textsuperscript{2}. The minimum metric value is 1.0016 and occurs when Fig. \ref{opp} is run with 4x4 subsets and a maximum triangle area of 0.04 cm\textsuperscript{2}. 
 
