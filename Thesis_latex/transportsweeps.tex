@@ -55,7 +55,7 @@ T_{\text{comm}} = M_L T_{\text{latency}} + T_{\text{byte}} N_{\text{bytes}}
 T_{\text{task}} = A_x A_y A_z A_m A_g T_{\text{grind}}
 \label{Ttask}
 \end{equation}
-where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. If a high value of $M_L$ is necessary for the \tcr{performance} model to match computational results, improvements should be made in code implementation.
+where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. If a high value of $M_L$ is necessary for the performance model to match computational results, improvements should be made in code implementation.
 
 \section{KBA Partitioning for Structured Grids}
 
@@ -167,8 +167,7 @@ While (uncompleted tasks)
 
 An important part of the algorithm above is the assigning priorities to tasks. Specialized prioritization heuristics generate partition boundary data as rapidly as possible in order to minimize the processor idle time. 
 
-Nearly linear speedups were obtained on up to 126 processors. Further work is being done for scaling to thousands of processors. 
-\tcr{I would cite again Pautz here so it is clear that the 126 procs results are part of that study}
+Nearly linear speedups were obtained on up to 126 processors\cite{Pautz}. Further work is being done for scaling to thousands of processors. 
 
 \subsection{Cycle Detection}
 
