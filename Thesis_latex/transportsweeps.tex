@@ -67,9 +67,6 @@ The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_
 \label{eKBA}
 \end{equation}
 
-\tcr{in the next section, you talk about stages, minimum number of stages to reach
-the center-most proc, ..., it would be good that to discuss KBA and PDT sweeps with as much as possible the same language. Add a few things here to allow for an easier comparison with the PDT text below}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The Structured Transport Sweep in PDT}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -88,11 +85,7 @@ N_{\text{tasks}} = 8 N_m N_g N_k
 \end{equation}
 where $\delta_u$ is 1 for $P_u$ odd, and 0 for $P_u$ even.
 
-\tcr{next, you start discussing volumetric overladed and non-overloaded but it feels that the discussion above doesn't naturally lead to this. Can you explain the logic a bit more. 
-First, why do you call it volumetric? Are they not all volumetric? To me, volumetric also implies no long skinny columns ... so is this a got term? Also, you give an efficiency in eq. 3.8 but it may not be clear how you compare it to KBA. I feel there is a bit of a mix in between the MC2013 and MC2015 papers of Michael, but try to get the bottom line to be evident.} 
-\tcr{Later, you say hybrid-KBA but explain how it is related to the SQO discussion below, I was under the impression hybrid was mainly Pz=2...}
-
-Figure \ref{partitioning} shows three different partitioning schemes used in transport sweeps, KBA (which is defined in the previous section), volumetric non-overloaded, and volumetric overloaded. Volumetric non-overloaded requires that all cells owned by a processor are contiguous, where as volumetric non-overloaded partitioning does not have this restriction.  
+When using KBA, $P_z$ is fixed to 1, and with hybrid KBA, $P_z$ is fixed to 2. Volumetric partitioning means that $P_z$ is greater than two. Figure \ref{partitioning} shows three different partitioning schemes used in transport sweeps, KBA (which is defined in the previous section), volumetric non-overloaded, and volumetric overloaded. Volumetric non-overloaded requires that all cells owned by a processor are contiguous, where as volumetric non-overloaded partitioning does not have this restriction.  
 
 \noindent\begin{minipage}{\textwidth}
 \centering

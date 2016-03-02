@@ -164,13 +164,12 @@ For monoenergetic neutrons, a source free, 1D pure absorber slab, the transport 
 \label{absorbertransport}
 \end{equation}
 where $\psi$ is the angular flux, $\Sigma_a$ is the macroscopic absorption cross section, and $\mu$ is the cosine of the polar angle. The boundary conditions for this problem are expressed in Eq. ~\eqref{boundaryconditions}:
-\tcr{this is confusing. why is the angular flux for mu>0 at x=0 equal to Psi inc /2 ? Why not just say it is Psi inc and it is the same value to all positive mu's? I think you are making it harder than it is. }
 \begin{align}
 \label{boundaryconditions}
-\psi(0,\mu>0) &= \int_{0}^{2\pi}d\gamma \int_{0}^{1}\frac{\psi_{inc}}{4\pi} d\mu = \frac{\psi_{inc}}{2} \text{ (incident isotropic)} \notag \\
+\psi(0,\mu>0) &= \int_{0}^{2\pi}d\gamma \int_{0}^{1}\frac{\psi_{0}}{4\pi} d\mu = \frac{\psi_{0}}{2}  = \psi_{inc} \text{ (incident isotropic)} \notag \\
 \psi(x_{\text{max}},\mu<0) &= 0 \text{ (vacuum)},
 \end{align}
-where $\psi_{inc}$ is the defined incident angular flux. Equation ~\eqref{absorber_derivation} solves the transport equation via separation of variables to get the angular flux for this problem:
+where $\psi_{0}$ is the user defined value of the incident isotropic angular flux, and $\psi_{inc}$ is the angular flux at $x = 0$. Equation ~\eqref{absorber_derivation} solves the transport equation via separation of variables to get the angular flux for this problem:
 %absorber derivation
 \begin{align}
 \label{absorber_derivation}
@@ -179,19 +178,19 @@ where $\psi_{inc}$ is the defined incident angular flux. Equation ~\eqref{absorb
 \int_{\psi(0,\mu>0)}^{\psi(x,\mu>0)}\frac{d\psi(x,\mu>0)}{\psi(x,\mu>0)} &= \int_{0}^{x}-\frac{\Sigma_a}{\mu} x' dx' \notag \\
 \ln[\frac{\psi(x,\mu>0)}{\psi(0,\mu>0)}] &= -\frac{\Sigma_a}{\mu} x \notag \\
 \psi(x,\mu>0) & = \psi(0,\mu>0)\exp(-\frac{\Sigma_a}{\mu} x) \notag \\
-\psi(x,\mu>0) & = \frac{\psi_{inc}}{2}\exp(-\frac{\Sigma_a}{\mu} x) 
+\psi(x,\mu>0) & = \psi_{inc}\exp(-\frac{\Sigma_a}{\mu} x) 
 \end{align}
 
 Using the fact that the scalar flux in this pure absorber is simply the angular flux integrated for $\mu > 0$, the scalar flux with our boundary conditions is represented by Eq. ~\eqref{absorberflux}:
 %Absorber flux
 \begin{align}
 \phi(x) &= \int_{0}^{1}\psi(x,\mu>0) d\mu \notag \\
-&= \int_{0}^{1}\frac{\psi_{inc}}{2}\exp(-\frac{\Sigma_a}{\mu} x) d\mu = \frac{\psi_{inc}}{2} E_{2}(\Sigma_a x),
+&= \int_{0}^{1}\psi_{inc}\exp(-\frac{\Sigma_a}{\mu} x) d\mu = \psi_{inc} E_{2}(\Sigma_a x),
 \label{absorberflux}
 \end{align}
 where $\phi$ is the scalar flux and $E_2$ is the exponential integral function with $n=2$. 
 
-The pure absorber was run with $\psi_{inc} = 7 \frac{\text{n}}{\text{cm}^2\text{-s-ster}}$ and $\Sigma_a = 5 \text{ cm}^{-1}$. Figure \ref{pa_allangles} shows a comparison of the analytical solution with PDT's solution for four different angular refinements. All four PDT runs used only 1 azimuthal angle per quadrant, but varied the number of positive polar angles, because the problem is not azimuthally dependent. The number of positive polar angles used were 1,5,10, and 70. 
+The pure absorber was run with $\psi_{inc} = 3.5 \frac{\text{n}}{\text{cm}^2\text{-s-ster}}$ and $\Sigma_a = 5 \text{ cm}^{-1}$. Figure \ref{pa_allangles} shows a comparison of the analytical solution with PDT's solution for four different angular refinements. All four PDT runs used only 1 azimuthal angle per quadrant, but varied the number of positive polar angles, because the problem is not azimuthally dependent. The number of positive polar angles used were 1,5,10, and 70. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -232,7 +231,25 @@ where $j_{inc}$ is the incident partial current and $D$ is the diffusion coeffic
 j_{inc} = \int_{0}^{2\pi}d\gamma \int_{0}^{1} \mu \frac{\psi_{inc}}{4\pi} d\mu = \frac{\psi_{inc}}{4}.
 \label{partialcurrent}
 \end{equation}
-\tcr{ there could be different values of jinc due to the angular quadrature. can you add a table to show how jinc converges towards a unique value}
+
+The integral over polar angles in Eq. ~\eqref{partialcurrent} is the result of computing the angular quadrature with an infinite number of polar angles. Table \ref{angleconvergence} shows the value of $j_{inc}$ converging to the integral value as the number of polar angles is increased. 
+\begin{table}[H]
+\centering
+\caption{The convergence of $j_{inc}$ as the number of polar angles increase.}
+\begin{tabular}{c c}
+\hline
+\textbf{Number of Positive Polar Angles} & \textbf{$j_{inc}$} \\
+1 & 2.0207 \\
+2 & 1.8244 \\
+5 & 1.7632 \\
+10 & 1.7534 \\
+20 & 1.7509 \\
+40 & 1.7502 \\
+Infinite & 1.750 \\
+\hline
+\end{tabular}
+\label{angleconvergence}
+\end{table}
 
 Equation ~\eqref{scalarflux} solves Eq. ~\eqref{diffusion}:
 \begin{align}
@@ -264,7 +281,6 @@ This problem was run with $\Sigma_t = 100 \text{ cm}^{-1}$ and $j_{inc} = \frac{
 \smallskip
 
 It is immediately clear graphically that the two solutions are in agreement, and the relative error of the numerical solution is 4.25E-04, as defined by Eq. ~\eqref{error}.
-\tcr{in the defense, it would be good to show angular convergence as well}
 
 \section{2D and 2D Extruded Meshing Capability}
 
