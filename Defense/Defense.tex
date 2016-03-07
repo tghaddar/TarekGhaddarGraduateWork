@@ -22,7 +22,7 @@
 \usepackage{graphicx}
 \usepackage{subfigure}
 \usepackage{colortbl}
-\usepackage[retainorgcmds]{IEEEtrantools}
+%\usepackage[retainorgcmds]{IEEEtrantools}
 \usepackage{wrapfig}
 \usepackage[figurename=,tablename=]{caption}
 \usepackage{multirow}
@@ -46,6 +46,8 @@
 \allowdisplaybreaks
 %Code
 \usepackage{listings}
+\usepackage{epstopdf}
+\usepackage{pdfpages}
 \newlength \figwidth
 \setlength \figwidth {0.5\textwidth}
 
@@ -269,7 +271,7 @@ $f$ = 3.61695
 \begin{block}{}
 \begin{itemize}
 	\item Three test cases were used to study the behavior of the load balancing algorithm.
-	\item For each test case, 162 inputs were constructed by varying the number of subsets, and the spatial resolution of the mesh (maximum triangle area).
+	\item For each test case, 162 inputs were constructed by varying the number of subsets and the spatial resolution of the mesh (maximum triangle area).
 \end{itemize}
 \end{block}
 \end{frame}
