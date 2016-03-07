@@ -3,15 +3,13 @@
 while (f > tol_subset)
 {
   //Mesh all subsets
-  else
+  if (f_I > tol_column)
   {
-    if (f_I > tol_column)
-    {
-      Redistribute(X); 
-    }
-    if (f_J > tol_row)
-    {
-      Redistribute(Y);
-    }
+    Redistribute(X); 
   }
+  if (f_J > tol_row)
+  {
+    Redistribute(Y);
+  }
+  
 }
