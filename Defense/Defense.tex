@@ -99,6 +99,7 @@
 		\item It is capable of multi-group simulations and employs discrete ordinates for angular discretization.
 		\item Features steady-state, time-dependent, criticality, and depletion simulations. It solves the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation.
 		\item  PDT  has been shown to scale on logically Cartesian grids out to 750,000 cores.
+		\item PDT now has an unstructured meshing capability, as a result of this thesis.
 		\end{itemize}
 	\end{block}
 \end{frame}
@@ -106,7 +107,8 @@
 \begin{frame}[t]\frametitle{The Triangle Mesh Generator}
 	\begin{block}{}
 	\begin{itemize}
-		\item Unstructured meshes in PDT are generated using the Triangle Mesh Generator.
+		\item Unstructured meshes in PDT are generated in 2D using the Triangle Mesh Generator.
+		\item These can be extruded to create 3D meshes.
 	\end{itemize}	
 	\end{block}
 	\includegraphics[scale = 0.15]{figures/IM12DPoly.png}
@@ -119,18 +121,18 @@
 \subsection{}
 \begin{frame}[t]\frametitle{The Transport Equation}
 	\begin{block}{}
-	\begin{align*}
-\hspace{-10cm} \vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  = \\ \int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo') + S_{ext}(\vr,E,\vo)
+	\begin{multline*}
+\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  = \\ \int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo') + S_{ext}(\vr,E,\vo)
 	\label{continuous transport}
-	\end{align*}
+	\end{multline*}
 	\end{block}
 	%\vspace{-0.3 cm}
 	\begin{block}{}
-	\begin{align*}
+	\begin{multline*}
 	\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  
 	= \\\frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \int_{4\pi}d\Omega' \psi(\vr,E',\vo')  + S_{ext}(\vr,E,\vo) \nonumber \\
 	 = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \phi(\vr,E')  + S_{ext}(\vr,E,\vo)
-	\end{align*}
+	\end{multline*}
 	\end{block}
 \end{frame}
 
@@ -212,7 +214,7 @@ T_{\text{task}} &= A_x A_y A_z A_m A_g T_{\text{grind}}
 \end{block}
 \end{frame}
 
-\section{Method}
+\section{Load Balance Algorithm}
 \subsection{}
 
 \begin{frame}[t]\frametitle{Partitioning for an Unstructured Mesh}
@@ -249,10 +251,13 @@ T_{\text{task}} &= A_x A_y A_z A_m A_g T_{\text{grind}}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Redistribution Function}
-\vspace{-0.5 cm}
-\begin{block}{}
-\lstinputlisting[language = C++, basicstyle = \footnotesize]{redistribute.cc}
-\end{block}
+\centering
+\includegraphics[scale = 0.5]{figures/before_redistribute.eps}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Redistribution Function}
+\centering
+\includegraphics[scale = 0.5]{figures/after_redistribute.eps}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Example}
