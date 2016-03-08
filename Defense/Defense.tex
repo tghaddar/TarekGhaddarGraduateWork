@@ -290,7 +290,12 @@ $f$ = 3.61695
 \begin{block}{}
 \begin{itemize}
 	\item Three test cases were used to study the behavior of the load balancing algorithm.
-	\item For each test case, 162 inputs were constructed by varying the number of subsets and the spatial resolution of the mesh (maximum triangle area).
+	\item For each test case, 162 inputs were constructed by varying:
+		\begin{itemize}
+		\item The number of subsets
+		\item The spatial resolution of the mesh (maximum triangle area).
+		\end{itemize}
+		
 \end{itemize}
 \end{block}
 \end{frame}
@@ -305,7 +310,7 @@ $f$ = 3.61695
 \begin{table}[H]
 \tiny
 \centering
-\caption{The metric behavior of the first test case run with no load balancing iterations.}
+\caption{The metric behavior of the first test case run with \textbf{no load balancing} iterations.}
 \begin{tabular}{rlrrrrrrrrr}
   \hline
  Area & N=4 & N=9 & N=16 & N=25 & N=36 & N=49 & N=64 & N=81 & N=100 \\ 
@@ -344,7 +349,7 @@ $f$ = 3.61695
 \begin{table}[H]
 \tiny
 \centering
-\caption{The metric behavior of the first test case after 10 load balancing iterations.} 
+\caption{The metric behavior of the first test case after \textbf{10 load balancing iterations}.} 
 \begin{tabular}{rlrrrrrrrrr}
   \hline
  Area & N=4 & N=9 & N=16 & N=25 & N=36 & N=49 & N=64 & N=81 & N=100 \\ 
@@ -383,7 +388,7 @@ $f$ = 3.61695
 \begin{table}[H]
 \tiny
 \centering
-\caption{The difference in metric behavior between no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.} 
+\caption{The ratio  of the metric with no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.} 
 \begin{tabular}{rlrrrrrrrrr}
   \hline
  Area & N=4 & N=9 & N=16 & N=25 & N=36 & N=49 & N=64 & N=81 & N=100 \\ 
@@ -427,7 +432,7 @@ $f$ = 3.61695
 \begin{table}[H]
 \tiny
 \centering
-\caption{The metric behavior of the second test case after no load balancing iterations.} 
+\caption{The metric behavior of the second test case after \textbf{no load balancing} iterations.} 
 \begin{tabular}{rrrrrrrrrrr}
   \hline
  Area & N=4 & N=9 & N=16 & N=25 & N=36 & N=49 & N=64 & N=81 & N=100 \\ 
@@ -463,7 +468,7 @@ $f$ = 3.61695
 \begin{table}[H]
 \centering
 \tiny
-\caption{The metric behavior of the second test case after 10 load balancing iterations.} 
+\caption{The metric behavior of the second test case after \textbf{10 load balancing iterations}.} 
 \begin{tabular}{rlrrrrrrrrr}
   \hline
  Area & N=4 & N=9 & N=16 & N=25 & N=36 & N=49 & N=64 & N=81 & N=100 \\ 
@@ -500,7 +505,7 @@ $f$ = 3.61695
 \begin{table}[H]
 \centering
 \tiny
-\caption{The difference in metric behavior between no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.} 
+\caption{The ratio  of the metric with no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.} 
 \begin{tabular}{rlrrrrrrrrr}
   \hline
   Area & N=4 & N=9 & N=16 & N=25 & N=36 & N=49 & N=64 & N=81 & N=100 \\ 
@@ -543,7 +548,7 @@ Coarse & 0.95 & 0.33 & 0.26 & 0.15 & 0.14 & 0.11 & \textbf{\cellcolor{blue!25}0.
 \begin{table}[H]
 \tiny
 \centering
-\caption{The metric behavior of the third test case after no load balancing iterations.} 
+\caption{The metric behavior of the third test case after\textbf{ no load balancing iterations}.} 
 \begin{tabular}{rlrrrrrrrrr}
   \hline
  Area & N=4 & N=9 & N=16 & N=25 & N=36 & N=49 & N=64 & N=81 & N=100 \\ 
@@ -580,7 +585,7 @@ Coarse & 0.95 & 0.33 & 0.26 & 0.15 & 0.14 & 0.11 & \textbf{\cellcolor{blue!25}0.
 \begin{table}[H]
 \tiny
 \centering
-\caption{The metric behavior of the third test case after 10 load balancing iterations.} 
+\caption{The metric behavior of the third test case after \textbf{10 load balancing iterations}.} 
 \begin{tabular}{rlrrrrrrrrr}
   \hline
   Area & N=4 & N=9 & N=16 & N=25 & N=36 & N=49 & N=64 & N=81 & N=100 \\ 
@@ -617,7 +622,7 @@ Coarse & 0.95 & 0.33 & 0.26 & 0.15 & 0.14 & 0.11 & \textbf{\cellcolor{blue!25}0.
 \begin{table}[H]
 \centering
 \tiny
-\caption{The difference in metric behavior between no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.} 
+\caption{The ratio  of the metric with no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.} 
 \begin{tabular}{rlrrrrrrrrr}
   \hline
   Area & N=4 & N=9 & N=16 & N=25 & N=36 & N=49 & N=64 & N=81 & N=100 \\ 
@@ -737,7 +742,7 @@ $\epsilon$=4.25E-04
 \begin{frame}[t]\frametitle{Conclusions}
 \begin{block}{}
 \begin{itemize}
-\item The effectiveness of the load balancing algorithm depends on the maximum triangle are used, and the number of subsets the domain is decomposed into.
+\item The effectiveness of the load balancing algorithm depends on the maximum triangle area used, and the number of subsets the domain is decomposed into.
 \item Good improvement is seen for all test cases, particularly the first two. 
 \item Improvements to the algorithm must be made, as the user will often need to decide on the number of subsets based on how many processors are wanted. 
 \end{itemize}
@@ -749,7 +754,9 @@ $\epsilon$=4.25E-04
 \begin{itemize}
 \item Improvements to the algorithm, moving portions of cut lines instead of moving the entire cutline.
 \item Domain overloading is the logical extension to the work presented in this thesis.
+\begin{itemize} 
 \item Processors could own different numbers of subsets, with no restriction on these subsets being contiguous.
+\end{itemize}
 \end{itemize}
 \end{block}
 \end{frame}
