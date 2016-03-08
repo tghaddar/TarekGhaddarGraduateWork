@@ -2,7 +2,7 @@
 
 
 
-num_angles = [1 2 5 10 20 40 50]';
+num_angles = [1 2 5 10 20 40 50 60 70]';
 all_j_inc = zeros(length(num_angles),2);
 all_j_inc(:,1) = num_angles;
 

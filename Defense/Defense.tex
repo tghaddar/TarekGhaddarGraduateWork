@@ -399,7 +399,7 @@ $f$ = 3.61695
   1.4 & 1.00 & 0.91 & 0.89 & 0.67 & 0.39 & 0.35 & 0.21 & 0.74 & 0.92 \\ 
    1.2 & 1.00 & 0.90 & 0.81 & 0.54 & 0.58 & 0.44 & 0.20 & 1.00 & 1.12 \\ 
    1 & 1.00 & 0.93 & 0.78 & 0.47 & 0.52 & 0.50 & 0.20 & 0.79 & 0.96 \\ 
-0.8 & 1.00 & 0.92 & 0.68 & 0.84 & 0.45 & 0.59 & 0.17 & 0.74 & 1.24 \\ 
+0.8 & 1.00 & 0.92 & 0.68 & 0.84 & 0.45 & 0.59 & 0.17 & 0.74 & \textbf{\cellcolor{blue!25}1.24} \\ 
   0.6 & 1.00 & 1.00 & 0.87 & 0.80 & 0.79 & 0.50 & 0.20 & 1.00 & 1.17 \\ 
  0.4 & 1.00 & 1.00 & 0.81 & 0.93 & 0.88 & 0.55 & 0.14 & 0.84 & 1.10 \\ 
   0.2 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 0.16 & 0.99 & 1.19 \\ 
@@ -410,7 +410,7 @@ $f$ = 3.61695
    0.04 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 0.52 & 1.00 & 1.05 \\ 
    0.03 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.01 \\ 
   0.02 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.04 \\ 
-   0.01 & \textbf{\cellcolor{blue!25}1.00} & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.01 \\ 
+   0.01 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.01 \\ 
    \hline
 \end{tabular}
 \end{table}
@@ -535,6 +535,30 @@ Coarse & 0.95 & 0.33 & 0.26 & 0.15 & 0.14 & 0.11 & \textbf{\cellcolor{blue!25}0.
 
 \begin{frame}[t]\frametitle{Test Case 2}
 \includegraphics[scale=0.47, trim = 0cm 8cm 0cm 7cm]{figures/SameDiff.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{A Closer Look at Test Case 2}
+\begin{minipage}{0.15\textwidth}
+\begin{footnotesize}
+$f$ = 2.72
+\end{footnotesize}
+\end{minipage}
+\begin{minipage}{0.8\textwidth}
+\centering
+\includegraphics[scale=0.22]{figures/sameside_before.png}
+\end{minipage}
+\end{frame}
+
+\begin{frame}[t]\frametitle{A Closer Look at Test Case 2}
+\begin{minipage}{0.15\textwidth}
+\begin{footnotesize}
+$f$ =1.85
+\end{footnotesize}
+\end{minipage}
+\begin{minipage}{0.8\textwidth}
+\centering
+\includegraphics[scale=0.22]{figures/sameside_after.png}
+\end{minipage}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Test Case 3}
@@ -703,7 +727,7 @@ $\epsilon = 0.012$
 
 \begin{frame}[t]\frametitle{Pure Scatterer}
 \begin{block}{}
-The transport solution for an optically thick pure scatterer reaches the diffusion limit, and the solution is:
+The transport solution for a pure scatterer reaches the diffusion limit, and the solution is:
 \begin{align*}
 \phi(x) = \frac{4j_{inc}}{1+4D}(-x + x_{\text{max}} + 2D).
 \end{align*}
@@ -713,7 +737,7 @@ This problem was run with $\Sigma_t = 100 \text{ cm}^{-1}$ and $j_{inc} = \frac{
 \end{block}
 \end{frame}
 
-\begin{frame}[t]\frametitle{PDT Results vs. Analytical for the Pure Absorber}
+\begin{frame}[t]\frametitle{PDT Results vs. Analytical for the Pure Scatterer}
 \begin{minipage}{0.2\textwidth}
 \begin{footnotesize}
 $\epsilon$=4.25E-04

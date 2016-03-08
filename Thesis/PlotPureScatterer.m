@@ -3,7 +3,7 @@ hold off;
 close all; clc;
 analyticalX = PureScatterer(:,1);
 
-XS = 100;
+XS = 5;
 D = 1/(3*XS);
 incident = 7;
 A = -incident/(1+4*D);
