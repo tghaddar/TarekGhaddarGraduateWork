@@ -150,10 +150,11 @@ The problem geometry is a 1 cm by 1 cm square. In order to simulate a 1D slab, o
 
 In order to measure how close the numerical and analytical solutions an error estimate, represented by, Eq. ~\eqref{error}, is used:
 \begin{equation}
-\epsilon = \frac{\norm{\text{Analytical} - \text{ Numerical}}_{l2}}{\norm{\text{Analytical}}_{l2}},
+\epsilon = \sqrt{\sum_k \sum_q w_q \cdot(\phi_h(x_q) - \phi_e(x_q))^2}
+%\epsilon = \frac{\norm{\text{Analytical} - \text{ Numerical}}_{l2}}{\norm{\text{Analytical}}_{l2}},
 \label{error}
 \end{equation}
-where the $l2$ norm of the absolute error is divided by the $l2$ norm of the analytical solution.
+where $k$ is the number of cells, $q$ is the number points per cell used in a Gauss-Legendre quadrature, $phi_h$ is the numerical flux solution and $phi_e$ is the analytical flux solution.
 
 \subsection{The 1D Pure Absorber Slab}
 
@@ -200,7 +201,7 @@ The pure absorber was run with $\psi_{inc} = 3.5 \frac{\text{n}}{\text{cm}^2\tex
 \end{minipage}
 \smallskip
 
-It is immediately clear that not many polar angles are necessary for agreement with the analytical solution. Figure \ref{pa_bestangle} examines the 70 positive polar angle case exclusively in comparison with the analytical solution. It is immediately clear graphically that the solutions are in agreement, and the relative error of the numerical solution is 0.012, as defined by Eq. ~\eqref{error}.
+It is immediately clear that not many polar angles are necessary for agreement with the analytical solution. Figure \ref{pa_bestangle} examines the 70 positive polar angle case exclusively in comparison with the analytical solution. It is immediately clear graphically that the solutions are in agreement. Table \ref{flux_errors} shows the error convergence as the number of cells in the problem increases.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -208,6 +209,22 @@ It is immediately clear that not many polar angles are necessary for agreement w
 \captionof{figure}{The pure absorber solution run with 70 positive polar angles.}
 \label{pa_bestangle}
 \end{minipage}
+\smallskip
+
+\begin{table}[H]
+\centering
+\caption{The convergence of the error as the number of cells increases.}
+\begin{tabular}{c c}
+\hline
+\textbf{Number of Cells} & \textbf{$\epsilon$} \\
+8 & 0.3035 \\
+32 & 0.1865 \\
+128 & 0.09168 \\
+512 & 0.0387 \\
+\hline
+\end{tabular}
+\label{flux_errors}
+\end{table}
 \smallskip
 
 \subsection{The 1D Pure Scatterer Slab}

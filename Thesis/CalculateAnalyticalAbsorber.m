@@ -22,6 +22,7 @@ for i_polar=1:num_positive_polar
     for j = 1:length(mu_positive)
         mu_val = mu_positive(j);
         polar_weight = w(j);
+        polar_weight
         scalar_flux = scalar_flux + psi_incident*polar_weight*exp(-XS*x/mu_val);
     end
     plot(x,scalar_flux); hold all;
