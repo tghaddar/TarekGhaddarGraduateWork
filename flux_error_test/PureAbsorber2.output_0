@@ -1,0 +1,133 @@
+BEGIN_RECORD TYPE = HEADER
+neutronics FALSE xy 1 1
+END_RECORD
+BEGIN_RECORD TYPE = STEADY_STATE
+BEGIN_RECORD TYPE = CELL
+# cell id, center x, center y, center z, cell volume, number of elements
+0 0.166666666666667 0.166666666666667 0.0 0.125 3
+# element id, corner x, corner y, corner z, element volume
+0 0 0.5 0.0 0.0416666666666667
+1 0 0 0.0 0.0416666666666667
+2 0.5 0 0.0 0.0416666666666667
+# group, moment, cell average flux
+0 0 1.17473924842014
+# group, moment, flux for element 0
+0 0 1.61098790503284
+# group, moment, flux for element 1
+0 0 1.61098790503284
+# group, moment, flux for element 2
+0 0 0.302241935194745
+END_RECORD
+BEGIN_RECORD TYPE = CELL
+# cell id, center x, center y, center z, cell volume, number of elements
+1 0.333333333333333 0.333333333333333 0.0 0.125 3
+# element id, corner x, corner y, corner z, element volume
+0 0.5 0 0.0 0.0416666666666667
+1 0.5 0.5 0.0 0.0416666666666667
+2 0 0.5 0.0 0.0416666666666667
+# group, moment, cell average flux
+0 0 0.428290686794443
+# group, moment, flux for element 0
+0 0 0.199742851148068
+# group, moment, flux for element 1
+0 0 0.204113641916628
+# group, moment, flux for element 2
+0 0 0.881015567318634
+END_RECORD
+BEGIN_RECORD TYPE = CELL
+# cell id, center x, center y, center z, cell volume, number of elements
+2 0.166666666666667 0.666666666666667 0.0 0.125 3
+# element id, corner x, corner y, corner z, element volume
+0 0 1 0.0 0.0416666666666667
+1 0 0.5 0.0 0.0416666666666667
+2 0.5 0.5 0.0 0.0416666666666667
+# group, moment, cell average flux
+0 0 1.12210159741608
+# group, moment, flux for element 0
+0 0 1.59189575473539
+# group, moment, flux for element 1
+0 0 1.51170095844723
+# group, moment, flux for element 2
+0 0 0.26270807906561
+END_RECORD
+BEGIN_RECORD TYPE = CELL
+# cell id, center x, center y, center z, cell volume, number of elements
+3 0.333333333333333 0.833333333333333 0.0 0.125 3
+# element id, corner x, corner y, corner z, element volume
+0 0.5 0.5 0.0 0.0416666666666667
+1 0.5 1 0.0 0.0416666666666667
+2 0 1 0.0 0.0416666666666667
+# group, moment, cell average flux
+0 0 0.343938672372597
+# group, moment, flux for element 0
+0 0 0.147504670806083
+# group, moment, flux for element 1
+0 0 0.159175018475529
+# group, moment, flux for element 2
+0 0 0.725136327836178
+END_RECORD
+BEGIN_RECORD TYPE = CELL
+# cell id, center x, center y, center z, cell volume, number of elements
+4 0.666666666666667 0.166666666666667 0.0 0.125 3
+# element id, corner x, corner y, corner z, element volume
+0 0.5 0.5 0.0 0.0416666666666667
+1 0.5 0 0.0 0.0416666666666667
+2 1 0 0.0 0.0416666666666667
+# group, moment, cell average flux
+0 0 0.0666044990297436
+# group, moment, flux for element 0
+0 0 0.0951285464924477
+# group, moment, flux for element 1
+0 0 0.0858177037215148
+# group, moment, flux for element 2
+0 0 0.0188672468752681
+END_RECORD
+BEGIN_RECORD TYPE = CELL
+# cell id, center x, center y, center z, cell volume, number of elements
+5 0.833333333333333 0.333333333333333 0.0 0.125 3
+# element id, corner x, corner y, corner z, element volume
+0 1 0 0.0 0.0416666666666667
+1 1 0.5 0.0 0.0416666666666667
+2 0.5 0.5 0.0 0.0416666666666667
+# group, moment, cell average flux
+0 0 0.0198223105733184
+# group, moment, flux for element 0
+0 0 0.0101529237646025
+# group, moment, flux for element 1
+0 0 0.00943655225389939
+# group, moment, flux for element 2
+0 0 0.0398774557014533
+END_RECORD
+BEGIN_RECORD TYPE = CELL
+# cell id, center x, center y, center z, cell volume, number of elements
+6 0.666666666666667 0.666666666666667 0.0 0.125 3
+# element id, corner x, corner y, corner z, element volume
+0 0.5 1 0.0 0.0416666666666667
+1 0.5 0.5 0.0 0.0416666666666667
+2 1 0.5 0.0 0.0416666666666667
+# group, moment, cell average flux
+0 0 0.0497134383436532
+# group, moment, flux for element 0
+0 0 0.0730968514821809
+# group, moment, flux for element 1
+0 0 0.0633244523712454
+# group, moment, flux for element 2
+0 0 0.0127190111775335
+END_RECORD
+BEGIN_RECORD TYPE = CELL
+# cell id, center x, center y, center z, cell volume, number of elements
+7 0.833333333333333 0.833333333333333 0.0 0.125 3
+# element id, corner x, corner y, corner z, element volume
+0 1 0.5 0.0 0.0416666666666667
+1 1 1 0.0 0.0416666666666667
+2 0.5 1 0.0 0.0416666666666667
+# group, moment, cell average flux
+0 0 0.0193257569893998
+# group, moment, flux for element 0
+0 0 0.0087943231665401
+# group, moment, flux for element 1
+0 0 0.00896483466350335
+# group, moment, flux for element 2
+0 0 0.0402181131381559
+END_RECORD
+END_RECORD
