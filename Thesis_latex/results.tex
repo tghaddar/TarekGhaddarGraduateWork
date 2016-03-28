@@ -154,7 +154,7 @@ In order to measure how close the numerical and analytical solutions an error es
 %\epsilon = \frac{\norm{\text{Analytical} - \text{ Numerical}}_{l2}}{\norm{\text{Analytical}}_{l2}},
 \label{error}
 \end{equation}
-where $k$ is the number of cells, $q$ is the number points per cell used in a Gauss-Legendre quadrature, $phi_h$ is the numerical flux solution and $phi_e$ is the analytical flux solution.
+where $k$ is the number of cells, $q$ is the number points per cell used in a Gauss-Legendre quadrature, $\phi_h$ is the numerical flux solution and $\phi_e$ is the analytical flux solution.
 
 \subsection{The 1D Pure Absorber Slab}
 
@@ -201,7 +201,7 @@ The pure absorber was run with $\psi_{inc} = 3.5 \frac{\text{n}}{\text{cm}^2\tex
 \end{minipage}
 \smallskip
 
-It is immediately clear that not many polar angles are necessary for agreement with the analytical solution. Figure \ref{pa_bestangle} examines the 70 positive polar angle case exclusively in comparison with the analytical solution. It is immediately clear graphically that the solutions are in agreement. Table \ref{flux_errors} shows the error convergence as the number of cells in the problem increases.
+It is immediately clear that not many polar angles are necessary for agreement with the analytical solution. Figure \ref{pa_bestangle} examines the 70 positive polar angle case exclusively in comparison with the analytical solution. It is immediately clear graphically that the solutions are in agreement. Table \ref{flux_errors} shows the error convergence as average mesh size in the problem decreases. This data shows that the error shows first order convergence, which is not the expected second order convergence. In the future, more work will be done to analyze and potentially correct the error calculation for unstructured meshes and to investigate why we don't see the second order convergence that is expected.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -216,11 +216,13 @@ It is immediately clear that not many polar angles are necessary for agreement w
 \caption{The convergence of the error as the number of cells increases.}
 \begin{tabular}{c c}
 \hline
-\textbf{Number of Cells} & \textbf{$\epsilon$} \\
-8 & 0.3035 \\
-32 & 0.1865 \\
-128 & 0.09168 \\
-512 & 0.0387 \\
+\textbf{Mesh size (cm)} & \textbf{$\epsilon$} \\
+1/4 & 0.3035 \\
+1/8 & 0.1865 \\
+1/16 & 0.09168 \\
+1/32 & 0.0387 \\
+1/64 & 0.0169 \\
+1/128 & 0.006963 \\
 \hline
 \end{tabular}
 \label{flux_errors}
