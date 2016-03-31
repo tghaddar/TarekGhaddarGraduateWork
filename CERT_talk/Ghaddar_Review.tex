@@ -51,6 +51,14 @@
 \newlength \figwidth
 \setlength \figwidth {0.5\textwidth}
 
+\newcommand{\backupbegin}{
+   \newcounter{finalframe}
+   \setcounter{finalframe}{\value{framenumber}}
+}
+\newcommand{\backupend}{
+   \setcounter{framenumber}{\value{finalframe}}
+}
+
 
 
 \begin{document}
@@ -113,6 +121,7 @@
 	\item The user inputs coordinates for cut lines in the X and Y directions.
 	\item The cut lines will determine the number of ``subsets" the problem is partitioned into.
 	\item Optimizing the location of these cut lines is the basis of the load balancing algorithm.
+	\item A ``subset" is an orthogonal unit that is formed by intersecting cut lines.
 	\end{itemize}
 \end{block}
 \end{frame}
@@ -122,10 +131,15 @@
 \includegraphics[width = 12 cm, height = 7 cm ]{figures/subsetlattice.png}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Metric Definitions}
+\begin{frame}[t]\frametitle{ Goal and Definitions}
 	\begin{block}{}
+	
 		\begin{itemize}
+			\item \textbf{Goal:} Obtain an equal number of cells per processor, which for our purposes means an equal number of cells per subset.
+			\item Achieved by optimizing the location of $X_i$ and $Y_j$, the location of the cut lines.
 			%\item We define the load balance metric, $f$.
+			\item $N_{ij}$: The number of cells  in subset ${i,j}$
+			%\item Cut Lines: $X_i, Y_j$, $1 <= i <= I-1$, $1 <= j <= J-1$
 			\item $f =\frac{\underset{ij}{\text{max}}(N_{ij})}{\frac{N_{tot}}{I\cdot J}}$
 			\item $f_I = \underset{i}{\text{max}}[\sum_{j} N_{ij}]/\frac{N_{tot}}{I}$
 			\item $f_J = \underset{j}{\text{max}}[\sum_{i} N_{ij}]/\frac{N_{tot}}{J}$
@@ -528,8 +542,94 @@ Coarse & \textbf{\cellcolor{blue!25}0.45} & 0.45 & 0.46 & 0.46 & 0.45 & 0.46 & 0
 \end{table}
 \end{frame}
 
-\section{Solution Verification}
+
+\section{Conclusions}
 \subsection{}
+
+\begin{frame}[t]\frametitle{Extruded Mesh Capability}
+\centering
+\includegraphics[scale=0.2]{figures/IM1_3D.png}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Extruded Mesh Capability}
+\centering
+\includegraphics[scale=0.23]{figures/IM1_Adams_2D_slice}
+\end{frame}
+
+\begin{frame}[t]\frametitle{MCNP vs. PDT}
+\begin{table}[H]
+\centering
+\small
+\caption{The results of MCNP and PDT Compared}
+\begin{tabular}{c | c | c}
+\hline
+\textbf{Code and Setup} & Abs. Rate w/Air ($s^{-1}$) & Abs. Rate w/Graphite $s^{-1}$\\
+\hline
+MCNP & 70.1 & 12.66 \\
+PDT Brick & & \\
+PDT Unstructured & 68.93 & 12.75 \\
+\hline
+
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Conclusions}
+\begin{block}{}
+\begin{itemize}
+\item The effectiveness of the load balancing algorithm depends on the maximum triangle area used, and the number of subsets the domain is decomposed into.
+\item Good improvement is seen for all test cases, particularly the first two. 
+\item Improvements to the algorithm must be made, as the user will often need to decide on the number of subsets based on how many processors are wanted. 
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Future Work}
+\begin{block}{}
+\begin{itemize}
+\item Domain overloading (combined with some adaptive mesh refinement) is the logical extension to the work presented in this talk.
+\begin{itemize} 
+\item Processors could own different numbers of subsets, with no restriction on these subsets being contiguous.
+\end{itemize}
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Initial Setup}
+\centering
+\includegraphics[scale=0.5]{figures/initial_setup.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{AMR}
+\centering
+\includegraphics[scale=0.5]{figures/amr.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Domain Overloading}
+\centering
+\includegraphics[scale=0.5]{figures/domain_overloading.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Acknowledgements}
+\begin{block}{}
+A special thank you to the following individuals for their help and support:
+\begin{itemize}
+\item Drs. Ragusa, Morel, Adams, and Popov
+\item Michael Adams, Daryl Hawkins, and Dr. Timmie Smith
+\item Dr. Andrew Till
+\item The CERT team and fellow grad students
+\item PSAAP-II 
+\end{itemize}
+\end{block}
+\end{frame}
+
+\backupbegin
+\appendix
+\section{Backup Slides}
+\begin{frame}[t]\frametitle{Backup Slides}
+
+\end{frame}
+
 \begin{frame}[t]\frametitle{Solution Verification}
 \begin{block}{}
 \begin{itemize}
@@ -600,53 +700,8 @@ $\epsilon$=4.25E-04
 
 \end{frame}
 
-\section{Conclusions}
-\subsection{}
 
-\begin{frame}[t]\frametitle{Extruded Mesh Capability}
-\centering
-\includegraphics[scale=0.2]{figures/IM1_3D.png}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Extruded Mesh Capability}
-\centering
-\includegraphics[scale=0.23]{figures/IM1_Adams_2D_slice}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Conclusions}
-\begin{block}{}
-\begin{itemize}
-\item The effectiveness of the load balancing algorithm depends on the maximum triangle area used, and the number of subsets the domain is decomposed into.
-\item Good improvement is seen for all test cases, particularly the first two. 
-\item Improvements to the algorithm must be made, as the user will often need to decide on the number of subsets based on how many processors are wanted. 
-\end{itemize}
-\end{block}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Future Work}
-\begin{block}{}
-\begin{itemize}
-\item Improvements to the algorithm, moving portions of cut lines instead of moving the entire cutline.
-\item Domain overloading is the logical extension to the work presented in this thesis.
-\begin{itemize} 
-\item Processors could own different numbers of subsets, with no restriction on these subsets being contiguous.
-\end{itemize}
-\end{itemize}
-\end{block}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Acknowledgements}
-\begin{block}{}
-A special thank you to the following individuals for their help and support:
-\begin{itemize}
-\item Drs. Ragusa, Morel, Adams, and Popov
-\item Michael Adams, Daryl Hawkins, Timmie Smith
-\item Dr. Andrew Till
-\item The CERT team and fellow grad students
-\end{itemize}
-\end{block}
-\end{frame}
-
+\backupend
 
 %\begin{frame}[allowframebreaks]{Bibliography}
 %\bibliographystyle{alpha}
