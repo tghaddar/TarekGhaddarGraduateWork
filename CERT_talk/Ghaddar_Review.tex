@@ -553,13 +553,42 @@ Coarse & \textbf{\cellcolor{blue!25}0.45} & 0.45 & 0.46 & 0.46 & 0.45 & 0.46 & 0
 \end{table}
 \end{frame}
 
+\begin{frame}[t]\frametitle{IM1-B}
+\centering
+\includegraphics[scale = 0.3]{figures/IM1_filled_boundary0000.png}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Iteration 0}
+\begin{minipage}{0.15\textwidth}
+\begin{footnotesize}
+$f = 42.1526$
+\end{footnotesize}
+\end{minipage}
+\begin{minipage}{0.8\textwidth}
+\centering
+\includegraphics[scale=0.3]{figures/IM1_pre_iterations0000.png}
+\end{minipage}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Iteration 7}
+\begin{minipage}{0.15\textwidth}
+\begin{footnotesize}
+$f = 2.99$
+\end{footnotesize}
+\end{minipage}
+\begin{minipage}{0.8\textwidth}
+\centering
+\includegraphics[scale=0.3]{figures/IM1_post_iterations0000.png}
+\end{minipage}
+\end{frame}
+
 
 \section{Conclusions}
 \subsection{}
 
 \begin{frame}[t]\frametitle{Extruded Mesh Capability}
 \centering
-\includegraphics[scale=0.2]{figures/IM1_3D_extrude.png}
+\includegraphics[scale=0.25]{figures/IM1_3D_extrude.png}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Extruded Mesh Capability}
@@ -572,7 +601,7 @@ Coarse & \textbf{\cellcolor{blue!25}0.45} & 0.45 & 0.46 & 0.46 & 0.45 & 0.46 & 0
 \begin{table}[H]
 \centering
 \small
-\caption{The results of MCNP and PDT Compared}
+\caption{The results of MCNP and PDT Compared for IM1-B}
 \begin{tabular}{c | c | c}
 \hline
 \textbf{Code and Setup} & Abs. Rate w/Air ($s^{-1}$) & Abs. Rate w/Graphite $s^{-1}$\\
@@ -584,6 +613,8 @@ PDT Unstructured & 68.93 & 12.75 \\
 \end{tabular}
 \end{table}
 \end{frame}
+
+
 
 \begin{frame}[t]\frametitle{Conclusions}
 \begin{block}{}
@@ -601,7 +632,8 @@ PDT Unstructured & 68.93 & 12.75 \\
 \item Three paths for improving the load balancing algorithm have been outlined.
 \begin{itemize} 
 \item Adaptively splitting the subsets that have large cell counts into smaller subsets, and redistributing subsets amongst processors.
-\item
+\item Load balancing by column only, then in each column individually load balancing rows. 
+\item Taking advantage of nested parallelism to assign more parallel processes at subsets that require more work to be done.
 \end{itemize}
 \end{itemize}
 \end{block}
@@ -618,8 +650,20 @@ PDT Unstructured & 68.93 & 12.75 \\
 \end{frame}
 
 \begin{frame}[t]\frametitle{Subset Redistribution}
+\begin{minipage}{0.15\textwidth}
+\begin{footnotesize}
+$f = 1$
+\end{footnotesize}
+\end{minipage}
+\begin{minipage}{0.8\textwidth}
 \centering
 \includegraphics[scale=0.5]{figures/domain_overloading.pdf}
+\end{minipage}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Nested Parallelism}
+\centering
+\includegraphics[scale=0.5]{figures/initial_setup.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Acknowledgements}
