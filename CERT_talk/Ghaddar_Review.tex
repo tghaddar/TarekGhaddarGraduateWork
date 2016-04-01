@@ -68,7 +68,7 @@
 \author[Ghaddar]{Tarek Ghaddar \\  Dr. Jean Ragusa}
 \institute[TAMU]{Texas A\&M University}
 %\committee{Morel,Popov}{Dr. Jim Morel \\ Dr. Bojan Popov}
-\date[March 8, 2016]
+\date[April 4, 2016]
 
 {
 \setbeamertemplate{headline}[default] 
@@ -82,6 +82,10 @@
 \titlepage
 \end{frame}
 }
+
+\begin{frame}[t]\frametitle{Project Components and Integration}
+\includegraphics[scale = 0.45 ]{figures/Integration_Slide.pdf}
+\end{frame}
 
 \begin{frame}
 \tableofcontents
@@ -138,11 +142,14 @@
 			\item \textbf{Goal:} Obtain an equal number of cells per processor, which for our purposes means an equal number of cells per subset.
 			\item Achieved by optimizing the location of $X_i$ and $Y_j$, the location of the cut lines.
 			%\item We define the load balance metric, $f$.
+			\item \textbf{Define}:
+			\begin{itemize}
 			\item $N_{ij}$: The number of cells  in subset ${i,j}$
 			%\item Cut Lines: $X_i, Y_j$, $1 <= i <= I-1$, $1 <= j <= J-1$
 			\item $f =\frac{\underset{ij}{\text{max}}(N_{ij})}{\frac{N_{tot}}{I\cdot J}}$
 			\item $f_I = \underset{i}{\text{max}}[\sum_{j} N_{ij}]/\frac{N_{tot}}{I}$
 			\item $f_J = \underset{j}{\text{max}}[\sum_{i} N_{ij}]/\frac{N_{tot}}{J}$
+			\end{itemize}
 		\end{itemize}
 	\end{block}
 \end{frame}
@@ -167,7 +174,8 @@
 \begin{frame}[t]\frametitle{Example}
 \begin{minipage}{0.15\textwidth}
 \begin{footnotesize}
-$f$ = 7.20583
+Iter 0 \\
+$f$ = 7.20583 
 \end{footnotesize}
 \end{minipage}
 \begin{minipage}{0.8\textwidth}
@@ -179,7 +187,8 @@ $f$ = 7.20583
 \begin{frame}[t]\frametitle{Example}
 \begin{minipage}{0.15\textwidth}
 \begin{footnotesize}
-$f$ = 3.61695
+Iter 1 \\
+$f$ = 3.61695 
 \end{footnotesize}
 \end{minipage}
 \begin{minipage}{0.8\textwidth}
@@ -415,6 +424,7 @@ Coarse & 0.95 & 0.33 & 0.26 & 0.15 & 0.14 & 0.11 & \textbf{\cellcolor{blue!25}0.
 \begin{frame}[t]\frametitle{A Closer Look at Test Case 2}
 \begin{minipage}{0.15\textwidth}
 \begin{footnotesize}
+Iter 0 \\
 $f$ = 2.72
 \end{footnotesize}
 \end{minipage}
@@ -427,6 +437,7 @@ $f$ = 2.72
 \begin{frame}[t]\frametitle{A Closer Look at Test Case 2}
 \begin{minipage}{0.15\textwidth}
 \begin{footnotesize}
+Iter 10\\
 $f$ =1.85
 \end{footnotesize}
 \end{minipage}
@@ -548,12 +559,13 @@ Coarse & \textbf{\cellcolor{blue!25}0.45} & 0.45 & 0.46 & 0.46 & 0.45 & 0.46 & 0
 
 \begin{frame}[t]\frametitle{Extruded Mesh Capability}
 \centering
-\includegraphics[scale=0.2]{figures/IM1_3D.png}
+\includegraphics[scale=0.2]{figures/IM1_3D_extrude.png}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Extruded Mesh Capability}
 \centering
-\includegraphics[scale=0.23]{figures/IM1_Adams_2D_slice}
+\includegraphics[scale=0.23]{figures/IM1_MCNP}
+\includegraphics[scale=0.23]{figures/IM1_PDT}
 \end{frame}
 
 \begin{frame}[t]\frametitle{MCNP vs. PDT}
@@ -566,7 +578,6 @@ Coarse & \textbf{\cellcolor{blue!25}0.45} & 0.45 & 0.46 & 0.46 & 0.45 & 0.46 & 0
 \textbf{Code and Setup} & Abs. Rate w/Air ($s^{-1}$) & Abs. Rate w/Graphite $s^{-1}$\\
 \hline
 MCNP & 70.1 & 12.66 \\
-PDT Brick & & \\
 PDT Unstructured & 68.93 & 12.75 \\
 \hline
 
@@ -577,7 +588,7 @@ PDT Unstructured & 68.93 & 12.75 \\
 \begin{frame}[t]\frametitle{Conclusions}
 \begin{block}{}
 \begin{itemize}
-\item The effectiveness of the load balancing algorithm depends on the maximum triangle area used, and the number of subsets the domain is decomposed into.
+\item The effectiveness of the load balancing algorithm depends on the spatial distribution of fine geometric features, the maximum triangle area used, and the number of subsets the domain is decomposed into.
 \item Good improvement is seen for all test cases, particularly the first two. 
 \item Improvements to the algorithm must be made, as the user will often need to decide on the number of subsets based on how many processors are wanted. 
 \end{itemize}
@@ -587,9 +598,10 @@ PDT Unstructured & 68.93 & 12.75 \\
 \begin{frame}[t]\frametitle{Future Work}
 \begin{block}{}
 \begin{itemize}
-\item Domain overloading (combined with some adaptive mesh refinement) is the logical extension to the work presented in this talk.
+\item Three paths for improving the load balancing algorithm have been outlined.
 \begin{itemize} 
-\item Processors could own different numbers of subsets, with no restriction on these subsets being contiguous.
+\item Adaptively splitting the subsets that have large cell counts into smaller subsets, and redistributing subsets amongst processors.
+\item
 \end{itemize}
 \end{itemize}
 \end{block}
@@ -600,12 +612,12 @@ PDT Unstructured & 68.93 & 12.75 \\
 \includegraphics[scale=0.5]{figures/initial_setup.pdf}
 \end{frame}
 
-\begin{frame}[t]\frametitle{AMR}
+\begin{frame}[t]\frametitle{Adaptively Refine Subsets}
 \centering
 \includegraphics[scale=0.5]{figures/amr.pdf}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Domain Overloading}
+\begin{frame}[t]\frametitle{Subset Redistribution}
 \centering
 \includegraphics[scale=0.5]{figures/domain_overloading.pdf}
 \end{frame}
