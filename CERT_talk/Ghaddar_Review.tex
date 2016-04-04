@@ -47,7 +47,7 @@
 %Allow page breaks within align
 \allowdisplaybreaks
 %Putting logo and banner in title and adding banner
-\usepackage[absolute]{textpos}
+\usepackage{textpos}
 %Code
 \usepackage{listings}
 \usepackage{epstopdf}
@@ -625,6 +625,13 @@ $f = 2.99$
 \includegraphics[scale=0.23]{figures/IM1_PDT}
 \end{frame}
 
+\begin{frame}[t]\frametitle{Extruded Mesh Capability}
+\centering
+\vspace{2cm}
+\includegraphics[scale=1.3]{figures/IM1_MCNP_Zoom.png}
+\includegraphics[scale=1.3]{figures/IM1_PDT_Zoom.png}
+\end{frame}
+
 \begin{frame}[t]\frametitle{MCNP vs. PDT}
 \begin{table}[H]
 \centering
@@ -648,7 +655,7 @@ PDT Unstructured & 68.93 & 12.75 \\
 \begin{block}{}
 \begin{itemize}
 \item The effectiveness of the load balancing algorithm depends on the spatial distribution of fine geometric features, the maximum triangle area used, and the number of subsets the domain is decomposed into.
-\item Good improvement is seen for all test cases, particularly the first two. 
+\item Good improvement is seen for all test cases, particularly Test Cases 1,2, and IM1-B. 
 \item Improvements to the algorithm must be made, as the user will often need to decide on the number of subsets based on how many processors are wanted. 
 \end{itemize}
 \end{block}
@@ -660,7 +667,7 @@ PDT Unstructured & 68.93 & 12.75 \\
 \item Three paths for improving the load balancing algorithm have been outlined.
 \begin{itemize} 
 \item Adaptively splitting the subsets that have large cell counts into smaller subsets, and redistributing subsets amongst processors.
-\item Load balancing by column only, then in each column individually load balancing rows. 
+\item Load balancing by column only (which our algorithm does effectively), then in each column individually load balancing rows. 
 \item Taking advantage of nested parallelism to assign more parallel processes at subsets that require more work to be done.
 \end{itemize}
 \end{itemize}
