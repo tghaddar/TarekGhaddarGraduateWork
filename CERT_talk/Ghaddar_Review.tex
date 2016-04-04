@@ -1,13 +1,15 @@
-\documentclass[]{beamer}
+\documentclass[compress]{beamer}
 %for printing or having a crappy pdf reader backup
 %\documentclass[handout]{beamer}
 \mode<presentation>
 \usetheme{Madrid}
 
 
-\usecolortheme[RGB={80,0,0}]{structure}
+\usecolortheme[RGB={128,128,128}]{structure}
+\definecolor{my_gray}{RGB}{105,105,105}
+\setbeamercolor{khumna}{fg=white,bg=my_gray}
 %teal \usecolortheme[RGB={0,128,128}]{structure}
-\useoutertheme{miniframes}
+%\useoutertheme{miniframes}
 \useinnertheme{default}
 \usepackage{color}
 \definecolor{Maroon}{RGB}{80,0,0}
@@ -44,6 +46,8 @@
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 %Allow page breaks within align
 \allowdisplaybreaks
+%Putting logo and banner in title and adding banner
+\usepackage[absolute]{textpos}
 %Code
 \usepackage{listings}
 \usepackage{epstopdf}
@@ -59,6 +63,14 @@
    \setcounter{framenumber}{\value{finalframe}}
 }
 
+\addtobeamertemplate{frametitle}{}
+{
+	\begin{textblock*}{100mm}(0.85\textwidth,-1cm)
+	\includegraphics[height = 1cm,width=2cm]{figures/cert_logo_maroon.png}
+	\end{textblock*}
+}
+\beamertemplatenavigationsymbolsempty
+
 
 
 \begin{document}
@@ -68,31 +80,47 @@
 \author[Ghaddar]{Tarek Ghaddar \\  Dr. Jean Ragusa}
 \institute[TAMU]{Texas A\&M University}
 %\committee{Morel,Popov}{Dr. Jim Morel \\ Dr. Bojan Popov}
-\date[April 4, 2016]
+\date[April 5, 2016]
 
 {
-\setbeamertemplate{headline}[default] 
+\setbeamertemplate{headline}{}
 \begin{frame}
 \vspace{-1.1cm}
 	\begin{figure}[t]
 		\centering
-			\includegraphics[width=.25\textwidth]{figures/seal.png}
+			\includegraphics[width=.25\textwidth]{figures/cert_logo_maroon.png}
 	\end{figure}
 \vspace{-0.75cm}
 \titlepage
 \end{frame}
 }
 
+\setbeamertemplate{footline}
+{
+
+%\vspace{-0.1ex}
+\begin{beamercolorbox}[wd=\textwidth,ht=3.5ex]{khumna}
+\includegraphics[width = 0.95\textwidth]{figures/cert_banner.pdf}
+	%\begin{textblock*}{10mm}(0.95\textwidth,10cm)
+	\insertframenumber/\inserttotalframenumber
+	%\end{textblock*}
+\end{beamercolorbox}
+%\begin{beamercolorbox}[wd=0.05\textwidth,ht=3.5ex]{khumna}
+
+%\end{beamercolorbox}
+}
+
 \begin{frame}[t]\frametitle{Project Components and Integration}
 \includegraphics[scale = 0.45 ]{figures/Integration_Slide.pdf}
 \end{frame}
+
 
 \begin{frame}
 \tableofcontents
 \end{frame}
 
 \section{Introduction}
-\subsection{}
+%\subsection{}
 \begin{frame}[t]\frametitle{Motivation}
 	\begin{block}{}
 	\begin{itemize}
@@ -117,7 +145,7 @@
 \end{frame}
 
 \section{Load Balance Algorithm}
-\subsection{}
+%\subsection{}
 
 \begin{frame}[t]\frametitle{Partitioning for an Unstructured Mesh}
 \begin{block}{}
@@ -198,7 +226,7 @@ $f$ = 3.61695
 \end{frame}
 
 \section{Load Balancing Results}
-\subsection{}
+%\subsection{}
 \begin{frame}[t]\frametitle{Load Balancing Results}
 \begin{block}{}
 \begin{itemize}
@@ -584,7 +612,7 @@ $f = 2.99$
 
 
 \section{Conclusions}
-\subsection{}
+%\subsection{}
 
 \begin{frame}[t]\frametitle{Extruded Mesh Capability}
 \centering
