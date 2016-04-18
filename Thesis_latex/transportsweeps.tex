@@ -90,7 +90,7 @@ When using KBA, $P_z$ is fixed to 1, and with hybrid KBA, $P_z$ is fixed to 2. V
 \noindent\begin{minipage}{\textwidth}
 \centering
 \includegraphics[scale = 1]{figures/Partitioning.png}
-\captionof{figure}{Three different partitioning schemes in 2D, from left to right: KBA, volumetric non-overloaded, and volumetric overloaded.}
+\captionof{figure}{Three different partitioning schemes in 2D, from left to right: KBA, volumetric non-overloaded, and volumetric overloaded \cite{mpadams2015}.}
 \label{partitioning}
 \end{minipage}
 \smallskip
@@ -144,7 +144,7 @@ While the structured PDT transport sweep has scaled well out to 750,000 cores, s
 
 There are three requirements for a sweep scheduling algorithm to have. First, the algorithm should have low complexity, since millions of individual tasks are swept over in a typical problem. Second, the algorithm should schedule on a set of processors that is small in comparison to the number of tasks in the sweep graph. Last, the algorithm should distribute work in the spatial dimension only, so that there is no need to communicate during the calculation of the scattering source. 
 
-Here is the pseudocode for the algorithm:
+Here is the pseudocode\cite{Pautz} for the algorithm:
 
 \begin{verbatim}
 Assign priorities to every cell-angle pair

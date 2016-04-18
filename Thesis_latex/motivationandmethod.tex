@@ -6,7 +6,8 @@
 \label{ch:motivation}
 
 The capability for PDT to generate and run on an unstructured mesh is important because it allows us to run problems without having to conform our mesh to the problem as much. The idea is to have a logically Cartesian grid (creating orthogonal ``subsets") with an unstructured mesh inside each subset. These logically Cartesian subdomains are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality. It is decomposed into 3 subsets in x and 3 in y, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator.
-\vspace{0.2cm}
+
+\bigskip
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -37,41 +38,9 @@ f_J &= \underset{j}{\text{max}}[\sum_{i} N_{ij}]/\frac{N_{tot}}{J}.
 \label{submetric}
 \end{align}
 
-$f_I$ is calculated by taking the maximum number of cells per column and dividing it by the average number of cells per column. $f_j$ is calculated by taking the maximum number of cells per row and dividing it by the average number of cells per row. If these two numbers are greater than predefined tolerances, the cut lines in the respective directions are redistributed. Once redistribution and remeshing occur, a new metric is calculated. This iterative process occurs until a maximum number of iterations is reached, or until $f$ converges within the user defined tolerance.
+$f_I$ is calculated by taking the maximum number of cells per column and dividing it by the average number of cells per column. $f_j$ is calculated by taking the maximum number of cells per row and dividing it by the average number of cells per row. If these two numbers are greater than predefined tolerances, the cut lines in the respective directions are redistributed. Once redistribution and remeshing occur, a new metric is calculated. This iterative process occurs until a maximum number of iterations is reached, or until $f$ converges within the user defined tolerance. The Load Balance algorithm behaves as follows:
 
-\noindent\begin{minipage}{\textwidth}
-\textbf{Load Balance:} A load balancing algorithm that attempts at equalizing the number of triangles per subset. \\
-\rule{\textwidth}{0.4pt}
-\begin{algorithmic}
-\STATE  $I,J$ subsets specified by user
-\STATE Mesh all subsets
-\STATE  $N_{tot} = $ total number of triangles
-\STATE  $N_{ij} = $ number of triangles in subset $ij$
-\STATE $f =\underset{ij}{\text{max}}(N_{ij})/\frac{N_{tot}}{I\cdot J}$
-\COMMENT {//Check if all subsets meet the tolerance}
-\IF {$f < \text{tol}_{\text{subset}}$}
-	\STATE DONE with load balancing
-\ELSE
-	\STATE $f_I = \underset{i}{\text{max}}[\sum_{j} N_{ij}]/\frac{N_{tot}}{I}$
-	\STATE $f_J = \underset{j}{\text{max}}[\sum_{i} N_{ij}]/\frac{N_{tot}}{J}$
-	\IF {$f_I > \text{tol}_{\text{row}}$}
-		\STATE \textbf{Redistribute}($X_i$)
-	\ENDIF
-	\IF{$f_J > \text{tol}_{\text{col}}$}
-		\STATE \textbf{Redistribute}($Y_j$)
-	\ENDIF 
-	\IF {redistribution occured}
-		\STATE REMESH and repeat algorithm
-	\ENDIF
-\ENDIF
-\IF {There is still a discrepancy amongst subsets}
-     \STATE Move cutplane segments on the subset level and remesh (may require changes to scheduling algorithm)
-\ENDIF
-\end{algorithmic}
-\rule{\textwidth}{0.4pt}
-\end{minipage}
-
-\bigskip
+\lstinputlisting[language = C++, basicstyle = \footnotesize]{loadbalance.cc}
 
 \noindent\begin{minipage}{\textwidth}
 \textbf{Redistribute:} A function that moves cut lines in either X or Y. \\
