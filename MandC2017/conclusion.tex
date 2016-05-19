@@ -1,0 +1,9 @@
+\chapter{\uppercase {Conclusion}}
+
+In conclusion, the load balancing algorithm outlined in Chapter \ref{ch:motivation} works well for more symmetric problems with a lot of features, and even works well for particularly unbalanced problems. As shown in Chapter~\ref{ch:results}, its effectiveness depends on the maximum triangle area used, and the number of subsets the user chooses to decompose the problem domain into. 
+
+Good improvement is seen throughout all three test cases for all three inputs, particularly the first two test cases, which were initially very unbalanced. However, there were many inputs run that had problems with $f > 1.1$, which means many problems were unbalanced by more than 10\%. The user will not always have the luxury of choosing the number of subsets they want the problem run with, as this directly affects the number of processors the problem will be run with. Certain problems will require more processors and will require minimizing the total number of cells in the domain for the problem to complete running in a reasonable amount of time. As a result, improvements to the algorithm must be made. 
+
+This can be done by changing how the cut lines are redistributed. Instead of changing entire row and column widths, the cut lines can be moved on the subset level. However, this can sacrifice the strict orthogonality that PDT currently utilizes to scale so well on a massively parallel scale. Changes to the performance model and the scheduler would have to be made.
+
+Another option is to implement domain overloading, which is the logical extension of the work presented in this thesis. This would involve processors owning different numbers of subsets, with no restriction on these subsets being contiguous. This would be the most effective method at perfecting this algorithm, and would lead to less problems being unbalanced by more than 10\%.

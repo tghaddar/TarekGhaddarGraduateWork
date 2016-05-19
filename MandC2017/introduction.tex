@@ -1,0 +1,43 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  New template code for TAMU Theses and Dissertations starting Fall 2012.  
+%  For more info about this template or the 
+%  TAMU LaTeX User's Group, see http://www.howdy.me/.
+%
+%  Author: Wendy Lynn Turner 
+%	 Version 1.0 
+%  Last updated 8/5/2012
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                           Introduction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\pagestyle{plain} % No headers, just page numbers
+\pagenumbering{arabic} % Arabic numerals
+\setcounter{page}{1}
+
+
+\chapter{\uppercase {Introduction}}
+\label{ch:introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+When running any massively parallel code, load balancing is a priority in order to achieve the best possible parallel efficiency. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.
+
+The concepts and results presented in this thesis are used by PDT, Texas A\&M University's massively parallel deterministic transport code. It is capable of multi-group simulations and employs discrete ordinates for angular discretization. PDT features steady-state, time-dependent, criticality, and depletion simulations. It solves the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation. PDT  has been shown to scale on logically Cartesian grids out to 750,000 cores. Logically Cartesian grids contain regular convex grid units that allow for vertex motion inside them, in order to conform to curved shapes. 
+
+The following are the completed goals of this thesis:
+\begin{itemize}
+\item Implement unstructured meshing capability in PDT for 2D and 2D extruded problems.
+\item Generate unstructured mesh in parallel using the same partitioning scheme and number of processors as the Cartesian-grid transport sweep.
+\item {Perform stitching between meshed subdomains to preserve interface continuity.}
+\item Implement load balancing algorithms for unstructured meshes in PDT. A load balanced problem is determined by the value of $f$, where $f$ is the subset with the maximum number of cells, divided by the average number of cells per subset. A perfectly balanced problem has $f = 1$.
+\item Verify and test code to prove load balancing algorithm effectiveness, in addition to unstructured meshing capability. 
+\item Show results of the parallel transport sweeps on unstructured meshes for benchmark problems.
+\end{itemize}
+
+The unstructured meshing capability being added into PDT was of paramount importance because it allows the user to define the problem geometry without having to conform the mesh to the problem geometry. The need to move vertices within convex grids is no longer needed, so the user only needs to define the geometry of the problem. A 2D unstructured mesh is created utilizing the Triangle mesh generator. The resulting mesh can be extruded in the third spatial dimension. The 2D extruded grid is not as generic as a fully tetrahedral grid (such implementation is left as future work). 
+
+In Chapters ~\ref{ch:transporteq} and ~\ref{ch:transportsweeps}, we introduce and review radiation transport and massively parallel transport sweeps on Cartesian meshes and moderately parallel unstructured meshes. Chapter \ref{ch:motivation} describes the load balancing algorithm that was implemented, and Chapter ~\ref{ch:results} presents the behavior of the algorithm for three test cases, in addition to verifying the solution to two benchmark problems and showcasing the unstructured meshing capability. 
