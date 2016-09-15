@@ -12,6 +12,7 @@ $^{*}$Dept. of Nuclear Engineering, Texas A\&M University, College Station, TX, 
 \email{tghaddar@tamu.edu \and jean.ragusa@tamu.edu}
 
 %%%% packages and definitions (optional)
+\usepackage{color} 
 \usepackage{graphicx} % allows inclusion of graphics
 \usepackage{booktabs} % nice rules (thick lines) for tables
 \usepackage{microtype} % improves typography for PDF
@@ -40,16 +41,17 @@ $^{*}$Dept. of Nuclear Engineering, Texas A\&M University, College Station, TX, 
 \newcommand{\vd}{\bm{\cdot}} % slightly bold vector dot
 \newcommand{\grad}{\vec{\nabla}} % gradient
 \newcommand{\ud}{\mathop{}\!\mathrm{d}} % upright derivative symbol
+\newcommand{\tcr}[1]{\textcolor{red}{#1}} % upright derivative symbol
 
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 \label{ch:introduction}
-When running any massively parallel code, load balancing is a priority in order to achieve the best possible parallel efficiency. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.
+When running any massively parallel code, load balancing is a priority in order to achieve the best possible parallel efficiency. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work load for each processor. \tcr{add a notation about communications too}
 
-The concepts and results presented in this paper are used by PDT, Texas A\&M University's massively parallel deterministic transport code. It is capable of multi-group simulations and employs discrete ordinates for angular discretization, and utilizes transport sweeps to solve the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation. To the best of our knowledge, transport sweeps are the only stuff to scale on current and next generation machines.PDT  has been shown to scale on logically Cartesian grids out to 750,000 cores\cite{mpadams2015}. Logically Cartesian grids contain regular convex grid units that allow for vertex motion inside them in order to conform to curved shapes. 
+\tcr{directly hit with transport sweeps but with logically Cartesian grids} The concepts and results presented in this paper are used by PDT, Texas A\&M University's massively parallel deterministic transport code. It is capable of multi-group simulations and employs discrete ordinates for angular discretization, and utilizes transport sweeps to solve the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation. To the best of our knowledge, transport sweeps are the only stuff to scale on current and next generation machines.PDT  has been shown to scale on logically Cartesian grids out to 750,000 cores\cite{mpadams2015}. Logically Cartesian grids contain regular convex grid units that allow for vertex motion inside them in order to conform to curved shapes. \tcr{then PDT}
 
-A new unstructured meshing capability was implemented in PDT in order to realistically represent certain geometries. Cut lines (planes for 3D cases) are used to partition the geometry into subdomains, which are then individually meshed in parallel using the Triangle Mesh Generator\cite{triangle}. These subdomains are then ``stitched" together in order to create a continuous geometry. 2D meshes can be extruded in the z dimension for 3D problems. 
+A new unstructured meshing capability was implemented in PDT in order to realistically represent certain geometries. Cut lines (planes for 3D cases) are used to partition the geometry into \tcr{logically-Cartesian} subdomains, which are then individually meshed in parallel using the Triangle Mesh Generator\cite{triangle}. These subdomains are then ``stitched" together in order to create a continuous geometry. 2D meshes can be extruded in the z dimension for 3D problems. 
 
 Unstructured meshes create unbalanced problems due to the way localized features can be meshed, so a load balancing algorithm was added into PDT. A load balanced problem is determined by the value of $f$, where $f$ is the subset with the maximum number of cells, divided by the average number of cells per subset. A perfectly balanced problem has $f = 1$.
 
@@ -96,8 +98,10 @@ In order to get from the 2D mesh to the 2D extruded mesh, an extrusion file is s
 
 \section{The Load Balancing Algorithm}
 
+\tcr{not sure we this this paragraph}
 When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to ``balance'' the number of cells. Ideally, each processor will be responsible for an equal number of cells. 
 
+\tcr{re-emphasize that this is done in the context of the provably-optimal transport sweep on logically Cartesian grids, hence your desire to equally spread the DoFs in the subsets}
 If the number of cells in each subset can be reasonably balanced, then the problem is effectively load balanced. The Load Balance algorithm described below details how the subsets will be load balanced. In summary, the procedure of the algorithm involves moving the initially user specified $x$ and $y$ cut planes, re-meshing, and iterating until a reasonably load balanced problem is obtained.  Equation \ref{metric_def} shows the equation for calculating the load balancing metric, which dictates how balanced or unbalanced the problem is.
 \begin{equation}
 f =\frac{\underset{ij}{\text{max}}(N_{ij})}{\frac{N_{tot}}{I\cdot J}},
@@ -106,12 +110,16 @@ f =\frac{\underset{ij}{\text{max}}(N_{ij})}{\frac{N_{tot}}{I\cdot J}},
 where $f$ is the load balance metric, $N_{ij}$ is the number of cells in subset $i,j$, $N_{tot}$ is the global number of cells in the problem, and $I$ and $J$ are the total number of in the $x$ and $y$ direction, respectively. The metric is a measure of the maximum number of cells per subset divided by the average number of cells per subset.
 
 The load balancing algorithm moves cut planes based on two sub-metrics, $f_I$ and $f_J$. Equation ~\eqref{submetric} defines these two parameters:
-\begin{align}
-f_I &= \underset{i}{\text{max}}[\sum_{j} N_{ij}]/\frac{N_{tot}}{I} \notag \\
-f_J &= \underset{j}{\text{max}}[\sum_{i} N_{ij}]/\frac{N_{tot}}{J}.
+\begin{subequations}
 \label{submetric}
-\end{align}
-
+\begin{equation}
+f_I = \frac{ \underset{i}{\text{max}}[\sum_{j} N_{ij}] } {\frac{N_{tot}}{I}} 
+\end{equation}
+\begin{equation}
+f_J = \frac{\underset{j}{\text{max}}[\sum_{i} N_{ij}] } {\frac{N_{tot}}{J}}.
+\end{equation}
+\end{subequations}
+%
 $f_I$ is calculated by taking the maximum number of cells per column and dividing it by the average number of cells per column. $f_j$ is calculated by taking the maximum number of cells per row and dividing it by the average number of cells per row. If these two numbers are greater than predefined tolerances, the cut lines in the respective directions are redistributed. Once redistribution and remeshing occur, a new metric is calculated. This iterative process occurs until a maximum number of iterations is reached, or until $f$ converges within the user defined tolerance. The Load Balance algorithm behaves as follows:
 
 \lstinputlisting[language = C++, basicstyle = \footnotesize]{loadbalance.cc}
@@ -146,7 +154,7 @@ The following sections will showcase the metric behavior and convergence for thr
 
 \subsection{Test Cases for Metric Behavior and Convergence}
 \label{sec:convergence}
-In order to showcase the behavior of the load balancing metric, calculated by Eq. \ref{metric_def} three test cases are presented. Figure \ref{opp} shows the first test case, a 20 cm by 20 cm domain with two pins in opposite corners of the domain. Figure \ref{same} shows the same size domain but with the pins on the same side.These are two theoretically very unbalanced cases, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to it's denser and repeated geometry, theoretically is a more balanced problem. 
+In order to showcase the behavior of the load balancing metric, calculated by Eq. \ref{metric_def} three test cases are presented. Figure \ref{opp} shows the first test case, a 20 cm by 20 cm domain with two pins in opposite corners of the domain. Figure \ref{same} shows the same size domain but with the pins on the same side.These are two theoretically very unbalanced cases, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to its denser and repeated geometry, theoretically is a more balanced problem. 
 
 A series of 162 inputs was constructed for each case. These inputs are constructed by varying the maximum triangle area from the coarsest possible to 0.01 cm\textsuperscript{2} and the number of subsets, $N$ from 2$\times$2 to 10$\times$10. 
 
@@ -240,13 +248,14 @@ Another option is to implement domain overloading, which is the logical extensio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
 
-In conclusion, the load balancing algorithm outlined in the Motivation and Methods section works well for more symmetric problems with a lot of features, and even works well for particularly unbalanced problems. As shown in Chapter~\ref{ch:results}, its effectiveness depends on the maximum triangle area used, and the number of subsets the user chooses to decompose the problem domain into. 
+In conclusion, the load balancing algorithm outlined in this paper performs satisfactorily for more symmetric problems with a lot of geometrical features, and even for particularly unbalanced problems. As shown in \tcr{Chapter}~\ref{ch:results}, its effectiveness depends on the maximum triangle area used and the number of subsets chosen to decompose the problem domain. 
 
-Good improvement is seen throughout all three test cases for all three inputs, particularly the first two test cases, which were initially very unbalanced. However, there were many inputs run that had problems with $f > 1.1$, which means many problems were unbalanced by more than 10\%. The user will not always have the luxury of choosing the number of subsets they want the problem run with, as this directly affects the number of processors the problem will be run with. Certain problems will require more processors and will require minimizing the total number of cells in the domain for the problem to complete running in a reasonable amount of time. As a result, improvements to the algorithm must be made. 
+Load imbalance reduction is observed throughout all three test cases for all three inputs, particularly the first two test cases, which were initially very unbalanced. However, there were many inputs run that had problems with $f > 1.1$, which means many problems were unbalanced by more than 10\%. It is not always to chosen the number of subsets as this directly affects the number of processors the problem will be run with. Certain problems will require more processors and will require minimizing the total number of cells in the domain for the problem to complete running in a reasonable amount of time. As a result, improvements to the algorithm must be made. 
 
-This can be done by changing how the cut lines are redistributed. Instead of changing entire row and column widths, the cut lines can be moved on the subset level. However, this can sacrifice the strict orthogonality that PDT currently utilizes to scale so well on a massively parallel scale. Changes to the performance model and the scheduler would have to be made.
+This can be done by changing how the cut lines are redistributed. Instead of changing entire row and column widths, the cut lines can be moved on the subset level. However, this can sacrifice the strict orthogonality that PDT currently utilizes perform transport sweep on a massively parallel scale. 
+% Changes to the performance model and the scheduler would have to be made.
 
-Another option is to implement domain overloading, which is the logical extension of the work presented in this paper. This would involve processors owning different numbers of subsets, with no restriction on these subsets being contiguous. This would be the most effective method at perfecting this algorithm, and would lead to less problems being unbalanced by more than 10\%.
+%Another option is to implement domain overloading, which is the logical extension of the work presented in this paper. This would involve processors owning different numbers of subsets, with no restriction on these subsets being contiguous. This would be the most effective method at perfecting this algorithm, and would lead to less problems being unbalanced by more than 10\%.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
