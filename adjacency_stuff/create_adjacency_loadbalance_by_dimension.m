@@ -57,7 +57,7 @@ for i=1:nx
             Y1=cut_lines_curr(j);
             Y2=cut_lines_curr(j+1);
             ind = find( (cut_lines_neig>Y1-eps) & (cut_lines_neig<Y2+eps) );
-            % TODO: need fuzzy logic for the vase when vertices are the same
+            % TODO: need fuzzy logic 
             % ind is the ID's of the cut lines of the neighbors
             if ~isempty(ind)
                 connecting_subsets = [ind(1)-1 ind];
