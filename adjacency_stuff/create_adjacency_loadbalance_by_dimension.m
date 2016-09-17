@@ -72,7 +72,7 @@ for i=1:nx
                 % i*ny: to skip all ofthe subset in all columns from 1 to i included
                 A(current_row,i*ny+connecting_subsets)=1;
             end % ind is not empty
-        end % we are not yet at the last column
+        end % loop over subset in given column
     end % we are not yet at the last column
     
 end % loop of columns
