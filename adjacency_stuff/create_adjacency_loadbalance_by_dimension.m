@@ -71,6 +71,20 @@ for i=1:nx
                 end
                 % i*ny: to skip all ofthe subset in all columns from 1 to i included
                 A(current_row,i*ny+connecting_subsets)=1;
+            else
+                % if ind is empty, then no cut lines of the neighboring
+                % column intersect the given subset but that subset still
+                % has a neighbor!!!
+                ind1 = find(cut_lines_neig<Y1+eps);
+                ind2 = find(cut_lines_neig>Y2-eps);
+                if (ind1(end)-ind2(1)~=-1)
+                    [i j]
+                    ind1
+                    ind2
+                    warning('these 2 number must differ by -1 only');
+                else
+                    A(current_row,i*ny+ind1(end))=2;                    
+                end
             end % ind is not empty
         end % loop over subset in given column
     end % we are not yet at the last column
