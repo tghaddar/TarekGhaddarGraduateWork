@@ -3,8 +3,8 @@ close all; clear all; clc;
 do_random=true;
 
 % number of cut lines
-n_cutx = 5;
-n_cuty = 3;
+n_cutx = 25;
+n_cuty = 31;
 
 % number of subsets per dimension
 nx = n_cutx + 1;
@@ -81,7 +81,7 @@ for i=1:nx
                     [i j]
                     ind1
                     ind2
-                    warning('these 2 number must differ by -1 only');
+                    warning('these 2 numbers must differ by -1 only');
                 else
                     A(current_row,i*ny+ind1(end))=2;                    
                 end
@@ -108,7 +108,7 @@ for i=1:nx
         Coordinates(k,:)=[xval yval];
     end
 end
-gplot(A,Coordinates,'r-*');
+gplot(A,Coordinates,'r-s');
 hold on
 % superimpose the subset mesh 
 for i=1:nx+1
@@ -120,4 +120,8 @@ for i=1:nx+1
     end
 end
     
-    
+% useful links:
+% http://stackoverflow.com/questions/27339909/how-to-automatically-create-coordinates-when-graphing-adjacency-matrix-using-mat
+% http://stackoverflow.com/questions/3277541/construct-adjacency-matrix-in-matlab
+% 
+% 
