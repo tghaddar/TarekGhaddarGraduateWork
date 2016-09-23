@@ -351,6 +351,6 @@ for i in range (0, num_subsets):
     print(y)
     plt.plot(x,y,'r-o')
 
-plt.savefig("adjacency_plot.pdf")
+plt.savefig("adjacency_plot.png")
 
 
