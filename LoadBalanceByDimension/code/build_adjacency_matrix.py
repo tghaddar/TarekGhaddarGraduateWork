@@ -22,7 +22,7 @@ def find_cut(subset_boundaries, cut):
 def find_ymin(subset_boundaries, cut, column):
   for i in range(0,len(subset_boundaries)):
     #The column this subset is in.
-    current_column = int(i/(N_x+1))
+    current_column = int(i/(N_y+1))
     if (current_column == column):
       if (subset_boundaries[i][2] == cut):
         return i
@@ -30,13 +30,13 @@ def find_ymin(subset_boundaries, cut, column):
 def find_ymax(subset_boundaries,cut,column):
   for i in range(0,len(subset_boundaries)):
     #The column this subset is in.
-    current_column = int(i/(N_x+1))
+    current_column = int(i/(N_y+1))
     if (current_column == column):
       if (subset_boundaries[i][3] == cut):
         return i
 
 #Number of cuts in x-direction
-N_x = 2
+N_x = 5
 #Number of cuts in y-direction
 N_y = 2
 
@@ -58,6 +58,7 @@ global_y_max = 10.0
 x_cuts = []
 #2D array that wills store the y_cuts for each y_column.
 y_cuts = []
+
 #y_cuts = [[2.0,6.0],[1.0,8.0], [0.5,5.0]]
 
 #Populating x_cuts with uniformly distributed random values.
@@ -76,6 +77,7 @@ for i in range(0,N_x):
 
   y_cuts.append(y_cuts_column)
 
+x_cuts.sort()
 #Last column
 y_cuts_column = []
 for i in range(0,N_y):
@@ -85,7 +87,6 @@ for i in range(0,N_y):
 y_cuts_column.sort()
 y_cuts.append(y_cuts_column)
 
-x_cuts.sort()
 
 print(x_cuts)
 print(y_cuts)
@@ -98,7 +99,7 @@ for i in range(0,num_subsets):
   #Subset ID
   ss_id = i
 
-  current_column = int(ss_id/(N_x+1))
+  current_column = int(ss_id/(N_y+1))
   current_row = 0
   if (current_column == 0):
     current_row = ss_id
@@ -109,6 +110,7 @@ for i in range(0,num_subsets):
   x_max = 0
   y_min = 0
   y_max = 0
+
 
   #Getting x_min, x_max, y_min, y_max of current subset
   if (current_column == 0):
@@ -166,13 +168,12 @@ global_neighbor_map = []
 for i in range(0,num_subsets):
   #Local neighbor map for this subset
   local_neighbor_map = []
-  current_column = int(i/(N_x+1))
+  current_column = int(i/(N_y+1))
   current_row = 0
   if (current_column == 0):
-    current_row = ss_id
+    current_row = i
   else:
-    current_row = int(ss_id - current_column*(N_y+1))
-  
+    current_row = int(i - current_column*(N_y+1))
   
   x_min = global_subset_boundary[i][0]
   x_max = global_subset_boundary[i][1]
@@ -211,7 +212,9 @@ for i in range(0,num_subsets):
       else:
         #Check if we're looking at the first cut line in this column
         if (j == 0):
+          print(second_column_y_cuts[j],current_column+1)
           subsets = find_ymax(global_subset_boundary,second_column_y_cuts[j],current_column+1)
+          print(subsets,i)
           local_neighbor_map.append(subsets)
         elif (second_column_y_cuts[j-1] < y_max):
           subsets = find_ymax(global_subset_boundary,cut,current_column+1)
@@ -219,7 +222,7 @@ for i in range(0,num_subsets):
   
   #We're only concerned with neighbors to the left
   elif (current_column == N_x):
-    left_neighbor_cuts = y_cuts[N_y-1]
+    left_neighbor_cuts = y_cuts[N_x-1]
     for j in range(0, N_y):
       cut = left_neighbor_cuts[j]
       if (cut < y_max):
@@ -310,7 +313,7 @@ for i in range(0,num_subsets):
           subsets = find_ymax(global_subset_boundary,right_cut,current_column+1)
           local_neighbor_map.append(subsets)
   
-  local_neighbor_map = sorted(set(local_neighbor_map))
+  #local_neighbor_map = sorted(set(local_neighbor_map))
   global_neighbor_map.append(local_neighbor_map)
 
 
@@ -347,8 +350,6 @@ for i in range (0, num_subsets):
     
     x = [subset_centers[i][0], subset_centers[n][0]]
     y = [subset_centers[i][1], subset_centers[n][1]]
-    print(x)
-    print(y)
     plt.plot(x,y,'r-o')
 
 plt.savefig("adjacency_plot.png")
