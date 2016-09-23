@@ -3,8 +3,8 @@ close all; clear all; clc;
 do_random=true;
 
 % number of cut lines
-n_cutx = 25;
-n_cuty = 31;
+n_cutx = 3;
+n_cuty = 3;
 
 % number of subsets per dimension
 nx = n_cutx + 1;
@@ -39,7 +39,7 @@ for i=1:nx
     for row=row_beg:row_end
         % top neighbor
         if row~=row_end, A(row,row+1)=1; end
-        % not need for bottom neighbors, we use transport at the end
+        % not need for bottom neighbors, we use transpose at the end
         % % bottom neighbor
         % if row~=row_beg, A(row,row-1)=1; end
     end
