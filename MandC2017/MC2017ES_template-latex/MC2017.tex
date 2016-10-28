@@ -193,17 +193,17 @@ Because Fig. \ref{lattice} has more features and is more symmetric of a problem,
 
 Good improvement is seen throughout all three test cases for all three inputs, particularly the first two test cases, which were initially very unbalanced. However, there were many inputs run that had problems with $f > 1.1$, which means many problems were unbalanced by more than 10\%. The user will not always have the luxury of choosing the number of subsets they want the problem run with, as this directly affects the number of processors the problem will be run with. Certain problems will require more processors and will require minimizing the total number of cells in the domain for the problem to complete running in a reasonable amount of time. As a result, improvements to the algorithm must be made. 
 
-This can be done by changing how the cut lines are redistributed. Instead of changing entire row and column widths, the cut lines can be moved on the subset level. However, this can sacrifice the strict orthogonality that PDT currently utilizes to scale so well on a massively parallel scale. Changes to the performance model and the scheduler will possibly have to be made.
-
-Another option is to implement domain overloading, which is the logical extension of the work presented in this paper. This would involve processors owning different numbers of subsets, with no restriction on these subsets being contiguous. This would be the most effective method at perfecting this algorithm, and would lead to less problems being unbalanced by more than 10\%.
+This can be done by changing how the cut lines are redistributed. Instead of changing entire row and column widths, the cut lines can be moved on the subset level. However, this can sacrifice the strict orthogonality that PDT currently utilizes to scale so well on a massively parallel scale. Updates to the performance model and the task scheduler are underway to allows this load balancing by dimension. Finally, another extension of this work would be to implement domain overloading
+whereby processors may own non-contiguous subsets.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
 
-We have proposed and tested a load-balance algorithm for radiation transport problems on unstructured grids solved using sweeps. 
-The load balancing algorithm outlined in this paper performs satisfactorily for feature-heavy problems and even for some particularly sparse problems. Its effectiveness depends on the maximum triangle area used and the number of subsets chosen to decompose the problem domain. 
+We have proposed and tested a load-balance algorithm for radiation transport problems on unstructured grids solved using transport sweeps. 
+The load balancing algorithm outlined in this paper performs satisfactorily for feature-heavy problems and for some particularly sparse problems. Its effectiveness depends on the maximum triangle area used and the number of subsets chosen to decompose the problem domain. 
 
-Load imbalance reduction is observed throughout all three test cases for all three inputs, particularly the first test case, which was initially very unbalanced. However, there were many inputs run that had problems with $f > 1.1$, which means many problems were unbalanced by more than 10\% after application of the load balancing algorithm. 
+Load imbalance reduction is observed for all test cases. However, there are situations where the load balance procedure described here 
+still yield a load imbalance greater than 10\% ($f > 1.1$). 
 Further improvement to the method will include: investigation of domain-overloading \cite{mpadams2015} and load-balancing by dimension.
 
 %It is not always possible to choose the number of subsets as this directly affects the number of processors the problem will be run with. Certain problems will require more processors and will require minimizing the total number of cells in the domain for the problem to complete running in a reasonable amount of time. As a result, improvements to the algorithm must be made. 
