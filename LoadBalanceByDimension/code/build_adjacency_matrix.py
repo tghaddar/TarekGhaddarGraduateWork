@@ -352,6 +352,6 @@ for i in range (0, num_subsets):
     y = [subset_centers[i][1], subset_centers[n][1]]
     plt.plot(x,y,'r-o')
 
-plt.savefig("adjacency_plot.png")
+plt.show()
 
 
