@@ -89,7 +89,7 @@ To demonstrate the newly implemented unstructured meshing capability in PDT, Tex
 \end{figure}
 
 The combination of the 2D mesh and extrusion parameters yield the full 3D problem, shown in Fig. \ref{IM13D}.
-
+   
 \begin{figure}[H]
 \centering
 \includegraphics[scale = 0.3]{figures/IM1_3D.png}
@@ -198,11 +198,9 @@ whereby processors may own non-contiguous subsets.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
 
-We have proposed and tested a load-balance algorithm for radiation transport problems on unstructured grids solved using transport sweeps. 
-The load balancing algorithm outlined in this paper performs satisfactorily for feature-heavy problems and for some particularly sparse problems. Its effectiveness depends on the maximum triangle area used and the number of subsets chosen to decompose the problem domain. 
+We have proposed and tested a load-balance algorithm for radiation transport problems on unstructured grids solved using transport sweeps. The load balancing algorithm outlined in this paper performs satisfactorily for feature-heavy problems and for some particularly sparse problems. Its effectiveness depends on the maximum triangle area used and the number of subsets chosen to decompose the problem domain. 
 
-Load imbalance reduction is observed for all test cases. However, there are situations where the load balance procedure described here 
-still yield a load imbalance greater than 10\% ($f > 1.1$). 
+Load imbalance reduction is observed for all test cases. However, there are situations where the load balance procedure described here still yield a load imbalance greater than 10\% ($f > 1.1$). 
 Further improvement to the method will include: investigation of domain-overloading \cite{mpadams2015} and load-balancing by dimension.
 
 %It is not always possible to choose the number of subsets as this directly affects the number of processors the problem will be run with. Certain problems will require more processors and will require minimizing the total number of cells in the domain for the problem to complete running in a reasonable amount of time. As a result, improvements to the algorithm must be made. 
