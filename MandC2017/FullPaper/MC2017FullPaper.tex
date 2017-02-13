@@ -4,6 +4,7 @@
 \usepackage{graphicx} % allows inclusion of graphics
 \usepackage{booktabs} % nice rules (thick lines) for tables
 \usepackage{microtype} % improves typography for PDF
+\usepackage{xcolor} % improves typography for PDF
 
 
 \newcommand{\SN}{S$_N$}
@@ -11,7 +12,6 @@
 \newcommand{\vd}{\bm{\cdot}} % slightly bold vector dot
 \newcommand{\grad}{\vec{\nabla}} % gradient
 \newcommand{\ud}{\mathop{}\!\mathrm{d}} % upright derivative symbol
-
 
 %%%% changes from the original 'anstrans' class
 \usepackage{fancyhdr} % allows headers and footers
@@ -69,7 +69,7 @@ actual articles, living or dead, is purely coincidental.}
 \vspace*{-42pt}
 \begin{strip}
 \centering{\parbox{153mm}{{\bf Abstract} \itshape - 
-When running any massively parallel code, load balancing is a priority in order to achieve the best possible parallel efficiency. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do. An unstructured meshing capability was implemented in PDT, Texas A\&M University's massively parallel deterministic transport code, utilizing the Triangle mesh generator, hence allowing the user to define more realistic problem geometries and to define 3D problems through the extrusion of 2D meshes. However, unstructured grids are significantly  harder to load balance than Cartesian rectangular meshes. A load balancing algorithm was implemented in PDT to minimize a metric that determines how unbalanced a mesh is based on the number of mesh cells per processor. Three test cases were constructed, and a series of 162 inputs were created for each case. A maximum improvement of 89.0\% was seen in Test Case 1, 89.1\% was seen in Test Case 2, and 55.2\% was seen in Test Case 3. }\par}
+When running any massively parallel code, load balancing is a priority in order to achieve the highest possible parallel efficiency. A load-balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work for each processor. An unstructured meshing capability was implemented in PDT, Texas A\&M University's massively parallel deterministic transport code, utilizing the Triangle mesh generator, hence allowing the user to define more realistic problem geometries and to define 3D problems through the extrusion of 2D meshes. However, unstructured grids are significantly  harder to load balance than Cartesian rectangular meshes. A load balancing algorithm was implemented in PDT to minimize a load-imbalance metric. Three test cases were constructed and a series of 162 inputs were created for each case. A maximum improvement of 89.0\% was seen in Test Case 1, 89.1\% was seen in Test Case 2, and 55.2\% was seen in Test Case 3. }\par}
 \vspace*{14pt}
 \end{strip}
 
@@ -79,15 +79,12 @@ When running any massively parallel code, load balancing is a priority in order 
 When running any massively parallel code, attaining load balancing is a priority in order to achieve the best possible parallel efficiency. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is an important factor to minimize idle time for all processors and is attained by equally distributing (as much as possible) the work load among all processors. 
 % This makes communicating information in between processors more efficient, improving parallel efficiency. 
 
-To the best of our knowledge, transport sweeps are the only method to scale on current and next-generation supercomputers. PDT, Texas A\&M University's massively parallel deterministic transport code, has been shown to scale on logically Cartesian grids out to 750,000 cores \cite{mpadams2015}. Logically Cartesian grids are constructed with mesh cells that are identified using integer triplets $ijk$ (i.e., cubic cells), but allow for vertex motion in order to conform to curved shapes. The concepts and results presented in this paper are implemented in PDT. PDT is a solver for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation transport phenomena. It uses discrete ordinates for angular discretization, multi-group differencing, and discontinuous finite elements in space. 
+To the best of our knowledge, transport sweeps is the only scalable solution technique on the current leadership class supercomputers. PDT, Texas A\&M University's massively parallel deterministic transport code, has been shown to scale on logically Cartesian grids out to 750,000 cores \cite{mpadams2015}. Logically Cartesian grids are constructed with mesh cells that are identified using integer triplets $ijk$ (i.e., cubic cells), but allow for vertex motion in order to conform to curved shapes. PDT solves radiation transport problems (neutron, gamma, coupled neutron-gamma, electron, coupled electron-photon, and radiative transfer). It uses discrete ordinates for angular discretization, multi-group and FEDS energy differencing, and discontinuous finite elements in space.  \tcr{add a ref for PWLD, you can take JCP Turcksin/Ragusa+JCP Teresa, add a ref for FEDS, no need for refs for Sn or MG}
 
-A new unstructured meshing capability was implemented in PDT in order to realistically represent certain geometries. Cut lines (planes for 3D cases) are used to partition such geometries into logically-Cartesian subdomains, which are then individually meshed in parallel using the Triangle Mesh Generator \cite{triangle}. These subdomains are then "stitched" together in order to create a continuous geometry. 2D meshes can be extruded in the $z$ dimension for 3D problems. 
+A new unstructured meshing capability was implemented in PDT in order to realistically represent certain geometries. Cut lines (cut planes for 3D cases) are used to partition such geometries into logically-Cartesian subdomains, which are then individually meshed in parallel using the Triangle Mesh Generator \cite{triangle}. These subdomains are then ``stitched'' or ``glued'' together in order to create a continuous geometry. 2D meshes can be extruded in the $z$ dimension for 3D problems. 
 
 However, unstructured meshes often create unbalanced problems due to the way localized features are meshed, so a load balancing algorithm was added into PDT. 
 
-
-The \SN\ equations were developed by Carlson \cite{Car1953}. Another
-paper is cited here \cite{Lar2008}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Theory}
@@ -96,57 +93,61 @@ The steady-state neutron transport equation describes the behavior of neutrons i
 \begin{multline}
 \vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  = \\
 \int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo') 
-+ S_{ext}(\vr,E,\vo) ,
+\\+ S_{ext}(\vr,E,\vo) ,
 \label{continuous transport}
 \end{multline}
-where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption, outscatter, and within group scattering). These are the loss terms of the neutron transport equation. The right hand side of Eq.~\eqref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into energies about $E$ and directions about $\vo$. 
-
-Without loss of generality for the research problem at hand, we assume isotropic scattering for simplicity. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, no longer depends on direction and is divided by $4\pi$ to reflect isotropic behavior. This yields:
-\begin{multline}
-\label{isotropic}
-\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo) \\ = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \int_{4\pi}d\Omega' \psi(\vr,E',\vo')  + S_{ext}(\vr,E,\vo) \nonumber
-\end{multline}
-\begin{multline}
-\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo) \\= \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \phi(\vr,E')  + S_{ext}(\vr,E,\vo) ,
-\end{multline}
-where we have introduced the scalar flux as the integral of the angular flux:
+where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption, outscatter, and within group scattering). The right hand side of Eq.~\eqref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into energies about $E$ and directions about $\vo$. 
+%
+We assumed a non-multiplying medium and will further assume isotropic scattering for simplicity and conciseness. 
+%The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, no longer depends on direction and is divided by $4\pi$ to reflect isotropic behavior. This yields:
+%\begin{multline}
+%\label{isotropic}
+%\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo) \\ = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \int_{4\pi}d\Omega' \psi(\vr,E',\vo')  + S_{ext}(\vr,E,\vo) \nonumber
+%\end{multline}
+%\begin{multline}
+%\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo) \\= \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \phi(\vr,E')  + S_{ext}(\vr,E,\vo) ,
+%\end{multline}
+We introduce the scalar flux as the integral of the angular flux:
 \begin{equation}
 \label{def_scalar_flux}
 \phi(\vr,E') = \int_{4\pi}d\Omega' \psi(\vr,E',\vo').
 \end{equation}
-The next step to solving the transport equation is to discretize in energy, yielding Eq.~\eqref{multigroup} the multigroup transport equation:
+Using the multigroup approximation yields:
 \begin{multline}
 \vo \cdot \vec \nabla \psi_g(\vr,\vo) +\Sigma_{t,g}(\vr) \psi_g(\vr,\vo)\\ = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g}(\vr,\vo), \quad \text{for } 1 \le g \le G
 \label{multigroup}
 \end{multline}
-where the multigroup transport equations now form a system of coupled equations. 
-
+where the multigroup transport equations now form a system of $G$ coupled equations. 
+%
 Next, we discretize in angle using the discrete ordinates method, whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of directions $\vo_m$:
 \begin{multline}
 \vo_m \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  \\= \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr),
 \label{angle}
 \end{multline}
-where the subscript $m$ is introduced to describe the angular flux in direction $m$. We notice that the subscript is not added to our inscatter term because of the isotropic scattering assumption and because the scalar flux does not depend on angle. However, in order to evaluate the scalar flux, we employ the angular weights $w_m$ and the angular flux solutions
-$\psi_m$ to numerically perform the angular integration:
+where the subscript $m$ is introduced to describe the angular flux in direction $m$. 
+% We notice that the subscript is not added to our inscatter term because of the isotropic scattering assumption and because the scalar flux does not depend on angle. However, 
+The scalar flux integral is numerically evaluated
 \begin{equation}
 \label{def_scalar_flux_2}
 \phi_g(\vr) \approx \sum_{m=1}^{m=M} w_m \psi_{g,m}(\vr).
 \end{equation}
-
-From Equation~\eqref{multigroup}, it is clear that we are solving a sequence of transport equations, one equation per group. Therefore, all transport equations are of the following form:
+%
+From Equation~\eqref{multigroup}, it is clear that we are solving a sequence of transport equations, one equation per group and per direction. Therefore, all transport equations are of the following form:
 \begin{equation}
 \vo_m \cdot \vec \nabla \psi_{m}(\vr) +\Sigma_{t}(\vr) \psi_{m}(\vr)  = \frac{1}{4\pi}\Sigma_{s}(\vr)\phi(\vr) + q^{ext+inscat}_m(\vr) = q_m(\vr),
 \end{equation}
 where the group index notation is omitted for brevity.
-
-In order to obtain the solution for this discrete form of the transport equation, an iterative process called source iteration is introduced. This is shown below for the one-group transport equation, Eq. ~\eqref{iteration}:
+%
+In order to obtain the solution for this discrete form of the transport equation, source iteration is introduced, for instance. % This is shown below for the one-group transport equation, Eq. ~\eqref{iteration}:
 \begin{equation}
 \vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
 \label{iteration}
 \end{equation}
 where the right hand side terms of Eq.~\eqref{angle} have been combined into one general source term, $q_m$. The angular flux of iteration $(l+1)$ is calculated using the $(l^{th})$ value of the scalar flux.
 
-After the angular and energy dependence have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. We use a discontinuous Galerkin approximation in space,  and the solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. The solution is obtained by meshing the domain and solving the spatial problem one cell at a time for a given direction. Sweeping the mesh and solving one cell at a time is possible utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}. Figure \ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
+After the angular and energy dependence have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. We use a discontinuous Galerkin approximation in space,  and the solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. The solution is obtained by meshing the domain and solving the spatial problem one cell at a time for a given direction and a given group. 
+%weeping the mesh and solving one cell at a time is possible utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}. 
+Figure~\ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
 
 \begin{figure}
 \centering
@@ -156,7 +157,7 @@ After the angular and energy dependence have been accounted for, Eq.~\eqref{iter
 \label{sweeps}
 \end{figure}
 
-The number in each cell represents the order in which the cells are solved. All cells must receive the solution downwind from them before solving for their own solution. This dependency can be represented and stored as a task dependence graph, shown in Fig. \ref{tdg}.
+The number in each cell represents the order in which the cells are solved. All cells must receive the solution downwind from them before solving for their own solution. This dependency can be represented and stored as a directed task dependence graph, shown in Fig.~\ref{tdg}.
 
 \begin{figure}
 \centering
@@ -165,9 +166,12 @@ The number in each cell represents the order in which the cells are solved. All 
 \label{tdg}
 \end{figure}
 
-As mentioned in the previous section, a transport sweep is set up by overlaying a domain with a finite element mesh. The sweep then solves the transport equation cell by cell using a discontinuous finite element approach. The order of which cell to solve first is given by a task dependence graph, as shown in Fig. \ref{tdg}. The transport sweep can be solved in parallel in order to obtain the solution faster, as well as distribute the memory to many processors for memory intensive cases. In PDT, a transport sweep can be performed on a structured Cartesian mesh, and the work proposed utilizes transport sweeps on an unstructured mesh. Performing a transport sweep on an unstructured mesh presents two big challenges: performing a transport sweep on a massively parallel scale in an efficient manner and keeping non-concave sub-domains due to the nature of the transport sweep itself. PDT has already proven the ability to perform massively parallel transport sweeps on structured meshes. As part of previous efforts in PDT, researchers have come to outline three important properties for parallel sweeps. 
+%As mentioned in the previous section, a transport sweep is set up by overlaying a domain with a finite element mesh. The sweep then solves the transport equation cell by cell using a discontinuous finite element approach. 
+The order in which radiation in a cell is solved is given by a task dependence graph. Transport sweep can be performed on parallel architectures in order to obtain the solution faster, as well as distribute the memory to many processors for memory intensive cases. Provably-optimal transport sweeping has been described in \cite{mpadams2013} and demonstrated in PDT using logically-Cartesian meshes. Our work utilizes that transport sweep machinery but adapts it to unstructured meshes. Performing a transport sweep on an unstructured mesh presents two challenges: (1) performing a transport sweep on a massively parallel scale in an efficient manner and (2) keeping non-concave sub-domains due to leverage fromt he provably-optimal transport sweep algorithms. 
+%PDT has already proven the ability to perform massively parallel transport sweeps on structured meshes. As part of previous efforts in PDT, researchers have come to outline three important properties for parallel sweeps. 
+\tcr{a now we wait a long time for a description of the proposed work. not ideal. it feels the following is too detailed}
 
-A parallel sweep algorithm is defined by three properties\cite{mpadams2013} :
+A parallel sweep algorithm is defined by three properties \cite{mpadams2013} :
 \begin{itemize}
 \item partitioning: dividing the domain among available processors
 \item aggregation: grouping cells, directions, and energy groups into tasks
@@ -293,9 +297,10 @@ The optimal efficiency formula changes slightly from the KBA and hybrid KBA part
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Unstructured Transport Sweep}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-In an unstructured mesh, the number of cells cannot be described in the same way as an unstructured mesh. In PDT specifically we initially subdivide the domain into subsets, which are just rectangular subdomains. Within each subset, an unstructured mesh is created. This creates a pseudo-regular grid. These subsets become the $N_x, N_y, N_z$ equivalent for an unstructured mesh. The spatial aggregation in a PDT unstructured mesh is done by aggregating subsets into cellsets. 
+In an unstructured mesh, the number of cells cannot be described in the same way as an unstructured mesh. In PDT, the 2D
+geometry is first subdivided into subsets, which are just rectangular subdomains. Within each subset, an unstructured mesh is generated (using Triangle) and then extruded in 3D. These subsets become the $N_x, N_y, N_z$ equivalent for an structured mesh. The spatial aggregation in a PDT unstructured mesh is done by aggregating subsets into cellsets. 
 
-While the structured PDT transport sweep has scaled well out to 750,000 cores, similar levels of parallel scaling have not been achieved using unstructured sweeps yet. Pautz proposed a new list scheduling algorithm has been constructed for modest levels of parallelism (up to 126 processors)\cite{Pautz} .
+While the structured PDT transport sweep has scaled well out to 750,000 cores, similar levels of parallel scaling have not been achieved using unstructured sweeps yet. Pautz proposed a new list scheduling algorithm has been constructed for modest levels of parallelism (up to 126 processors)\cite{Pautz}. \tcr{what's the point of this paragraph? You are way way past the literature review. at this point on the paper, it is only about your work}
 
 There are three requirements for a sweep scheduling algorithm to have. First, the algorithm should have low complexity, since millions of individual tasks are swept over in a typical problem. Second, the algorithm should schedule on a set of processors that is small in comparison to the number of tasks in the sweep graph. Last, the algorithm should distribute work in the spatial dimension only, so that there is no need to communicate during the calculation of the scattering source. 
 
@@ -315,10 +320,10 @@ While (uncompleted tasks)
 
 An important part of the algorithm above is the assigning priorities to tasks. Specialized prioritization heuristics generate partition boundary data as rapidly as possible in order to minimize the processor idle time. 
 
-Nearly linear speedups were obtained on up to 126 processors\cite{Pautz}. Further work is being done for scaling to thousands of processors. 
+Nearly linear speedups were obtained on up to 126 processors\cite{Pautz}. Further work is being done for scaling to thousands of processors. \tcr{how does this relate to our load-balancing?}
 
 \subsubsection{Cycle Detection}
-
+\tcr{no need for this here. at most, one sentence somewhere because we never have cycles with how we do it so far: we have orthogonal subsets, there are no cycles in 2D triangular grids and extrusion preserves this. period}
 A cycle is a loop in a directed graph and they can occur commonly in unstructured meshes. However, they do not exist in 2D triangular extruded problems and, because our domain partitioning is convex, arbitrary degenerate polygons appearing on subdomain boundaries will not produce cycles. Even though they are not applicable to this application of unstructured transport sweeps, they are discussed here for completeness.
 
 Cycles can cause hang time in the problem, as a processor will wait for a message that might will never come. This means that the computation for one or more elements will never be completed. The solution to this is to ``break'' any cycles that exist by removing an edge of the task dependence graph (TDG). Old flux information is used on a particular element face in the domain. Most of the time, the edge removed is oriented obliquely with respect to the radiation direction. 
@@ -330,7 +335,7 @@ Cycle detection utilizes two operations: trim and mark. Trimming identifies and 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Motivation and Methods}
-The capability for PDT to generate and run on an unstructured mesh is important because it allows us to run problems without having to conform our mesh to the problem as much. The idea is to have a logically Cartesian grid (creating orthogonal ``subsets") with an unstructured mesh inside each subset. These logically Cartesian subdomains are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality. It is decomposed into 3 subsets in x and 3 in y, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator.
+The capability for PDT to generate and run on an unstructured mesh is important because it allows us to run problems without having to conform our mesh to the problem as much. The idea is to have a logically Cartesian grid (creating orthogonal ``subsets'') with an unstructured mesh inside each subset. These logically Cartesian subdomains are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality. It is decomposed into 3 subsets in x and 3 in y, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator.
 
 \begin{figure}
 \centering
@@ -342,9 +347,9 @@ The capability for PDT to generate and run on an unstructured mesh is important 
 
 This orthogonal grid is superimposed and each subset is meshed in parallel.  Subsets are now the base structured unit when calculating our parallel efficiency. Discontinuities along the boundary are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, there is no problem solving on degenerate polygons. 
 
-When using the unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG)\cite{triangle}. After superimposing the orthogonal grid, a PSLG is created for each subset, and meshed. Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. Obviously, this is not as good as an unstructured tetrahedral mesh, but for many problems, it is a great capability to have. 
+When using the unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG)\cite{triangle}. After superimposing the orthogonal grid, a PSLG is created for each subset, and meshed. Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. Obviously, this is not as good as general an unstructured grid as a tetrahedral grid, but for many problems (e.g., reactor problems), it is a useful capability to have and it can be employed to assess load-balancing algorithm. 
 
-When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to ``balance'' the number of cells. Ideally, each processor will be responsible for an equal number of cells. 
+When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processes by equally distributing (as much as possible) the work on each process.  For the purposes of unstructured meshes in PDT, we are looking to ``balance'' the number of cells. Ideally, each process will be responsible for an equal number of cells. 
 
 If the number of cells in each subset can be reasonably balanced, then the problem is effectively load balanced. The Load Balance algorithm described below details how the subsets will be load balanced. In summary, the procedure of the algorithm involves moving the initially user specified $x$ and $y$ cut planes, re-meshing, and iterating until a reasonably load balanced problem is obtained.  Equation \ref{metric_def} shows the equation for calculating the load balancing metric, which dictates how balanced or unbalanced the problem is.
 \begin{equation}
@@ -604,7 +609,7 @@ It is immediately clear that not many polar angles are necessary for agreement w
 \end{table}
 
 \subsubsection{The 1D Pure Scatterer Slab}
-
+\tcr{no sure we need to spent that much time on solution verification. this feels too long}
 For an optically thick, source free 1D pure absorber with monoenergetic neutrons, the transport solution will reach the diffusion limit. The diffusion equation for this problem is represented by Eq. ~\eqref{diffusion}:
 %Scattering equation
 \begin{equation}
@@ -674,9 +679,11 @@ This problem was run with $\Sigma_t = 100 \text{ cm}^{-1}$ and $j_{inc} = \frac{
 
 It is immediately clear graphically that the two solutions are in agreement, and the relative error of the numerical solution is 4.25E-04, as defined by Eq. ~\eqref{error}.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{2D and 2D Extruded Meshing Capability}
 
-To showcase, the newly implemented unstructured meshing capability in PDT, Texas A\&M Nuclear Engineering's Impurity Model 1 (IM1) problem is used. Figure \ref{IM12D} showcases the 2D mesh of the IM1 problem,
+\tcr{I do not like showcase. use illustrate. it's better}
+To showcase, the newly implemented unstructured meshing capability in PDT, Texas A\&M Nuclear Engineering's Impurity Model 1 (IM1) problem is used. Figure~\ref{IM12D} showcases the 2D mesh of the IM1 problem,
 
 \begin{figure}
 \centering
@@ -694,10 +701,11 @@ In order to get from the 2D mesh to the 2D extruded mesh, an extrusion file is s
 \label{IM13D}
 \end{figure}
 
-
+\tcr{we need to put some results here. this needs to be a bit more quantitative. and you need to cut elsewhere. this is too long. I think section II is too long and the verification is too long as well}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
+\tcr{not read yet. if you feel you need to amend based on my comments, go ahead}
 
 In conclusion, the load balancing algorithm outlined in the Motivation and Methods section works well for more symmetric problems with a lot of features, and even works well for particularly unbalanced problems. As shown in the results, its effectiveness depends on the maximum triangle area used, and the number of subsets the user chooses to decompose the problem domain into. 
 
