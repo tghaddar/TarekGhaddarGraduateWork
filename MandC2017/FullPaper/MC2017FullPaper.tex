@@ -523,19 +523,8 @@ where $\psi$ is the angular flux, $\Sigma_a$ is the macroscopic absorption cross
  &= \psi_{inc} \text{ (incident isotropic)} \notag \\
 \psi(x_{\text{max}},\mu<0) &= 0 \text{ (vacuum)},
 \end{align}
-where $\psi_{0}$ is the user defined value of the incident isotropic angular flux, and $\psi_{inc}$ is the angular flux at $x = 0$. Equation ~\eqref{absorber_derivation} solves the transport equation via separation of variables to get the angular flux for this problem:
-%absorber derivation
-\begin{align}
-\label{absorber_derivation}
-\frac{d\psi(x,\mu>0)}{dx} &= -\frac{\Sigma_a}{\mu} x \notag \\
-\frac{d\psi(x,\mu>0)}{\psi(x,\mu>0)} &= -\frac{\Sigma_a}{\mu} x dx \notag \\
-\int_{\psi(0,\mu>0)}^{\psi(x,\mu>0)}\frac{d\psi(x,\mu>0)}{\psi(x,\mu>0)} &= \int_{0}^{x}-\frac{\Sigma_a}{\mu} x' dx' \notag \\
-\ln[\frac{\psi(x,\mu>0)}{\psi(0,\mu>0)}] &= -\frac{\Sigma_a}{\mu} x \notag \\
-\psi(x,\mu>0) & = \psi(0,\mu>0)\exp(-\frac{\Sigma_a}{\mu} x) \notag \\
-\psi(x,\mu>0) & = \psi_{inc}\exp(-\frac{\Sigma_a}{\mu} x) 
-\end{align}
-
-Using the fact that the scalar flux in this pure absorber is simply the angular flux integrated for $\mu > 0$, the scalar flux with our boundary conditions is represented by Eq. ~\eqref{absorberflux}:
+where $\psi_{0}$ is the user defined value of the incident isotropic angular flux, and $\psi_{inc}$ is the angular flux at $x = 0$. 
+The scalar flux with our boundary conditions is represented by Eq. ~\eqref{absorberflux}:
 %Absorber flux
 \begin{align}
 \phi(x) &= \int_{0}^{1}\psi(x,\mu>0) d\mu \notag \\
@@ -553,7 +542,7 @@ The pure absorber was run with $\psi_{inc} = 3.5 \frac{\text{n}}{\text{cm}^2\tex
 \label{pa_allangles}
 \end{figure}
 
-It is immediately clear that not many polar angles are necessary for agreement with the analytical solution. Figure \ref{pa_bestangle} examines the 70 positive polar angle case exclusively in comparison with the analytical solution. It is immediately clear graphically that the solutions are in agreement. Table \ref{flux_errors} shows the error convergence as average mesh size in the problem decreases. This data shows that the error shows first order convergence, which is not the expected second order convergence. In the future, more work will be done to analyze and potentially correct the error calculation for unstructured meshes and to investigate why we don't see the second order convergence that is expected.
+It is immediately clear that not many polar angles are necessary for agreement with the analytical solution. Figure \ref{pa_bestangle} examines the 70 positive polar angle case exclusively in comparison with the analytical solution. It is immediately clear graphically that the solutions are in agreement.
 
 \begin{figure}
 \centering
@@ -562,22 +551,6 @@ It is immediately clear that not many polar angles are necessary for agreement w
 \label{pa_bestangle}
 \end{figure}
 
-\begin{table}[H]
-\centering
-\caption{The convergence of the error as the number of cells increases.}
-\begin{tabular}{c c}
-\hline
-\textbf{Mesh size (cm)} & \textbf{$\epsilon$} \\
-1/4 & 0.3035 \\
-1/8 & 0.1865 \\
-1/16 & 0.09168 \\
-1/32 & 0.0387 \\
-1/64 & 0.0169 \\
-1/128 & 0.006963 \\
-\hline
-\end{tabular}
-\label{flux_errors}
-\end{table}
 
 \subsubsection{The 1D Pure Scatterer Slab}
 \tcr{no sure we need to spent that much time on solution verification. this feels too long}
@@ -620,20 +593,8 @@ Infinite & 1.750 \\
 \label{angleconvergence}
 \end{table}
 
-Equation ~\eqref{scalarflux} solves Eq. ~\eqref{diffusion}:
-\begin{align}
-\frac{d\phi(x)}{dx} &= A \notag \\
-\phi(x) &= Ax + B,
-\label{scalarflux}
-\end{align}
-where A and B are integration constants. Using our boundary conditions in Eq ~\eqref{scatterboundary} to solve for A and B:
-\begin{align}
-\phi(-2D) &= -2DA + B = 4j_{inc} \notag \\
-\phi(x_{\text{max}} + 2D) &= A(x_{\text{max}} + 2D) + B = 0, \notag
-\label{notimportant}
-\end{align}
-the scalar flux, represented by Eq. ~\eqref{scatterflux}, is:
-%Scatter flux
+Equation ~\eqref{scatterflux} is the solution to Eq. ~\eqref{diffusion} with the boundary conditions described by ~\eqref{scatterboundary} and ~\eqref{partialcurrent}:
+
 \begin{equation}
 \phi(x) = \frac{4j_{inc}}{1+4D}(-x + x_{\text{max}} + 2D).
 \label{scatterflux}
