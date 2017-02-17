@@ -65,7 +65,12 @@ Dept. of Nuclear Engineering, Texas A\&M University, College Station, TX, 77843-
 \vspace*{-42pt}
 \begin{strip}
 \centering{\parbox{153mm}{{\bf Abstract} \itshape - 
-When running massively parallel codes, load balancing is a priority in order to improve parallel efficiency. A load-balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work for each processor. An unstructured meshing capability was implemented in PDT, Texas A\&M University's massively parallel deterministic transport code, utilizing the Triangle mesh generator, hence allowing the user to define more realistic problem geometries and to define 3D problems through the extrusion of 2D meshes. However, unstructured grids are significantly  harder to load balance than Cartesian rectangular meshes. A load balancing algorithm was implemented in PDT to minimize a load-imbalance metric. Three test cases were constructed and a series of 162 inputs were created for each case. A maximum improvement of 89.0\% was seen in Test Case 1, 89.1\% was seen in Test Case 2, and 55.2\% was seen in Test Case 3. }\par}
+Load balancing refers to the practice of distributing approximately equal amounts of work among processors so that all processors are kept busy all of the time.
+When running massively parallel codes, load balancing is a priority in order to improve parallel efficiency. 
+Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work for each processor. 
+Here, we discuss load-balanced problems in terms of an (approximately) equal number of degrees of freedom per processor, provided that we are employing a partitioning scheme that
+minimizes idle time. 
+Recently , an unstructured meshing capability was implemented in PDT, Texas A\&M University's massively parallel deterministic transport code, hence allowing the user to define more realistic problem geometries and to define 3D problems through the extrusion of 2D meshes. However, unstructured grids are significantly  harder to load balance than logically-Cartesian meshes. In this work, we propose a load balancing algorithm that is now implemented in PDT in order to minimize a specific load-imbalance metric. Several numerical test cases are provided.}}
 \vspace*{14pt}
 \end{strip}
 
