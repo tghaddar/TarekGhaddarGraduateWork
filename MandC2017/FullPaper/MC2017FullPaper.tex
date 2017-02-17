@@ -65,17 +65,17 @@ Dept. of Nuclear Engineering, Texas A\&M University, College Station, TX, 77843-
 \vspace*{-42pt}
 \begin{strip}
 \centering{\parbox{153mm}{{\bf Abstract} \itshape - 
-When running any massively parallel code, load balancing is a priority in order to achieve the highest possible parallel efficiency. A load-balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work for each processor. An unstructured meshing capability was implemented in PDT, Texas A\&M University's massively parallel deterministic transport code, utilizing the Triangle mesh generator, hence allowing the user to define more realistic problem geometries and to define 3D problems through the extrusion of 2D meshes. However, unstructured grids are significantly  harder to load balance than Cartesian rectangular meshes. A load balancing algorithm was implemented in PDT to minimize a load-imbalance metric. Three test cases were constructed and a series of 162 inputs were created for each case. A maximum improvement of 89.0\% was seen in Test Case 1, 89.1\% was seen in Test Case 2, and 55.2\% was seen in Test Case 3. }\par}
+When running massively parallel codes, load balancing is a priority in order to improve parallel efficiency. A load-balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work for each processor. An unstructured meshing capability was implemented in PDT, Texas A\&M University's massively parallel deterministic transport code, utilizing the Triangle mesh generator, hence allowing the user to define more realistic problem geometries and to define 3D problems through the extrusion of 2D meshes. However, unstructured grids are significantly  harder to load balance than Cartesian rectangular meshes. A load balancing algorithm was implemented in PDT to minimize a load-imbalance metric. Three test cases were constructed and a series of 162 inputs were created for each case. A maximum improvement of 89.0\% was seen in Test Case 1, 89.1\% was seen in Test Case 2, and 55.2\% was seen in Test Case 3. }\par}
 \vspace*{14pt}
 \end{strip}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-When running any massively parallel code, attaining load balancing is a priority in order to achieve the best possible parallel efficiency. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is an important factor to minimize idle time for all processors and is attained by equally distributing (as much as possible) the work load among all processors. 
+When running a massively parallel code, attaining load balancing is a priority in order to improve parallel efficiency. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is an important factor to minimize idle time for all processors and is attained by equally distributing (as much as possible) the work load among all processors. 
 % This makes communicating information in between processors more efficient, improving parallel efficiency. 
 
-To the best of our knowledge, transport sweeps is the only scalable solution technique on the current leadership class supercomputers. PDT, Texas A\&M University's massively parallel deterministic transport code, has been shown to scale on logically Cartesian grids out to 750,000 cores \cite{mpadams2015}. Logically Cartesian grids are constructed with mesh cells that are identified using integer triplets $ijk$ (i.e., cubic cells), but allow for vertex motion in order to conform to curved shapes. PDT solves radiation transport problems (neutron, gamma, coupled neutron-gamma, electron, coupled electron-photon, and radiative transfer). It uses discrete ordinates for angular discretization\cite{pwld_ragusa,pwld_teresa}, multi-group and FEDS\cite{feds} energy differencing, and discontinuous finite elements in space.  \tcr{add a ref for PWLD, you can take JCP Turcksin/Ragusa+JCP Teresa, add a ref for FEDS, no need for refs for Sn or MG}
+To the best of our knowledge, the transport sweep is the only scalable solution technique on the current leadership class supercomputers. PDT, Texas A\&M University's massively parallel deterministic transport code, has been shown to scale on logically Cartesian grids out to 768,000 cores \cite{mpadams2015}. Logically Cartesian grids are constructed with mesh cells that are identified using integer triplets $ijk$ (i.e., cubic cells), but allow for vertex motion in order to conform to curved shapes. PDT solves radiation transport problems (neutron, gamma, coupled neutron-gamma, electron, coupled electron-photon, and radiative transfer). It uses discrete ordinates for angular discretization\cite{pwld_ragusa,pwld_teresa}, multi-group and FEDS\cite{feds} energy differencing, and discontinuous finite elements in space.  
 
 A new unstructured meshing capability was implemented in PDT in order to realistically represent certain geometries. Cut lines (cut planes for 3D cases) are used to partition such geometries into logically-Cartesian subdomains, which are then individually meshed in parallel using the Triangle Mesh Generator \cite{triangle}. These subdomains are then ``stitched'' or ``glued'' together in order to create a continuous geometry. 2D meshes can be extruded in the $z$ dimension for 3D problems. 
 
@@ -142,7 +142,6 @@ In order to obtain the solution for this discrete form of the transport equation
 where the right hand side terms of Eq.~\eqref{angle} have been combined into one general source term, $q_m$. The angular flux of iteration $(l+1)$ is calculated using the $(l^{th})$ value of the scalar flux.
 
 After the angular and energy dependence have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. We use a discontinuous Galerkin approximation in space,  and the solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. The solution is obtained by meshing the domain and solving the spatial problem one cell at a time for a given direction and a given group. 
-%weeping the mesh and solving one cell at a time is possible utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}. 
 Figure~\ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
 
 \begin{figure}
@@ -162,10 +161,9 @@ The number in each cell represents the order in which the cells are solved. All 
 \label{tdg}
 \end{figure}
 
-%As mentioned in the previous section, a transport sweep is set up by overlaying a domain with a finite element mesh. The sweep then solves the transport equation cell by cell using a discontinuous finite element approach. 
 The order in which radiation in a cell is solved is given by a task dependence graph. Transport sweep can be performed on parallel architectures in order to obtain the solution faster, as well as distribute the memory to many processors for memory intensive cases. Provably-optimal transport sweeping has been described in \cite{mpadams2013} and demonstrated in PDT using logically-Cartesian meshes. Our work utilizes that transport sweep machinery but adapts it to unstructured meshes. Performing a transport sweep on an unstructured mesh presents two challenges: (1) performing a transport sweep on a massively parallel scale in an efficient manner and (2) keeping non-concave sub-domains due to leverage fromt he provably-optimal transport sweep algorithms. 
-%PDT has already proven the ability to perform massively parallel transport sweeps on structured meshes. As part of previous efforts in PDT, researchers have come to outline three important properties for parallel sweeps. 
-\tcr{a now we wait a long time for a description of the proposed work. not ideal. it feels the following is too detailed}
+
+\subsection{The Parallel Transport Sweep}
 
 A parallel sweep algorithm is defined by three properties \cite{mpadams2013} :
 \begin{itemize}
@@ -213,7 +211,7 @@ T_{\text{task}} = A_x A_y A_z A_m A_g T_{\text{grind}}
 \end{equation}
 where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. If a high value of $M_L$ is necessary for the performance model to match computational results, improvements should be made in code implementation.
 
-\subsection{KBA Partitioning for Structured Grids}
+\subsubsection{KBA Partitioning for Structured Grids}
 
 Several parallel transport sweep codes use KBA partitioning in their sweeping, such as Denovo \cite{denovo} and PARTISN \cite{partisn}. The KBA partitioning scheme and algorithm was developed by Koch, Baker, and Alcouffe \cite{partisn}.
 
@@ -224,7 +222,7 @@ The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_
 \end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{The Structured Transport Sweep in PDT}
+\subsubsection{The Structured Transport Sweep in PDT}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 The minimum possible number of stages for given partitioning parameters $P_i$ and $A_j$ is $2 N_{\text{fill}}+N_{\text{tasks}}$. $N_{\text{fill}}$ is both the minimum number of stages before a sweepfront can reach the center-most processors and the number needed to finish a direction's sweep after the center-most processors have finished. Equations~\eqref{nfill}, ~\eqref{nidle}, and~\eqref{ntasks} define $N_{\text{fill}}$, $N_{\text{idle}}$, and $N_{\text{tasks}}$:
 \begin{equation}
@@ -246,7 +244,7 @@ When using KBA, $P_z$ is fixed to 1, and with hybrid KBA, $P_z$ is fixed to 2. V
 \begin{figure}
 \centering
 \includegraphics[scale = 0.75]{figures/Partitioning.png}
-\caption{Three different partitioning schemes in 2D, from left to right: KBA, volumetric non-overloaded, and volumetric overloaded. \cite{mpadams2015}.}
+\caption{Three different partitioning schemes in 2D, from left to right: KBA, volumetric non-overloaded, and volumetric overloaded \cite{mpadams2015}.}
 \label{partitioning}
 \end{figure}
 
@@ -292,15 +290,15 @@ For a thorough and complete description of partitioning, aggregation, and schedu
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{The Unstructured Transport Sweep}
+\subsubsection{The Unstructured Transport Sweep}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 In an unstructured mesh, the number of cells cannot be described in the same way as a structured mesh. In PDT, the 2D
 geometry is first subdivided into subsets, which are just rectangular subdomains. Within each subset, an unstructured mesh is generated (using Triangle) and then extruded in 3D. These subsets become the $N_x, N_y, N_z$ equivalent for an structured mesh. The spatial aggregation in a PDT unstructured mesh is done by aggregating subsets into cellsets. 
 
-While the structured PDT transport sweep has scaled well out to \tcr{750,000} cores, similar levels of parallel scaling have not been achieved using unstructured sweeps yet. Further work is being done to determine how well PDT scales on unstructured meshes. The load balancing algorithm described in this paper was the first step to scaling on unstructured meshes.\tcr{how does this relate to our load-balancing?}
+While the PDT transport sweep on structured grids has scaled well out to 768,000 cores, similar levels of parallel scaling have not been achieved using unstructured sweeps yet. Further work is being done to determine how well PDT scales on unstructured meshes. The load balancing algorithm described in this paper was the first step to scaling on unstructured meshes.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Motivation and Methods}
+\section{Load Balancing Method}
 The capability for PDT to generate and run on an unstructured mesh is important because it allows us to run problems without having to conform our mesh to the problem as much. The idea is to have a logically Cartesian grid (creating orthogonal ``subsets'') with an unstructured mesh inside each subset. These logically Cartesian subdomains are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality. It is decomposed into 3 subsets in x and 3 in y, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator.
 
 \begin{figure}
@@ -363,7 +361,7 @@ $f_I$ is calculated by taking the maximum number of cells per column and dividin
 
 The following sections will showcase the metric behavior and convergence for three test cases, solution verification for pure absorber and pure scatterer 2D slab problems, and the new unstructured meshing capability both in 2D and 3D.
 
-\subsection{Test Cases for Metric Behavior and Convergence}
+\subsection{Description of Test Cases}
 \label{sec:convergence}
 In order to showcase the behavior of the load balancing metric, calculated by Eq. \ref{metric_def} three test cases are presented. Figure \ref{opp} shows the first test case, a 20 cm by 20 cm domain with two pins in opposite corners of the domain. Figure \ref{same} shows the same size domain but with the pins on the same side.These are two theoretically very unbalanced cases, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to it's denser and repeated geometry, theoretically is a more balanced problem. 
 
@@ -390,7 +388,7 @@ A series of 162 inputs was constructed for each case. These inputs are construct
 \label{lattice}
 \end{figure}
 
-\subsection{Metric Behavior and Convergence}
+\subsection{Load Balancing Analysis}
 
 For each test case, the 162 input inputs are run twice, once with no load balancing iterations, and once with ten load balancing iterations. The best metric is reported and recorded. Three figures for each test cases are presented below: the first figure will show the metric behavior for no iterations, the second figure will show the metric behavior for each input run with ten load balancing iterations, and the third figure will show a ratio of the ten iteration runs over the no iteration runs.
 
@@ -456,143 +454,27 @@ This can be done by changing how the cut lines are redistributed. Instead of cha
 
 Another option is to implement domain overloading\cite{mpadams2015}, which is the logical extension of the work presented in this paper. This would involve processors owning different numbers of subsets, with no restriction on these subsets being contiguous. This would be the most effective method at perfecting this algorithm, and would lead to less problems being unbalanced by more than 10\%.
 
-\subsection{Solution Verification}
-
-For solution verification, two simple problems were chosen: a 1D pure absorber slab and a 1D pure scatterer slab. These problems were chosen because their analytical solutions are easily obtained, thus making a comparison between PDT's solution and the analytical solution easy and informative. The same geometry and mesh were used for both problems, and are shown in Figure \ref{verificationgeometry}.
-
-\begin{figure}
-\centering
-\includegraphics[width=85mm,trim = 10cm 10cm 0cm 0cm ]{figures/solutionmesh.png}
-\caption{The geometry and mesh used in solution verification problems.}
-\label{verificationgeometry}
-\end{figure}
-
-The problem geometry is a 1 cm by 1 cm square. In order to simulate a 1D slab, opposing reflecting boundaries were placed on the both y boundaries, effectively forcing the problem to be infinite in the y direction. At the x minimum boundary, an incident isotropic flux was used, and a vacuum boundary was enforced at the x max boundary. No source was used in either problem.
-
-In order to measure how close the numerical and analytical solutions an error estimate, represented by, Eq. ~\eqref{error}, is used:
-\begin{equation}
-\epsilon = \sqrt{\sum_k \sum_q w_q \cdot(\phi_h(x_q) - \phi_e(x_q))^2}
-%\epsilon = \frac{\norm{\text{Analytical} - \text{ Numerical}}_{l2}}{\norm{\text{Analytical}}_{l2}},
-\label{error}
-\end{equation}
-where $k$ is the number of cells, $q$ is the number points per cell used in a Gauss-Legendre quadrature, $\phi_h$ is the numerical flux solution and $\phi_e$ is the analytical flux solution.
-
-\subsection{The 1D Pure Absorber Slab}
-
-For monoenergetic neutrons, a source free, 1D pure absorber slab, the transport equation is represented by Eq. ~\eqref{absorbertransport}:
-%Absorber transport
-\begin{equation}
-\mu \frac{d\psi (x,\mu>0)}{dx} + \Sigma_a \psi(x,\mu>0) = 0,
-\label{absorbertransport}
-\end{equation}
-where $\psi$ is the angular flux, $\Sigma_a$ is the macroscopic absorption cross section, and $\mu$ is the cosine of the polar angle. The boundary conditions for this problem are expressed in Eq. ~\eqref{boundaryconditions}:
-\begin{align}
-\label{boundaryconditions}
-\psi(0,\mu>0) &= \int_{0}^{2\pi}d\gamma \int_{0}^{1}\frac{\psi_{0}}{4\pi} d\mu = \frac{\psi_{0}}{2} \notag \\
- &= \psi_{inc} \text{ (incident isotropic)} \notag \\
-\psi(x_{\text{max}},\mu<0) &= 0 \text{ (vacuum)},
-\end{align}
-where $\psi_{0}$ is the user defined value of the incident isotropic angular flux, and $\psi_{inc}$ is the angular flux at $x = 0$. 
-The scalar flux with our boundary conditions is represented by Eq. ~\eqref{absorberflux}:
-%Absorber flux
-\begin{align}
-\phi(x) &= \int_{0}^{1}\psi(x,\mu>0) d\mu \notag \\
-&= \int_{0}^{1}\psi_{inc}\exp(-\frac{\Sigma_a}{\mu} x) d\mu = \psi_{inc} E_{2}(\Sigma_a x),
-\label{absorberflux}
-\end{align}
-where $\phi$ is the scalar flux and $E_2$ is the exponential integral function with $n=2$. 
-
-The pure absorber was run with $\psi_{inc} = 3.5 \frac{\text{n}}{\text{cm}^2\text{-s-ster}}$ and $\Sigma_a = 5 \text{ cm}^{-1}$. Figure \ref{pa_allangles} shows a comparison of the analytical solution with PDT's solution for four different angular refinements. All four PDT runs used only 1 azimuthal angle per quadrant, but varied the number of positive polar angles, because the problem is not azimuthally dependent. The number of positive polar angles used were 1,5,10, and 70. 
-
-\begin{figure}
-\centering
-\includegraphics[scale = 0.5]{figures/PureAbsorberAllAngles.eps}
-\caption{The pure absorber solution with four different angular refinements.}
-\label{pa_allangles}
-\end{figure}
-
-It is immediately clear that not many polar angles are necessary for agreement with the analytical solution. Figure \ref{pa_bestangle} examines the 70 positive polar angle case exclusively in comparison with the analytical solution. It is immediately clear graphically that the solutions are in agreement.
-
-\begin{figure}
-\centering
-\includegraphics[width=85mm]{figures/PureAbsorberBestangle.eps}
-\caption{The pure absorber solution run with 70 positive polar angles.}
-\label{pa_bestangle}
-\end{figure}
-
-
-\subsubsection{The 1D Pure Scatterer Slab}
-\tcr{no sure we need to spent that much time on solution verification. this feels too long}
-For an optically thick, source free 1D pure absorber with monoenergetic neutrons, the transport solution will reach the diffusion limit. The diffusion equation for this problem is represented by Eq. ~\eqref{diffusion}:
-%Scattering equation
-\begin{equation}
-\frac{d^2\phi}{dx^2} = 0,
-\label{diffusion}
-\end{equation}
-where $\phi$ is the scalar flux. The boundary conditions for this problem are expressed in Eq. ~\eqref{scatterboundary}:
-%Scatter bc's
-\begin{align}
-\phi(-2D) &= 4j_{inc} \notag \\
-\phi(x_{\text{max}}+2D) &= 0, 
-\label{scatterboundary}
-\end{align}
-where $j_{inc}$ is the incident partial current and $D$ is the diffusion coefficient, which is equivalent to $\frac{1}{3 \Sigma_t}$, where $\Sigma_t$ is the total macroscopic cross section. The first boundary condition is the extrapolated boundary condition, and the second is the extrapolated vacuum condition. The incident partial current is calculated from the incident angular flux, as shown in Eq. ~\eqref{partialcurrent}:
-%Partial current
-\begin{equation}
-j_{inc} = \int_{0}^{2\pi}d\gamma \int_{0}^{1} \mu \frac{\psi_{inc}}{4\pi} d\mu = \frac{\psi_{inc}}{4}.
-\label{partialcurrent}
-\end{equation}
-
-The integral over polar angles in Eq. ~\eqref{partialcurrent} is the result of computing the angular quadrature with an infinite number of polar angles. Table \ref{angleconvergence} shows the value of $j_{inc}$ converging to the integral value as the number of polar angles is increased. 
-\begin{table}[H]
-\centering
-\caption{The convergence of $j_{inc}$ as the number of polar angles increase.}
-\begin{tabular}{c c}
-\hline
-\textbf{Number of Positive Polar Angles} & \textbf{$j_{inc}$} \\
-1 & 2.0207 \\
-2 & 1.8244 \\
-5 & 1.7632 \\
-10 & 1.7534 \\
-20 & 1.7509 \\
-40 & 1.7502 \\
-Infinite & 1.750 \\
-\hline
-\end{tabular}
-\label{angleconvergence}
-\end{table}
-
-Equation ~\eqref{scatterflux} is the solution to Eq. ~\eqref{diffusion} with the boundary conditions described by ~\eqref{scatterboundary} and ~\eqref{partialcurrent}:
-
-\begin{equation}
-\phi(x) = \frac{4j_{inc}}{1+4D}(-x + x_{\text{max}} + 2D).
-\label{scatterflux}
-\end{equation}
-
-This problem was run with $\Sigma_t = 100 \text{ cm}^{-1}$ and $j_{inc} = \frac{7}{4} \frac{\text{n}}{\text{cm}^2\text{-s}}$. Figure \ref{scattersoln} shows the agreement between the analytical solution and PDT's solution. An angular refinement of 40 polar angles was used, with one azimuthal angle in each quadrant.
-
-\begin{figure}
-\centering
-\includegraphics[width=85mm]{figures/PureScatterer.eps}
-\caption{The pure scatterer solution run with 40 positive polar angles.}
-\label{scattersoln}
-\end{figure}
-
-It is immediately clear graphically that the two solutions are in agreement, and the relative error of the numerical solution is 4.25E-04, as defined by Eq. ~\eqref{error}.
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{2D and 2D Extruded Meshing Capability}
+\subsection{2D and 2D Extruded Meshing Capability}
 
-\tcr{I do not like showcase. use illustrate. it's better}
-To illustrate the newly implemented unstructured meshing capability in PDT, Texas A\&M Nuclear Engineering's Impurity Model 1 (IM1) problem is used. Figure~\ref{IM12D} showcases the 2D mesh of the IM1 problem,
+To illustrate the newly implemented unstructured meshing capability in PDT, Texas A\&M Nuclear Engineering's Impurity Model 1 (IM1) problem is used. Figure~\ref{IM12D} shows the 2D mesh of the IM1 problem before and after 7 load balancing iterations. The metric before any load balancing iterations is 42.15, and 2.99 after 7 iterations.
+
+%\includegraphics[scale=0.3]{figures/IM1_pre_iterations0000.png}
+%\includegraphics[scale=0.3]{figures/IM1_post_iterations0000.png}
 
 \begin{figure}
 \centering
-\includegraphics[width=85mm,trim= 4cm 5cm 0cm 5cm, clip]{figures/im12d.png}
-\caption{The 2D mesh of the IM1 problem.}
+\includegraphics[width=85mm]{figures/IM1_pre_iterations0000.png}
+\caption{The 2D mesh of the IM1 problem with no load balancing iterations.}
 \label{IM12D}
 \end{figure}
 
+\begin{figure}
+\centering
+\includegraphics[width=85mm]{figures/IM1_post_iterations0000.png}
+\caption{The 2D mesh of the IM1 problem with 7 load balancing iterations.}
+\label{IM12D}
+\end{figure}
 In order to get from the 2D mesh to the 2D extruded mesh, an extrusion file is supplied to PDT. This extrusion file supplies two critical pieces of information: the number of z layers and their locations, and how each region of the 2D mesh is mapped to these z layers. The combination of the 2D mesh and the extrusion file yield the full 3D problem, shown in Fig. \ref{IM13D}.
 
 \begin{figure}
@@ -602,13 +484,11 @@ In order to get from the 2D mesh to the 2D extruded mesh, an extrusion file is s
 \label{IM13D}
 \end{figure}
 
-\tcr{we need to put some results here. this needs to be a bit more quantitative. and you need to cut elsewhere. this is too long. I think section II is too long and the verification is too long as well}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
-\tcr{not read yet. if you feel you need to amend based on my comments, go ahead}
 
-In conclusion, the load balancing algorithm outlined in the Motivation and Methods section works well for more symmetric problems with a lot of features, and even works well for particularly unbalanced problems. As shown in the results, its effectiveness depends on the maximum triangle area used, and the number of subsets the user chooses to decompose the problem domain into. 
+In conclusion, the load balancing algorithm outlined in the Load Balancing Method section works well for more symmetric problems with a lot of features, and even works well for particularly unbalanced problems. As shown in the results, its effectiveness depends on the maximum triangle area used, and the number of subsets the user chooses to decompose the problem domain into. 
 
 Good improvement is seen throughout all three test cases for all three inputs, particularly the first two test cases, which were initially very unbalanced. However, there were many inputs run that had problems with $f > 1.1$, which means many problems were unbalanced by more than 10\%. The user will not always have the luxury of choosing the number of subsets they want the problem run with, as this directly affects the number of processors the problem will be run with. Certain problems will require more processors and will require minimizing the total number of cells in the domain for the problem to complete running in a reasonable amount of time. As a result, improvements to the algorithm must be made. 
 
