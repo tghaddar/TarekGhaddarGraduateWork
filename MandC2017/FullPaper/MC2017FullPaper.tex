@@ -412,15 +412,6 @@ Figure \ref{oppiter} shows the metric behavior for Fig. \ref{opp} after 10 load 
 \label{oppiter}
 \end{figure}
 
-Figure \ref{oppdiff} shows the difference in metric behavior for Fig. \ref{opp}. This difference is calculated by dividing the metric with no iterations by the metric with 10 iterations. The maximum improvement has a value of 0.1097 and occurs for Fig. \ref{opp} is run with 8x8 subsets with a maximum triangle area of 1.6 cm\textsuperscript{2}. The minimum improvement has a value of very close to 1.0 and occurs for many of the inputs. 
-
-\begin{figure}
-\centering
-\includegraphics[width=85mm, trim = 0cm 5cm 0cm 5cm,clip]{figures/OppDiff.pdf}
-\caption{The difference in metric behavior between no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.}
-\label{oppdiff}
-\end{figure}
-
 Figure \ref{samenoiter} shows the metric behavior for Fig. \ref{same}. The maximum metric is 22.6654 and occurs when Fig. \ref{same} is run with 8x8 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0024 and occurs when Fig. \ref{same} is run with 2x2 subsets with a maximum triangle are of 0.01 cm\textsuperscript{2}.
 
 \begin{figure}
@@ -439,15 +430,6 @@ Figure \ref{sameiter} shows the metric behavior for Fig. \ref{same} after ten lo
 \label{sameiter}
 \end{figure}
 
-Figure \ref{samediff} shows the difference in metric behavior for Fig. \ref{same}. The maximum improvement has a value of 0.1090 and occurs for Fig. \ref{same} is run with 8x8 subsets with Triangle's coarsest possible mesh generation settings. The minimum improvement has a value of very close to 1.0 and occurs for many of the inputs. 
-
-\begin{figure}
-\centering
-\includegraphics[width=85mm, trim = 2cm 5cm 0cm 5cm,clip]{figures/SameDiff.pdf}
-\caption{The difference in metric behavior of the second test case with no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.}
-\label{samediff}
-\end{figure}
-
 Figure \ref{latticenoiter} shows the metric behavior for Fig. \ref{lattice}. The maximum metric is 2.6489 and occurs when Fig. \ref{lattice} is run with 10x10 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0179 and occurs when Fig. \ref{lattice} is run with 2x2 subsets with a maximum triangle are of 0.08 cm\textsuperscript{2}.
 
 \begin{figure}
@@ -464,15 +446,6 @@ Figure \ref{latticeiter} shows the metric behavior for Fig. \ref{lattice} after 
 \includegraphics[width=85mm, trim = 0cm 5cm 0cm 5cm,clip]{figures/lattice_iter.pdf}
 \caption{The difference in metric behavior of the third test case after ten load balancing iterations.}
 \label{latticeiter}
-\end{figure}
-
-Figure \ref{latticediff} shows the difference in metric behavior for Fig. \ref{lattice}. The maximum improvement has a value of 0.4476 and occurs for Fig. \ref{lattice} is run with 2x2 subsets with Triangle's coarsest possible mesh generation settings. The minimum improvement has a value of very close to 1.0 and occurs for many of the inputs. 
-
-\begin{figure}
-\centering
-\includegraphics[width=85mm, trim = 0cm 5cm 0cm 5cm,clip]{figures/lattice_diff.pdf}
-\caption{The difference in metric behavior of the third test case with no iteration and 10 iterations. The closer the z-value to zero, the better the improvement.}
-\label{latticediff}
 \end{figure}
 
 Because Fig. \ref{lattice} has more features and is more symmetric of a problem, the initial load balancing metric will not be as large as the load balancing metric of Figs. \ref{same} and \ref{opp}. As a result, the improvement in the load balancing metric after 10 iterations will not be as great in problems similar to Fig. \ref{lattice}. 
