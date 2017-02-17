@@ -462,7 +462,7 @@ Another option is to implement domain overloading\cite{mpadams2015}, which is th
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{2D and 2D Extruded Meshing Capability}
 
-To illustrate the newly implemented unstructured meshing capability in PDT, Texas A\&M Nuclear Engineering's Impurity Model 1 (IM1) problem is used. Figure~\ref{IM12D} shows the 2D mesh of the IM1 problem before and after 7 load balancing iterations. The metric before any load balancing iterations is 42.15, and 2.99 after 7 iterations.
+To illustrate the newly implemented unstructured meshing capability in PDT, a neutron graphite experiment, modeled at Texas A\&M University as part of the DOE's NNSA PSAAP program, is used as an example. Figure~\ref{IM12D} shows the 2D mesh of the IM1 problem before and after 7 load-balancing iterations. The metric before any load balancing iterations is 42.15, and 2.99 after 7 iterations. The 3D extruded mesh is shown in Fig.~\ref{IM13D}.
 
 %\includegraphics[scale=0.3]{figures/IM1_pre_iterations0000.png}
 %\includegraphics[scale=0.3]{figures/IM1_post_iterations0000.png}
@@ -480,12 +480,11 @@ To illustrate the newly implemented unstructured meshing capability in PDT, Texa
 \caption{The 2D mesh of the IM1 problem with 7 load balancing iterations.}
 \label{IM12D}
 \end{figure}
-In order to get from the 2D mesh to the 2D extruded mesh, an extrusion file is supplied to PDT. This extrusion file supplies two critical pieces of information: the number of z layers and their locations, and how each region of the 2D mesh is mapped to these z layers. The combination of the 2D mesh and the extrusion file yield the full 3D problem, shown in Fig. \ref{IM13D}.
 
 \begin{figure}
 \centering
 \includegraphics[width=85mm,trim= 0cm 0cm 0cm 3cm, clip]{figures/IM1_3D.png}
-\caption{The 2D extruded view of the IM1 problem.}
+\caption{The 3D extruded view of the IM1 problem (HDPE cylinder with AmBe source; graphite block; detector and detector shroud).}
 \label{IM13D}
 \end{figure}
 
