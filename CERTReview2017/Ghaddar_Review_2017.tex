@@ -430,6 +430,11 @@
 \end{table}
 \end{frame}
 
+\begin{frame}[t]\frametitle{IM1}
+\centering
+\includegraphics[scale=0.25]{figures/IM12D_val.png}
+\end{frame}
+
 \begin{frame}[t]\frametitle{IM1 - Original Load Balancing, f = 2.63}
 \centering
 \includegraphics[scale=0.33]{figures/IM1_old_load_balance.png}
@@ -520,86 +525,6 @@ A special thank you to the following individuals for their help and support:
 \end{itemize}
 \end{block}
 \end{frame}
-
-\backupbegin
-\appendix
-\section{Backup Slides}
-\begin{frame}[t]\frametitle{Backup Slides}
-
-\end{frame}
-
-\begin{frame}[t]\frametitle{Solution Verification}
-\begin{block}{}
-\begin{itemize}
-\item Two benchmark problems were set up to verify that the scalar flux was being computed correctly on unstructured meshes in PDT.
-\item Both problems utilized a 1 cm$\times$1 cm square domain, with opposing reflecting boundaries on the y boundaries, an incident isotropic angular flux on the left boundary, and a vacuum boundary on the right.
-\end{itemize}
-\end{block}
-\begin{block}{}
-The error presented when comparing numerical to analytical solutions is defined as follows:
-\begin{align*}
-\epsilon = \frac{\norm{\text{Analytical} - \text{ Numerical}}_{l2}}{\norm{\text{Analytical}}_{l2}},
-\end{align*}
-\end{block}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Pure Absorber}
-\begin{block}{}
-The analytical scalar flux solution of the 1D Pure Absorber is:
-\begin{align*}
-\phi(x) &= \int_{0}^{1}\psi(x,\mu>0) d\mu \notag \\
-&= \int_{0}^{1}\psi_{inc}\exp(-\frac{\Sigma_a}{\mu} x) d\mu = \psi_{inc} E_{2}(\Sigma_a x),
-\end{align*}
-\end{block}
-\begin{block}{}
-The pure absorber was run with $\psi_{inc} = 3.5 \frac{\text{n}}{\text{cm}^2\text{-s-ster}}$ and $\Sigma_a = 5 \text{ cm}^{-1}$.
-\end{block}
-\end{frame}
-
-\begin{frame}[t]\frametitle{PDT Results vs. Analytical for the Pure Absorber}
-\centering
-\includegraphics[scale = 0.5]{figures/PureAbsorberAllAngles.eps}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Analysis with 70 Positive Polar Angles}
-\begin{minipage}{0.15\textwidth}
-\begin{footnotesize}
-$\epsilon = 0.012$
-\end{footnotesize}
-\end{minipage}
-\begin{minipage}{0.8\textwidth}
-\centering
-\includegraphics[scale = 0.5]{figures/PureAbsorberBestangle.eps}
-\end{minipage}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Pure Scatterer}
-\begin{block}{}
-The transport solution for a pure scatterer reaches the diffusion limit, and the solution is:
-\begin{align*}
-\phi(x) = \frac{4j_{inc}}{1+4D}(-x + x_{\text{max}} + 2D).
-\end{align*}
-\end{block}
-\begin{block}{}
-This problem was run with $\Sigma_t = 100 \text{ cm}^{-1}$ and $j_{inc} = \frac{7}{4} \frac{\text{n}}{\text{cm}^2\text{-s}}$. 
-\end{block}
-\end{frame}
-
-\begin{frame}[t]\frametitle{PDT Results vs. Analytical for the Pure Scatterer}
-\begin{minipage}{0.2\textwidth}
-\begin{footnotesize}
-$\epsilon$=4.25E-04
-\end{footnotesize}
-\end{minipage}
-\begin{minipage}{0.75\textwidth}
-\centering
-\includegraphics[scale = 0.5]{figures/PureScatterer.eps}
-\end{minipage}
-
-\end{frame}
-
-
-\backupend
 
 %\begin{frame}[allowframebreaks]{Bibliography}
 %\bibliographystyle{alpha}
