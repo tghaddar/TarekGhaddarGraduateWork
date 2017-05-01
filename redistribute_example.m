@@ -7,8 +7,8 @@ figure;
 plot(x,y,'-o');
 ax = gca;
 ax.XTick = [0 1 2 3 4 5];
-xlabel('Column');
-ylabel('CDF of triangles per column');
+xlabel('x (cm)');
+ylabel('Unnormalized CDF of triangles per column');
 
 
 y1 = [6 6 6 6 6 6];
@@ -24,5 +24,5 @@ plot(x,y1,'--',x,y2,'--',x,y3,'--',x,y4,'--');
 hold off;
 ax = gca;
 ax.XTick = [0 1 2 3 4 5];
-xlabel('Column');
-ylabel('CDF of triangles per column');
+xlabel('x (cm)');
+ylabel('Unnormalized CDF of triangles per column');
