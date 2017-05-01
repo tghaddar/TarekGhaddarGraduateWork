@@ -194,6 +194,28 @@
 \end{block}
 \end{frame}
 
+\begin{frame}[t]\frametitle{Why a new algorithm?}
+\centering
+\includegraphics[scale = 0.3]{figures/unbalanced_lattice-eps-converted-to.pdf}
+\begin{block}{}
+\begin{itemize}
+\item Limited effectiveness if we don't move more cut lines into BOTH features.
+\item We allow one dimension's cut lines to be moved by row/column rather than cut all the way through the problem. 
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Challenges}
+\begin{block}{}
+\begin{itemize}
+\item Altering and tinkering with the algorithm is not difficult.
+\item However, a completely new stitching algorithm had to be written.
+\item The old stitching algorithm assumed one neighboring subset to the north, south, east and west.
+\item We now have an arbitrary number of neighbors in the north/south or east/west directions.
+\end{itemize}
+\end{block}
+\end{frame}
+
 \begin{frame}[t]\frametitle{Load Balancing By Dimension Algorithm}
 \vspace{-0.5 cm}
 \begin{block}{}
