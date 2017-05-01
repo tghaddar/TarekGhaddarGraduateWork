@@ -1,10 +1,10 @@
+%Needed for adobe reader to work
+\pdfminorversion=4
 \documentclass[compress]{beamer}
 %for printing or having a crappy pdf reader backup
 %\documentclass[handout]{beamer}
 \mode<presentation>
 \usetheme{Madrid}
-
-
 \usecolortheme[RGB={128,128,128}]{structure}
 \definecolor{my_gray}{RGB}{105,105,105}
 \setbeamercolor{khumna}{fg=white,bg=my_gray}
@@ -82,7 +82,7 @@
 \author[Ghaddar]{Tarek Ghaddar \\  Dr. Jean Ragusa}
 \institute[TAMU]{Texas A\&M University}
 %\committee{Morel,Popov}{Dr. Jim Morel \\ Dr. Bojan Popov}
-\date[April 5, 2016]
+\date[May 2, 2017]
 
 {
 \setbeamertemplate{headline}{}
@@ -131,6 +131,7 @@
 		\item Load balancing a logically Cartesian mesh is ``not difficult", as the user specifies the number of cells being used.
 		\item In an unstructured mesh, the user cannot always specify the number of cells they want per processor, and obtaining a load balanced problem is more difficult.
 		\item The goal is to implement a load balancing algorithm for unstructured meshes in PDT.
+		\item Our problem is unique because we need our cellsets to be convex (bricks for now) because bricks are provably optimal.
 	\end{itemize}
 	\end{block}
 \end{frame}
@@ -140,6 +141,7 @@
 	\begin{itemize}
 		\item Unstructured meshes in PDT are generated in 2D using the Triangle Mesh Generator.
 		\item These can be extruded to create 3D meshes.
+		\item Fixes by Daryl Hawkins within the Triangle source code have lead to much more stable mesh generation for complex geometries.
 	\end{itemize}	
 	\end{block}
 	\includegraphics[scale = 0.15]{figures/IM12DPoly.png}
@@ -155,7 +157,7 @@
 	\item The user inputs coordinates for cut lines in the X and Y directions.
 	\item The cut lines will determine the number of ``subsets" the problem is partitioned into.
 	\item Optimizing the location of these cut lines is the basis of the load balancing algorithm.
-	\item A ``subset" is an orthogonal unit that is formed by intersecting cut lines.
+	\item A ``subset" is a rectangular unit that is formed by intersecting cut lines.
 	\end{itemize}
 \end{block}
 \end{frame}
@@ -179,6 +181,7 @@
 			\item $f =\frac{\underset{ij}{\text{max}}(N_{ij})}{\frac{N_{tot}}{I\cdot J}}$
 			\item $f_I = \underset{i}{\text{max}}[\sum_{j} N_{ij}]/\frac{N_{tot}}{I}$
 			\item $f_J = \underset{j}{\text{max}}[\sum_{i} N_{ij}]/\frac{N_{tot}}{J}$
+			\item $f_{J_i} = \text{max}[N_{ij}]/\frac{\sum_{j}N_{ij}}{J}$
 			\end{itemize}
 		\end{itemize}
 	\end{block}
