@@ -181,7 +181,7 @@
 			\item $f =\frac{\underset{ij}{\text{max}}(N_{ij})}{\frac{N_{tot}}{I\cdot J}}$
 			\item $f_I = \underset{i}{\text{max}}[\sum_{j} N_{ij}]/\frac{N_{tot}}{I}$
 			\item $f_J = \underset{j}{\text{max}}[\sum_{i} N_{ij}]/\frac{N_{tot}}{J}$
-			\item $f_{J_i} = \text{max}[N_{ij}]/\frac{\sum_{j}N_{ij}}{J}$
+			\item $f_{J_i} = \text{max}[N_{ij}]_i/\frac{\sum_{j}N_{ij}}{J}$
 			\end{itemize}
 		\end{itemize}
 	\end{block}
@@ -216,7 +216,7 @@
 \begin{frame}[t]\frametitle{Load Balancing Results}
 \begin{block}{}
 \begin{itemize}
-	\item Three test cases were used to study the behavior of the load balancing algorithm.
+	\item Two test cases were used to study the behavior of both load balancing algorithms.
 	\item For each test case, 162 inputs were constructed by varying:
 		\begin{itemize}
 		\item The number of subsets
@@ -433,19 +433,24 @@
 \end{table}
 \end{frame}
 
-\begin{frame}[t]\frametitle{IM1}
+\begin{frame}[t]\frametitle{IM1D Validation}
 \centering
 \includegraphics[scale=0.25]{figures/IM12D_val.png}
 \end{frame}
 
-\begin{frame}[t]\frametitle{IM1 - Original Load Balancing, f = 2.63}
+\begin{frame}[t]\frametitle{Original Load Balancing, f = 2.63}
 \centering
 \includegraphics[scale=0.33]{figures/IM1_old_load_balance.png}
 \end{frame}
 
-\begin{frame}[t]\frametitle{IM1 - Load Balancing By Dimension, f = 1.76}
+\begin{frame}[t]\frametitle{Load Balancing By Dimension, f = 1.76}
 \centering
 \includegraphics[scale=0.33]{figures/IM1_new_load_balance.png}
+\end{frame}
+
+\begin{frame}[t]\frametitle{A closer look}
+\centering
+\includegraphics[scale=0.19]{figures/IM1_new_load_balance_zoom.png}
 \end{frame}
 
 \section{Conclusions}
@@ -453,8 +458,8 @@
 \begin{frame}[t]\frametitle{Conclusions}
 \begin{block}{}
 \begin{itemize}
-\item The effectiveness of the load balancing algorithm depends on the spatial distribution of fine geometric features, the maximum triangle area used, and the number of subsets the domain is decomposed into.
-\item Good improvement is seen for Test Cases 1 and 2, and especially the IM1 problem.m
+\item The effectiveness of both load balancing algorithms depends on the spatial distribution of fine geometric features, the maximum triangle area used, and the number of subsets the domain is decomposed into.
+\item Some improvement is seen for Test Cases 1 and 2.
 \item More tinkering with the load balancing by dimension algorithm will be done to study its behavior and potential improvements.
 \end{itemize}
 \end{block}
@@ -468,9 +473,15 @@
 		\item Lack of support
 		\item Unable to enforce mesh quality consistently while load balancing problems
 	\end{itemize}
-\item Current path forward involves a collaborative effort with Richard Vega (TAMU/Sandia) using a combination of Cubit and OpenFoam.
+\item Spiderweb and heterogeneous grids for 2D and 2D extruded cases.
+\item Extrusion based methods that avoid stair stepping.
+	\begin{itemize}
+		\item Incredibly thin planes in Z that gives the diffusion solver problems.
+	\end{itemize}
+\item One path forward involves a collaborative effort with Richard Vega (TAMU/Sandia) using a combination of Cubit and OpenFoam.
 	\begin{itemize}
 		\item Splitting the mesh into subsets rather than the problem geometry
+		\item Will allow us to mesh complex 3D problems
 	\end{itemize}
 \end{itemize}
 \end{block}
@@ -485,36 +496,11 @@
 \item Taking advantage of nested parallelism to assign more parallel processes at subsets that require more work to be done.
 \end{itemize}
 \item Studying the behavior of the communication penalty while load balancing (brought up by Derek Gaston at M\&C 2017).
+\item Begin the delevopment of a provably optimal sweep algorithm for ``misaligned'' cellsets.
 \end{itemize}
 \end{block}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Initial Setup}
-\centering
-\includegraphics[scale=0.5]{figures/initial_setup.pdf}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Adaptively Refine Subsets}
-\centering
-\includegraphics[scale=0.5]{figures/amr.pdf}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Subset Redistribution}
-\begin{minipage}{0.15\textwidth}
-\begin{footnotesize}
-$f = 1$
-\end{footnotesize}
-\end{minipage}
-\begin{minipage}{0.8\textwidth}
-\centering
-\includegraphics[scale=0.5]{figures/domain_overloading.pdf}
-\end{minipage}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Nested Parallelism}
-\centering
-\includegraphics[scale=0.5]{figures/initial_setup.pdf}
-\end{frame}
 
 \begin{frame}[t]\frametitle{Acknowledgments}
 \begin{block}{}
@@ -524,7 +510,7 @@ A special thank you to the following individuals for their help and support:
 \item Michael Adams, Daryl Hawkins, and Dr. Timmie Smith
 \item Dr. Andrew Till
 \item The CERT team and fellow grad students 
-\item special mention for Rick Vega (TAMU/Sandia) for his help with 3D meshing using OpenFOAM meshing utilities
+\item Special mention to Rick Vega (TAMU/Sandia) for his help with 3D meshing using OpenFOAM meshing utilities
 \item PSAAP-II 
 \end{itemize}
 \end{block}
