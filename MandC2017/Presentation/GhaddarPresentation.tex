@@ -76,11 +76,11 @@
 \begin{document}
 %	
 
-\title[Load Balancing]{Load Balancing Unstructured Meshes for Massively Parallel Transport Sweeps}
-\author[Ghaddar]{Tarek Ghaddar \\  Dr. Jean Ragusa}
+\title[Load Balancing]{An Approach for Load Balancing Massively Parallel Transport Sweeps on Unstructured Grids}
+\author[Ghaddar]{Tarek Habib Ghaddar \\  Dr. Jean Ragusa}
 \institute[TAMU]{Texas A\&M University}
 %\committee{Morel,Popov}{Dr. Jim Morel \\ Dr. Bojan Popov}
-\date[April 5, 2016]
+\date[April 19, 2017]
 
 {
 \setbeamertemplate{headline}{}
@@ -110,7 +110,9 @@
 %\end{beamercolorbox}
 }
 
-
+\begin{frame}
+\tableofcontents
+\end{frame}
 
 \section{Introduction}
 %\subsection{}
@@ -121,11 +123,21 @@
 		\item  A load balanced problem has an equal number of degrees of freedom per processor.
 		\item Load balancing a logically Cartesian mesh is ``not difficult", as the user specifies the number of cells being used.
 		\item In an unstructured mesh, the user cannot always specify the number of cells they want per processor, and obtaining a load balanced problem is more difficult.
-		\item A load balancing algorithm for unstructured meshes was implemented in PDT.
+		\item The goal is to implement a load balancing algorithm for unstructured meshes in PDT.
 	\end{itemize}
 	\end{block}
 \end{frame}
 
+\begin{frame}[t]\frametitle{The Triangle Mesh Generator}
+	\begin{block}{}
+	\begin{itemize}
+		\item Unstructured meshes in PDT are generated in 2D using the Triangle Mesh Generator.
+		\item These can be extruded to create 3D meshes.
+	\end{itemize}	
+	\end{block}
+	\includegraphics[scale = 0.15]{figures/IM12DPoly.png}
+	\includegraphics[scale = 0.15]{figures/IM12DMesh.png}
+\end{frame}
 
 \section{Load Balance Algorithm}
 %\subsection{}
@@ -597,6 +609,41 @@ $f = 2.99$
 \section{Conclusions}
 %\subsection{}
 
+\begin{frame}[t]\frametitle{Extruded Mesh Capability}
+\centering
+\includegraphics[scale=0.25]{figures/IM1_3D_extrude.png}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Extruded Mesh Capability}
+\centering
+\includegraphics[scale=0.23]{figures/IM1_MCNP}
+\includegraphics[scale=0.23]{figures/IM1_PDT}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Extruded Mesh Capability}
+\centering
+\vspace{2cm}
+\includegraphics[scale=1.3]{figures/IM1_MCNP_Zoom.png}
+\includegraphics[scale=1.3]{figures/IM1_PDT_Zoom.png}
+\end{frame}
+
+%\begin{frame}[t]\frametitle{MCNP vs. PDT}
+%\begin{table}[H]
+%\centering
+%\small
+%\caption{The results of MCNP and PDT Compared for IM1-B}
+%\begin{tabular}{c | c | c}
+%\hline
+%\textbf{Code and Setup} & Abs. Rate w/Air ($s^{-1}$) & Abs. Rate w/Graphite $s^{-1}$\\
+%\hline
+%MCNP & 70.1 & 12.66 \\
+%PDT Unstructured & 68.93 & 12.75 \\
+%\hline
+%
+%\end{tabular}
+%\end{table}
+%\end{frame}
+
 
 
 \begin{frame}[t]\frametitle{Conclusions}
@@ -644,6 +691,12 @@ $f = 1$
 \end{minipage}
 \end{frame}
 
+\begin{frame}[t]\frametitle{Nested Parallelism}
+\centering
+\includegraphics[scale=0.5]{figures/initial_setup.pdf}
+\end{frame}
+
+
 \begin{frame}[t]\frametitle{Load Balancing by Dimension}
 \centering
 \includegraphics[scale=0.5]{figures/initial_1b.pdf}
@@ -652,29 +705,136 @@ $f = 1$
 \begin{frame}[t]\frametitle{Load Balance Columns}
 \centering
 \includegraphics[scale=0.5]{figures/row_moves.pdf}
-\end{frame} 
+\end{frame}
 
 \begin{frame}[t]\frametitle{Load Balancing by Dimension}
 \centering
 \includegraphics[scale=0.5]{figures/column_moves.pdf}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Load Balancing by Dimension}
-\begin{block}{}
-	\begin{itemize}
-		\item This algorithm will utilize the same machinery as the currently implemented load balancing algorithm.
-		\item An initial dimension's cut lines will be redistributed.
-		\item The second dimension's cut lines are redistributed per column/row.
-		\item A new stitching algorithm had to be implemented in order to handle "hanging" subsets.
-	\end{itemize}
-	\end{block}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Nested Parallelism}
+\begin{frame}[t]\frametitle{f = 2.633}
 \centering
-\includegraphics[scale=0.5]{figures/initial_setup.pdf}
+\includegraphics[scale=0.33]{figures/IM1_old_load_balance.png}
 \end{frame}
 
+\begin{frame}[t]\frametitle{f = 1.762}
+\centering
+\includegraphics[scale=0.33]{figures/IM1_new_load_balance.png}
+\end{frame}
+
+
+
+\begin{frame}[t]\frametitle{Acknowledgements}
+\begin{block}{}
+A special thank you to the following individuals for their help and support:
+\begin{itemize}
+\item Drs. Ragusa, Morel, Adams, and Popov
+\item Michael Adams, Daryl Hawkins, and Dr. Timmie Smith
+\item Dr. Andrew Till
+\item The CERT team and fellow grad students
+\item PSAAP-II 
+\end{itemize}
+\end{block}
+\end{frame}
+
+\backupbegin
+\appendix
+\section{Backup Slides}
+\begin{frame}[t]\frametitle{Backup Slides}
+
+\end{frame}
+
+\begin{frame}[t]\frametitle{Solution Verification}
+\begin{block}{}
+\begin{itemize}
+\item Two benchmark problems were set up to verify that the scalar flux was being computed correctly on unstructured meshes in PDT.
+\item Both problems utilized a 1 cm$\times$1 cm square domain, with opposing reflecting boundaries on the y boundaries, an incident isotropic angular flux on the left boundary, and a vacuum boundary on the right.
+\end{itemize}
+\end{block}
+\begin{block}{}
+The error presented when comparing numerical to analytical solutions is defined as follows:
+\begin{align*}
+\epsilon = \frac{\norm{\text{Analytical} - \text{ Numerical}}_{l2}}{\norm{\text{Analytical}}_{l2}},
+\end{align*}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Pure Absorber}
+\begin{block}{}
+The analytical scalar flux solution of the 1D Pure Absorber is:
+\begin{align*}
+\phi(x) &= \int_{0}^{1}\psi(x,\mu>0) d\mu \notag \\
+&= \int_{0}^{1}\psi_{inc}\exp(-\frac{\Sigma_a}{\mu} x) d\mu = \psi_{inc} E_{2}(\Sigma_a x),
+\end{align*}
+\end{block}
+\begin{block}{}
+The pure absorber was run with $\psi_{inc} = 3.5 \frac{\text{n}}{\text{cm}^2\text{-s-ster}}$ and $\Sigma_a = 5 \text{ cm}^{-1}$.
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{PDT Results vs. Analytical for the Pure Absorber}
+\centering
+\includegraphics[scale = 0.5]{figures/PureAbsorberAllAngles.eps}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Analysis with 70 Positive Polar Angles}
+\begin{minipage}{0.15\textwidth}
+\begin{footnotesize}
+$\epsilon = 0.012$
+\end{footnotesize}
+\end{minipage}
+\begin{minipage}{0.8\textwidth}
+\centering
+\includegraphics[scale = 0.5]{figures/PureAbsorberBestangle.eps}
+\end{minipage}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Pure Scatterer}
+\begin{block}{}
+The transport solution for a pure scatterer reaches the diffusion limit, and the solution is:
+\begin{align*}
+\phi(x) = \frac{4j_{inc}}{1+4D}(-x + x_{\text{max}} + 2D).
+\end{align*}
+\end{block}
+\begin{block}{}
+This problem was run with $\Sigma_t = 100 \text{ cm}^{-1}$ and $j_{inc} = \frac{7}{4} \frac{\text{n}}{\text{cm}^2\text{-s}}$. 
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{PDT Results vs. Analytical for the Pure Scatterer}
+\begin{minipage}{0.2\textwidth}
+\begin{footnotesize}
+$\epsilon$=4.25E-04
+\end{footnotesize}
+\end{minipage}
+\begin{minipage}{0.75\textwidth}
+\centering
+\includegraphics[scale = 0.5]{figures/PureScatterer.eps}
+\end{minipage}
+
+\end{frame}
+
+
+\backupend
+
+%\begin{frame}[allowframebreaks]{Bibliography}
+%\bibliographystyle{alpha}
+%\bibliography{science}
+% \nocite{*}
+%\end{frame}
+
+
+
+%\section{\ }
+%\begin{frame}[t]\frametitle{Sources}
+%	\nocite{Dubcova20111182}
+%	\nocite{CHAUVET}
+%	\bibliographystyle{ieeetr}
+%	\bibliography{science.bib}
+%	
+%	
+%\end{frame}
+%
 
 
 

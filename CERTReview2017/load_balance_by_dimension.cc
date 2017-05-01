@@ -9,9 +9,13 @@ while (f_I > tol_column)
 }
 
 while (f > tol)
-  if (f_J > tol_row)
+{
+  for i < I
   {
-    Redistribute(Y);
+    if (f_J[i] > tol_row)
+    {
+      Redistribute(Y_i);
+    }
   }
   Remesh;
 }
