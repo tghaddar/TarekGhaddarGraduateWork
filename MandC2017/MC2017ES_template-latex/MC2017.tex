@@ -76,12 +76,11 @@ The capability for PDT to generate and run using unstructured meshes is importan
 \label{grid}
 \end{figure}
 
-The orthogonal grid composed of the cut planes is superimposed on the geometry; each resulting subset is meshed in parallel.  Subsets are now the base structured unit when performing transport sweeps. Discontinuities along the subset boundary are fixed by "stitching'' hanging nodes, creating degenerate polygons along these boundaries. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, degenerate polygons do not lead to numerical difficulties \cite{pwld_teresa,pwld_ragusa}. % at the local cell solve. 
+The orthogonal grid composed of the cut planes is superimposed on the geometry; each resulting subset is meshed in parallel.  Subsets are now the base structured unit when performing transport sweeps. Discontinuities along the subset boundary are fixed by "stitching'' hanging nodes, creating degenerate polygons along these boundaries. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, degenerate polygons do not lead to numerical difficulties at the local cell solve. \cite{pwld_teresa,pwld_ragusa}.
 
 Currently, only 2D and 2D extruded unstructured capability is available in PDT. The 2D input geometry is described by a Planar Straight Line Graph (PSLG). After superimposing the orthogonal grid, a PSLG is created for each subset, and meshed. The mesh can be extruded in the $z$ dimension for 3D problems. Obviously, this is not as general as a 3D unstructured tetrahedral mesh, but for many problems of interest, it is a useful capability to have. Furthermore, this simpler setting allows for the testing of our load balancing approach for unstructured grids.
 
 To demonstrate the newly implemented unstructured meshing capability in PDT, Texas A\&M Nuclear Engineering's Impurity Model 1 (IM1) problem is used. Figure \ref{IM12D} showcases the 2D mesh of the IM1 problem,
-
 \begin{figure}[H]
 \centering
 \includegraphics[scale = 0.13, trim=28cm  4cm 0cm 4cm,clip]{figures/im12d.png}
@@ -90,7 +89,7 @@ To demonstrate the newly implemented unstructured meshing capability in PDT, Tex
 \end{figure}
 
 The combination of the 2D mesh and extrusion parameters yield the full 3D problem, shown in Fig. \ref{IM13D}.
-
+   
 \begin{figure}[H]
 \centering
 \includegraphics[scale = 0.3]{figures/IM1_3D.png}
@@ -123,42 +122,15 @@ $f_I$ is calculated by taking the maximum number of cells per column and dividin
 
 \lstinputlisting[language = C++, basicstyle = \footnotesize]{loadbalance.cc}
 
-\tcr{remove}
-
-\begin{algorithm}
-\textbf{Redistribute:} A function that moves cut lines in either X or Y. \\
-\begin{algorithmic}
-\STATE \textbf{Input:}CutLines (X or Y vector that stores cut lines). 
-\STATE \textbf{Input:} num\_tri\_row or num\_tri\_col, a pArray containing number of triangles in each row or column 
-\STATE \textbf{Input:} The total number of triangles in the domain, $N_{tot}$
-\STATE stapl::array\_view num\_tri\_view, over num\_tri\_row/column
-\STATE stapl::array\_vew offset\_view
-\STATE stapl::partial\_sum(num\_tri\_view) \COMMENT {Perform prefix sum}
-\COMMENT {We now have a cumulative distribution stored in offset\_view}
-\FOR {$i = 1$ :CutLines.size()-1}
-
-	\STATE vector $<$double$>$ pt1 = [CutLines(i-1), offset\_view(i-1)]
-	\STATE vector $<$double$>$ pt2 = [CutLines(i), offset\_view(i)]
-	\STATE ideal\_value = $i\cdot \frac{N_{tot}}{\text{CutLines.size()}-1}$
-	\STATE X-intersect(pt1,pt2,ideal\_value) \COMMENT{Calculates the X-intersect of the line formed by pt1 and pt2 and the line y = ideal\_value.}
-	\STATE CutLines(i) = X-intersect
-\ENDFOR
-\end{algorithmic}
-\end{algorithm}
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}
 \label{ch:results}
-
-\tcr{remove 1 or 2 and add a sentence to the effect that more examples will be provided in the full paper}
 
 The following sections will showcase the metric behavior and convergence for three test cases and the new unstructured meshing capability both in 2D and 3D.
 
 \subsection{Test Cases for Metric Behavior and Convergence}
 \label{sec:convergence}
-In order to illustrate the behavior of the load balancing metric, calculated by Eq.\ref{metric_def}, three test cases are presented. Figure \ref{opp} shows the first test case, a 20 cm by 20 cm domain with two pins in opposite corners of the domain. Figure \ref{same} shows the same size domain but with the pins on the same side.These are two theoretically very unbalanced cases, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to its denser and repeated geometry, theoretically is a more balanced problem. 
+In order to illustrate the behavior of the load balancing metric, calculated by Eq.\ref{metric_def}, two test cases are presented. Figure \ref{opp} shows the first test case, a 20 cm by 20 cm domain with two pins in opposite corners of the domain. This is a theoretically very unbalanced case, as geometrically there are two features located distantly from each other with an empty geometry throughout the rest of the domain. Figure \ref{lattice} shows a lattice and reflector, which due to its denser and repeated geometry, theoretically is a more balanced problem. One more test case will be presented in the full paper.
 
 A series of 162 inputs was constructed for each case. These inputs are constructed by varying the maximum triangle area from the coarsest possible to 0.01 cm\textsuperscript{2}. In addition, the number of subsets, $N$, varies from 2$\times$2 to 10$\times$10. 
 
@@ -167,13 +139,6 @@ A series of 162 inputs was constructed for each case. These inputs are construct
 \includegraphics[scale = 0.5,trim = {0, 0, 0, 0}, clip]{figures/unbalanced_lattice.eps}
 \caption{The first test case used in order to test effectiveness and convergence of the load balancing metric.}
 \label{opp}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[scale = 0.5]{figures/unbalanced_pins_same_side.eps}
-\caption{The second test case used in order to test effectiveness and convergence of the load balancing metric.}
-\label{same}
 \end{figure}
 
 \begin{figure}[H]
@@ -205,24 +170,6 @@ Figure \ref{oppiter} shows the metric behavior for Fig. \ref{opp} after 10 load 
 \label{oppiter}
 \end{figure}
 
-Figure \ref{samenoiter} shows the metric behavior for Fig. \ref{same}. The maximum metric is 22.6654 and occurs when Fig. \ref{same} is run with 8x8 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0024 and occurs when Fig. \ref{same} is run with 2x2 subsets with a maximum triangle are of 0.01 cm\textsuperscript{2}.
-
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.5, trim = 2cm 6cm 2cm 7cm,clip]{figures/SameNoIter.pdf}
-\caption{The metric behavior of the second test case run with no load balancing iterations.}
-\label{samenoiter}
-\end{figure}
-
-Figure \ref{sameiter} shows the metric behavior for Fig. \ref{same} after ten load balancing iterations. The maximum metric is 3.9929 and occurs when Fig. \ref{same} is run with 10x10 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0024 and occurs when Fig. \ref{same} is run with 2x2 subsets with a maximum triangle are of 0.01 cm\textsuperscript{2}.
-
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.50, trim = 2cm 6cm 2cm 7cm,clip]{figures/SameIter.pdf}
-\caption{The metric behavior of the second test case run with 10 load balancing iterations.}
-\label{sameiter}
-\end{figure}
-
 Figure \ref{latticenoiter} shows the metric behavior for Fig. \ref{lattice}. The maximum metric is 2.6489 and occurs when Fig. \ref{lattice} is run with 10x10 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0179 and occurs when Fig. \ref{lattice} is run with 2x2 subsets with a maximum triangle are of 0.08 cm\textsuperscript{2}.
 
 \begin{figure}[H]
@@ -241,23 +188,19 @@ Figure \ref{latticeiter} shows the metric behavior for Fig. \ref{lattice} after 
 \label{latticeiter}
 \end{figure}
 
-Because Fig. \ref{lattice} has more features and is more symmetric of a problem, the initial load balancing metric will not be as large as the load balancing metric of Figs. \ref{same} and \ref{opp}. As a result, the improvement in the load balancing metric after 10 iterations will not be as great in problems similar to Fig. \ref{lattice}. 
+Because Fig. \ref{lattice} has more features and is more symmetric of a problem, the initial load balancing metric will not be as large as the load balancing metric of Fig.\ref{opp}. As a result, the improvement in the load balancing metric after 10 iterations will not be as great in problems similar to Fig. \ref{lattice}. 
 
-Good improvement is seen throughout all three test cases for all three inputs, particularly the first two test cases, which were initially very unbalanced. However, there were many inputs run that had problems with $f > 1.1$, which means many problems were unbalanced by more than 10\%. The user will not always have the luxury of choosing the number of subsets they want the problem run with, as this directly affects the number of processors the problem will be run with. Certain problems will require more processors and will require minimizing the total number of cells in the domain for the problem to complete running in a reasonable amount of time. As a result, improvements to the algorithm must be made. 
+Good improvement is seen throughout all two test cases for all two inputs, particularly the first test case, which was initially very unbalanced. However, there were many inputs run that had problems with $f > 1.1$, which means many problems were unbalanced by more than 10\%. The user will not always have the luxury of choosing the number of subsets they want the problem run with, as this directly affects the number of processors the problem will be run with. Certain problems will require more processors and will require minimizing the total number of cells in the domain for the problem to complete running in a reasonable amount of time. As a result, improvements to the algorithm must be made. 
 
-This can be done by changing how the cut lines are redistributed. Instead of changing entire row and column widths, the cut lines can be moved on the subset level. However, this can sacrifice the strict orthogonality that PDT currently utilizes to scale so well on a massively parallel scale. Changes to the performance model and the scheduler will possibly have to be made.
-
-Another option is to implement domain overloading, which is the logical extension of the work presented in this paper. This would involve processors owning different numbers of subsets, with no restriction on these subsets being contiguous. This would be the most effective method at perfecting this algorithm, and would lead to less problems being unbalanced by more than 10\%.
+This can be done by changing how the cut lines are redistributed. Instead of changing entire row and column widths, the cut lines can be moved on the subset level. However, this can sacrifice the strict orthogonality that PDT currently utilizes to scale so well on a massively parallel scale. Updates to the performance model and the task scheduler are underway to allows this load balancing by dimension. Finally, another extension of this work would be to implement domain overloading
+whereby processors may own non-contiguous subsets.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
 
-\tcr{
-We have proposed and tested a load-balance algorithm for radiation transport problems on unstructured grids solved using sweeps. 
-}
-The load balancing algorithm outlined in this paper performs satisfactorily for feature-heavy problems and even for some particularly sparse problems. Its effectiveness depends on the maximum triangle area used and the number of subsets chosen to decompose the problem domain. 
+We have proposed and tested a load-balance algorithm for radiation transport problems on unstructured grids solved using transport sweeps. The load balancing algorithm outlined in this paper performs satisfactorily for feature-heavy problems and for some particularly sparse problems. Its effectiveness depends on the maximum triangle area used and the number of subsets chosen to decompose the problem domain. 
 
-Load imbalance reduction is observed throughout all three test cases for all three inputs, particularly the \tcr{first} two test cases, which were initially very unbalanced. However, there were many inputs run that had problems with $f > 1.1$, which means many problems were unbalanced by more than 10\% after application of the load balancing algorithm. 
+Load imbalance reduction is observed for all test cases. However, there are situations where the load balance procedure described here still yield a load imbalance greater than 10\% ($f > 1.1$). 
 Further improvement to the method will include: investigation of domain-overloading \cite{mpadams2015} and load-balancing by dimension.
 
 %It is not always possible to choose the number of subsets as this directly affects the number of processors the problem will be run with. Certain problems will require more processors and will require minimizing the total number of cells in the domain for the problem to complete running in a reasonable amount of time. As a result, improvements to the algorithm must be made. 
@@ -270,8 +213,6 @@ Further improvement to the method will include: investigation of domain-overload
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Acknowledgments}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliographystyle{ans}
