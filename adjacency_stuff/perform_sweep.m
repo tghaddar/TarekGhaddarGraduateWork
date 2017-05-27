@@ -23,10 +23,10 @@ end
 % compute out degree
 out_degree = outdegree(dg);
 % check dimensions
-siz_ = length(in_degree); 
+siz_ = length(in_degree);
 n_nodes=numnodes(dg);
 if siz_ ~= nx*ny || siz_ ~= n_nodes
-    error('inconsisntency in the number of nodes in %s',mfilename);
+    error('inconsistency in the number of nodes in %s',mfilename);
 end
 how_many = max (max(in_degree),max(out_degree) );
 % predecessors and successors arrays
@@ -63,7 +63,7 @@ n_stages = 1;
 wave{n_stages} = current_nodes;
 
 while ~isempty(my_buffer)
-    
+
     % remove current nodes from list of predecessors (work by column is
     % quicker)
     for k=1:length(current_nodes)
@@ -72,7 +72,7 @@ while ~isempty(my_buffer)
             pred(indi(i),indj(i))=0;
         end
     end
-    
+
     % get next nodes by looking at the successors
     next_nodes = [];
     for k=1:length(current_nodes)
@@ -80,7 +80,7 @@ while ~isempty(my_buffer)
         next_nodes = [next_nodes succ(current_nodes(k),ind)];
     end
     next_nodes = unique(next_nodes);
-    
+
     % check that these next nodes are free
     for k=1:length(next_nodes)
         ind = find(pred(next_nodes(k),:)>0, 1);
@@ -91,7 +91,7 @@ while ~isempty(my_buffer)
     end
     % assign them a new name
     current_nodes=next_nodes;
-    
+
     % remove the free nodes from the buffer
     for k=1:length(current_nodes)
         ind = find(my_buffer==current_nodes(k));
@@ -101,7 +101,7 @@ while ~isempty(my_buffer)
             my_buffer(ind)=[];
         end
     end
-    
+
     % increment the stage count
     n_stages = n_stages + 1;
     wave{n_stages} = current_nodes;
