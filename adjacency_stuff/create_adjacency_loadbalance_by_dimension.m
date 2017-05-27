@@ -1,16 +1,28 @@
 close all; clear variables; % clc;
+debug=true;
 
 % number of cut lines
 n_cutx = 3;
 n_cuty = 3;
 % random cuts
-do_random=true;
+do_random=false;
 
 [X,Y,ny,nx] = create_mesh_partition(n_cutx,n_cuty,do_random);
+if debug
+    clear X Y nx ny;
+    if do_random
+        load debug_cut.mat;
+    else
+        load debug_reg_cut.mat;
+    end
+end
 
 plot_mesh=true;
 plot_dag=true;
-[diG,corners]=create_adjacency_matrices(X,Y,nx,ny,plot_mesh,plot_dag);
+[diG,order,corners]=create_adjacency_matrices(X,Y,nx,ny,plot_mesh,plot_dag);
+
+do_plot_sweep=true;
+perform_sweep(diG,order,X,Y,nx,ny,do_plot_sweep);
 
 error('stopping here')
 

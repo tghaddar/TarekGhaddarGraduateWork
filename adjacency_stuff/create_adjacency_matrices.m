@@ -1,4 +1,4 @@
-function [diGG,corners]=create_adjacency_matrices(X,Y,nx,ny,plot_mesh,plot_dag)
+function [diGG,order,corners]=create_adjacency_matrices(X,Y,nx,ny,plot_mesh,plot_dag)
 
 % adjacency matrix
 n=nx*ny;
