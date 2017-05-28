@@ -148,11 +148,11 @@ for i=1:nx
         order{2}(ind)=k;
     end
 end
-aux=reordernodes(diG,order{2}); diGG{2}=aux;
-% figure(99); clf; plot(aux); pause
-% ooo=toposort(G2,'Order','stable');
-% G2=reordernodes(G2,ooo);
-% figure(98); clf; plot(G2); pause
+% aux=reordernodes(diG,order{2}); diGG{2}=aux;
+% % figure(99); clf; plot(aux); pause
+% % ooo=toposort(G2,'Order','stable');
+% % G2=reordernodes(G2,ooo);
+% % figure(98); clf; plot(G2); pause
 order{3}=zeros(n,1);
 k=0;
 for i=nx:-1:1
@@ -162,8 +162,8 @@ for i=nx:-1:1
         order{3}(ind)=k;
     end
 end
-aux=reordernodes(diG,order{3});  diGG{3}=aux;
-% figure(99); clf; plot(aux); pause
+% aux=reordernodes(diG,order{3});  diGG{3}=aux;
+% % figure(99); clf; plot(aux); pause
 order{4}=zeros(n,1);
 k=0;
 for i=nx:-1:1
@@ -173,8 +173,12 @@ for i=nx:-1:1
         order{4}(ind)=k;
     end
 end
-aux=reordernodes(diG,order{4});  diGG{4}=aux;
-% figure(99); clf; plot(aux); pause
+% aux=reordernodes(diG,order{4});  diGG{4}=aux;
+% % figure(99); clf; plot(aux); pause
+
+for k=2:4
+    diGG{k}=digraph(triu(A_sym(order{k},order{k})));
+end
 
 if plot_dag
     figID=figID+1;
@@ -188,6 +192,13 @@ if plot_dag
         subplot(2,2,k); plot(diGG{k});
     end
 end
+
+% P=sparse(1:n,order{2},ones(n,1));
+% A2=P*A_nonsym*P';
+% A3=P'*A_nonsym*P;
+% figure(99);
+% subplot(1,2,1);spy(A2);
+% subplot(1,2,2);spy(A3);
 
 
 % check that the corners are correct (debug mode)
