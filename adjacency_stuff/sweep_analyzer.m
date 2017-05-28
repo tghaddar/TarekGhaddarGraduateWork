@@ -2,14 +2,14 @@ close all; clear variables; % clc;
 % 
 % number of cut lines
 n_cutx = 3;
-n_cuty = 3;
+n_cuty = 2;
 % partition_type='debug_regular';
 % partition_type='debug_random';
-partition_type='regular';
-% partition_type='random';
+% partition_type='regular';
+partition_type='random';
 % partition_type='mild_random';
 % partition_type='worst';
-[X,Y,ny,nx] = create_mesh_partition(n_cutx,n_cuty,partition_type);
+[X,Y,nx,ny] = create_mesh_partition(n_cutx,n_cuty,partition_type);
 
 plot_mesh=true;
 plot_dag=true;

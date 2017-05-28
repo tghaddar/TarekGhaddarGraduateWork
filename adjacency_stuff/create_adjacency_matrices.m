@@ -17,7 +17,7 @@ corners(4) = n;
 %%%% create adjacency matrix starting with corner #1
 % loop over columns
 for i=1:nx
-    % beginning and end rows in A for this colum
+    % beginning and end rows in A for this column
     row_beg = (i-1)*ny+1;
     row_end = (i  )*ny  ;
     % up/down neighbors
