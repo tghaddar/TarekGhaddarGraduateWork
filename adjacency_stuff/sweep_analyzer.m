@@ -1,11 +1,11 @@
 close all; clear variables; % clc;
 % 
 % number of cut lines
-n_cutx = 3;
-n_cuty = 2;
-% partition_type='debug_regular';
+n_cutx = 4;
+n_cuty = 4;
+partition_type='debug_regular';
 % partition_type='debug_random';
-% partition_type='regular';
+partition_type='regular';
 partition_type='random';
 % partition_type='mild_random';
 % partition_type='worst';
@@ -16,7 +16,8 @@ plot_dag=true;
 [diG,order,corners]=create_adjacency_matrices(X,Y,nx,ny,plot_mesh,plot_dag);
 
 do_plot_sweep=true;
-rez = perform_sweep(diG,order,X,Y,nx,ny,do_plot_sweep);
+n_angle_sets=1;
+rez = perform_sweep_angle_set(diG,order,X,Y,nx,ny,n_angle_sets,do_plot_sweep);
 
 error('stopping here')
 
