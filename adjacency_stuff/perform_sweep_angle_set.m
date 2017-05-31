@@ -129,7 +129,14 @@ while n_tasks>0
     % remove current nodes from tasks
     n_tasks = n_tasks - length(current_nodes(:,1));
 
-% %     % remove the free nodes from the buffer
+    % also remove the nodes that have been completed from the not_ready buffer
+    for k=1:length(current_nodes(:,1))
+        ind = find(ismember(not_ready,current_nodes(k,:),'rows'));
+        if ~isempty(ind)
+            not_ready(ind,:)=[];
+        end
+    end
+
 % %     for k=1:length(current_nodes(:,1))
 % %         ind = find(my_buffer==current_nodes(k));
 % %         if isempty(ind)

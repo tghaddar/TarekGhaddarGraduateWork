@@ -25,8 +25,12 @@ for s=1:n_stages
     nodes = wave{s}(:,1);
     quad  = wave{s}(:,2);
     as    = wave{s}(:,3);
+    wave{s}
     % id = (i-1)*ny+j
     for k=1:length(nodes)
+%         if quad(k)~=4
+%             continue
+%         end
         id = nodes(k); %order{quad(k)}(nodes(k));
         jj = mod(id-1,ny)+1;
         ii = (id -jj)/ny+1;
