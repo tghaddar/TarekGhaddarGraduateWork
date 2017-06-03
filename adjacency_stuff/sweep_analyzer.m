@@ -1,15 +1,19 @@
 close all; clear variables; % clc;
 % 
 % number of cut lines
-n_cutx = 4;
-n_cuty = 14;
-partition_type='debug_regular';
+n_cutx = 8;
+n_cuty = 8;
+% partition_type='debug_regular';
 % partition_type='debug_random';
 % partition_type='regular';
-% partition_type='random';
+partition_type='random';
 % partition_type='mild_random';
 % partition_type='worst';
 [X,Y,nx,ny] = create_mesh_partition(n_cutx,n_cuty,partition_type);
+
+if ny>nx
+    warning('we assume Px >= Py for angle priorities, so we need nx>=ny');
+end
 
 plot_mesh=true;
 plot_dag=true;
@@ -18,9 +22,9 @@ plot_dag=true;
 % do_plot_sweep=true;
 % rez1 = perform_sweep(diG,order,X,Y,nx,ny,do_plot_sweep);
 
-do_plot_sweep=true;
 n_angle_sets=1;
-rez = perform_sweep_angle_set(diG,order,X,Y,nx,ny,n_angle_sets,do_plot_sweep);
+do_plot_sweep=true;
+rez = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,do_plot_sweep);
 
 error('stopping here')
 

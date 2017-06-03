@@ -34,7 +34,7 @@ for s=1:n_stages
     nodes = wave{s}(:,1);
     quad  = wave{s}(:,2);
     as    = wave{s}(:,3);
-    wave{s}
+%     wave{s}
     % id = (i-1)*ny+j
     for k=1:length(nodes)
 %         if quad(k)~=4
@@ -54,9 +54,19 @@ for s=1:n_stages
         patch('Faces',face,'Vertices',vert,'FaceColor',col{quad(k)},'FaceAlpha',gradation(mod(as(k)-1,2)+1));
     end
     title(sprintf('Stage %d',s));
-%     if n_stages <= 999
-%         filename=sprintf('./sweep_pix/sweep_stage_%d_%0.3d.png',quad,s);
+    if n_stages <= 999
+%         filename=sprintf('./sweep_pix/sweep_stage_%0.3d.png',s);
 %         print('-dpng',filename);
-%     end
+%         drawnow
+%         filename2=sprintf('./sweep_pix/sweep.png');
+%         frame = getframe(1);
+%         im = frame2im(frame);
+%         [imind,cm] = rgb2ind(im,256);
+%         if s == 1
+%             imwrite(imind,cm,filename,'gif', 'Loopcount',inf);
+%         else
+%             imwrite(imind,cm,filename,'gif','WriteMode','append');
+%         end
+    end
     pause
 end
