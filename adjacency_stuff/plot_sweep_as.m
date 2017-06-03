@@ -1,9 +1,8 @@
-function plot_sweep_as(wave,order,X,Y,nx,ny)
+function plot_sweep_as(wave,n_angle_sets,X,Y,nx,ny)
 
 n_stages = length(wave);
 
-figure(100); clf;
-hold on;
+figure(100);
 % superimpose the subset mesh
 for i=1:nx+1
     line([X(i),X(i)],[0,1])
@@ -13,15 +12,25 @@ for i=1:nx+1
         end
     end
 end
-
+% save figure data
+h1=gcf;
+objects=allchild(h1);
 % colors for patches
 col{1}='blue';
 col{2}='black';
 col{3}='green';
 col{4}='red';
+% create gradation of colors for angle sets
+gradation=[0.25 0.75];
 
 % loop through stages
 for s=1:n_stages
+    
+    figure(101); clf;
+    h2=gcf;
+    copyobj(get(h1,'children'),h2);
+    hold on;
+    
     nodes = wave{s}(:,1);
     quad  = wave{s}(:,2);
     as    = wave{s}(:,3);
@@ -42,7 +51,7 @@ for s=1:n_stages
         y2=Y(ii,jj+1);
         vert = [x1 y1; x2 y1; x2 y2; x1 y2];
         face = [1 2 3 4];
-        patch('Faces',face,'Vertices',vert,'FaceColor',col{quad(k)},'FaceAlpha',0.5);
+        patch('Faces',face,'Vertices',vert,'FaceColor',col{quad(k)},'FaceAlpha',gradation(mod(as(k)-1,2)+1));
     end
     title(sprintf('Stage %d',s));
 %     if n_stages <= 999

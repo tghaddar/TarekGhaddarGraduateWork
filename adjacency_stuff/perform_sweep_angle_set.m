@@ -1,7 +1,6 @@
 function result = perform_sweep_angle_set(diG,order,X,Y,nx,ny,n_angle_sets,do_plot_sweep)
 
-n_quad=4;
-n_quad=4;
+n_quad=1;
 %%% init phase for all quadrants and all angle sets
 for quad=1:n_quad
     
@@ -38,18 +37,22 @@ for quad=1:n_quad
     for k=1:n_nodes
         node_ids = ord(predecessors(dg,k));
         if ~isempty(node_ids)
-            pred{quad}(ord(k),1:length(node_ids),:) = node_ids; %ord(node_ids);
+            for as=1:n_angle_sets
+                pred{quad}(ord(k),1:length(node_ids),as) = node_ids; %ord(node_ids);
+            end
         end
         node_ids = ord(successors(dg,k));
         if ~isempty(node_ids)
-            succ{quad}(ord(k),1:length(node_ids),:) = node_ids; %ord(node_ids);
+            for as=1:n_angle_sets
+                succ{quad}(ord(k),1:length(node_ids),as) = node_ids; %ord(node_ids);
+            end
         end
     end
     
-    % create buffer of tasks, including info about quadrant and anglet set IDs
-    for as=1:n_angle_sets
-        my_buffer{quad,as}=order{quad};
-    end
+%     % create buffer of tasks, including info about quadrant and anglet set IDs
+%     for as=1:n_angle_sets
+%         my_buffer{quad,as}=order{quad};
+%     end
     
 end
 
@@ -66,9 +69,10 @@ n_stages = 1;
 wave{n_stages} = current_nodes;
 % make a buffer for nodes for which some predecessors have been completed
 % but not all
-not_ready=zeros(n_angle_sets-1,3);
-for as=2:n_angle_sets
-    not_ready((as-1)*n_quad+1:as*n_quad,1:3)=[starting_node' qq' as*ones(n_quad,1)];
+if n_angle_sets==1
+    potentially_next=zeros(0,3);
+else
+    potentially_next(1:n_quad,1:3)=[starting_node' qq' 2*ones(n_quad,1)];
 end
 
 while n_tasks>0
@@ -95,7 +99,7 @@ while n_tasks>0
     end
     
     % get next nodes by looking at the successors
-    next_nodes = not_ready;
+    next_nodes = potentially_next;
     for k=1:length(current_nodes(:,1))
         quad=current_nodes(k,2);
         as  =current_nodes(k,3);
@@ -114,28 +118,40 @@ while n_tasks>0
         ind = find(pred{quad}(next_nodes(k),:,as)>0, 1);
         if ~isempty(ind)
             % that node still has a pred that hasn't been worked on
-            not_ready = [not_ready; next_nodes(k,:)];
+            potentially_next = [potentially_next; next_nodes(k,:)];
             % we do the loop from the end because of this line: next_nodes(k,:)=[];
             next_nodes(k,:)=[];
         end
     end
-    not_ready = unique(not_ready,'rows');
+    potentially_next = unique(potentially_next,'rows');
     % assign them a new name
     current_nodes=next_nodes;
     
     % resolve conflicts (nodes doing more than one task)
-    % TBD
+    % get current nodes
+%     nodes_only = current_nodes(:,1); 
+%     [unique_nodes,ia,ic]=unique(nodes_only);
+%     if length(nodes_only)~=length(
     
     % remove current nodes from tasks
     n_tasks = n_tasks - length(current_nodes(:,1));
 
     % also remove the nodes that have been completed from the not_ready buffer
     for k=1:length(current_nodes(:,1))
-        ind = find(ismember(not_ready,current_nodes(k,:),'rows'));
+        ind = find(ismember(potentially_next,current_nodes(k,:),'rows'));
         if ~isempty(ind)
-            not_ready(ind,:)=[];
+            potentially_next(ind,:)=[];
         end
     end
+    
+    % add the next angle set in the list of potential next nodes
+    for k=1:length(current_nodes(:,1))
+        as=current_nodes(k,3);
+        if as<n_angle_sets
+            % increment the as by 1
+            potentially_next(end+1,:)=[current_nodes(k,1:2) (as+1)];
+        end
+    end    
 
 % %     for k=1:length(current_nodes(:,1))
 % %         ind = find(my_buffer==current_nodes(k));
@@ -158,7 +174,7 @@ while n_tasks>0
 end
 
 if do_plot_sweep
-    plot_sweep_as(wave,order,X,Y,nx,ny);
+    plot_sweep_as(wave,n_angle_sets,X,Y,nx,ny);
 end
 % save all results
 result.n_stages= n_stages;
