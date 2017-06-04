@@ -42,12 +42,18 @@ end
 
 to_do =zeros(0,3);
 to_lag=zeros(0,3);
+option='old';
 % resolve conflicts node by node
-% using quadrant priority
-[to_do,to_lag,conflict,stop_sweep] = quadrant_priority(to_do,to_lag,conflict,nx,ny);
-%  then using quadrant priority, if needed
-if length(conflict)>0 && ~stop_sweep
-    [to_do,to_lag,conflict,stop_sweep] = depth_of_graph(diG,order,corners,to_do,to_lag,conflict,nx,ny);
+switch option
+    case 'old'
+        % using quadrant priority
+        [to_do,to_lag,conflict,stop_sweep] = quadrant_priority(to_do,to_lag,conflict,nx,ny);
+        %  then using quadrant priority, if needed
+        if length(conflict)>0 && ~stop_sweep
+            [to_do,to_lag,conflict,stop_sweep] = depth_of_graph(diG,order,corners,to_do,to_lag,conflict,nx,ny);
+        end
+    case 'depth_of_graph'
+        [to_do,to_lag,conflict,stop_sweep] = depth_of_graph(diG,order,corners,to_do,to_lag,conflict,nx,ny);
 end
 % assign no_conflict and resolved conflicts to current
 for k=1:length(to_do(:,1))
