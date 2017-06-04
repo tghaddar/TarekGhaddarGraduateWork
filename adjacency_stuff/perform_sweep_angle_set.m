@@ -1,4 +1,4 @@
-function result = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,do_plot_sweep)
+function result = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,partition_type,do_plot_sweep)
 
 n_quad=4;
 %%% init phase for all quadrants and all angle sets
@@ -78,7 +78,9 @@ end
 while n_tasks>0
     
     fprintf('Stage #: %d \n',n_stages+1);
-    
+%     if n_stages==82-1
+%         disp('82')
+%     end
     % remove current nodes from list of predecessors (work by column is
     % quicker)
     for q=1:n_quad
@@ -198,7 +200,7 @@ while n_tasks>0
 end
 
 if do_plot_sweep
-    plot_sweep_as(wave,n_angle_sets,X,Y,nx,ny);
+    plot_sweep_as(wave,X,Y,nx,ny,partition_type,n_angle_sets);
 end
 % save all results
 result.n_stages= n_stages;

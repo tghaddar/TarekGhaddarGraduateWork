@@ -1,13 +1,15 @@
 close all; clear variables; % clc;
 % 
 % number of cut lines
-n_cutx = 15;
-n_cuty = 15;
+n_cutx = 17;
+n_cuty = 17;
 % partition_type='debug_regular';
 % partition_type='debug_random';
+% partition_type='debug_random1818';
 % partition_type='regular';
 partition_type='random';
-% partition_type='mild_random';
+partition_type='mild_random';
+partition_type='mild_random1818';
 % partition_type='worst';
 [X,Y,nx,ny] = create_mesh_partition(n_cutx,n_cuty,partition_type);
 
@@ -15,16 +17,16 @@ if ny>nx
     warning('we assume Px >= Py for angle priorities, so we need nx>=ny');
 end
 
-plot_mesh=true;
-plot_dag=true;
+plot_mesh=false;
+plot_dag=false;
 [diG,order,corners]=create_adjacency_matrices(X,Y,nx,ny,plot_mesh,plot_dag);
 
 % do_plot_sweep=true;
 % rez1 = perform_sweep(diG,order,X,Y,nx,ny,do_plot_sweep);
 
-n_angle_sets=5;
+n_angle_sets=20;
 do_plot_sweep=true;
-rez = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,do_plot_sweep);
+rez = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,partition_type,do_plot_sweep);
 
 error('stopping here')
 

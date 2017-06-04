@@ -39,6 +39,10 @@ switch lower(partition_type)
         end
     case 'debug_random'
         load debug_cut.mat;
+    case 'debug_random1818'
+        load debug1818.mat;
+    case 'mild_random1818'
+        load mild1818.mat;
     case 'debug_regular'
         load debug_reg_cut.mat;
     otherwise

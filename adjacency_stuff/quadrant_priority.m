@@ -15,12 +15,12 @@ for k=1:conflicted
     
     n=length(conflict{k}(:,1));
     
-    if n~=2
-        conflict{k}
-        warning('only resolving conflicts pair-by-pair for now; in %s',mfilename);
-%         stop_sweep=true;
-%         break
-    end
+%     if n~=2
+%         conflict{k}
+%         warning('only resolving conflicts pair-by-pair for now; in %s',mfilename);
+% %         stop_sweep=true;
+% %         break
+%     end
     
     % quadrant IDs
     %  2---4

@@ -1,4 +1,6 @@
-function plot_sweep_as(wave,n_angle_sets,X,Y,nx,ny)
+function plot_sweep_as(wave,X,Y,nx,ny,partition_type,n_angle_sets)
+
+filename_gif=sprintf('./sweep_pix/sweep_%s_%dx%d_as%d.gif',partition_type,nx,ny,n_angle_sets);
 
 n_stages = length(wave);
 
@@ -22,6 +24,7 @@ col{3}='green';
 col{4}='red';
 % create gradation of colors for angle sets
 gradation=[0.25 0.75];
+gradation2=linspace(0,1,n_angle_sets+1);
 
 % loop through stages
 for s=1:n_stages
@@ -52,21 +55,21 @@ for s=1:n_stages
         vert = [x1 y1; x2 y1; x2 y2; x1 y2];
         face = [1 2 3 4];
         patch('Faces',face,'Vertices',vert,'FaceColor',col{quad(k)},'FaceAlpha',gradation(mod(as(k)-1,2)+1));
+%         patch('Faces',face,'Vertices',vert,'FaceColor',col{quad(k)},'FaceAlpha',gradation2(as(k)+1));
     end
     title(sprintf('Stage %d',s));
     if n_stages <= 999
 %         filename=sprintf('./sweep_pix/sweep_stage_%0.3d.png',s);
 %         print('-dpng',filename);
-%         drawnow
-%         filename2=sprintf('./sweep_pix/sweep.png');
-%         frame = getframe(1);
-%         im = frame2im(frame);
-%         [imind,cm] = rgb2ind(im,256);
-%         if s == 1
-%             imwrite(imind,cm,filename,'gif', 'Loopcount',inf);
-%         else
-%             imwrite(imind,cm,filename,'gif','WriteMode','append');
-%         end
+        drawnow
+        frame = getframe(101);
+        im = frame2im(frame);
+        [imind,cm] = rgb2ind(im,256);
+        if s == 1
+            imwrite(imind,cm,filename_gif,'gif', 'Loopcount',inf);
+        else
+            imwrite(imind,cm,filename_gif,'gif','WriteMode','append');
+        end
     end
-    pause
+%     pause
 end
