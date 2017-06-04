@@ -130,8 +130,10 @@ end
 
 %%% construct the directed graph based on A
 diG = digraph(A_nonsym);
-figure(3);
-plot(diG,'Layout','force','EdgeLabel',diG.Edges.Weight);
+if plot_dag
+    figure(3);
+    plot(diG,'Layout','force','EdgeLabel',diG.Edges.Weight);
+end
 
 %%% ordering for each quadrant
 %   2---4
