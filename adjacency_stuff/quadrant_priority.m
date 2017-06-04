@@ -128,12 +128,12 @@ for k=1:conflicted
                         i_to_lag=1;
                     end
                 else % the top quadrants go first
-                    if q1==1 || q1==3
-                        i_to_do =2;
-                        i_to_lag=1;
-                    else
+                    if q1==2 || q1==4
                         i_to_do =1;
                         i_to_lag=2;
+                    else
+                        i_to_do =2;
+                        i_to_lag=1;
                     end
                 end
             else % odd ny
@@ -146,12 +146,12 @@ for k=1:conflicted
                         i_to_lag=1;
                     end
                 elseif j>(ny+1)/2 % the top quadrants go first
-                    if q1==1 || q1==3
-                        i_to_do =2;
-                        i_to_lag=1;
-                    else
+                    if q1==2 || q1==4
                         i_to_do =1;
                         i_to_lag=2;
+                    else
+                        i_to_do =2;
+                        i_to_lag=1;
                     end
                 else
                     % cannot decide yet
@@ -171,11 +171,11 @@ for k=1:conflicted
                     end
                 else % the right quadrants go first
                     if q1==3 || q1==4
-                        i_to_do =2;
-                        i_to_lag=1;
-                    else
                         i_to_do =1;
                         i_to_lag=2;
+                    else
+                        i_to_do =2;
+                        i_to_lag=1;
                     end
                 end
             else % odd nx
@@ -189,11 +189,11 @@ for k=1:conflicted
                     end
                 elseif i>(nx+1)/2 % the right quadrants go first
                     if q1==3 || q1==4
-                        i_to_do =2;
-                        i_to_lag=1;
-                    else
                         i_to_do =1;
                         i_to_lag=2;
+                    else
+                        i_to_do =2;
+                        i_to_lag=1;
                     end
                 else
                     % cannot decide yet

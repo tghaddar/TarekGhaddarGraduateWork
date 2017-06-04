@@ -111,6 +111,27 @@ while n_tasks>0
     end
     next_nodes = unique(next_nodes,'rows');
     
+    % remove multiple as's for the list of nexy nodes
+    % a=[1 2 3 4 4 3 2 5]
+    % [c,ia,ic]=unique(a);ia=ia';ic=ic';
+    % c =     1     2     3     4     5
+    % ia =    1     2     3     4     8
+    % ic =     1     2     3     4     4     3     2     5
+    [c,iu,ic]=unique(next_nodes(:,1:2),'rows');
+    to_keep=zeros(0,3);
+    for k=1:length(iu)
+        ind=find(ic==k);
+        if length(ind)>1
+            [~,lowest_as]=min(next_nodes(ind,3));
+            to_keep = [to_keep ; next_nodes(ind(lowest_as),:)];
+        elseif length(ind)==1
+            to_keep = [to_keep ; next_nodes(ind(1),:)];
+        else
+            error('ind must be >=1 in %s',mfilename);
+        end
+    end
+    next_nodes=to_keep;
+    
     % check that these next nodes are free
     for k=length(next_nodes(:,1)):-1:1
         quad=next_nodes(k,2);
@@ -134,7 +155,7 @@ while n_tasks>0
     % remove current nodes from tasks
     n_tasks = n_tasks - length(current_nodes(:,1));
 
-    % also remove the nodes that have been completed from the not_ready buffer
+    % also remove the nodes that have been completed from the potentially_next buffer
     for k=1:length(current_nodes(:,1))
         ind = find(ismember(potentially_next,current_nodes(k,:),'rows'));
         if ~isempty(ind)

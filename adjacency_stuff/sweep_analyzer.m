@@ -1,8 +1,8 @@
 close all; clear variables; % clc;
 % 
 % number of cut lines
-n_cutx = 8;
-n_cuty = 8;
+n_cutx = 15;
+n_cuty = 15;
 % partition_type='debug_regular';
 % partition_type='debug_random';
 % partition_type='regular';
@@ -22,7 +22,7 @@ plot_dag=true;
 % do_plot_sweep=true;
 % rez1 = perform_sweep(diG,order,X,Y,nx,ny,do_plot_sweep);
 
-n_angle_sets=1;
+n_angle_sets=5;
 do_plot_sweep=true;
 rez = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,do_plot_sweep);
 
