@@ -1,4 +1,4 @@
-function result = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,partition_type,do_plot_sweep)
+function result = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,conflict_option,partition_type,do_plot_sweep)
 
 n_quad=4;
 %%% init phase for all quadrants and all angle sets
@@ -152,7 +152,7 @@ while n_tasks>0
     
     % resolve conflicts (nodes doing more than one task)
     [current_nodes,potentially_next,stop_sweep]=resolve_sweep_conflicts(diG,order,corners,...
-        current_nodes,potentially_next,nx,ny);
+        current_nodes,potentially_next,nx,ny,conflict_option);
     
     % remove current nodes from tasks
     n_tasks = n_tasks - length(current_nodes(:,1));
@@ -200,7 +200,7 @@ while n_tasks>0
 end
 
 if do_plot_sweep
-    plot_sweep_as(wave,X,Y,nx,ny,partition_type,n_angle_sets);
+    plot_sweep_as(wave,X,Y,nx,ny,partition_type,n_angle_sets,conflict_option);
 end
 % save all results
 result.n_stages= n_stages;

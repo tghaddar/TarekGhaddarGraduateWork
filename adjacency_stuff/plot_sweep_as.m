@@ -1,6 +1,6 @@
-function plot_sweep_as(wave,X,Y,nx,ny,partition_type,n_angle_sets)
+function plot_sweep_as(wave,X,Y,nx,ny,partition_type,n_angle_sets,conflict_option)
 
-filename_gif=sprintf('./sweep_pix/sweep_%s_%dx%d_as%d.gif',partition_type,nx,ny,n_angle_sets);
+filename_gif=sprintf('./sweep_pix/sweep_%s_%dx%d_as%d_%s.gif',partition_type,nx,ny,n_angle_sets,conflict_option);
 
 n_stages = length(wave);
 

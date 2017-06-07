@@ -1,4 +1,4 @@
-function  [current,next,stop_sweep]=resolve_sweep_conflicts(diG,order,corners,current,next,nx,ny)
+function  [current,next,stop_sweep]=resolve_sweep_conflicts(diG,order,corners,current,next,nx,ny,conflict_option)
 
 % get list of current nodes
 nodes_only = current(:,1);
@@ -42,9 +42,8 @@ end
 
 to_do =zeros(0,3);
 to_lag=zeros(0,3);
-option='old';
 % resolve conflicts node by node
-switch option
+switch conflict_option
     case 'old'
         % using quadrant priority
         [to_do,to_lag,conflict,stop_sweep] = quadrant_priority(to_do,to_lag,conflict,nx,ny);
@@ -52,7 +51,7 @@ switch option
         if length(conflict)>0 && ~stop_sweep
             [to_do,to_lag,conflict,stop_sweep] = depth_of_graph(diG,order,corners,to_do,to_lag,conflict,nx,ny);
         end
-    case 'depth_of_graph'
+    case 'dog'
         [to_do,to_lag,conflict,stop_sweep] = depth_of_graph(diG,order,corners,to_do,to_lag,conflict,nx,ny);
 end
 % assign no_conflict and resolved conflicts to current
