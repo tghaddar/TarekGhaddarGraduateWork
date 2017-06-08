@@ -2,7 +2,11 @@ function [diGG,order,corners]=create_adjacency_matrices(X,Y,nx,ny,plot_mesh,plot
 
 % adjacency matrix
 n=nx*ny;
-A = zeros(n,n);
+if n<=100
+    A = zeros(n,n);
+else
+    A = spalloc(n,n,(2+2*length(X))*n);
+end
 
 % corner nodes of graph (needed for sweep by quadrant)
 %   2---4
