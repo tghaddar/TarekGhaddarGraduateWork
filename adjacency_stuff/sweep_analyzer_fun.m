@@ -30,8 +30,8 @@ else
         %%% get input from varargin
     inp=varargin{1};
     
-    n_cut_x = inp.n_cutx;
-    n_cut_y = inp.n_cuty;
+    n_cutx = inp.n_cutx;
+    n_cuty = inp.n_cuty;
     partition_type = inp.partition_type;
     
     n_angle_sets = inp.n_angle_sets;
@@ -62,18 +62,29 @@ end
 
 switch conflict_option
     case {'old','dog'}
-        rez = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,conflict_option,partition_type,do_plot_sweep);
+        rez = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,conflict_option,...
+            partition_type,do_plot_sweep);
+        varargout{1}=rez;
+        if nargout~=1
+            error('nargout should be =1, it is %d, in %s',nargout,mfilename);
+        end
     case 'both'
         rez_old = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,'old',...
             partition_type,do_plot_sweep);
+        varargout{1}=rez_old;
         rez_dog = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,'dog',...
             partition_type,do_plot_sweep);
+        varargout{2}=rez_old;
+        if nargout~=2
+            error('nargout should be =2, it is %d, in %s',nargout,mfilename);
+        end
 end
 
 if save_case
     filename_mat=sprintf('%s_%dx%d_as%d_v%d.mat',partition_type,nx,ny,n_angle_sets,save_ID);
     save(filename_mat, 'X', 'Y', 'nx', 'ny', 'rez_old', 'rez_dog');
 end
+
 
 return
 
