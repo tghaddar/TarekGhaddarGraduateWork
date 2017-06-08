@@ -14,9 +14,9 @@ inp.conflict_option = 'both';
 cutx = [3 5 10 20 50];
 as   = [ 1 3 5 10 20];
 k=0;
-k=k+1;   partition_type{k} = 'regular';
-k=k+1; partition_type{k} = 'random';
+k=k+1; partition_type{k} = 'regular';
 k=k+1; partition_type{k} = 'mild_random';
+k=k+1; partition_type{k} = 'random';
 k=k+1; partition_type{k} = 'worst';
 
 % cutx = [ 3 ];
