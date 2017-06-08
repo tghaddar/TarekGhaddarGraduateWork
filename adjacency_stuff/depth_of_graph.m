@@ -74,13 +74,15 @@ for k=1:conflicted
         i_to_do =ind_sort(1);
         i_to_lag=ind_sort(2:end);
     else
+        % get quadrants of the nodes with longest DOG
         qq=q(ind_sort(ind));
+        % find which one has priority
         for j=1:length(ind)
             indj(j)=find(q_prio==qq(j));
         end
         [~,best]=min(indj);
         i_to_do=ind_sort(ind(best));
-        i_to_lag=[ind_sort(1:ind(best)-1) ind_sort(ind(best)+1:end)];
+        i_to_lag=[ind_sort(1:ind(best)-1) ; ind_sort(ind(best)+1:end)];
         % clean up before next conflict
         clear qq indj 
     end
