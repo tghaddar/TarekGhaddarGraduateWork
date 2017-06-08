@@ -1,7 +1,7 @@
 clear variables; close all; clc;
 
-load sweep_analysis.mat
-
+load sweep_analysis_jcr_v1.mat
+n_stages(:,:,:,1)=[];
 len=length(n_stages(1,1,1,:));
 switch len
     case 1
@@ -22,13 +22,13 @@ for i_partition=1:length(partition_type)
     name = regexprep(name,'_',' ');
     for i_as=1:length(as)
         if ~dog_only
-            plot(as,n_stages(i_partition,:,i_as,1),'-+'); 
+            plot(cutx,n_stages(i_partition,:,i_as,1),'-+'); 
             leg=char(leg,sprintf('%s, as=%d, pdt',name,as(i_as)));
         end
-        plot(as,n_stages(i_partition,:,i_as,end),'-o'); 
+        plot(cutx,n_stages(i_partition,:,i_as,end),'-o'); 
         leg=char(leg,sprintf('%s, as=%d, dog',name,as(i_as)));
     end
-    title(sprintf('Partition %s',partition_type{i_partition}));
+    title(sprintf('Partition %s',name));
     ylabel('n stages');
     xlabel('cuts in x/y');
     grid on
@@ -45,10 +45,10 @@ for i_as=1:length(as)
         name = partition_type{i_partition};
         name = regexprep(name,'_',' ');
         if ~dog_only
-            plot(as,n_stages(i_partition,:,i_as,1),'-+');
+            plot(cutx,n_stages(i_partition,:,i_as,1),'-+');
             leg=char(leg,sprintf('%s, as=%d, pdt',name,as(i_as)));
         end
-        plot(as,n_stages(i_partition,:,i_as,end),'-o');
+        plot(cutx,n_stages(i_partition,:,i_as,end),'-o');
         leg=char(leg,sprintf('%s, as=%d, dog',name,as(i_as)));
     end
     title(sprintf('Angle set %d',as(i_as)));

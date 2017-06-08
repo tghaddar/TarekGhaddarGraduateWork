@@ -35,7 +35,11 @@ end
 % as   =[ 1 3 ];
 % k=1;   partition_type{k} = 'regular';
 
-n_stages=zeros(length(partition_type),length(cutx),length(as),2);
+if strcmp(inp.conflict_option,'both')
+    n_stages=zeros(length(partition_type),length(cutx),length(as),2);
+else
+    n_stages=zeros(length(partition_type),length(cutx),length(as),1);
+end
 
 for i_partition=1:length(partition_type)
     inp.partition_type = partition_type{i_partition};
@@ -46,9 +50,14 @@ for i_partition=1:length(partition_type)
             inp.n_angle_sets = as(i_as);
             % call analyzer
             fprintf('Working on %s, cut=%d, as=%d\n',partition_type{i_partition},cutx(i_cutx),as(i_as));
-            [out_pdt,out_dog]=sweep_analyzer_fun(inp);
-            n_stages(i_partition,i_cutx,i_as,1)=out_pdt.n_stages;
-            n_stages(i_partition,i_cutx,i_as,2)=out_dog.n_stages;
+            if strcmp(inp.conflict_option,'both')
+                [out_pdt,out_dog]=sweep_analyzer_fun(inp);
+                n_stages(i_partition,i_cutx,i_as,1)=out_pdt.n_stages;
+                n_stages(i_partition,i_cutx,i_as,2)=out_dog.n_stages;
+            else
+                [out]=sweep_analyzer_fun(inp);
+                n_stages(i_partition,i_cutx,i_as,1)=out.n_stages;
+            end
             fprintf('\n\n');
         end
     end
