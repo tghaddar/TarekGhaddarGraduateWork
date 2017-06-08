@@ -8,16 +8,28 @@ inp.do_plot_sweep = false;
 inp.save_case = false;
 inp.save_ID = 0;
 
-inp.conflict_option = 'both';
+inp.conflict_option = 'dog';
 
 % list of parameters that vary
-cutx = [3 5 10 20 50];
-as   = [ 1 3 5 10 20];
-k=0;
-k=k+1; partition_type{k} = 'regular';
-k=k+1; partition_type{k} = 'mild_random';
-k=k+1; partition_type{k} = 'random';
-k=k+1; partition_type{k} = 'worst';
+testname = 'jcr_v2';
+switch testname
+    case 'jcr_v1'
+        cutx = [3 5 10 20 50];
+        as   = [ 1 3 5 10 20];
+        k=0;
+        k=k+1; partition_type{k} = 'regular';
+        k=k+1; partition_type{k} = 'mild_random';
+        k=k+1; partition_type{k} = 'random';
+        k=k+1; partition_type{k} = 'worst';
+    case 'jcr_v2'
+        cutx = [3 5 10 20 50 100 150 200 300 400 500];
+        as   = [1];
+        k=0;
+        k=k+1; partition_type{k} = 'regular';
+        k=k+1; partition_type{k} = 'mild_random';
+        k=k+1; partition_type{k} = 'random';
+        k=k+1; partition_type{k} = 'worst';
+end
 
 % cutx = [ 3 ];
 % as   =[ 1 3 ];
@@ -42,6 +54,7 @@ for i_partition=1:length(partition_type)
     end
 end
 
-save sweep_analysis.mat partition_type cutx as n_stages
+file_save =sprintf('sweep_analysis_%s.mat',testname);
+save(file_save,'partition_type','cutx','as','n_stages')
 
 disp('done');

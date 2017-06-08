@@ -2,6 +2,16 @@ clear variables; close all; clc;
 
 load sweep_analysis.mat
 
+len=length(n_stages(1,1,1,:));
+switch len
+    case 1
+        dog_only=true;
+    case 2
+        dog_only=false;
+    otherwise
+        error('only 2 conflict resolution options max: %d in %s',len,mfilename);
+end
+
 % one figure per partition type, nstages versus ncuts for various angle
 % sets
 for i_partition=1:length(partition_type)
@@ -11,9 +21,11 @@ for i_partition=1:length(partition_type)
     %     name(regexp(name,'_'))=[] ;
     name = regexprep(name,'_',' ');
     for i_as=1:length(as)
-        plot(as,n_stages(i_partition,:,i_as,1),'-+'); 
-        leg=char(leg,sprintf('%s, as=%d, pdt',name,as(i_as)));
-        plot(as,n_stages(i_partition,:,i_as,2),'-o'); 
+        if ~dog_only
+            plot(as,n_stages(i_partition,:,i_as,1),'-+'); 
+            leg=char(leg,sprintf('%s, as=%d, pdt',name,as(i_as)));
+        end
+        plot(as,n_stages(i_partition,:,i_as,end),'-o'); 
         leg=char(leg,sprintf('%s, as=%d, dog',name,as(i_as)));
     end
     title(sprintf('Partition %s',partition_type{i_partition}));
@@ -32,9 +44,11 @@ for i_as=1:length(as)
     for i_partition=1:length(partition_type)
         name = partition_type{i_partition};
         name = regexprep(name,'_',' ');
-        plot(as,n_stages(i_partition,:,i_as,1),'-+');
-        leg=char(leg,sprintf('%s, as=%d, pdt',name,as(i_as)));
-        plot(as,n_stages(i_partition,:,i_as,2),'-o');
+        if ~dog_only
+            plot(as,n_stages(i_partition,:,i_as,1),'-+');
+            leg=char(leg,sprintf('%s, as=%d, pdt',name,as(i_as)));
+        end
+        plot(as,n_stages(i_partition,:,i_as,end),'-o');
         leg=char(leg,sprintf('%s, as=%d, dog',name,as(i_as)));
     end
     title(sprintf('Angle set %d',as(i_as)));
