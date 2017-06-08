@@ -2,7 +2,8 @@ clear variables; close all; clc;
 
 load sweep_analysis.mat
 
-% one figure per partition type, nstages versus ncuts
+% one figure per partition type, nstages versus ncuts for various angle
+% sets
 for i_partition=1:length(partition_type)
     figure(i_partition); hold all
     leg=char('dummy');
@@ -20,10 +21,11 @@ for i_partition=1:length(partition_type)
     xlabel('cuts in x/y');
     grid on
     leg(1,:)=[];
-    legend(leg,'Location','Best')
+    legend(leg,'Location','northwest')
 end
 
-% one figure per angle set, nstages versus ncuts
+% one figure per angle set, nstages versus ncuts for various partition
+% types
 for i_as=1:length(as)
     figure(10+i_as); hold all
     leg=char('dummy');
