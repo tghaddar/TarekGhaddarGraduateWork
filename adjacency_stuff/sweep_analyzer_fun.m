@@ -74,7 +74,7 @@ switch conflict_option
         varargout{1}=rez_old;
         rez_dog = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,'dog',...
             partition_type,do_plot_sweep);
-        varargout{2}=rez_old;
+        varargout{2}=rez_dog;
         if nargout~=2
             error('nargout should be =2, it is %d, in %s',nargout,mfilename);
         end
