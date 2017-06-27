@@ -1,7 +1,10 @@
 clear variables; close all; clc;
 
-load sweep_analysis_jcr_v1.mat
-n_stages(:,:,:,1)=[];
+% load sweep_analysis_jcr_v1.mat
+% n_stages(:,:,:,1)=[];
+
+load sweep_analysis_jcr_v2.mat
+
 len=length(n_stages(1,1,1,:));
 switch len
     case 1

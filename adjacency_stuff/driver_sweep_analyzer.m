@@ -11,7 +11,7 @@ inp.save_ID = 0;
 inp.conflict_option = 'dog';
 
 % list of parameters that vary
-testname = 'jcr_v2';
+testname = 'jcr_v5b';
 switch testname
     case 'jcr_v1'
         cutx = [3 5 10 20 50];
@@ -22,13 +22,40 @@ switch testname
         k=k+1; partition_type{k} = 'random';
         k=k+1; partition_type{k} = 'worst';
     case 'jcr_v2'
-        cutx = [3 5 10 20 50 100 150 200 300 400 500];
+        cutx = [3 5 10 20 50 100 150 200];
         as   = [1];
         k=0;
         k=k+1; partition_type{k} = 'regular';
         k=k+1; partition_type{k} = 'mild_random';
         k=k+1; partition_type{k} = 'random';
         k=k+1; partition_type{k} = 'worst';
+    case 'jcr_v3'
+        cutx = [200];
+        as   = [1];
+        k=0;
+        k=k+1; partition_type{k} = 'worst';
+    case 'jcr_v4a'
+        cutx = 10;
+        as   = [1];
+        k=0;
+        k=k+1; partition_type{k} = 'regular';
+    case 'jcr_v4b'
+        cutx = 20*ones(10,1); % 20 realizations with 10 cuts
+        as   = [1];
+        k=0;
+        k=k+1; partition_type{k} = 'mild_random';
+        k=k+1; partition_type{k} = 'random';
+    case 'jcr_v5a'
+        cutx = 50;
+        as   = [1];
+        k=0;
+        k=k+1; partition_type{k} = 'regular';
+    case 'jcr_v5b'
+        cutx = 50*ones(20,1); % 20 realizations with 50 cuts
+        as   = [1];
+        k=0;
+        k=k+1; partition_type{k} = 'mild_random';
+        k=k+1; partition_type{k} = 'random';
 end
 
 % cutx = [ 3 ];
