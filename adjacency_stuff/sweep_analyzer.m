@@ -1,8 +1,8 @@
 close all; clc; clear variables;
 
 % number of cut lines
-n_cutx = 4;
-n_cuty = 4;
+n_cutx = 19;
+n_cuty = 19;
 % partition_type='debug_regular';
 % partition_type='debug_random';
 % partition_type='debug_random1818';
@@ -10,7 +10,7 @@ n_cuty = 4;
 partition_type='random';
 % partition_type='mild_random';
 % partition_type='mild_random1818';
-% partition_type='worst';
+partition_type='worst';
 
 % create partition typpe
 [X,Y,nx,ny] = create_mesh_partition(n_cutx,n_cuty,partition_type);
@@ -27,10 +27,10 @@ plot_dag=false;
 % rez1 = perform_sweep(diG,order,X,Y,nx,ny,do_plot_sweep);
 
 do_plot_sweep=true;
-n_angle_sets=2;
-conflict_option='old';
-rez_old = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,conflict_option,...
-    partition_type,do_plot_sweep);
+n_angle_sets=1;
+% conflict_option='old';
+% rez_old = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,conflict_option,...
+%     partition_type,do_plot_sweep);
 conflict_option='dog';
 rez_dog = perform_sweep_angle_set(diG,order,corners,X,Y,nx,ny,n_angle_sets,conflict_option,...
     partition_type,do_plot_sweep);

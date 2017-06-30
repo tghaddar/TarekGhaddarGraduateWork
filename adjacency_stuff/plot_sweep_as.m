@@ -2,6 +2,8 @@ function plot_sweep_as(wave,X,Y,nx,ny,partition_type,n_angle_sets,conflict_optio
 
 filename_gif=sprintf('./sweep_pix/sweep_%s_%dx%d_as%d_%s.gif',partition_type,nx,ny,n_angle_sets,conflict_option);
 
+filename_png=sprintf('./sweep_pix/sweep_%s_%dx%d_as%d_%s_',partition_type,nx,ny,n_angle_sets,conflict_option);
+
 n_stages = length(wave);
 
 figure(100);
@@ -59,8 +61,8 @@ for s=1:n_stages
     end
     title(sprintf('Stage %d',s));
     if n_stages <= 999
-%         filename=sprintf('./sweep_pix/sweep_stage_%0.3d.png',s);
-%         print('-dpng',filename);
+        filename=sprintf('%s%d.png',filename_png,s);
+        print('-dpng',filename);
         drawnow
         frame = getframe(101);
         im = frame2im(frame);

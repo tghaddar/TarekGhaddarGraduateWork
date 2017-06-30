@@ -25,10 +25,10 @@ for i_partition=1:length(partition_type)
     name = regexprep(name,'_',' ');
     for i_as=1:length(as)
         if ~dog_only
-            plot(cutx,n_stages(i_partition,:,i_as,1),'-+'); 
+            plot(cutx,n_stages(i_partition,:,i_as,1),'-+','LineWidth',3); 
             leg=char(leg,sprintf('%s, as=%d, pdt',name,as(i_as)));
         end
-        plot(cutx,n_stages(i_partition,:,i_as,end),'-o'); 
+        plot(cutx,n_stages(i_partition,:,i_as,end),'-o','LineWidth',3); 
         leg=char(leg,sprintf('%s, as=%d, dog',name,as(i_as)));
     end
     title(sprintf('Partition %s',name));
@@ -48,10 +48,10 @@ for i_as=1:length(as)
         name = partition_type{i_partition};
         name = regexprep(name,'_',' ');
         if ~dog_only
-            plot(cutx,n_stages(i_partition,:,i_as,1),'-+');
+            plot(cutx,n_stages(i_partition,:,i_as,1),'-+','LineWidth',3);
             leg=char(leg,sprintf('%s, as=%d, pdt',name,as(i_as)));
         end
-        plot(cutx,n_stages(i_partition,:,i_as,end),'-o');
+        plot(cutx,n_stages(i_partition,:,i_as,end),'-o','LineWidth',3);
         leg=char(leg,sprintf('%s, as=%d, dog',name,as(i_as)));
     end
     title(sprintf('Angle set %d',as(i_as)));
@@ -59,7 +59,8 @@ for i_as=1:length(as)
     xlabel('cuts in x/y');
     grid on
     leg(1,:)=[];
-    legend(leg,'Location','northwest')
+    hl=legend(leg,'Location','northwest');
+    set(hl,'FontSize',14); 
 end
 
 
