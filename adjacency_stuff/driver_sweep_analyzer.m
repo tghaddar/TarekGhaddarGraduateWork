@@ -11,7 +11,7 @@ inp.save_ID = 0;
 inp.conflict_option = 'dog';
 
 % list of parameters that vary
-testname = 'jcr_v7b';
+testname = 'jcr_v6a';
 switch testname
     case 'jcr_v1'
         cutx = [3 5 10 20 50];
@@ -56,7 +56,22 @@ switch testname
         k=0;
         k=k+1; partition_type{k} = 'mild_random';
         k=k+1; partition_type{k} = 'random';
-
+    case 'jcr_v6a'
+        cutx = [300];
+        as   = [1];
+        k=0;
+        k=k+1; partition_type{k} = 'worst';
+        k=k+1; partition_type{k} = 'regular';
+        k=k+1; partition_type{k} = 'mild_random';
+        k=k+1; partition_type{k} = 'random';
+    case 'jcr_v6b'
+        cutx = [400];
+        as   = [1];
+        k=0;
+        k=k+1; partition_type{k} = 'regular';
+        k=k+1; partition_type{k} = 'mild_random';
+        k=k+1; partition_type{k} = 'random';
+        k=k+1; partition_type{k} = 'worst';
     case 'jcr_v7a'
         cutx = [1 2 3 4 5 10 20];
         as   = [1 3 5];
