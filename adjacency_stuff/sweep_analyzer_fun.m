@@ -81,8 +81,14 @@ switch conflict_option
 end
 
 if save_case
-    filename_mat=sprintf('%s_%dx%d_as%d_v%d.mat',partition_type,nx,ny,n_angle_sets,save_ID);
-    save(filename_mat, 'X', 'Y', 'nx', 'ny', 'rez_old', 'rez_dog');
+    switch conflict_option
+        case {'old','dog'}
+            filename_mat=sprintf('%s_%dx%d_as%d_v%d.mat',partition_type,nx,ny,n_angle_sets,save_ID);
+            save(filename_mat, 'X', 'Y', 'nx', 'ny', 'rez');
+        case 'both'
+            filename_mat=sprintf('%s_%dx%d_as%d_v%d.mat',partition_type,nx,ny,n_angle_sets,save_ID);
+            save(filename_mat, 'X', 'Y', 'nx', 'ny', 'rez_old', 'rez_dog');
+    end
 end
 
 
