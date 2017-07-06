@@ -5,13 +5,13 @@ inp.plot_mesh = false;
 inp.plot_dag = false;
 inp.do_plot_sweep = false;
 
-inp.save_case = false;
+inp.save_case = true;
 inp.save_ID = 0;
 
 inp.conflict_option = 'dog';
 
 % list of parameters that vary
-testname = 'jcr_v5b';
+testname = 'jcr_v7b';
 switch testname
     case 'jcr_v1'
         cutx = [3 5 10 20 50];
@@ -53,6 +53,18 @@ switch testname
     case 'jcr_v5b'
         cutx = 50*ones(20,1); % 20 realizations with 50 cuts
         as   = [1];
+        k=0;
+        k=k+1; partition_type{k} = 'mild_random';
+        k=k+1; partition_type{k} = 'random';
+
+    case 'jcr_v7a'
+        cutx = [1 2 3 4 5 10 20];
+        as   = [1 3 5];
+        k=0;
+        k=k+1; partition_type{k} = 'regular';
+    case 'jcr_v7b'
+        cutx = kron([1 2 3 4 5 10 20],ones(1,20)); % 20 realizations with 10 cuts
+        as   = [1 3 5];
         k=0;
         k=k+1; partition_type{k} = 'mild_random';
         k=k+1; partition_type{k} = 'random';
