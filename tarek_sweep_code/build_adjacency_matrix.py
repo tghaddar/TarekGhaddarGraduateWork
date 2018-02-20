@@ -1,5 +1,5 @@
 #This builds the adjacency matrix for all subsets. ycuts are stored by column. 
-def build_adjacency(global_bounds, xcuts, ycuts,i_val,j_val):
+def build_adjacency(global_bounds,n_x, n_y, ycuts):
   
   #The number of subsets in our domain.
   num_subsets = len(global_bounds)
@@ -10,16 +10,17 @@ def build_adjacency(global_bounds, xcuts, ycuts,i_val,j_val):
     #The neighbors of this subset.
     neighbors = []
     #The bounds of this subset.
-    xmin = global_bounds[s][0]
-    xmax = global_bounds[s][1]
     ymin = global_bounds[s][2]
     ymax = global_bounds[s][3]
+
+    
+    i_val = int(s/(n_y+1))
     
     #The number of interior ycuts in each column
     n_y = len(ycuts[0]) - 2
     
     #The number of columns in our domain.
-    numcol = len(xcuts) - 1
+    numcol = n_x+1
     #The number of rows in our domain.
     numrow = n_y + 1
     
