@@ -1,10 +1,13 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 #This builds the adjacency matrix for all subsets. ycuts are stored by column. 
 def build_adjacency(global_bounds,n_x, n_y, ycuts):
   
   #The number of subsets in our domain.
   num_subsets = len(global_bounds)
   
-  adjacency_matrix = []
+  adjacency_list = []
   
   for s in range(0, num_subsets):
     #The neighbors of this subset.
@@ -62,8 +65,52 @@ def build_adjacency(global_bounds,n_x, n_y, ycuts):
           if ( ymin < next_cut and ymax > cut ):
             neighbors.append((i_val-1)*numrow + j )
     
-    adjacency_matrix.append(neighbors)        
+    adjacency_list.append(neighbors)        
+
+
+  plt.figure(1)
+  subset_centers = []
+  for i in range(0,num_subsets):
+    subset_boundary = global_bounds[i]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+  
+    center_x = (xmin+xmax)/2
+    center_y = (ymin+ymax)/2
+  
+    subset_centers.append([center_x, center_y])
+  
+    x = [xmin, xmax, xmax, xmin, xmin]
+    y = [ymin, ymin, ymax, ymax, ymin]
+  
+    plt.plot(x,y,'b')
+  
+  
+  for i in range (0, num_subsets):
+  
+    neighbors = adjacency_list[i]
+  
+    for j in range(0, len(neighbors)):
+      n = neighbors[j]
+  
+      x = [subset_centers[i][0], subset_centers[n][0]]
+      y = [subset_centers[i][1], subset_centers[n][1]]
+      plt.plot(x,y,'r-o')
+  
+  plt.savefig('adjacency_matrix.pdf')
+
+
+  #The adjacency matrix in matrix form instead of in sparse list form.
+  adjacency_matrix = np.zeros((num_subsets,num_subsets))
+  
+  for i in range(0,num_subsets):
     
+    neighbors = adjacency_list[i]
+    for j in range(0,len(neighbors)):
+      
+      adjacency_matrix[i][neighbors[j]] = 1
   
   return adjacency_matrix
 

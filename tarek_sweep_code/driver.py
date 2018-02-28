@@ -1,17 +1,17 @@
 #importing the adjacency building capabilities.
 from build_adjacency_matrix import build_adjacency
 from build_global_subset_boundaries import build_global_subset_boundaries
-from build_graph import build_graph
 import random
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
 #Number of cuts in x direction.
-N_x = 2
+N_x = 1
 #Number of cuts in y direction.
-N_y = 2
+N_y = 1
 
 #Number of subsets
 num_subsets = (N_x+1)*(N_y+1)
@@ -60,46 +60,24 @@ y_cuts.append(y_cuts_column)
 global_subset_boundaries = build_global_subset_boundaries(N_x,N_y,x_cuts,y_cuts)
 adjacency_matrix = build_adjacency(global_subset_boundaries,N_x,N_y,y_cuts)
 
-
-plt.figure(1)
-
-subset_centers = []
-
-for i in range(0,num_subsets):
-  subset_boundary = global_subset_boundaries[i]
-  xmin = subset_boundary[0]
-  xmax = subset_boundary[1]
-  ymin = subset_boundary[2]
-  ymax = subset_boundary[3]
-
-  center_x = (xmin+xmax)/2
-  center_y = (ymin+ymax)/2
-
-  subset_centers.append([center_x, center_y])
-
-  x = [xmin, xmax, xmax, xmin, xmin]
-  y = [ymin, ymin, ymax, ymax, ymin]
-
-  plt.plot(x,y,'b')
-
-
-for i in range (0, num_subsets):
-
-  neighbors = adjacency_matrix[i]
-
-  for j in range(0, len(neighbors)):
-    n = neighbors[j]
-
-    x = [subset_centers[i][0], subset_centers[n][0]]
-    y = [subset_centers[i][1], subset_centers[n][1]]
-    plt.plot(x,y,'r-o')
-
-plt.savefig('adjacency_matrix.pdf')
-
 #The adjacency matrix has been computed and plotted.
+#Getting the upper triangular portion of the adjacency_matrix
+adjacency_matrix_0 = np.triu(adjacency_matrix)
 #Time to build the graph
-G = build_graph(adjacency_matrix)
+G = nx.DiGraph(adjacency_matrix_0)
+#Getting the in degree of the graph's nodes
+a = [x for  x in G.nodes() if G.in_degree(x) == 0]
+if (len(a) != 1):
+  raise Exception('Only one node should have an in degree of 0')
+a = a[0]
 
 plt.figure(2)
 nx.draw(G,with_labels = True)
 plt.savefig('digraph.pdf')
+
+#Test what lower triangular looks like
+adjacency_matrix_1 = np.tril(adjacency_matrix)
+G_1 = nx.DiGraph(adjacency_matrix_1)
+plt.figure(3)
+nx.draw(G_1,with_labels = True)
+plt.savefig('digraph1.pdf')
