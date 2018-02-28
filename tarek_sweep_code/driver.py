@@ -5,12 +5,13 @@ from build_graph import build_graph
 import random
 import matplotlib.pyplot as plt
 import networkx as nx
-
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
 #Number of cuts in x direction.
-N_x = 3
+N_x = 2
 #Number of cuts in y direction.
-N_y = 3
+N_y = 2
 
 #Number of subsets
 num_subsets = (N_x+1)*(N_y+1)
@@ -98,6 +99,7 @@ plt.savefig('adjacency_matrix.pdf')
 #The adjacency matrix has been computed and plotted.
 #Time to build the graph
 G = build_graph(adjacency_matrix)
+
 plt.figure(2)
 nx.draw(G,with_labels = True)
 plt.savefig('digraph.pdf')
