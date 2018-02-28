@@ -15,6 +15,7 @@ def build_adjacency(global_bounds,n_x, n_y, ycuts):
 
     
     i_val = int(s/(n_y+1))
+    j_val = int(s - i_val*(n_y + 1))
     
     #The number of interior ycuts in each column
     n_y = len(ycuts[0]) - 2
@@ -24,9 +25,18 @@ def build_adjacency(global_bounds,n_x, n_y, ycuts):
     #The number of rows in our domain.
     numrow = n_y + 1
     
-    #We are only adding right and left neighborsif our domain is more than one subset wide
+    #We only add top or bottom neighbors if our domain is more than one subset tall
+    if (numrow != 1):
+      if (j_val == 0):
+        neighbors.append(s+1)
+      elif (j_val == numrow - 1):
+        neighbors.append(s-1)
+      else:
+        neighbors.append(s+1)
+        neighbors.append(s-1)
+    
+    #We are only adding right and left neighbors if our domain is more than one subset wide
     if (numcol != 1):
-      
       #If we're in any column but the last one, we look to our right for potential neighbors.
       if (i_val < numcol - 1):
         #The ycut lines in the column to the right.

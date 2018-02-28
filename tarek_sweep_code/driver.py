@@ -1,14 +1,16 @@
 #importing the adjacency building capabilities.
 from build_adjacency_matrix import build_adjacency
 from build_global_subset_boundaries import build_global_subset_boundaries
+from build_graph import build_graph
 import random
 import matplotlib.pyplot as plt
+import networkx as nx
 
 
 #Number of cuts in x direction.
-N_x = 5
+N_x = 3
 #Number of cuts in y direction.
-N_y = 2
+N_y = 3
 
 #Number of subsets
 num_subsets = (N_x+1)*(N_y+1)
@@ -93,3 +95,9 @@ for i in range (0, num_subsets):
 
 plt.savefig('adjacency_matrix.pdf')
 
+#The adjacency matrix has been computed and plotted.
+#Time to build the graph
+G = build_graph(adjacency_matrix)
+plt.figure(2)
+nx.draw(G,with_labels = True)
+plt.savefig('digraph.pdf')
