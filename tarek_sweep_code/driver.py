@@ -8,10 +8,15 @@ import numpy as np
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
+plt.close("all")
+
 #Number of cuts in x direction.
 N_x = 1
 #Number of cuts in y direction.
 N_y = 1
+
+if (N_y > N_x):
+  raise Exception('N_x >= N_y because our model assumes P_x >= P_y' )
 
 #Number of subsets
 num_subsets = (N_x+1)*(N_y+1)
@@ -57,6 +62,11 @@ y_cuts_column.append(global_y_max)
 y_cuts_column.sort()
 y_cuts.append(y_cuts_column)
 
+#Test Case
+x_cuts[1] = 5
+y_cuts[0][1] = 3
+y_cuts[1][1] = 7
+
 global_subset_boundaries = build_global_subset_boundaries(N_x,N_y,x_cuts,y_cuts)
 adjacency_matrix = build_adjacency(global_subset_boundaries,N_x,N_y,y_cuts)
 
@@ -81,3 +91,8 @@ G_1 = nx.DiGraph(adjacency_matrix_1)
 plt.figure(3)
 nx.draw(G_1,with_labels = True)
 plt.savefig('digraph1.pdf')
+
+#To get the top left and bottom right quadrants, we have to reverse our ordering by column.
+adjacency_flip = np.zeros(num_subsets,num_subsets)
+
+
