@@ -80,33 +80,31 @@ nx.draw(G,with_labels = True)
 plt.savefig('digraph.pdf')
 
 #Test what lower triangular looks like
-adjacency_matrix_1 = np.tril(adjacency_matrix)
-G_1 = nx.DiGraph(adjacency_matrix_1)
+adjacency_matrix_3 = np.tril(adjacency_matrix)
+G_3 = nx.DiGraph(adjacency_matrix_3)
 plt.figure(3)
-nx.draw(G_1,with_labels = True)
-plt.savefig('digraph1.pdf')
+nx.draw(G_3,with_labels = True)
+plt.savefig('digraph3.pdf')
 
 #To get the top left and bottom right quadrants, we have to reverse our ordering by column.
 adjacency_flip,id_map = flip_adjacency(adjacency_matrix,N_y+1,N_x+1)
-adjacency_matrix_2 = np.triu(adjacency_flip)
+adjacency_matrix_1 = np.triu(adjacency_flip)
+G_1 = nx.DiGraph(adjacency_matrix_1)
+G_1 = nx.relabel_nodes(G_1,id_map,copy=True)
+plt.figure(4)
+nx.draw(G_1,with_labels=True)
+plt.savefig('digraph1.pdf')
+
+#Bottom right quadrant.
+adjacency_matrix_2 = np.tril(adjacency_flip)
 G_2 = nx.DiGraph(adjacency_matrix_2)
 G_2 = nx.relabel_nodes(G_2,id_map,copy=True)
-plt.figure(4)
+plt.figure(5)
 nx.draw(G_2,with_labels=True)
 plt.savefig('digraph2.pdf')
 
-#Bottom right quadrant.
-adjacency_matrix_3 = np.tril(adjacency_flip)
-G_3 = nx.DiGraph(adjacency_matrix_3)
-G_3 = nx.relabel_nodes(G_3,id_map,copy=True)
-plt.figure(5)
-nx.draw(G_3,with_labels=True)
-plt.savefig('digraph3.pdf')
+all_graphs = [G,G_1,G_2,G_3]
 
-#Getting the in degree of the graph's nodes
-a = [x for  x in G.nodes() if G.in_degree(x) == 0]
-if (len(a) != 1):
-  raise Exception('Only one node should have an in degree of 0')
-a = a[0]
+
 
 

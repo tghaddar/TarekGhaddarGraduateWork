@@ -38,7 +38,6 @@ def flip_adjacency(adjacency_matrix,numrow,numcol):
       new_neighbors[new_neighbor_id] = 1 
     
     #Adding the neighbors to the flipped adjacency matrix when ordered differently.
-    print(s, new_neighbors,len(indices))
     adjacency_flip[new_ss_id] = new_neighbors
       
   return adjacency_flip,id_map
