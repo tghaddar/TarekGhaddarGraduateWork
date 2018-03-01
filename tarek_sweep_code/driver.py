@@ -1,12 +1,13 @@
 #importing the adjacency building capabilities.
 from build_adjacency_matrix import build_adjacency
 from build_global_subset_boundaries import build_global_subset_boundaries
+from flip_adjacency import flip_adjacency
 import random
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning) 
+warnings.filterwarnings("ignore") 
 
 plt.close("all")
 
@@ -70,17 +71,10 @@ y_cuts[1][1] = 7
 global_subset_boundaries = build_global_subset_boundaries(N_x,N_y,x_cuts,y_cuts)
 adjacency_matrix = build_adjacency(global_subset_boundaries,N_x,N_y,y_cuts)
 
-#The adjacency matrix has been computed and plotted.
 #Getting the upper triangular portion of the adjacency_matrix
 adjacency_matrix_0 = np.triu(adjacency_matrix)
 #Time to build the graph
 G = nx.DiGraph(adjacency_matrix_0)
-#Getting the in degree of the graph's nodes
-a = [x for  x in G.nodes() if G.in_degree(x) == 0]
-if (len(a) != 1):
-  raise Exception('Only one node should have an in degree of 0')
-a = a[0]
-
 plt.figure(2)
 nx.draw(G,with_labels = True)
 plt.savefig('digraph.pdf')
@@ -93,6 +87,26 @@ nx.draw(G_1,with_labels = True)
 plt.savefig('digraph1.pdf')
 
 #To get the top left and bottom right quadrants, we have to reverse our ordering by column.
-adjacency_flip = np.zeros(num_subsets,num_subsets)
+adjacency_flip,id_map = flip_adjacency(adjacency_matrix,N_y+1,N_x+1)
+adjacency_matrix_2 = np.triu(adjacency_flip)
+G_2 = nx.DiGraph(adjacency_matrix_2)
+G_2 = nx.relabel_nodes(G_2,id_map,copy=True)
+plt.figure(4)
+nx.draw(G_2,with_labels=True)
+plt.savefig('digraph2.pdf')
+
+#Bottom right quadrant.
+adjacency_matrix_3 = np.tril(adjacency_flip)
+G_3 = nx.DiGraph(adjacency_matrix_3)
+G_3 = nx.relabel_nodes(G_3,id_map,copy=True)
+plt.figure(5)
+nx.draw(G_3,with_labels=True)
+plt.savefig('digraph3.pdf')
+
+#Getting the in degree of the graph's nodes
+a = [x for  x in G.nodes() if G.in_degree(x) == 0]
+if (len(a) != 1):
+  raise Exception('Only one node should have an in degree of 0')
+a = a[0]
 
 

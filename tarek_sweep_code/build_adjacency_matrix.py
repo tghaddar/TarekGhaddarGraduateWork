@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 #This builds the adjacency matrix for all subsets. ycuts are stored by column. 
 def build_adjacency(global_bounds,n_x, n_y, ycuts):
