@@ -2,6 +2,7 @@
 from build_adjacency_matrix import build_adjacency
 from build_global_subset_boundaries import build_global_subset_boundaries
 from flip_adjacency import flip_adjacency
+from perform_sweep import perform_sweep
 import random
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -104,6 +105,13 @@ nx.draw(G_2,with_labels=True)
 plt.savefig('digraph2.pdf')
 
 all_graphs = [G,G_1,G_2,G_3]
+
+#Angles per quadrant.
+n_angle = 1
+#Number of quadrants.
+n_quad = 4
+#Performing the sweep.
+n_stages = perform_sweep(all_graphs,n_angle,n_quad)
 
 
 

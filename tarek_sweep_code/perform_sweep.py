@@ -1,3 +1,5 @@
-def perform_sweep(all_graphs):
+import networkx as nx
+def perform_sweep(all_graphs,n_angle,n_quad):
+
+  num_subsets = nx.number_of_nodes(all_graphs[0])
   
-  for g in range(0,len(all_graphs)):
