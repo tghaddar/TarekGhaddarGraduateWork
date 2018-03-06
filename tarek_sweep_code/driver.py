@@ -113,8 +113,6 @@ n_quad = 4
 #Performing the sweep.
 n_stages = perform_sweep(all_graphs,n_angle)
 
-num = G.successors(0)
-print(G.predecessors())
 
 
 

@@ -1,12 +1,12 @@
-import networkx as nx
 import numpy as np
+import networkx as nx
 def perform_sweep(all_graphs,n_angle):
 
   num_subsets = nx.number_of_nodes(all_graphs[0])
   
   n_quad = 4
-  predecessors = np.empty(n_quad)
-  successors = np.empty(n_quad)
+  predecessors = {}
+  successors = {}
   
   for q in range(0,n_quad):
     
@@ -14,14 +14,14 @@ def perform_sweep(all_graphs,n_angle):
     current_graph = all_graphs[q]
     #Number of nodes in the graph.
     num_nodes = current_graph.number_of_nodes()
+    quad_pred = {}
+    quad_suc = {}
+    #starting_node = [x for  x in current_graph.nodes() if current_graph.in_degree(x) == 0][0]
+    for n in range (0, num_nodes):
+      #The predecessors for this quadrant's graph
+      quad_pred[n] = current_graph.predecessors(n)
+      #The successors for this quadrants's graph
+      quad_suc[n] = current_graph.successors(n)
     
-    starting_node = [x for  x in current_graph.nodes() if current_graph.in_degree(x) == 0][0]
-    
-    #The predecessors for this quadrant's graph
-    quad_pred = nx.predecessor(current_graph,starting_node)
-    print(quad_pred)
-    #The successors for this quadrants's graph
-    quad_suc = nx.predecessor(current_graph,starting_node)
-    
-#    predecessors[q] = quad_pred
-#    successors[q] = quad_suc
+    predecessors[q] = quad_pred
+    successors[q] = quad_suc
