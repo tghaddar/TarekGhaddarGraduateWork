@@ -25,3 +25,12 @@ def perform_sweep(all_graphs,n_angle):
     
     predecessors[q] = quad_pred
     successors[q] = quad_suc
+  
+  #All predecessors and successors have been populated for all nodes for all quadrant configurations of the graphs.
+  #Total Number of tasks in this problem.
+  n_tasks = num_subsets*n_angle*n_quad
+  num_stages = 0
+  
+    
+  
+  
