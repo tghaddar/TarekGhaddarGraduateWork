@@ -7,6 +7,7 @@ def perform_sweep(all_graphs,n_angle):
   n_quad = 4
   predecessors = {}
   successors = {}
+  starting_nodes = np.zeros(n_quad)
   
   for q in range(0,n_quad):
     
@@ -16,7 +17,7 @@ def perform_sweep(all_graphs,n_angle):
     num_nodes = current_graph.number_of_nodes()
     quad_pred = {}
     quad_suc = {}
-    #starting_node = [x for  x in current_graph.nodes() if current_graph.in_degree(x) == 0][0]
+    starting_nodes[q] = [x for  x in current_graph.nodes() if current_graph.in_degree(x) == 0][0]
     for n in range (0, num_nodes):
       #The predecessors for this quadrant's graph
       quad_pred[n] = current_graph.predecessors(n)
@@ -30,6 +31,19 @@ def perform_sweep(all_graphs,n_angle):
   #Total Number of tasks in this problem.
   n_tasks = num_subsets*n_angle*n_quad
   num_stages = 0
+  while n_tasks > 0:
+    
+    for q in range(0,n_quad):
+      current_nodes = []
+      
+      #If this sweep is just starting
+      if (num_stages == 0):
+        current_nodes.append(starting_nodes[q])
+      else:
+        current_nodes = predecessors[q][]
+        
+        
+  
   
     
   
