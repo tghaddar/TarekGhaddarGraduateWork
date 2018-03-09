@@ -47,11 +47,17 @@ def perform_sweep(all_graphs,n_angle):
       #Predecessors of this quadrant.
       quad_pred = predecessors[q]
       #Predecessors to remove for this quadrant.
-      nodes_to_remove = current_nodes[q]
+      potentially_remove = current_nodes[q]
       
-      for n in range(0,len(nodes_to_remove)):
-        node_to_remove = nodes_to_remove[n]
+      for n in range(0,len(potentially_remove)):
+        node_to_remove = potentially_remove[n]
         
+        #Check if this node has no predecessors.
+        if not quad_pred[node_to_remove]:
+          #If it doesn't have any predecessors, then it is ready to be solved.
+          #We have to remove it entirely from the dictionary of predecessors.
+          quad_pred = {k:[x for x in quad_pred[k] if x!= node_to_remove] for k in quad_pred}
+          
       
       #Updating global predecessors dictionary.
       predecessors[q] = quad_pred
