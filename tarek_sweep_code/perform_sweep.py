@@ -1,5 +1,7 @@
 import numpy as np
 import networkx as nx
+import collections
+from itertools import chain
 def perform_sweep(all_graphs,n_angle):
 
   #Number of nodes in the graph
@@ -39,7 +41,6 @@ def perform_sweep(all_graphs,n_angle):
   
   while n_tasks > 0:
     
-    potentially_next = dict.fromkeys(range(4))
     #We get nodes that are potentially next per quadrant and remove the current nodes from the quadrant.
     for q in range(0,n_quad):
       #Successors for this quadrant.
@@ -55,12 +56,36 @@ def perform_sweep(all_graphs,n_angle):
         #Check if this node has no predecessors.
         if not quad_pred[node_to_remove]:
           #If it doesn't have any predecessors, then it is ready to be solved.
-          #We have to remove it entirely from the dictionary of predecessors.
-          quad_pred = {k:[x for x in quad_pred[k] if x!= node_to_remove] for k in quad_pred}
-          
+          pass
+        else:
+          #If it still has predecessors, it is not ready to be solved and should not be in current nodes.
+          potentially_remove = [x for x in potentially_remove if x!= node_to_remove]
+        
       
-      #Updating global predecessors dictionary.
-      predecessors[q] = quad_pred
+      current_nodes[q] = potentially_remove
+        
+    #At this point, for every quadrant, we have removed any nodes from current_nodes that is not ready to be solved, meaning it still has predecessors. If a predecessors list for a node is empty, then we know it should be solved and belongs in current_nodes.
+    
+    #Checking for conflicts. We know our current nodes being solved in each quadrant. We look for any duplicate nodes in current_nodes, across quadrants.
+    #All the current nodes,across all quadrants flattened into a 1d array.
+    all_current_nodes = np.array(list(chain.from_iterable(current_nodes.values())))
+    #The nodes that have a conflict.
+    conflicted_nodes = [item for item, count in collections.Counter(all_current_nodes).items() if count > 1]
+    #Checking 
+    for  n in range(0,len(conflicted_nodes)):
+      current_node = conflicted_nodes[n]
+      #Pulling quadrants where this node exists.
+      quadrants = [k for k in current_nodes for x in current_nodes[k] if x == current_node]
+    
+    #We now know which nodes are conflicted. If it's not a conflicted node.
+    
+    #We have to remove it entirely from the dictionary of predecessors.
+    quad_pred = {k:[x for x in quad_pred[k] if x!= node_to_remove] for k in quad_pred}
+        
+    
+    #Updating global predecessors dictionary.
+    predecessors[q] = quad_pred
+    break
         
         
       
