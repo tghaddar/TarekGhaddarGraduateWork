@@ -76,6 +76,9 @@ def perform_sweep(all_graphs,n_angle):
       current_node = conflicted_nodes[n]
       #Pulling quadrants where this node exists.
       quadrants = [k for k in current_nodes for x in current_nodes[k] if x == current_node]
+      #Getting the graphs that we need.
+      conflict_graphs = [all_graphs[i] for i in quadrants]
+      winning_node = resolve_conflict(graphs,quadrants)
     
     #We now know which nodes are conflicted. If it's not a conflicted node.
     
