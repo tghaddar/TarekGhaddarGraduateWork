@@ -2,6 +2,7 @@ import numpy as np
 import networkx as nx
 import collections
 from itertools import chain
+from resolve_conflict import resolve_conflict
 def perform_sweep(all_graphs,n_angle):
 
   #Number of nodes in the graph
@@ -78,9 +79,8 @@ def perform_sweep(all_graphs,n_angle):
       quadrants = [k for k in current_nodes for x in current_nodes[k] if x == current_node]
       #Getting the graphs that we need.
       conflict_graphs = [all_graphs[i] for i in quadrants]
-      winning_node = resolve_conflict(graphs,quadrants)
-    
-    #We now know which nodes are conflicted. If it's not a conflicted node.
+      winning_quadrant = resolve_conflict(conflict_graphs,quadrants,current_node)
+      #The quadrant with the winning node keeps it in it's current nodes. The other quadrants remove this node.
     
     #We have to remove it entirely from the dictionary of predecessors.
     quad_pred = {k:[x for x in quad_pred[k] if x!= node_to_remove] for k in quad_pred}
@@ -89,8 +89,6 @@ def perform_sweep(all_graphs,n_angle):
     #Updating global predecessors dictionary.
     predecessors[q] = quad_pred
     break
-        
-        
       
     #if (num_stages != 1):
       #We check if the predecessors have been solved for this angle.
