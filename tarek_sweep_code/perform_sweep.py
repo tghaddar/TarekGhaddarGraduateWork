@@ -7,6 +7,8 @@ def perform_sweep(all_graphs,n_angle):
 
   #Number of nodes in the graph
   num_nodes = nx.number_of_nodes(all_graphs[0])
+  #Dictionary storing the current nodes at each stage.
+  wave = {}
   
   n_quad = 4
   predecessors = dict.fromkeys(range(n_quad))
@@ -35,7 +37,7 @@ def perform_sweep(all_graphs,n_angle):
   #All predecessors and successors have been populated for all nodes for all quadrant configurations of the graphs.
   #Total Number of tasks in this problem.
   n_tasks = num_nodes*n_angle*n_quad
-  num_stages = 1
+  num_stages = 0
   
   #Initially, the current_nodes are the starting nodes.
   current_nodes = starting_nodes
@@ -81,14 +83,37 @@ def perform_sweep(all_graphs,n_angle):
       conflict_graphs = [all_graphs[i] for i in quadrants]
       winning_quadrant = resolve_conflict(conflict_graphs,quadrants,current_node)
       #The quadrant with the winning node keeps it in it's current nodes. The other quadrants remove this node.
-    
-    #We have to remove it entirely from the dictionary of predecessors.
-    quad_pred = {k:[x for x in quad_pred[k] if x!= node_to_remove] for k in quad_pred}
-        
-    
-    #Updating global predecessors dictionary.
-    predecessors[q] = quad_pred
-    break
+      #This is the current_nodes for the winning quadrant.
+      current_nodes_wq = current_nodes[winning_quadrant]
       
-    #if (num_stages != 1):
-      #We check if the predecessors have been solved for this angle.
+      current_nodes = {k:[x for x in current_nodes[k] if x!=current_node] for k in current_nodes if k!=winning_quadrant}
+      #Adding back the winning quadrant 
+      current_nodes[winning_quadrant] = current_nodes_wq
+    
+      
+    #We have successfully distilled the current_nodes to things that will only be solved at this stage.
+    #We now have to remove all these nodes from the dictionary of predecessors entirely.
+    for key,value in current_nodes.items():
+      quad_pred = predecessors[key]
+      for i in range(0,len(value)):
+        quad_pred = {k:[x for x in quad_pred[k] if x!= value[i]] for k in quad_pred}
+      #Updating global predecessors dictionary.
+    predecessors[key] = quad_pred
+    
+    #Add the current nodes to this stage.
+    wave[num_stages] = current_nodes
+    num_stages += 1
+    #Subtracting the current nodes from the task
+    n_tasks -= sum(map(len,current_nodes.values()))
+    
+    #We now need to set the successors for the next stage.
+    next_nodes = dict.fromkeys(range(n_quad))
+    for q in range(0,n_quad):
+      quad_suc = successors[q]
+      quad_current_nodes = current_nodes[q]
+      next_nodes[q] = {k: for k in quad_suc}
+      
+    
+    
+    
+    
