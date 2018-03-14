@@ -105,13 +105,16 @@ def perform_sweep(all_graphs,n_angle):
     num_stages += 1
     #Subtracting the current nodes from the task
     n_tasks -= sum(map(len,current_nodes.values()))
+    break
     
     #We now need to set the successors for the next stage.
     next_nodes = dict.fromkeys(range(n_quad))
     for q in range(0,n_quad):
       quad_suc = successors[q]
       quad_current_nodes = current_nodes[q]
-      next_nodes[q] = {k: for k in quad_suc}
+      #NEED TO FLATTEN THIS LIST. But the logic is good.
+      next_nodes[q] = [quad_suc[x] for x in quad_current_nodes]
+      current_nodes[q] = next_nodes
       
     
     
