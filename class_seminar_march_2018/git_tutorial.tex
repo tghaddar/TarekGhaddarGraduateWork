@@ -1,0 +1,111 @@
+\pdfminorversion=4
+\documentclass[]{beamer}
+%for printing or having a crappy pdf reader backup
+%\documentclass[handout]{beamer}
+\mode<presentation>
+\usetheme{Madrid}
+\usecolortheme[RGB={80,0,0}]{structure}
+%teal \usecolortheme[RGB={0,128,128}]{structure}
+\useoutertheme{miniframes}
+\useinnertheme{default}
+\usepackage{color}
+\definecolor{Maroon}{RGB}{80,0,0}
+\definecolor{BurntOrange}{RGB}{204,85,0}
+\usepackage{setspace}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{verbatim}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{colortbl}
+%\usepackage[retainorgcmds]{IEEEtrantools}
+\usepackage{wrapfig}
+\usepackage[figurename=,tablename=]{caption}
+\usepackage{multirow}
+\usepackage{bm}
+\setbeamercolor{normal text}{fg=black}
+\setbeamercovered{dynamic}
+\beamertemplatetransparentcovereddynamicmedium
+%\usepackage{chronology}
+\setbeamertemplate{caption}[numbered]
+\usepackage{colortbl}
+\newcommand {\mathsym}[1]{{}}
+\newcommand {\unicode}{{}}
+\newcommand{\om}{\boldsymbol{\Omega}}
+\newcommand{\etal}{{\it et al.\,}}
+\newcommand{\vr}{\vec{r}}
+\newcommand{\vo}{\vec{\Omega}}
+\newcolumntype{L}{>{\centering\arraybackslash}m{3cm}}
+\newcommand{\tcr}[1]{\textcolor{red}{#1}}
+%Creating a norm command
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+%Allow page breaks within align
+\allowdisplaybreaks
+%Code
+\usepackage{listings}
+\usepackage{pdfpages}
+\newlength \figwidth
+\setlength \figwidth {0.5\textwidth}
+
+%Flow Chart Package
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+
+\begin{document}
+%	
+\title[GitHub Tutorial]{Basic GitHub Tutorial}
+\author[Ghaddar]{Tarek Habib Ghaddar}
+\institute[TAMU]{Texas A\&M University}
+\date[March 30, 2018]
+
+{
+\setbeamertemplate{headline}[default] 
+\begin{frame}
+\vspace{-1.1cm}
+	\begin{figure}[t]
+		\centering
+			\includegraphics[width=.25\textwidth]{figures/seal.png}
+	\end{figure}
+\vspace{-0.75cm}
+\titlepage
+\end{frame}
+}
+
+\begin{frame}
+\tableofcontents
+\end{frame}
+
+\section{Introduction}
+\subsection{}
+\begin{frame}{t}\frametitle{Background}
+  \begin{block}{Why Version Control?}
+    \begin{itemize}
+      \item Keeps a software system consisting of many versions and configurations well organized.
+      \item Allows everyone to see what changes everyone else is making.
+      \item 
+    \end{itemize}
+  \end{block}
+
+\end{frame}
+
+\section{Summary}
+\subsection{}
+\begin{frame}[t]\frametitle{Best Practices}
+  \begin{block}{}
+    \begin{enumerate}
+      \item ALWAYS pull in changes from the online repository before working on your local copy. 
+        \begin{itemize}
+          \item Version Control Maxim: "He who commits first, wins."
+        \end{itemize}
+      \item If there is a conflict, merge your changes responsibly.
+      \item ALWAYS make sure your code compiles and runs before committing and pushing.
+      \item If you don't know what to do, ask someone more knowledgeable, or check StackOverflow and similar sites.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+
+\end{document}
