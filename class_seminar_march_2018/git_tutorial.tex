@@ -50,9 +50,9 @@
 \newlength \figwidth
 \setlength \figwidth {0.5\textwidth}
 
-%Flow Chart Package
-\usepackage{tikz}
-\usetikzlibrary{shapes,arrows}
+%Hyperlinking
+\usepackage{hyperref}
+
 
 \begin{document}
 %	
@@ -100,7 +100,8 @@
   \begin{itemize}
     \item TAMU offers a free enterprise account to students, faculty, etc.
     \item Just login with your TAMU NetID and password to GitHub Enterprise.
-    \item Allows you to make repository private.
+    \item Allows you to make repository private for free.
+    \item \url{https://github.tamu.edu}
   \end{itemize}
 \end{block}
 \end{frame}
@@ -111,8 +112,9 @@
 \begin{frame}[t]\frametitle{GitHub Desktop}
 \begin{block}{}
 \begin{itemize}
-  \item A nice, easy to use, GUI that walks the user through some of the more complex parts of GitHub.
+  \item A nice, easy to use, GUI that walks the user through some of the some slightly complex parts of GitHub.
   \item Does not have the power/fidelity of the terminal interface.
+  \item \url{https://desktop.github.com}
 \end{itemize}
 \end{block}
 \end{frame}
@@ -125,6 +127,42 @@
 \begin{frame}
 \centering
 \includegraphics[scale=0.39,angle=-90,origin=c]{figures/desktop_history.pdf}
+\end{frame}
+
+\section{Important Files and Commands}
+
+\subsection{Files}
+\begin{frame}[t]\frametitle{.gitingore File}
+\centering
+\includegraphics[scale = 0.49, trim={1.06in 2.83in 1.05in 2.84in},clip]{figures/gitignore_image.pdf}
+\end{frame}
+
+\subsection{Commands}
+\begin{frame}[t]\frametitle{Commit/git commit}
+\begin{columns}
+\begin{column}{.6\textwidth}
+\begin{block}{} 
+\begin{itemize}
+  \item A user commits to their local copy of their repository. 
+  \item This DOES NOT update the remote (online) repository.
+  \item Your commit is a local, offline, ``save point" in your repository.
+  \end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{0.38\textwidth}
+\centering
+\includegraphics[scale = 0.30,trim={2.49in 1.39in 2.49in 1.39in},clip]{figures/commit_image.pdf}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+\section{Branches, Forks, and Pull Requests}
+\subsection{}
+
+\begin{frame}[t]{Forking a Repository}
+
 \end{frame}
 
 \section{Summary}
