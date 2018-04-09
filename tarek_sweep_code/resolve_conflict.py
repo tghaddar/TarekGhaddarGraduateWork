@@ -1,5 +1,4 @@
 import networkx as nx
-import numpy as np
 #We need to determine which quadrant wins for this node. We'll do this with seeing who has a longer depth of graph (more work left). 
 def resolve_conflict(graphs,quadrants,node,num_nodes):
   
@@ -9,9 +8,10 @@ def resolve_conflict(graphs,quadrants,node,num_nodes):
     #The current graph
     G = graphs[q]
     #Last node.
-    last_node = G.nodes()[num_nodes-1]
+    last_node = list(G.nodes())[num_nodes-1]
+    path_length = nx.shortest_path(G,node,last_node)
     
-    path_lengths.append(nx.shortest_path(G,node,last_node))
+    path_lengths.append(path_length)
   
   
   #Finding the max path length.

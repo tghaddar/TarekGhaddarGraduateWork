@@ -111,7 +111,7 @@ n_angle = 1
 #Number of quadrants.
 n_quad = 4
 #Performing the sweep.
-n_stages = perform_sweep(all_graphs,n_angle)
+n_stages,wave = perform_sweep(all_graphs,n_angle)
 
 
 

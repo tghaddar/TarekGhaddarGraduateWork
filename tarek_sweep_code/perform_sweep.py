@@ -27,9 +27,9 @@ def perform_sweep(all_graphs,n_angle):
     
     for n in range (0, num_nodes):
       #The predecessors for this quadrant's graph
-      quad_pred[n] = current_graph.predecessors(n)
+      quad_pred[n] = list(current_graph.predecessors(n))
       #The successors for this quadrants's graph
-      quad_suc[n] = current_graph.successors(n)
+      quad_suc[n] = list(current_graph.successors(n))
     
     predecessors[q] = quad_pred
     successors[q] = quad_suc
@@ -39,33 +39,39 @@ def perform_sweep(all_graphs,n_angle):
   n_tasks = num_nodes*n_angle*n_quad
   num_stages = 0
   
+  
+  
   #Initially, the current_nodes are the starting nodes.
   current_nodes = starting_nodes
   
+  counter = 1
   while n_tasks > 0:
-    
-    #We get nodes that are potentially next per quadrant and remove the current nodes from the quadrant.
-    for q in range(0,n_quad):
-      #Successors for this quadrant.
-      quad_suc = successors[q]
-      #Predecessors of this quadrant.
-      quad_pred = predecessors[q]
-      #Predecessors to remove for this quadrant.
-      potentially_remove = current_nodes[q]
-      
-      for n in range(0,len(potentially_remove)):
-        node_to_remove = potentially_remove[n]
+    if (counter > 1):
+      #We get nodes that are potentially next per quadrant and remove the current nodes from the quadrant.
+      for q in range(0,n_quad):
+        #Successors for this quadrant.
+        quad_suc = successors[q]
+        #Predecessors of this quadrant.
+        quad_pred = predecessors[q]
+        #Predecessors to remove for this quadrant.
+        potentially_remove = current_nodes[q]
+        print(q)
+        while (n < len(potentially_remove)):
+          print(counter,n,len(potentially_remove))
+          node_to_remove = potentially_remove[n]
+          
+          #Check if this node has no predecessors.
+          if not quad_pred[node_to_remove]:
+            #If it doesn't have any predecessors, then it is ready to be solved.
+            n += 1
+            pass
+          else: 
+            #If it still has predecessors, it is not ready to be solved and should not be in current nodes.
+            potentially_remove = [x for x in potentially_remove if x!= node_to_remove]
+            n -= 1
+          
         
-        #Check if this node has no predecessors.
-        if not quad_pred[node_to_remove]:
-          #If it doesn't have any predecessors, then it is ready to be solved.
-          pass
-        else:
-          #If it still has predecessors, it is not ready to be solved and should not be in current nodes.
-          potentially_remove = [x for x in potentially_remove if x!= node_to_remove]
-        
-      
-      current_nodes[q] = potentially_remove
+        current_nodes[q] = potentially_remove
         
     #At this point, for every quadrant, we have removed any nodes from current_nodes that is not ready to be solved, meaning it still has predecessors. If a predecessors list for a node is empty, then we know it should be solved and belongs in current_nodes.
     
@@ -81,7 +87,7 @@ def perform_sweep(all_graphs,n_angle):
       quadrants = [k for k in current_nodes for x in current_nodes[k] if x == current_node]
       #Getting the graphs that we need.
       conflict_graphs = [all_graphs[i] for i in quadrants]
-      winning_quadrant = resolve_conflict(conflict_graphs,quadrants,current_node)
+      winning_quadrant = resolve_conflict(conflict_graphs,quadrants,current_node,num_nodes)
       #The quadrant with the winning node keeps it in it's current nodes. The other quadrants remove this node.
       #This is the current_nodes for the winning quadrant.
       current_nodes_wq = current_nodes[winning_quadrant]
@@ -105,16 +111,19 @@ def perform_sweep(all_graphs,n_angle):
     num_stages += 1
     #Subtracting the current nodes from the task
     n_tasks -= sum(map(len,current_nodes.values()))
-    break
+    counter += 1
     
     #We now need to set the successors for the next stage.
-    next_nodes = dict.fromkeys(range(n_quad))
     for q in range(0,n_quad):
       quad_suc = successors[q]
       quad_current_nodes = current_nodes[q]
       #NEED TO FLATTEN THIS LIST. But the logic is good.
-      next_nodes[q] = [quad_suc[x] for x in quad_current_nodes]
-      current_nodes[q] = next_nodes
+      full_list = [quad_suc[x] for x in quad_current_nodes]
+      flat_list = [item for sublist in full_list for item in sublist]
+      current_nodes[q] = flat_list
+      
+      
+  return num_stages,wave
       
     
     
