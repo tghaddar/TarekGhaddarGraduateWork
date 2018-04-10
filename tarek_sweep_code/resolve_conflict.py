@@ -9,7 +9,10 @@ def resolve_conflict(graphs,quadrants,node,num_nodes):
     G = graphs[q]
     #Last node.
     last_node = list(G.nodes())[num_nodes-1]
-    path_length = nx.shortest_path(G,node,last_node)
+    try:
+      path_length = nx.shortest_path_length(G,node,last_node)
+    except nx.NetworkXNoPath:
+      path_length = 0
     
     path_lengths.append(path_length)
   
@@ -20,7 +23,7 @@ def resolve_conflict(graphs,quadrants,node,num_nodes):
   max_indices = [i for i, j in enumerate(path_lengths) if j == max_length]
   
   #If there's only one index that has this, then that is the winning quadrant.
-  if len(max_indices == 1):
+  if len(max_indices) == 1:
     winning_quadrant = quadrants[max_indices[0]]
   #Otherwise we have to break the tie.
   else:

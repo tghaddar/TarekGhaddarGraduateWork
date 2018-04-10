@@ -46,6 +46,7 @@ def perform_sweep(all_graphs,n_angle):
   
   counter = 1
   while n_tasks > 0:
+    print(n_tasks)
     if (counter > 1):
       #We get nodes that are potentially next per quadrant and remove the current nodes from the quadrant.
       for q in range(0,n_quad):
@@ -55,9 +56,7 @@ def perform_sweep(all_graphs,n_angle):
         quad_pred = predecessors[q]
         #Predecessors to remove for this quadrant.
         potentially_remove = current_nodes[q]
-        print(q)
         while (n < len(potentially_remove)):
-          print(counter,n,len(potentially_remove))
           node_to_remove = potentially_remove[n]
           
           #Check if this node has no predecessors.
