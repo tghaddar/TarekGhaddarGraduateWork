@@ -46,7 +46,6 @@ def perform_sweep(all_graphs,n_angle):
   
   counter = 1
   while n_tasks > 0:
-    print(n_tasks)
     if (counter > 1):
       #We get nodes that are potentially next per quadrant and remove the current nodes from the quadrant.
       for q in range(0,n_quad):
@@ -105,9 +104,12 @@ def perform_sweep(all_graphs,n_angle):
       #Updating global predecessors dictionary.
     predecessors[key] = quad_pred
     
+    wave_current = current_nodes
     #Add the current nodes to this stage.
-    wave[num_stages] = current_nodes
+    wave[num_stages] = wave_current
+    print(num_stages,wave)
     num_stages += 1
+    print(num_stages)
     #Subtracting the current nodes from the task
     n_tasks -= sum(map(len,current_nodes.values()))
     counter += 1
@@ -119,6 +121,7 @@ def perform_sweep(all_graphs,n_angle):
       #NEED TO FLATTEN THIS LIST. But the logic is good.
       full_list = [quad_suc[x] for x in quad_current_nodes]
       flat_list = [item for sublist in full_list for item in sublist]
+      #THIS IS OVERWRITING THE WAVEs
       current_nodes[q] = flat_list
       
       
