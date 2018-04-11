@@ -3,6 +3,7 @@ import networkx as nx
 import collections
 from itertools import chain
 from resolve_conflict import resolve_conflict
+from copy import copy
 def perform_sweep(all_graphs,n_angle):
 
   #Number of nodes in the graph
@@ -104,12 +105,17 @@ def perform_sweep(all_graphs,n_angle):
       #Updating global predecessors dictionary.
     predecessors[key] = quad_pred
     
-    wave_current = current_nodes
+    current_nodes_copy = copy(current_nodes)
     #Add the current nodes to this stage.
-    wave[num_stages] = wave_current
-    print(num_stages,wave)
+    wave[num_stages] = current_nodes_copy
+    print(wave)
+    test = copy(wave[num_stages])
+    test = copy({k:[x for x in test[k]] for k in test if test[k]})
+    print(test)
+    if not test:
+      break
+      
     num_stages += 1
-    print(num_stages)
     #Subtracting the current nodes from the task
     n_tasks -= sum(map(len,current_nodes.values()))
     counter += 1
