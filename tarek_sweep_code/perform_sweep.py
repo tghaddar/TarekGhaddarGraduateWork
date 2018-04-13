@@ -108,10 +108,8 @@ def perform_sweep(all_graphs,n_angle):
     current_nodes_copy = copy(current_nodes)
     #Add the current nodes to this stage.
     wave[num_stages] = current_nodes_copy
-    print(wave)
     test = copy(wave[num_stages])
     test = copy({k:[x for x in test[k]] for k in test if test[k]})
-    print(test)
     if not test:
       break
       

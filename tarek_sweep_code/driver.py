@@ -5,6 +5,7 @@ from flip_adjacency import flip_adjacency
 from perform_sweep import perform_sweep
 import random
 import matplotlib.pyplot as plt
+from matplotlib import animation
 import networkx as nx
 import numpy as np
 import warnings
@@ -113,6 +114,47 @@ n_quad = 4
 #Performing the sweep.
 n_stages,wave = perform_sweep(all_graphs,n_angle)
 
+quad_colors = ["b","r","g","y"]
+for i in range(0,n_stages):
+  plt.figure()
+  for s in range(0,num_subsets):
+    subset_boundary = global_subset_boundaries[s]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+  
+    x = [xmin, xmax, xmax, xmin, xmin]
+    y = [ymin, ymin, ymax, ymax, ymin]
+  
+    plt.plot(x,y)
+    
+  current_stage = wave[i]
+  
+  for j in range(0,n_quad):
+    color = quad_colors[j]
+    
+    nodes = current_stage[j]
+    for k in range(0,len(nodes)):
+      
+      subset_boundary = global_subset_boundaries[nodes[k]]
+      xmin = subset_boundary[0]
+      xmax = subset_boundary[1]
+      ymin = subset_boundary[2]
+      ymax = subset_boundary[3]
+    
+    
+      x = [xmin, xmax, xmax, xmin, xmin]
+      y = [ymin, ymin, ymax, ymax, ymin]
+      plt.plot(x,y)
+      plt.fill(x,y,color)
+  
+  fig_name = "sweep_figs/wave_"+str(i)+".png"
+  plt.savefig(fig_name)
+  plt.clf()
+  plt.cla()
+  plt.close()
+  
 
 
 
