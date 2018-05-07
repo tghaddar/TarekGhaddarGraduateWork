@@ -105,6 +105,7 @@ plt.figure(5)
 nx.draw(G_2,with_labels=True)
 plt.savefig('digraph2.pdf')
 
+
 all_graphs = [G,G_1,G_2,G_3]
 
 #Angles per quadrant.
