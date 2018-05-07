@@ -47,7 +47,6 @@ def perform_sweep(all_graphs,n_angle):
   
   counter = 1
   while n_tasks > 0:
-    print(current_nodes,num_stages)
     #We know the current nodes from the previous stages successors. 
     #However, we need to make sure that the nodes up to be solved do not have any predecessors. If they do, they are not ready to be solved.
     if (counter > 1):
@@ -70,6 +69,7 @@ def perform_sweep(all_graphs,n_angle):
             
         current_nodes[q] = potentially_remove
     
+    print(current_nodes)
     #At this point, for every quadrant, we have removed any nodes from current_nodes that is not ready to be solved, meaning it still has predecessors. If a predecessors list for a node is empty, then we know it should be solved and belongs in current_nodes.
     
     #Checking for conflicts. We know our current nodes being solved in each quadrant. We look for any duplicate nodes in current_nodes, across quadrants.
@@ -96,7 +96,8 @@ def perform_sweep(all_graphs,n_angle):
       current_nodes[winning_quadrant] = current_nodes_wq
     
     
-    #print("Post Conflict: ", current_nodes)
+    print("Pre Conflict: ", current_nodes_with_conflicts)
+    print("Post Conflict: ", current_nodes)
     #We have successfully distilled the current_nodes to things that will only be solved at this stage.
     #We now have to remove all these nodes from the dictionary of predecessors FOR RESPECTIVE QUADRANTS.
     for q in range(0,n_quad):
@@ -124,13 +125,13 @@ def perform_sweep(all_graphs,n_angle):
     #Subtracting the current nodes from the task
     n_tasks -= sum(map(len,current_nodes.values()))
     counter += 1
-    print("post wave: ", current_nodes)
     #We now need to set the successors for the next stage. We also have to add back any current nodes that were removed during the conflict.
     for q in range(0,n_quad):
       quad_suc = successors[q]
       quad_current_nodes = current_nodes[q]
       conflict_nodes = current_nodes_with_conflicts[q]
-      diff = list(set(quad_current_nodes) - set(conflict_nodes))
+      #The nodes we need to add back.
+      diff = list(set(conflict_nodes) - set(quad_current_nodes))
       if (diff):
         if diff[0] < 0:
           diff = []
@@ -138,10 +139,7 @@ def perform_sweep(all_graphs,n_angle):
       full_list = [quad_suc[x] for x in quad_current_nodes]
       flat_list = [item for sublist in full_list for item in sublist]
       current_nodes[q] = list(set(flat_list).union(set(diff)))
-      print(current_nodes[q])
-    
-    print(current_nodes)
-   
+  
       
   return num_stages,wave
       
