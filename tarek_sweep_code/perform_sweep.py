@@ -47,31 +47,32 @@ def perform_sweep(all_graphs,n_angle):
   
   counter = 1
   while n_tasks > 0:
+    print(current_nodes,num_stages)
+    #We know the current nodes from the previous stages successors. 
+    #However, we need to make sure that the nodes up to be solved do not have any predecessors. If they do, they are not ready to be solved.
     if (counter > 1):
       #We get nodes that are potentially next per quadrant and remove the current nodes from the quadrant.
       for q in range(0,n_quad):
-        #Successors for this quadrant.
-        quad_suc = successors[q]
         #Predecessors of this quadrant.
         quad_pred = predecessors[q]
         #Predecessors to remove for this quadrant.
         potentially_remove = current_nodes[q]
-        while (n < len(potentially_remove)):
+        print("Potential_remove: ", potentially_remove)
+        print("quad_pred: ", quad_pred )
+        #len_potentially_remove = len(potentially_remove)
+        n = 0
+        while n < len(potentially_remove):
+          #The node we are checking to make sure it has no predecessors.
           node_to_remove = potentially_remove[n]
-          
-          #Check if this node has no predecessors.
-          if not quad_pred[node_to_remove]:
-            #If it doesn't have any predecessors, then it is ready to be solved.
-            n += 1
-            pass
-          else: 
-            #If it still has predecessors, it is not ready to be solved and should not be in current nodes.
-            potentially_remove = [x for x in potentially_remove if x!= node_to_remove]
-            n -= 1
-          
-        
+          #If it still has predecessors, we remove it.
+          if quad_pred[node_to_remove]:
+            del potentially_remove[n]
+          else:
+            n+=1 
+            
         current_nodes[q] = potentially_remove
-        
+    
+    print(current_nodes)
     #At this point, for every quadrant, we have removed any nodes from current_nodes that is not ready to be solved, meaning it still has predecessors. If a predecessors list for a node is empty, then we know it should be solved and belongs in current_nodes.
     
     #Checking for conflicts. We know our current nodes being solved in each quadrant. We look for any duplicate nodes in current_nodes, across quadrants.
@@ -97,13 +98,19 @@ def perform_sweep(all_graphs,n_angle):
     
       
     #We have successfully distilled the current_nodes to things that will only be solved at this stage.
-    #We now have to remove all these nodes from the dictionary of predecessors entirely.
-    for key,value in current_nodes.items():
-      quad_pred = predecessors[key]
-      for i in range(0,len(value)):
-        quad_pred = {k:[x for x in quad_pred[k] if x!= value[i]] for k in quad_pred}
-      #Updating global predecessors dictionary.
-    predecessors[key] = quad_pred
+    #We now have to remove all these nodes from the dictionary of predecessors FOR RESPECTIVE QUADRANTS.
+    for q in range(0,n_quad):
+      #There should only be one current node for each quadrant at this point.
+      quad_current_node = current_nodes[q]
+      #If there is a current node
+      if (quad_current_node):
+        quad_current_node = quad_current_node[0]
+        quad_pred = predecessors[q]
+        #Removing the current node as a predecessor for any other nodes in this quadrant. It has been solved.
+        quad_pred = {k:[x for x in quad_pred[k] if x!=quad_current_node] for k in quad_pred}
+        predecessors[q] = quad_pred
+      
+    print('here')
     
     current_nodes_copy = copy(current_nodes)
     #Add the current nodes to this stage.
@@ -121,13 +128,12 @@ def perform_sweep(all_graphs,n_angle):
     #We now need to set the successors for the next stage.
     for q in range(0,n_quad):
       quad_suc = successors[q]
+      #Again, there should only be one current node here, after conflicts are resolved. Only one node can be solved per quadrant per stage.
       quad_current_nodes = current_nodes[q]
       #NEED TO FLATTEN THIS LIST. But the logic is good.
       full_list = [quad_suc[x] for x in quad_current_nodes]
       flat_list = [item for sublist in full_list for item in sublist]
-      #THIS IS OVERWRITING THE WAVEs
       current_nodes[q] = flat_list
-    
    
       
   return num_stages,wave
