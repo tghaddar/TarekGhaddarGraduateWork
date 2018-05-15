@@ -428,6 +428,10 @@ However, upon further study of the load balancing by dimension algorithm, it is 
 
 \section{Preliminary Results}
 
+While perfect load balance was the initial goal, we need to know how this affects the efficiency of our parallel transport sweep. Figures \ref{regular_partition}-\ref{worst_partition} showcase the theoretical effect of perfect load balance on the transport sweep.
+
+Figure \ref{regular_partition} shows a sweep domain with a regular partition with perfect balance (equivalent number of cells per processor). The sweep maintains a mostly regular wavelike structure as each angle sweeps through the domain, and this sweep completes in 40 stages. This is the ideal partitioning for the transport sweep, but often hard to achieve with unstructured meshes \textbf{and} perfect balance.
+
 \begin{figure}[H]
   \centering
   \begin{subfigure}{0.49\textwidth}
@@ -446,21 +450,54 @@ However, upon further study of the load balancing by dimension algorithm, it is 
   \label{regular_partition}
 \end{figure}
 
+With the improved load balancing by dimension, we are likely to see a partition similar to the partitioning shown in Fig. \ref{random_partition} for all geometries. It is immediately observable that we don't have the same wavelike transport sweep, as communication penalties take their toll. As a result, this sweep completes in 101 stages, as opposed to 40 stages for the regular partition.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/random_partition_1.png}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/random_partition_2.png}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/random_partition_3.png}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/random_partition_4.png}
+  \end{subfigure}
+  \caption{The transport sweep using a random partition with perfect balance.}
+  \label{random_partition}
+\end{figure}
+
+Figure \ref{worst_partition} observes the worst theoretical sweep partitioning, where the transport sweep takes on a snake-like behavior. This partitioning yields a stage count of 230, which is far worse than even the random partitioning stage count of 101.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/worst_partition_1.png}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/worst_partition_2.png}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/worst_partition_3.png}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/worst_partition_4.png}
+  \end{subfigure}
+  \caption{The transport sweep using the worst partition with perfect balance.}
+  \label{worst_partition}
+\end{figure}
+
+Two things become immediately clear as a result of this study: perfect balance does not always yield the best parallel efficiency, and the stage count of a sweep is no longer as important. The concept of the stage is invalidated, becuase a stage relies on the assumption of perfect load balance. Once the time to compute a task changes throughout the problem domain, we must instead rely on the total time to solution as the most important metric, not the stage and the previously staged definition of parallel efficiency (Eq. \ref{paralleleff}). 
 
 \section{Goals and Proposed Plan}
 
-%\subsection{Completed Work}
 \begin{itemize}
-\item Implement unstructured meshing capability in PDT for 2D and 2D extruded problems.
-\item Generate unstructured mesh in parallel using the same partitioning scheme and number of processors as the sweep.
-\item {Perform stitching between meshed subdomains to preserve interface continuity.}
-%\end{itemize}
-
-%\subsection{Planned Work}
-%\begin{itemize}
-\item Implement load balancing algorithm for unstructured meshes in PDT. A load balanced problem would be defined by $f$ in the pseudocode, or the subset with the maximum number of cells, divided by the average number of cells per subset.
-\item Verify and test code to prove load balancing algorithm effectiveness. 
-\item Show results of the parallel transport sweeps for benchmark problems.
+\item Create test problem to gather data for unbalanced, partially balanced, and load balanced runs to study how time to solution behaves in a real problem. 
+\item Develop a cost function that correlates imbalanced partitioning to time to solution.
+\item Utilize this cost function in a 
 \end{itemize}
 \subsection{Possible Outlook for Research}
 \begin{itemize}
