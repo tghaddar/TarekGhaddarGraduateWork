@@ -15,6 +15,7 @@
 %Graphic Stuff
 \usepackage{xcolor,graphicx}
 \usepackage{float}
+\usepackage{subcaption}
 %Math tools
 \usepackage{amsmath}
 \usepackage{mathptmx}
@@ -427,14 +428,24 @@ However, upon further study of the load balancing by dimension algorithm, it is 
 
 \section{Preliminary Results}
 
-Figure \ref{lattice} is an example of a triangular mesh of a lattice run through PDT. It is meshed using the coarsest possible mesh settings of the Triangle Mesh Generator. This is lattice is meshed using 16 orthogonal subsets, which can be clearly seen in the figure. As can be seen however, this problem is not balanced at all. There are subsets with only 2 triangles, and some with order 100 triangles. This will kill our sweep times, as some processors will be doing way more work than others, increasing our idle time, and thus our sweep times.
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/regular_partition_1.png}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/regular_partition_2.png}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/regular_partition_3.png}
+  \end{subfigure}
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[scale=0.5]{../figures/regular_partition_4.png}
+  \end{subfigure}
+  \caption{The transport sweep using a regular partition with perfect balance.}
+  \label{regular_partition}
+\end{figure}
 
-\noindent\begin{minipage}{\textwidth}
-\centering
-\includegraphics[scale = .75]{../figures/proposal_lattice.pdf}
-\captionof{figure}{A reactor lattice, meshed and run in PDT.}
-\label{lattice}
-\end{minipage}
 
 \section{Goals and Proposed Plan}
 
