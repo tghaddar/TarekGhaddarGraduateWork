@@ -113,7 +113,7 @@ while n_tasks>0
     end
     next_nodes = unique(next_nodes,'rows');
     
-    % remove multiple as's for the list of nexy nodes
+    % remove multiple as's for the list of next nodes
     % a=[1 2 3 4 4 3 2 5]
     % [c,ia,ic]=unique(a);ia=ia';ic=ic';
     % c =     1     2     3     4     5

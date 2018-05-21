@@ -25,7 +25,7 @@ switch lower(partition_type)
         dy=tmp(2)-tmp(1);
         percent=0.1;
         for i=1:nx
-            Y(i,:) = tmp + dy*[0 (2*rand(1,n_cuty)-1) 0]*percent;;
+            Y(i,:) = tmp + dy*[0 (2*rand(1,n_cuty)-1) 0]*percent;
         end
     case 'worst'
         X = linspace(0,1,n_cutx+2);
