@@ -2,6 +2,7 @@
 from build_adjacency_matrix import build_adjacency
 from build_global_subset_boundaries import build_global_subset_boundaries
 from flip_adjacency import flip_adjacency
+from sweep_solver import compute_solve_time
 import random
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -104,4 +105,8 @@ nx.draw(G_2,with_labels=True)
 plt.savefig('digraph2.pdf')
 
 
+
+
 all_graphs = [G,G_1,G_2,G_3]
+
+time = compute_solve_time(all_graphs,1e-09,1)
