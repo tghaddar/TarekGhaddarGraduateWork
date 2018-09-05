@@ -14,8 +14,10 @@ plt.close("all")
 
 #Number of cuts in x direction.
 N_x = 1
+num_col = N_x+1
 #Number of cuts in y direction.
 N_y = 1
+num_row = N_y + 1
 
 if (N_y > N_x):
   raise Exception('N_x >= N_y because our model assumes P_x >= P_y' )
@@ -110,4 +112,4 @@ all_graphs = [G,G_1,G_2,G_3]
 #Test structure.
 #cells_per_subset = [2,3,2,4,5,2,1,2,3]
 cells_per_subset = [120,140,150,110]
-time = compute_solve_time(all_graphs,1e-09,1,cells_per_subset,global_subset_boundaries)
+time = compute_solve_time(all_graphs,1e-09,1,cells_per_subset,global_subset_boundaries,num_row,num_col)

@@ -14,7 +14,7 @@ t_byte = 1e-09
 #The message latency time.
 m_l = 1
 
-def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries):
+def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries,num_row,num_col):
   time = 0
   #Number of nodes in the graph.
   num_nodes = nx.number_of_nodes(tdgs[0])
@@ -47,9 +47,25 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
     num_cells = cells_per_subset[starting_node]
     #The boundaries for this node.
     bounds = global_subset_boundaries[starting_node]
+    #The area of this subset
+    subset_area = (bounds[1]-bounds[0])*(bounds[3]-bounds[2])
+    #The number of cells per unit area
+    cell_area_density = num_cells/subset_area
     
+    #Finding the successors of this node.
+    node_suc = successors[starting_node]
     
-    
+    for s in range(0,len(node_suc)):
+      suc = node_suc[s]
+      #ij index of the successor.
+      ij_suc = get_ij(suc,)
+      #Checking which side this successor exists on.
+      #Top neighbor.
+      if (suc == starting_node+1):
+      
+      elif (suc == starting_node - 1 ):
+        
+      elif (suc == suc > )
     
     
   return time
