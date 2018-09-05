@@ -22,6 +22,8 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
   solve_cell = 0.1
   #avg_triangle_area
   tri_area = 0.2
+  #For quality meshes (min. angle is 20 degrees), we know the side length is:
+  tri_length = np.sqrt((4/np.sqrt(3))*tri_area)
   #Looping over the graphs.
   for ig in range(0,len(tdgs)):
     #Time it takes to traverse this graph.
@@ -45,8 +47,7 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
     num_cells = cells_per_subset[starting_node]
     #The boundaries for this node.
     bounds = global_subset_boundaries[starting_node]
-    #For quality meshes (min. angle is 20 degrees), we know the side length is:
-    tri_length = np.sqrt((4/np.sqrt(3))*tri_area)
+    
     
     
     
