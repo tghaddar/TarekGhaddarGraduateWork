@@ -13,9 +13,9 @@ warnings.filterwarnings("ignore")
 plt.close("all")
 
 #Number of cuts in x direction.
-N_x = 2
+N_x = 1
 #Number of cuts in y direction.
-N_y = 2
+N_y = 1
 
 if (N_y > N_x):
   raise Exception('N_x >= N_y because our model assumes P_x >= P_y' )
@@ -105,8 +105,9 @@ nx.draw(G_2,with_labels=True)
 plt.savefig('digraph2.pdf')
 
 
-
-
 all_graphs = [G,G_1,G_2,G_3]
 
-time = compute_solve_time(all_graphs,1e-09,1)
+#Test structure.
+#cells_per_subset = [2,3,2,4,5,2,1,2,3]
+cells_per_subset = [120,140,150,110]
+time = compute_solve_time(all_graphs,1e-09,1,cells_per_subset,global_subset_boundaries)
