@@ -45,28 +45,19 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
     
     #The number of cells in the starting node in the tdg.
     num_cells = cells_per_subset[starting_node]
+    #Getting the number of mini subsets we will need for this subset to have roughly 2 cells/mini sub
+    num_mini_sub = num_cells/2
+    #Ratio of x-length to y-length of the subset.
+    xy_ratio = (bounds[1]-bounds[0])/(bounds[3]-bounds[2])
+    num_sub_x = int(xy_ratio*num_mini_sub)
+    num_sub_y = int(num_mini_sub/xy_ratio)
     #The boundaries for this node.
     bounds = global_subset_boundaries[starting_node]
     #The area of this subset
     subset_area = (bounds[1]-bounds[0])*(bounds[3]-bounds[2])
-    #The number of cells per unit area
-    cell_area_density = num_cells/subset_area
     
     #Finding the successors of this node.
     node_suc = successors[starting_node]
-    
-    for s in range(0,len(node_suc)):
-      suc = node_suc[s]
-      #ij index of the successor.
-      ij_suc = get_ij(suc,)
-      #Checking which side this successor exists on.
-      #Top neighbor.
-      if (suc == starting_node+1):
-      
-      elif (suc == starting_node - 1 ):
-        
-      elif (suc == suc > )
-    
     
   return time
     
