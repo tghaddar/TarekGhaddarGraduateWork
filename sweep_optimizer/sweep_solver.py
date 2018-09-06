@@ -47,15 +47,17 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
     num_cells = cells_per_subset[starting_node]
     #Getting the number of mini subsets we will need for this subset to have roughly 2 cells/mini sub
     num_mini_sub = num_cells/2
-    #Ratio of x-length to y-length of the subset.
-    xy_ratio = (bounds[1]-bounds[0])/(bounds[3]-bounds[2])
-    num_sub_x = int(xy_ratio*num_mini_sub)
-    num_sub_y = int(num_mini_sub/xy_ratio)
     #The boundaries for this node.
     bounds = global_subset_boundaries[starting_node]
-    #The area of this subset
-    subset_area = (bounds[1]-bounds[0])*(bounds[3]-bounds[2])
+    #Ratio of x-length to y-length of the subset.
+    xy_ratio = (bounds[1]-bounds[0])/(bounds[3]-bounds[2])
+    num_sub_y = int(np.sqrt(num_mini_sub/xy_ratio))
+    num_sub_x = int(num_mini_sub/num_sub_y)
     
+    #Approximate number of cells along x boundaries.
+    bound_cell_x = num_sub_x*2
+    #Approximate number of cells along y boundaries.
+    bound_cell_y = num_sub_y*2
     #Finding the successors of this node.
     node_suc = successors[starting_node]
     
