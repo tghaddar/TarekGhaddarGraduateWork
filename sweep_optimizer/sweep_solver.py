@@ -22,10 +22,10 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
   solve_cell = 0.1
   #avg_triangle_area
   tri_area = 0.2
-  #For quality meshes (min. angle is 20 degrees), we know the side length is:
-  tri_length = np.sqrt((4/np.sqrt(3))*tri_area)
   #Looping over the graphs.
   for ig in range(0,len(tdgs)):
+    #Tallying solved nodes.
+    solved = []
     #Time it takes to traverse this graph.
     time_graph = 0.0
     #The current graph
@@ -42,7 +42,7 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
       predecessors[n] = list(graph.predecessors(n))
     
     time_graph += cells_per_subset[starting_node]*solve_cell
-    
+    solved.append(starting_node)
     #The number of cells in the starting node in the tdg.
     num_cells = cells_per_subset[starting_node]
     #Getting the number of mini subsets we will need for this subset to have roughly 2 cells/mini sub
@@ -53,7 +53,6 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
     xy_ratio = (bounds[1]-bounds[0])/(bounds[3]-bounds[2])
     num_sub_y = int(np.sqrt(num_mini_sub/xy_ratio))
     num_sub_x = int(num_mini_sub/num_sub_y)
-    
     #Approximate number of cells along x boundaries.
     bound_cell_x = num_sub_x*2
     #Approximate number of cells along y boundaries.
@@ -61,5 +60,29 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
     #Finding the successors of this node.
     node_suc = successors[starting_node]
     
+    #Adding the two communication times for each boundary.
+    time_graph += bound_cell_x*solve_cell
+    time_graph += bound_cell_y*solve_cell
+    
+    #Starting the sweep.
+    num_suc = len(node_suc)
+    for n in range(0,num_suc):
+      node = node_suc[n]
+      #The predecessors to this node.
+      preds_of_node = predecessors[node]
+      #Checking if all predecessors of this node have been solved.
+      #Boolean value
+      in_list = 0
+      for p in range(0,len(preds_of_node)):
+        pred = preds_of_node[p]
+        if pred in solved:
+          in_list += 1
+      #All predecessors have been solved.
+      if (in_list == len(preds_of_node)):
+        time_graph += cells_per_subset[node]*solve_cell
+        solved.append(node)
+      else:
+        
+        
   return time
     
