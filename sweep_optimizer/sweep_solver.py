@@ -100,8 +100,10 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
         bound_cell_y = num_sub_y*2
         #Need to find out which boundaries we communicate to.
         node_succ = successors[node]
-        #If we have two neighbors, then we communicate to 
-        
+        #If we have two or more neighbors, we are communicating to both boundaries.
+        if (len(node_succ) >= 2):
+          time_graph += bound_cell_x*solve_cell
+          time_graph += bound_cell_y*solve_cell
         #Computing the time it would take to solve this node.
         temp_time = num_cells*solve_cell
         #In regular partitions, two cells may solve at once, we take the max time.
