@@ -2,6 +2,7 @@ import numpy as np
 import warnings
 import networkx as nx
 import copy
+from utilities import get_ij
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 #This function computes the solve time for a sweep for each octant. 
@@ -49,8 +50,21 @@ def flatten_graph(graph,successors):
   flattened_graph = [x for x in flattened_graph if x]
   return flattened_graph
     
+#Checking if the current node shares x or y subset boundaries.
+def find_bounds(node,succ,num_row,num_col):
+  bounds_check = []
+  for s in range(0,len(succ)):
+    test = succ[s]
+    i_node,j_node = get_ij(node,num_row,num_col)
+    i_succ,j_succ = get_ij(test,num_row,num_col)
     
-  
+    if (i_succ > i_node or i_node > i_succ):
+      bounds_check.append('x')
+    if (j_node == j_succ + 1 or j_node == j_succ - 1) and (i_succ == i_node):
+      bounds_check.append('y')
+    
+    
+  return bounds_check
   
 
 def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries,num_row,num_col):
@@ -100,9 +114,11 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
         bound_cell_y = num_sub_y*2
         #Need to find out which boundaries we communicate to.
         node_succ = successors[node]
-        #If we have two or more neighbors, we are communicating to both boundaries.
-        if (len(node_succ) >= 2):
+        #Checking which boundaries are shared.
+        bounds_check = find_bounds(node,node_succ)
+        if 'x' in bounds_check: 
           time_graph += bound_cell_x*solve_cell
+        if 'y' in bounds_check:
           time_graph += bound_cell_y*solve_cell
           
         #Computing the time it would take to solve this node.
