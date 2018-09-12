@@ -113,3 +113,4 @@ all_graphs = [G,G_1,G_2,G_3]
 #cells_per_subset = [2,3,2,4,5,2,1,2,3]
 cells_per_subset = [120,140,150,110]
 time = compute_solve_time(all_graphs,1e-09,1,cells_per_subset,global_subset_boundaries,num_row,num_col)
+print(time)
