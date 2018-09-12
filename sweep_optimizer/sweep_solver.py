@@ -104,6 +104,7 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
         if (len(node_succ) >= 2):
           time_graph += bound_cell_x*solve_cell
           time_graph += bound_cell_y*solve_cell
+          
         #Computing the time it would take to solve this node.
         temp_time = num_cells*solve_cell
         #In regular partitions, two cells may solve at once, we take the max time.
