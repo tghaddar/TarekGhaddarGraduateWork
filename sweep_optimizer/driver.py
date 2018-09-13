@@ -13,10 +13,10 @@ warnings.filterwarnings("ignore")
 plt.close("all")
 
 #Number of cuts in x direction.
-N_x = 1
+N_x = 2
 num_col = N_x+1
 #Number of cuts in y direction.
-N_y = 1
+N_y = 2
 num_row = N_y + 1
 
 if (N_y > N_x):
@@ -68,8 +68,13 @@ y_cuts.append(y_cuts_column)
 
 #Test Case
 x_cuts[1] = 5
+x_cuts[2] = 7
 y_cuts[0][1] = 3
-y_cuts[1][1] = 7
+y_cuts[0][2] = 5
+y_cuts[1][1] = 4
+y_cuts[1][2] = 7
+y_cuts[2][1] = 3
+y_cuts[2][2] = 5
 
 global_subset_boundaries = build_global_subset_boundaries(N_x,N_y,x_cuts,y_cuts)
 adjacency_matrix = build_adjacency(global_subset_boundaries,N_x,N_y,y_cuts)
@@ -111,6 +116,6 @@ all_graphs = [G,G_1,G_2,G_3]
 
 #Test structure.
 #cells_per_subset = [2,3,2,4,5,2,1,2,3]
-cells_per_subset = [120,140,150,110]
+cells_per_subset = [120,140,150,110,90,120,80,90,160]
 time = compute_solve_time(all_graphs,1e-09,1,cells_per_subset,global_subset_boundaries,num_row,num_col)
 print(time)

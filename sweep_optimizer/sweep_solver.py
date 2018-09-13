@@ -27,23 +27,24 @@ def flatten_graph(graph,successors):
   while starting_nodes:
     temp = []
     st_nodes_copy = copy.copy(starting_nodes)
-    #Getting the node to start.
-    node = st_nodes_copy[0]
-    #temp.append(node)
-    #Successors to this node.
-    node_succ = successors[node]
-    #Removing this node from starting_nodes.
-    starting_nodes.remove(node)
-
-    #Checking which successors go next.
-    for s in range(0,len(node_succ)):
-      test_node = node_succ[s]
-      #Removing the edge.
-      graph.remove_edge(node,test_node)
-      #Checking that this is the only edge coming into this node (ready to solve).
-      if graph.in_degree(test_node) == 0:
-        starting_nodes.append(test_node)
-        temp.append(test_node)
+    for i in range(0,len(st_nodes_copy)):
+      #Getting the node to start.
+      node = st_nodes_copy[i]
+      #temp.append(node)
+      #Successors to this node.
+      node_succ = successors[node]
+      #Removing this node from starting_nodes.
+      starting_nodes.remove(node)
+  
+      #Checking which successors go next.
+      for s in range(0,len(node_succ)):
+        test_node = node_succ[s]
+        #Removing the edge.
+        graph.remove_edge(node,test_node)
+        #Checking that this is the only edge coming into this node (ready to solve).
+        if graph.in_degree(test_node) == 0:
+          starting_nodes.append(test_node)
+          temp.append(test_node)
         
     flattened_graph.append(temp)
     
@@ -97,8 +98,8 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
       max_time = 0.0
       for c in range(0,len(current_nodes)):
         node = current_nodes[c]
-        #The number of cells for this in the tdg.
-        num_cells = cells_per_subset[starting_node]
+        #The number of cells for this node in the tdg.
+        num_cells = cells_per_subset[node]
         #Add communication time for this node.
         #Getting the number of mini subsets we will need for this subset to have roughly 2 cells/mini sub
         num_mini_sub = num_cells/2
