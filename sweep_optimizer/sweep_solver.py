@@ -3,6 +3,8 @@ import warnings
 import networkx as nx
 import copy
 from utilities import get_ij
+from build_adjacency_matrix import build_adjacency
+from flip_adjacency import flip_adjacency
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 #This function computes the solve time for a sweep for each octant. 
@@ -16,6 +18,33 @@ t_byte = 1e-09
 #The message latency time.
 m_l = 1
 
+#Compute Task dependence graphs given a set of boundaries.
+def get_graphs(global_subset_boundaries,N_x,N_y,y_cuts):
+  adjacency_matrix = build_adjacency(global_subset_boundaries,N_x,N_y,y_cuts)
+  #Getting the upper triangular portion of the adjacency_matrix
+  adjacency_matrix_0 = np.triu(adjacency_matrix)
+  #Time to build the graph
+  G = nx.DiGraph(adjacency_matrix_0)
+  
+  #Test what lower triangular looks like
+  adjacency_matrix_3 = np.tril(adjacency_matrix)
+  G_3 = nx.DiGraph(adjacency_matrix_3)
+  
+  #To get the top left and bottom right quadrants, we have to reverse our ordering by column.
+  adjacency_flip,id_map = flip_adjacency(adjacency_matrix,N_y+1,N_x+1)
+  adjacency_matrix_1 = np.triu(adjacency_flip)
+  G_1 = nx.DiGraph(adjacency_matrix_1)
+  G_1 = nx.relabel_nodes(G_1,id_map,copy=True)
+  
+  #Bottom right quadrant.
+  adjacency_matrix_2 = np.tril(adjacency_flip)
+  G_2 = nx.DiGraph(adjacency_matrix_2)
+  G_2 = nx.relabel_nodes(G_2,id_map,copy=True)
+
+
+  all_graphs = [G,G_1,G_2,G_3]
+  return all_graphs
+  
 def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   
   #Approximately two cells per mini subset.
