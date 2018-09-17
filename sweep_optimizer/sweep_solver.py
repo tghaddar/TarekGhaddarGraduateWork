@@ -16,6 +16,27 @@ t_byte = 1e-09
 #The message latency time.
 m_l = 1
 
+def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
+  
+  #Approximately two cells per mini subset.
+  num_mini_sub = num_total_cells/2.0
+  num_subsets = len(global_subset_boundaries)
+  cells_per_subset = []
+  for s in range(0,num_subsets):
+    #The boundaries for this node.
+    bounds = global_subset_boundaries[s]
+    #Ratio of x-length to y-length of the subset.
+    xy_ratio = (bounds[1]-bounds[0])/(bounds[3]-bounds[2])
+    #Approx number of mini subsets in each direction.
+    num_sub_y = int(np.sqrt(num_mini_sub/xy_ratio))
+    num_sub_x = int(num_mini_sub/num_sub_y)
+    cells_in_subset = 2.0*num_sub_y*num_sub_x
+    cells_per_subset.append(cells_in_subset)
+    
+  return cells_per_subset
+    
+  
+
 #Flattening the directed graph using a variant of Kahn's algorithm.
 def flatten_graph(graph,successors):
   flattened_graph = []
@@ -80,10 +101,7 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
     #Time it takes to traverse this graph.
     time_graph = 0.0
     #The current graph
-    graph = tdgs[ig]
-    #Getting the starting node for this graph.
-    starting_node = [x for x in graph.nodes() if graph.in_degree(x)==0][0]
-    
+    graph = tdgs[ig]    
     #Storing the successors and predecessors for each node in the graph.
     successors = dict.fromkeys(range(num_nodes))
     predecessors = dict.fromkeys(range(num_nodes))
@@ -104,7 +122,7 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
         #Getting the number of mini subsets we will need for this subset to have roughly 2 cells/mini sub
         num_mini_sub = num_cells/2
         #The boundaries for this node.
-        bounds = global_subset_boundaries[starting_node]
+        bounds = global_subset_boundaries[node]
         #Ratio of x-length to y-length of the subset.
         xy_ratio = (bounds[1]-bounds[0])/(bounds[3]-bounds[2])
         #Approx number of subsets in each direction.
