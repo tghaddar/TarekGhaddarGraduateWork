@@ -1,6 +1,7 @@
 #importing the adjacency building capabilities.
 from build_adjacency_matrix import build_adjacency
 from build_global_subset_boundaries import build_global_subset_boundaries
+from sweep_solver import get_subset_cell_dist
 from flip_adjacency import flip_adjacency
 from sweep_solver import compute_solve_time
 import random
@@ -116,6 +117,9 @@ all_graphs = [G,G_1,G_2,G_3]
 
 #Test structure.
 #cells_per_subset = [2,3,2,4,5,2,1,2,3]
+num_cells = 120+140+150+110+90+120+80+90+160
+cps = get_subset_cell_dist(num_cells,global_subset_boundaries,global_x_min,global_x_max,global_y_min,global_y_max)
+print(cps)
 cells_per_subset = [120,140,150,110,90,120,80,90,160]
 time = compute_solve_time(all_graphs,1e-09,1,cells_per_subset,global_subset_boundaries,num_row,num_col)
 print(time)

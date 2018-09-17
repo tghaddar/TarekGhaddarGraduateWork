@@ -45,20 +45,25 @@ def get_graphs(global_subset_boundaries,N_x,N_y,y_cuts):
   all_graphs = [G,G_1,G_2,G_3]
   return all_graphs
   
-def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
+def get_subset_cell_dist(num_total_cells,global_subset_boundaries,global_x_min,global_x_max,global_y_min,global_y_max):
   
   #Approximately two cells per mini subset.
   num_mini_sub = num_total_cells/2.0
   num_subsets = len(global_subset_boundaries)
+  global_xy_ratio = (global_x_max - global_x_min)/(global_y_max - global_y_min)
+  nsy = int(np.sqrt(num_mini_sub)/global_xy_ratio)
+  nsx = int(num_mini_sub/nsy)
   cells_per_subset = []
   for s in range(0,num_subsets):
     #The boundaries for this node.
     bounds = global_subset_boundaries[s]
     #Ratio of x-length to y-length of the subset.
-    xy_ratio = (bounds[1]-bounds[0])/(bounds[3]-bounds[2])
+    x_ratio = (bounds[1]-bounds[0])/(global_x_max - global_x_min)
+    y_ratio = (bounds[3]-bounds[2])/(global_y_max - global_y_min)
     #Approx number of mini subsets in each direction.
-    num_sub_y = int(np.sqrt(num_mini_sub/xy_ratio))
-    num_sub_x = int(num_mini_sub/num_sub_y)
+    num_sub_y = int(nsy*y_ratio)
+    num_sub_x = int(nsx*x_ratio)
+    print(num_sub_x,num_sub_y)
     cells_in_subset = 2.0*num_sub_y*num_sub_x
     cells_per_subset.append(cells_in_subset)
     
