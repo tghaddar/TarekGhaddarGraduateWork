@@ -27,6 +27,16 @@ def get_ijk(ss_id,num_row,num_col,num_plane):
   
   return i,j,k
 
+def get_all_ijk(num_subsets,num_row,num_col,num_plane):
+  
+  all_ijk = []
+  for s in range(0,num_subsets):
+    
+    coords = get_ijk(s,num_row,num_col,num_plane)
+    all_ijk.append(coords)
+  
+  return all_ijk
+
 def build_3d_global_subset_boundaries(N_x,N_y,N_z,x_cuts,y_cuts,z_cuts):
   
   global_subset_boundaries = []
@@ -142,9 +152,19 @@ for z in range(0,num_plane):
   adjacency_matrix_3d = np.zeros((num_subsets,num_subsets))
   adjacency_matrix_3d[0:num_subsets_2d,0:num_subsets_2d] = adjacency_matrix
   all_2d_matrices.append(adjacency_matrix_3d)
-  
-  
-  
-  
-  
 
+#Time to add in the neighbors in 3D. We'll loop over the subsets in each layer and add in neighbors that are in the layer above and below.
+all_ijk = get_all_ijk(num_subsets,num_row,num_col,num_plane)
+for s in range(0,num_subsets):
+  
+  i,j,k = get_ijk(s,num_row,num_col,num_plane)
+  
+  if (k == 0):
+    #Getting subsets in the above layer.
+    subsets = [(i,j,k) for (i,j,k) in all_ijk if k==1]
+    #Looping over above subsets.
+    for n in range(0,len(subsets)):
+      i,j,k = subsets[n]
+      ss_id = (i*num_row+j) + k*(num_row*num_col)
+
+      
