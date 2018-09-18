@@ -68,6 +68,7 @@ N_y = 1
 N_z = 1
 #Total number of subsets
 num_subsets = (N_x+1)*(N_y+1)*(N_z+1)
+num_subsets_2d = (N_x+1)*(N_y+1)
 
 #Global bounds.
 global_x_min = 0.0
@@ -138,8 +139,9 @@ for z in range(0,num_plane):
   y_cuts_plane = y_cuts[z]
   global_2d_subset_boundaries = build_global_subset_boundaries(N_x, N_y,x_cuts_plane,y_cuts_plane)
   adjacency_matrix = build_adjacency(global_2d_subset_boundaries,N_x,N_y,y_cuts_plane)
-  all_2d_matrices.append(adjacency_matrix)
-  
+  adjacency_matrix_3d = np.zeros((num_subsets,num_subsets))
+  adjacency_matrix_3d[0:num_subsets_2d,0:num_subsets_2d] = adjacency_matrix
+  all_2d_matrices.append(adjacency_matrix_3d)
   
   
   
