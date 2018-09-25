@@ -1,19 +1,22 @@
 import numpy as np
-from build_3d_adjacency import get_ijk
+from utilities import get_ijk
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 def flip_adjacency(adjacency_matrix,numrow,numcol,num_plane):
   
-  num_subsets = numrow*numcol
+  num_subsets = numrow*numcol*num_plane
   adjacency_flip = np.zeros((num_subsets,num_subsets))
   #Maps old ids to new ones.
   id_map = {}
+  num_subsets_2d = numrow*numcol
+  
+  #Flipping by layer.
   
   for s in range(0,num_subsets):
     #Getting the i,j indices of the subset.
     i,j,k = get_ijk(s,numrow,numcol,num_plane)
     #The maximum subset in this column when ordered conventionally.
-    max_subset = i*numrow + (numrow-1)
+    max_subset = k*num_subsets_2d  + i*numrow + (numrow-1)
     #The new subset id in the flipped ordering.
     new_ss_id = max_subset - j
     #Recording the new id.
@@ -29,9 +32,9 @@ def flip_adjacency(adjacency_matrix,numrow,numcol,num_plane):
       #Original nieghbor id
       neighbor_id = indices[ind]
       #Getting the i,j indices of this neighbor.
-      i_ind,j_ind = get_ij(neighbor_id,numrow,numcol)
+      i_ind,j_ind,k_ind = get_ijk(neighbor_id,numrow,numcol,num_plane)
       #Getting the maximum subset of this neighbor when ordered conventionally.
-      max_subset_neighbor = i_ind*numrow + (numrow-1)
+      max_subset_neighbor = k_ind*num_subsets_2d + i_ind*numrow + (numrow-1)
       #The new subset id of this neighbor in the flipped ordering.
       new_neighbor_id = int(max_subset_neighbor - j_ind)
       #Adding this neighbor into the new neighbors.

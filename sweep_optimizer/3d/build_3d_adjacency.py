@@ -10,27 +10,16 @@ Test space for 3D adjacency matrix building.
 
 from build_global_subset_boundaries import build_global_subset_boundaries
 from build_adjacency_matrix import build_adjacency
+from utilities import get_ijk
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import networkx as nx
+from flip_adjacency import flip_adjacency
 import warnings
 warnings.filterwarnings("ignore") 
 
 plt.close("all")
-
-def get_ijk(ss_id,num_row,num_col,num_plane):
-#  k = ss_id%num_plane
-#  j = int((ss_id - k)/num_plane%num_row)
-#  i = int(((ss_id-k)/num_plane - j)/num_row)
-  k = int(ss_id/(num_row*num_col))
-  if (ss_id >= num_row*num_col):
-    ss_id -= (k)*num_row*num_col
-  j = int(ss_id % num_row)
-  i = int((ss_id - j)/num_row)
-  
-  
-  return i,j,k
 
 def get_all_ijk(num_subsets,num_row,num_col,num_plane):
   
@@ -256,4 +245,11 @@ plt.figure(3)
 nx.draw(G_7,with_labels = True)
 plt.savefig('digraph7.pdf')
 
-
+#Reordering for octant 1.
+adjacency_flip,id_map = flip_adjacency(adjacency_matrix_3d,num_row,num_col,num_plane)
+adjacency_matrix_1 = np.triu(adjacency_flip)
+G_1 = nx.DiGraph(adjacency_matrix_1)
+G_1 = nx.relabel_nodes(G_1,id_map,copy=True)
+plt.figure(4)
+nx.draw(G_1,with_labels=True)
+plt.savefig('digraph1.pdf')
