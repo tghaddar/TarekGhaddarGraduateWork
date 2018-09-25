@@ -291,3 +291,6 @@ plt.figure(9)
 nx.draw(G_4,nx.shell_layout(G_4),with_labels=True)
 plt.savefig('digraph4.pdf')
 
+
+
+
