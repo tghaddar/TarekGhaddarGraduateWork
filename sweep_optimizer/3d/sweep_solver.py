@@ -16,11 +16,21 @@ t_byte = 1e-09
 #The message latency time.
 m_l = 1
 
-def get_subset_cell_dist(num_total_cells,global_subset_boundaries,global_x_min,global_x_max,global_y_min,global_y_max):
+def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   
   #Approximately two cells per mini subset.
   num_mini_sub = num_total_cells/2.0
   num_subsets = len(global_subset_boundaries)
+  first_sub = global_subset_boundaries[0]
+  last_sub = global_subset_boundaries[num_subsets-1]
+  global_x_min = first_sub[0]
+  global_y_min = first_sub[2]
+  global_z_min = first_sub[4]
+  
+  global_x_max = last_sub[1]
+  global_y_max = last_sub[3]
+  global_z_max = last_sub[5]
+  
   global_xy_ratio = (global_x_max - global_x_min)/(global_y_max - global_y_min)
   nsy = int(np.sqrt(num_mini_sub)/global_xy_ratio)
   nsx = int(num_mini_sub/nsy)
@@ -31,6 +41,7 @@ def get_subset_cell_dist(num_total_cells,global_subset_boundaries,global_x_min,g
     #Ratio of x-length to y-length of the subset.
     x_ratio = (bounds[1]-bounds[0])/(global_x_max - global_x_min)
     y_ratio = (bounds[3]-bounds[2])/(global_y_max - global_y_min)
+    z_ratio = (bounds[5]-bounds[4])/(global_z_max - global_z_min)
     #Approx number of mini subsets in each direction.
     num_sub_y = int(nsy*y_ratio)
     num_sub_x = int(nsx*x_ratio)
