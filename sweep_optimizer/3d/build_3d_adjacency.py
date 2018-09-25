@@ -49,7 +49,6 @@ def build_3d_global_subset_boundaries(N_x,N_y,N_z,x_cuts,y_cuts,z_cuts):
     subset_boundary = []
     ss_id = s
     i,j,k = get_ijk(ss_id,num_row,num_col,num_plane)
-    print(i,j,k)
     
     x_min = x_cuts[k][i]
     x_max = x_cuts[k][i+1]
@@ -66,7 +65,25 @@ def build_3d_global_subset_boundaries(N_x,N_y,N_z,x_cuts,y_cuts,z_cuts):
     
   return global_subset_boundaries
     
+
+#Checking if two rectangles overlap.
+def overlap(s_bounds,n_bounds):
+  #The top left points of both the current subset and potential neighbor.
+  s_topleft = [s_bounds[0],s_bounds[3]]
+  n_topleft = [n_bounds[0],n_bounds[3]]
+  #The bottom right points of both the current subset and potential neighbor.
+  s_botright = [s_bounds[1],s_bounds[2]]
+  n_botright = [n_bounds[1],n_bounds[2]]
   
+  #If one rectangle is left of the other.
+  if ( (s_topleft[0] > n_botright[0]) or (n_topleft[0] > s_botright[0]) ):
+    return False
+  
+  #If one rectangle is above the other.
+  if ( (s_topleft[1] < n_botright[1]) or (n_topleft[1] < s_botright[1]) ):
+    return False
+  
+  return True
 
 #We will be building this layer by layer. 
 
@@ -144,13 +161,14 @@ plt.savefig("subset_plot.pdf")
 
 all_2d_matrices = []
 #Building an adjacency matrix for each layer.
+adjacency_matrix_3d = np.zeros((num_subsets,num_subsets))
 for z in range(0,num_plane):
   x_cuts_plane = x_cuts[z]
   y_cuts_plane = y_cuts[z]
   global_2d_subset_boundaries = build_global_subset_boundaries(N_x, N_y,x_cuts_plane,y_cuts_plane)
   adjacency_matrix = build_adjacency(global_2d_subset_boundaries,N_x,N_y,y_cuts_plane)
-  adjacency_matrix_3d = np.zeros((num_subsets,num_subsets))
-  adjacency_matrix_3d[0:num_subsets_2d,0:num_subsets_2d] = adjacency_matrix
+  
+  adjacency_matrix_3d[z*num_subsets_2d:(z+1)*num_subsets_2d,z*num_subsets_2d:(z+1)*num_subsets_2d] = adjacency_matrix
   all_2d_matrices.append(adjacency_matrix_3d)
 
 #Time to add in the neighbors in 3D. We'll loop over the subsets in each layer and add in neighbors that are in the layer above and below.
@@ -158,6 +176,7 @@ all_ijk = get_all_ijk(num_subsets,num_row,num_col,num_plane)
 for s in range(0,num_subsets):
   
   i,j,k = get_ijk(s,num_row,num_col,num_plane)
+  s_bounds = global_3d_subset_boundaries[s]
   
   if (k == 0):
     #Getting subsets in the above layer.
@@ -166,5 +185,27 @@ for s in range(0,num_subsets):
     for n in range(0,len(subsets)):
       i,j,k = subsets[n]
       ss_id = (i*num_row+j) + k*(num_row*num_col)
+      #Bounds of the potential neighbor.
+      n_bounds = global_3d_subset_boundaries[ss_id]
+      
+      #Checking for overlap. If true, this into the adjacency matrix.
+      overlap_bool = overlap(s_bounds,n_bounds)
+      if (overlap_bool):
+        adjacency_matrix_3d[s][ss_id] = 1
+  
+  #Checking for neighbors below only.
+  elif (k == num_plane-1):
+    subsets = [(i,j,k2) for (i,j,k2) in all_ijk if k2 == k-1]
+    #Looping over below subsets.
+    for n in range(0,len(subsets)):
+      i,j,k = subsets[n]
+      ss_id = (i*num_row+j) + k*(num_row*num_col)
+      #Bounds of the potential neighbor.
+      n_bounds = global_3d_subset_boundaries[ss_id]
+      
+      #Checking for overlap. If true, this into the adjacency matrix.
+      overlap_bool = overlap(s_bounds,n_bounds)
+      if (overlap_bool):
+        adjacency_matrix_3d[s][ss_id] = 1
 
       
