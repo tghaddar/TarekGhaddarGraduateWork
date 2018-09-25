@@ -13,6 +13,11 @@ from build_adjacency_matrix import build_adjacency
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+import networkx as nx
+import warnings
+warnings.filterwarnings("ignore") 
+
+plt.close("all")
 
 def get_ijk(ss_id,num_row,num_col,num_plane):
 #  k = ss_id%num_plane
@@ -180,7 +185,7 @@ for s in range(0,num_subsets):
   
   if (k == 0):
     #Getting subsets in the above layer.
-    subsets = [(i,j,k) for (i,j,k) in all_ijk if k==1]
+    subsets = [(i,j,k) for (i,j,k) in all_ijk if k == 1]
     #Looping over above subsets.
     for n in range(0,len(subsets)):
       i,j,k = subsets[n]
@@ -207,5 +212,48 @@ for s in range(0,num_subsets):
       overlap_bool = overlap(s_bounds,n_bounds)
       if (overlap_bool):
         adjacency_matrix_3d[s][ss_id] = 1
-
+  else:
+    top_subsets = [(i,j,k2) for (i,j,k2) in all_ijk if k2 == k+1]
+    bot_subsets = [(i,j,k2) for (i,j,k2) in all_ijk if k2 == k-1]
+    
+    #Looping over top and bottom layers for neighbors.
+    for n in range(0,len(top_subsets)):
+      i,j,k = top_subsets[n]
+      ss_id = (i*num_row+j) + k*(num_row*num_col)
+      #Bounds of the potential neighbor.
+      n_bounds = global_3d_subset_boundaries[ss_id]
       
+      #Checking for overlap. If true, this into the adjacency matrix.
+      overlap_bool = overlap(s_bounds,n_bounds)
+      if (overlap_bool):
+        adjacency_matrix_3d[s][ss_id] = 1
+    
+    for n in range(0,len(bot_subsets)):
+      i,j,k = bot_subsets[n]
+      ss_id = (i*num_row+j) + k*(num_row*num_col)
+      #Bounds of the potential neighbor.
+      n_bounds = global_3d_subset_boundaries[ss_id]
+      
+      #Checking for overlap. If true, this into the adjacency matrix.
+      overlap_bool = overlap(s_bounds,n_bounds)
+      if (overlap_bool):
+        adjacency_matrix_3d[s][ss_id] = 1
+
+#Creating the graphs.
+#Getting the upper triangular portion of the adjacency_matrix
+adjacency_matrix_0 = np.triu(adjacency_matrix_3d)
+#Time to build the graph for octant 0
+G = nx.DiGraph(adjacency_matrix_0)
+plt.figure(2)
+nx.draw(G,with_labels = True)
+plt.savefig('digraph.pdf')
+
+#Lower triangular matrix.
+adjacency_matrix_7 = np.tril(adjacency_matrix_3d)
+#Building graph for octant 7
+G_7 = nx.DiGraph(adjacency_matrix_7)
+plt.figure(3)
+nx.draw(G_7,with_labels = True)
+plt.savefig('digraph7.pdf')
+
+
