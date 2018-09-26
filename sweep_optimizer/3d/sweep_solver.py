@@ -191,16 +191,19 @@ def compute_solve_time(graphs,t_byte,m_l,cells_per_subset,num_cells,global_subse
         node_succ = successors[node]
         #Checking which boundaries are shared.
         bounds_check = find_bounds(node,node_succ,num_row,num_col,num_plane)
+        #yz face
         if 'x' in bounds_check: 
-          time_graph += bound_cell_x*solve_cell
+          time_graph += bound_cell_y*bound_cell_z*3*t_byte
+        #xz face
         if 'y' in bounds_check:
-          time_graph += bound_cell_y*solve_cell
+          time_graph += bound_cell_x*bound_cell_z*3*t_byte
+        #xy face
         if 'z' in bounds_check:
-          time_graph+= bound_cell_z*solve_cell
+          time_graph+= bound_cell_x*bound_cell_y*3*t_byte
           
         #Computing the time it would take to solve this node.
         temp_time = num_cells*solve_cell
-        #In regular partitions, two cells may solve at once, we take the max time.
+        #In regular partitions, two subsets may solve at once, we take the max time.
         if (temp_time > max_time):
           max_time = temp_time
       time_graph += max_time
