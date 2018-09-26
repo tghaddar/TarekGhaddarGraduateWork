@@ -294,4 +294,18 @@ plt.savefig('digraph4.pdf')
 
 num_total_cells = 12000
 cell_dist = sweep_solver.get_subset_cell_dist(num_total_cells,global_3d_subset_boundaries)
-print(cell_dist)
+
+#Storing all the graphs in a list.
+graphs = [G,G_1,G_2,G_3,G_4,G_5,G_6,G_7]
+flat_graphs = [None]*len(graphs)
+num_nodes = num_subsets
+for ig in range(0,len(graphs)):
+  graph = graphs[ig]
+  successors = dict.fromkeys(range(num_nodes))
+  predecessors = dict.fromkeys((range(num_nodes)))
+  for n in range(0,num_nodes):
+    successors[n] = list(graph.successors(n))
+    predecessors[n] = list(graph.predecessors(n))
+  
+  flat_graphs[ig] = sweep_solver.flatten_graph(graph,successors)
+  

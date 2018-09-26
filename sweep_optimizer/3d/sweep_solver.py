@@ -55,7 +55,6 @@ def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
     num_sub_y = nsy*y_ratio
     num_sub_x = nsx*x_ratio
     num_sub_z = nsz*z_ratio
-    print(num_sub_x,num_sub_y,num_sub_z)
     cells_in_subset = 2.0*num_sub_y*num_sub_x*num_sub_z
     cells_per_subset.append(cells_in_subset)
     
