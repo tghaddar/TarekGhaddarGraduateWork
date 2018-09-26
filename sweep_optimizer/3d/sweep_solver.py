@@ -116,19 +116,44 @@ def find_bounds(node,succ,num_row,num_col,num_plane):
   return bounds_check
   
 
-def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries,num_row,num_col):
+def compute_solve_time(graphs,t_byte,m_l,cells_per_subset,num_cells,global_subset_boundaries,num_row,num_col,num_plane):
   time = 0
-  all_graph_time = np.zeros(4)
   #Number of nodes in the graph.
-  num_nodes = nx.number_of_nodes(tdgs[0])
+  num_nodes = nx.number_of_nodes(graphs[0])
+  all_graph_time = np.zeros(8)
   #The time it takes to solve a cell.
   solve_cell = 0.1
+  
+  num_mini_sub = num_cells/2.0
+  
+  num_subsets = len(global_subset_boundaries)
+  first_sub = global_subset_boundaries[0]
+  last_sub = global_subset_boundaries[num_subsets-1]
+  global_x_min = first_sub[0]
+  global_y_min = first_sub[2]
+  global_z_min = first_sub[4]
+  
+  global_x_max = last_sub[1]
+  global_y_max = last_sub[3]
+  global_z_max = last_sub[5]
+  #global x length
+  a = global_x_max - global_x_min
+  #global y length
+  b = global_y_max - global_y_min
+  #global z length
+  c = global_z_max - global_z_min
+  #Number of mini subs in x
+  nsx = a*pow((num_mini_sub/(a*b*c)),1/3)
+  #Number of mini subs in y
+  nsy = b*pow((num_mini_sub/(a*b*c)),1/3)
+  #Number of mini subs in z
+  nsz = c*pow((num_mini_sub/(a*b*c)),1/3)
   #Looping over the graphs.
-  for ig in range(0,len(tdgs)):
+  for ig in range(0,len(graphs)):
     #Time it takes to traverse this graph.
     time_graph = 0.0
     #The current graph
-    graph = tdgs[ig]    
+    graph = graphs[ig]    
     #Storing the successors and predecessors for each node in the graph.
     successors = dict.fromkeys(range(num_nodes))
     predecessors = dict.fromkeys(range(num_nodes))
@@ -141,32 +166,37 @@ def compute_solve_time(tdgs,t_byte,m_l,cells_per_subset,global_subset_boundaries
     for n in range(0,len(flat_graph)):
       current_nodes = flat_graph[n]
       max_time = 0.0
-      for c in range(0,len(current_nodes)):
-        node = current_nodes[c]
+      for cn in range(0,len(current_nodes)):
+        node = current_nodes[cn]
         #The number of cells for this node in the tdg.
         num_cells = cells_per_subset[node]
         #Add communication time for this node.
-        #Getting the number of mini subsets we will need for this subset to have roughly 2 cells/mini sub
-        num_mini_sub = num_cells/2
         #The boundaries for this node.
         bounds = global_subset_boundaries[node]
         #Ratio of x-length to y-length of the subset.
-        xy_ratio = (bounds[1]-bounds[0])/(bounds[3]-bounds[2])
-        #Approx number of subsets in each direction.
-        num_sub_y = int(np.sqrt(num_mini_sub/xy_ratio))
-        num_sub_x = int(num_mini_sub/num_sub_y)
+        x_ratio = (bounds[1]-bounds[0])/(global_x_max - global_x_min)
+        y_ratio = (bounds[3]-bounds[2])/(global_y_max - global_y_min)
+        z_ratio = (bounds[5]-bounds[4])/(global_z_max - global_z_min)
+        #Approx number of mini subsets in each direction.
+        num_sub_y = nsy*y_ratio
+        num_sub_x = nsx*x_ratio
+        num_sub_z = nsz*z_ratio
         #Approximate number of cells along x boundaries.
-        bound_cell_x = num_sub_x*2
+        bound_cell_x = num_sub_x*2.0
         #Approximate number of cells along y boundaries.
-        bound_cell_y = num_sub_y*2
+        bound_cell_y = num_sub_y*2.0
+        #Approximate number of cells along z boundaries.
+        bound_cell_z = num_sub_z*2.0
         #Need to find out which boundaries we communicate to.
         node_succ = successors[node]
         #Checking which boundaries are shared.
-        bounds_check = find_bounds(node,node_succ,num_row,num_col)
+        bounds_check = find_bounds(node,node_succ,num_row,num_col,num_plane)
         if 'x' in bounds_check: 
           time_graph += bound_cell_x*solve_cell
         if 'y' in bounds_check:
           time_graph += bound_cell_y*solve_cell
+        if 'z' in bounds_check:
+          time_graph+= bound_cell_z*solve_cell
           
         #Computing the time it would take to solve this node.
         temp_time = num_cells*solve_cell
