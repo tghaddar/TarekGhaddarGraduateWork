@@ -52,9 +52,9 @@ def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
     y_ratio = (bounds[3]-bounds[2])/(global_y_max - global_y_min)
     z_ratio = (bounds[5]-bounds[4])/(global_z_max - global_z_min)
     #Approx number of mini subsets in each direction.
-    num_sub_y = int(nsy*y_ratio)
-    num_sub_x = int(nsx*x_ratio)
-    num_sub_z = int(nsz*z_ratio)
+    num_sub_y = nsy*y_ratio
+    num_sub_x = nsx*x_ratio
+    num_sub_z = nsz*z_ratio
     print(num_sub_x,num_sub_y,num_sub_z)
     cells_in_subset = 2.0*num_sub_y*num_sub_x*num_sub_z
     cells_per_subset.append(cells_in_subset)
