@@ -31,9 +31,18 @@ def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   global_y_max = last_sub[3]
   global_z_max = last_sub[5]
   
-  global_xy_ratio = (global_x_max - global_x_min)/(global_y_max - global_y_min)
-  nsy = int(np.sqrt(num_mini_sub)/global_xy_ratio)
-  nsx = int(num_mini_sub/nsy)
+  #global x length
+  a = global_x_max - global_x_min
+  #global y length
+  b = global_y_max - global_y_min
+  #global z length
+  c = global_z_max - global_z_min
+  #Number of mini subs in x
+  nsx = a*pow((num_mini_sub/(a*b*c)),1/3)
+  #Number of mini subs in y
+  nsy = b*pow((num_mini_sub/(a*b*c)),1/3)
+  #Number of mini subs in z
+  nsz = c*pow((num_mini_sub/(a*b*c)),1/3)
   cells_per_subset = []
   for s in range(0,num_subsets):
     #The boundaries for this node.
@@ -45,8 +54,9 @@ def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
     #Approx number of mini subsets in each direction.
     num_sub_y = int(nsy*y_ratio)
     num_sub_x = int(nsx*x_ratio)
-    print(num_sub_x,num_sub_y)
-    cells_in_subset = 2.0*num_sub_y*num_sub_x
+    num_sub_z = int(nsz*z_ratio)
+    print(num_sub_x,num_sub_y,num_sub_z)
+    cells_in_subset = 2.0*num_sub_y*num_sub_x*num_sub_z
     cells_per_subset.append(cells_in_subset)
     
   return cells_per_subset

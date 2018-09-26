@@ -14,6 +14,7 @@ from utilities import get_ijk
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+import sweep_solver
 import networkx as nx
 import flip_adjacency
 import warnings
@@ -291,4 +292,6 @@ plt.figure(9)
 nx.draw(G_4,nx.shell_layout(G_4),with_labels=True)
 plt.savefig('digraph4.pdf')
 
-
+num_total_cells = 12000
+cell_dist = sweep_solver.get_subset_cell_dist(num_total_cells,global_3d_subset_boundaries)
+print(cell_dist)
