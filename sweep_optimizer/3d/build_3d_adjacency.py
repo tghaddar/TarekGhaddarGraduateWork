@@ -301,4 +301,4 @@ graphs = [G,G_1,G_2,G_3,G_4,G_5,G_6,G_7]
 t_byte = 1e-9
 m_l = 1.0
 
-time = sweep_solver.compute_solve_time(graphs,t_byte,m_l,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)
+all_graph_time,time = sweep_solver.compute_solve_time(graphs,t_byte,m_l,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)

@@ -210,5 +210,5 @@ def compute_solve_time(graphs,t_byte,m_l,cells_per_subset,num_cells,global_subse
       
     all_graph_time[ig] = time_graph  
     time = np.average(all_graph_time)
-  return time
+  return all_graph_time,time
     
