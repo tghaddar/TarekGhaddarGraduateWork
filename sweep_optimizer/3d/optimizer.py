@@ -15,9 +15,40 @@ import numpy as np
 import sweep_solver
 import networkx as nx
 import warnings
+from scipy.optimize import minimize
 warnings.filterwarnings("ignore")
 
 plt.close("all")
+
+num_total_cells = 12000
+#Time to solve a cell (ns)
+solve_cell = 2.0
+#Time to communicate cell boundary info (ns)
+t_comm = 3.0 
+
+#Number of cuts in the x direction.
+N_x = 1
+#Number of cuts in the y direction.
+N_y = 1
+#Number of cuts in the z direction.
+N_z = 1
+#Total number of subsets
+num_subsets = (N_x+1)*(N_y+1)*(N_z+1)
+num_subsets_2d = (N_x+1)*(N_y+1)
+
+#Global bounds.
+global_x_min = 0.0
+global_x_max = 10.0
+
+global_y_min = 0.0
+global_y_max = 10.0
+
+global_z_min = 0.0
+global_z_max = 10.0
+
+num_row = N_y + 1
+num_col = N_x + 1
+num_plane = N_z + 1
 
 def plot_subset_boundaries(global_3d_subset_boundaries,num_subsets):
   fig = plt.figure(1)
@@ -58,57 +89,69 @@ def plot_subset_boundaries(global_3d_subset_boundaries,num_subsets):
   
   plt.savefig("subset_plot.pdf")
 
-#Time to solve a cell (ns)
-solve_cell = 2.0
-#Time to communicate cell boundary info (ns)
-t_comm = 3.0 
+def time_solver(param):
+  x_cuts,y_cuts,z_cuts = param
+  
+  #Adding global z boundaries.
+  z_cuts = [global_z_min] + z_cuts + [global_z_max]
+  
+  #Adding x global boundaries
+  for i in range(0,len(x_cuts)):
+    #x_cuts for this plane
+    p_x_cuts = x_cuts[i]
+    p_x_cuts = [global_x_min] + p_x_cuts + [global_x_max]
+    x_cuts[i] = p_x_cuts
+  
+  for j in range(0,len(y_cuts)):
+    for jp in range(0,len(y_cuts[j])):
+      p_y_cuts = y_cuts[j][jp]
+      p_y_cuts = [global_y_min] + p_y_cuts + [global_y_max]
+      y_cuts[j][jp] = p_y_cuts
 
-#Number of cuts in the x direction.
-N_x = 1
-#Number of cuts in the y direction.
-N_y = 1
-#Number of cuts in the z direction.
-N_z = 1
-#Total number of subsets
-num_subsets = (N_x+1)*(N_y+1)*(N_z+1)
-num_subsets_2d = (N_x+1)*(N_y+1)
-
-#Global bounds.
-global_x_min = 0.0
-global_x_max = 10.0
-
-global_y_min = 0.0
-global_y_max = 10.0
-
-global_z_min = 0.0
-global_z_max = 10.0
-
-num_row = N_y + 1
-num_col = N_x + 1
-num_plane = N_z + 1
-
-num_total_cells = 12000
+  #Building the global subset boundaries.
+  global_3d_subset_boundaries = b3a.build_3d_global_subset_boundaries(N_x,N_y,N_z,x_cuts,y_cuts,z_cuts)
+  
+  cell_dist = sweep_solver.get_subset_cell_dist(num_total_cells,global_3d_subset_boundaries)
+  
+  adjacency_matrix = b3a.build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane)
+  
+  graphs = b3a.build_graphs(adjacency_matrix,num_row,num_col,num_plane)
+  
+  #We need to acquire a cost distribution (cell solve time + comm time for each node in each graph)
+  graphs = sweep_solver.add_edge_cost(graphs,num_total_cells,global_3d_subset_boundaries,cell_dist,solve_cell,t_comm,num_row,num_col,num_plane)
+  
+  #Solving for the amount of time.
+  all_graph_time,time = sweep_solver.compute_solve_time(graphs,solve_cell,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)
+  
+  #Removing the global bounds.
+  z_cuts.pop(0)
+  z_cuts.pop()
+  
+  for i in range(0,len(x_cuts)):
+    #x_cuts for this plane
+    p_x_cuts = x_cuts[i]
+    p_x_cuts.pop(0)
+    p_x_cuts.pop()
+    x_cuts[i] = p_x_cuts
+  
+  for j in range(0,len(y_cuts)):
+    for jp in range(0,len(y_cuts[j])):
+      p_y_cuts = y_cuts[j][jp]
+      p_y_cuts.pop(0)
+      p_y_cuts.pop()
+      y_cuts[j][jp] = p_y_cuts
+      
+  param = (x_cuts,y_cuts,z_cuts)
+  return time
 
 #Assuming the order of cutting is z,x,y.
-z_cuts = [global_z_min,5,global_z_max]
+z_cuts = [5]
 #X_cuts per plane.
-x_cuts = [[global_x_min,3,global_x_max],[global_x_min,5,global_x_max]]
+x_cuts = [[3],[5]]
 #y_cuts per column per plane.
-y_cuts = [[[global_y_min,3,global_y_max],[global_y_min,5,global_y_max]], [[global_y_min,4,global_y_max],[global_y_min,7,global_y_max]]]
+y_cuts = [[[3],[5]], [[4],[7]]]
 
-#Building the global subset boundaries.
-global_3d_subset_boundaries = b3a.build_3d_global_subset_boundaries(N_x,N_y,N_z,x_cuts,y_cuts,z_cuts)
+param = (x_cuts,y_cuts,z_cuts)
 
+time = time_solver(param)
 
-
-cell_dist = sweep_solver.get_subset_cell_dist(num_total_cells,global_3d_subset_boundaries)
-
-adjacency_matrix = b3a.build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane)
-
-graphs = b3a.build_graphs(adjacency_matrix,num_row,num_col,num_plane)
-
-#We need to acquire a cost distribution (cell solve time + comm time for each node in each graph)
-cost_distribution = sweep_solver.add_edge_cost(graphs,num_total_cells,global_3d_subset_boundaries,cell_dist,solve_cell,t_comm,num_row,num_col,num_plane)
-
-#
-all_graph_time,time = sweep_solver.compute_solve_time(graphs,solve_cell,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)
