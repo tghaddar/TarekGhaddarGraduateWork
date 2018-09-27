@@ -82,229 +82,161 @@ def overlap(s_bounds,n_bounds):
 
 
 
-#Number of cuts in the x direction.
-N_x = 1
-#Number of cuts in the y direction.
-N_y = 1
-#Number of cuts in the z direction.
-N_z = 1
-#Total number of subsets
-num_subsets = (N_x+1)*(N_y+1)*(N_z+1)
-num_subsets_2d = (N_x+1)*(N_y+1)
 
-#Global bounds.
-global_x_min = 0.0
-global_x_max = 10.0
-
-global_y_min = 0.0
-global_y_max = 10.0
-
-global_z_min = 0.0
-global_z_max = 10.0
-
-num_row = N_y + 1
-num_col = N_x + 1
-num_plane = N_z + 1
-
-#Assuming the order of cutting is z,x,y.
-z_cuts = [global_z_min,5,global_z_max]
-#X_cuts per plane.
-x_cuts = [[global_x_min,3,global_x_max],[global_x_min,5,global_x_max]]
-#y_cuts per column per plane.
-y_cuts = [[[global_y_min,3,global_y_max],[global_y_min,5,global_y_max]], [[global_y_min,4,global_y_max],[global_y_min,7,global_y_max]]]
-
-#Building the global subset boundaries.
-global_3d_subset_boundaries = build_3d_global_subset_boundaries(N_x,N_y,N_z,x_cuts,y_cuts,z_cuts)
-
-fig = plt.figure(1)
-ax = fig.gca(projection='3d')
-subset_centers = []
-layer_colors = ['b','r']
-layer = 0
-for i in range(0,num_subsets):
-
-  subset_boundary = global_3d_subset_boundaries[i]
-  xmin = subset_boundary[0]
-  xmax = subset_boundary[1]
-  ymin = subset_boundary[2]
-  ymax = subset_boundary[3]
-  zmin = subset_boundary[4]
-  zmax = subset_boundary[5]
-  if (zmax == 10.0):
-    layer = 1
-  else:
-    layer = 0
-
-  center_x = (xmin+xmax)/2
-  center_y = (ymin+ymax)/2
-  center_z = (zmin+zmax)/2
-
-  subset_centers.append([center_x, center_y, center_z])
-
-  x = [xmin, xmax, xmax, xmin, xmin,xmax,xmax,xmin,xmin,xmin,xmin,xmin,xmax,xmax,xmin,xmin]
-  y = [ymin, ymin, ymax, ymax, ymin,ymin,ymin,ymin,ymin,ymax,ymax,ymin,ymin,ymax,ymax,ymin]
-  z = [zmin, zmin, zmin, zmin, zmin,zmin,zmax,zmax,zmin,zmin,zmax,zmax,zmax,zmax,zmax,zmax]
-
-  ax.plot(x,y,z,layer_colors[layer])
+def build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane):
   
-  x2 = [xmax,xmax]
-  y2 = [ymax,ymax]
-  z2 = [zmax,zmin]
-  ax.plot(x2,y2,z2,layer_colors[layer])
+  num_subsets = num_row*num_col*num_plane
+  num_subsets_2d = num_row*num_col
 
-plt.savefig("subset_plot.pdf")
-
-all_2d_matrices = []
-#Building an adjacency matrix for each layer.
-adjacency_matrix_3d = np.zeros((num_subsets,num_subsets))
-for z in range(0,num_plane):
-  x_cuts_plane = x_cuts[z]
-  y_cuts_plane = y_cuts[z]
-  global_2d_subset_boundaries = build_global_subset_boundaries(N_x, N_y,x_cuts_plane,y_cuts_plane)
-  adjacency_matrix = build_adjacency(global_2d_subset_boundaries,N_x,N_y,y_cuts_plane)
-  
-  adjacency_matrix_3d[z*num_subsets_2d:(z+1)*num_subsets_2d,z*num_subsets_2d:(z+1)*num_subsets_2d] = adjacency_matrix
-  all_2d_matrices.append(adjacency_matrix_3d)
-
-#Time to add in the neighbors in 3D. We'll loop over the subsets in each layer and add in neighbors that are in the layer above and below.
-all_ijk = get_all_ijk(num_subsets,num_row,num_col,num_plane)
-for s in range(0,num_subsets):
-  
-  i,j,k = get_ijk(s,num_row,num_col,num_plane)
-  s_bounds = global_3d_subset_boundaries[s]
-  
-  if (k == 0):
-    #Getting subsets in the above layer.
-    subsets = [(i,j,k) for (i,j,k) in all_ijk if k == 1]
-    #Looping over above subsets.
-    for n in range(0,len(subsets)):
-      i,j,k = subsets[n]
-      ss_id = (i*num_row+j) + k*(num_row*num_col)
-      #Bounds of the potential neighbor.
-      n_bounds = global_3d_subset_boundaries[ss_id]
-      
-      #Checking for overlap. If true, this into the adjacency matrix.
-      overlap_bool = overlap(s_bounds,n_bounds)
-      if (overlap_bool):
-        adjacency_matrix_3d[s][ss_id] = 1
-  
-  #Checking for neighbors below only.
-  elif (k == num_plane-1):
-    subsets = [(i,j,k2) for (i,j,k2) in all_ijk if k2 == k-1]
-    #Looping over below subsets.
-    for n in range(0,len(subsets)):
-      i,j,k = subsets[n]
-      ss_id = (i*num_row+j) + k*(num_row*num_col)
-      #Bounds of the potential neighbor.
-      n_bounds = global_3d_subset_boundaries[ss_id]
-      
-      #Checking for overlap. If true, this into the adjacency matrix.
-      overlap_bool = overlap(s_bounds,n_bounds)
-      if (overlap_bool):
-        adjacency_matrix_3d[s][ss_id] = 1
-  else:
-    top_subsets = [(i,j,k2) for (i,j,k2) in all_ijk if k2 == k+1]
-    bot_subsets = [(i,j,k2) for (i,j,k2) in all_ijk if k2 == k-1]
+  #Adding the adjacency matrix for each layer.
+  adjacency_matrix_3d = np.zeros((num_subsets,num_subsets))
+  for z in range(0,num_plane):
+    x_cuts_plane = x_cuts[z]
+    y_cuts_plane = y_cuts[z]
+    global_2d_subset_boundaries = build_global_subset_boundaries(num_col-1, num_row-1,x_cuts_plane,y_cuts_plane)
+    adjacency_matrix = build_adjacency(global_2d_subset_boundaries,num_col-1,num_row-1,y_cuts_plane)
     
-    #Looping over top and bottom layers for neighbors.
-    for n in range(0,len(top_subsets)):
-      i,j,k = top_subsets[n]
-      ss_id = (i*num_row+j) + k*(num_row*num_col)
-      #Bounds of the potential neighbor.
-      n_bounds = global_3d_subset_boundaries[ss_id]
-      
-      #Checking for overlap. If true, this into the adjacency matrix.
-      overlap_bool = overlap(s_bounds,n_bounds)
-      if (overlap_bool):
-        adjacency_matrix_3d[s][ss_id] = 1
+    adjacency_matrix_3d[z*num_subsets_2d:(z+1)*num_subsets_2d,z*num_subsets_2d:(z+1)*num_subsets_2d] = adjacency_matrix
+
+  
+  global_3d_subset_boundaries = build_3d_global_subset_boundaries(num_col-1,num_row-1,num_plane-1,x_cuts,y_cuts,z_cuts)
+  
+  #Time to add in the neighbors in 3D. We'll loop over the subsets in each layer and add in neighbors that are in the layer above and below.
+  all_ijk = get_all_ijk(num_subsets,num_row,num_col,num_plane)
+  for s in range(0,num_subsets):
     
-    for n in range(0,len(bot_subsets)):
-      i,j,k = bot_subsets[n]
-      ss_id = (i*num_row+j) + k*(num_row*num_col)
-      #Bounds of the potential neighbor.
-      n_bounds = global_3d_subset_boundaries[ss_id]
+    i,j,k = get_ijk(s,num_row,num_col,num_plane)
+    s_bounds = global_3d_subset_boundaries[s]
+    
+    if (k == 0):
+      #Getting subsets in the above layer.
+      subsets = [(i,j,k) for (i,j,k) in all_ijk if k == 1]
+      #Looping over above subsets.
+      for n in range(0,len(subsets)):
+        i,j,k = subsets[n]
+        ss_id = (i*num_row+j) + k*(num_row*num_col)
+        #Bounds of the potential neighbor.
+        n_bounds = global_3d_subset_boundaries[ss_id]
+        
+        #Checking for overlap. If true, this into the adjacency matrix.
+        overlap_bool = overlap(s_bounds,n_bounds)
+        if (overlap_bool):
+          adjacency_matrix_3d[s][ss_id] = 1
+    
+    #Checking for neighbors below only.
+    elif (k == num_plane-1):
+      subsets = [(i,j,k2) for (i,j,k2) in all_ijk if k2 == k-1]
+      #Looping over below subsets.
+      for n in range(0,len(subsets)):
+        i,j,k = subsets[n]
+        ss_id = (i*num_row+j) + k*(num_row*num_col)
+        #Bounds of the potential neighbor.
+        n_bounds = global_3d_subset_boundaries[ss_id]
+        
+        #Checking for overlap. If true, this into the adjacency matrix.
+        overlap_bool = overlap(s_bounds,n_bounds)
+        if (overlap_bool):
+          adjacency_matrix_3d[s][ss_id] = 1
+    else:
+      top_subsets = [(i,j,k2) for (i,j,k2) in all_ijk if k2 == k+1]
+      bot_subsets = [(i,j,k2) for (i,j,k2) in all_ijk if k2 == k-1]
       
-      #Checking for overlap. If true, this into the adjacency matrix.
-      overlap_bool = overlap(s_bounds,n_bounds)
-      if (overlap_bool):
-        adjacency_matrix_3d[s][ss_id] = 1
+      #Looping over top and bottom layers for neighbors.
+      for n in range(0,len(top_subsets)):
+        i,j,k = top_subsets[n]
+        ss_id = (i*num_row+j) + k*(num_row*num_col)
+        #Bounds of the potential neighbor.
+        n_bounds = global_3d_subset_boundaries[ss_id]
+        
+        #Checking for overlap. If true, this into the adjacency matrix.
+        overlap_bool = overlap(s_bounds,n_bounds)
+        if (overlap_bool):
+          adjacency_matrix_3d[s][ss_id] = 1
+      
+      for n in range(0,len(bot_subsets)):
+        i,j,k = bot_subsets[n]
+        ss_id = (i*num_row+j) + k*(num_row*num_col)
+        #Bounds of the potential neighbor.
+        n_bounds = global_3d_subset_boundaries[ss_id]
+        
+        #Checking for overlap. If true, this into the adjacency matrix.
+        overlap_bool = overlap(s_bounds,n_bounds)
+        if (overlap_bool):
+          adjacency_matrix_3d[s][ss_id] = 1
+
+  return adjacency_matrix_3d
 
 #Creating the graphs.
-#Getting the upper triangular portion of the adjacency_matrix
-adjacency_matrix_0 = np.triu(adjacency_matrix_3d)
-#Time to build the graph for octant 0
-G = nx.DiGraph(adjacency_matrix_0)
-plt.figure(2)
-nx.draw(G,nx.shell_layout(G),with_labels = True)
-plt.savefig('digraph.pdf')
+def build_graphs(adjacency_matrix_3d,num_row,num_col,num_plane):
+  
+  #Getting the upper triangular portion of the adjacency_matrix
+  adjacency_matrix_0 = np.triu(adjacency_matrix_3d)
+  #Time to build the graph for octant 0
+  G = nx.DiGraph(adjacency_matrix_0)
+  plt.figure(2)
+  nx.draw(G,nx.shell_layout(G),with_labels = True)
+  plt.savefig('digraph.pdf')
+  
+  #Lower triangular matrix.
+  adjacency_matrix_7 = np.tril(adjacency_matrix_3d)
+  #Building graph for octant 7
+  G_7 = nx.DiGraph(adjacency_matrix_7)
+  plt.figure(3)
+  nx.draw(G_7,nx.shell_layout(G_7),with_labels = True)
+  plt.savefig('digraph7.pdf')
+  
+  #Reordering for octant 1.
+  adjacency_flip,id_map = flip_adjacency.flip_adjacency_1(adjacency_matrix_3d,num_row,num_col,num_plane)
+  adjacency_matrix_1 = np.triu(adjacency_flip)
+  G_1 = nx.DiGraph(adjacency_matrix_1)
+  G_1 = nx.relabel_nodes(G_1,id_map,copy=True)
+  plt.figure(4)
+  nx.draw(G_1,nx.shell_layout(G_1),with_labels=True)
+  plt.savefig('digraph1.pdf')
+  
+  adjacency_matrix_6 = np.tril(adjacency_flip)
+  G_6 = nx.DiGraph(adjacency_matrix_6)
+  G_6 = nx.relabel_nodes(G_6,id_map,copy=True)
+  plt.figure(5)
+  nx.draw(G_6,nx.shell_layout(G_6),with_labels=True)
+  plt.savefig('digraph6.pdf')
+  
+  adjacency_flip,id_map = flip_adjacency.flip_adjacency_2(adjacency_matrix_3d,num_row,num_col,num_plane)
+  adjacency_matrix_2 = np.triu(adjacency_flip)
+  G_2 = nx.DiGraph(adjacency_matrix_2)
+  G_2 = nx.relabel_nodes(G_2,id_map,copy=True)
+  plt.figure(6)
+  nx.draw(G_2,nx.shell_layout(G_2),with_labels=True)
+  plt.savefig('digraph2.pdf')
+  
+  adjacency_matrix_5 = np.tril(adjacency_flip)
+  G_5 = nx.DiGraph(adjacency_matrix_5)
+  G_5 = nx.relabel_nodes(G_5,id_map,copy=True)
+  plt.figure(7)
+  nx.draw(G_5,nx.shell_layout(G_5),with_labels=True)
+  plt.savefig('digraph5.pdf')
+  
+  adjacency_flip,id_map = flip_adjacency.flip_adjacency_3(adjacency_matrix_3d,num_row,num_col,num_plane)
+  adjacency_matrix_3 = np.triu(adjacency_flip)
+  G_3 = nx.DiGraph(adjacency_matrix_3)
+  G_3 = nx.relabel_nodes(G_3,id_map,copy=True)
+  plt.figure(8)
+  nx.draw(G_3,nx.shell_layout(G_3),with_labels=True)
+  plt.savefig('digraph3.pdf')
+  
+  adjacency_matrix_4 = np.tril(adjacency_flip)
+  G_4 = nx.DiGraph(adjacency_matrix_4)
+  G_4 = nx.relabel_nodes(G_4,id_map,copy=True)
+  plt.figure(9)
+  nx.draw(G_4,nx.shell_layout(G_4),with_labels=True)
+  plt.savefig('digraph4.pdf')
 
-#Lower triangular matrix.
-adjacency_matrix_7 = np.tril(adjacency_matrix_3d)
-#Building graph for octant 7
-G_7 = nx.DiGraph(adjacency_matrix_7)
-plt.figure(3)
-nx.draw(G_7,nx.shell_layout(G_7),with_labels = True)
-plt.savefig('digraph7.pdf')
-
-#Reordering for octant 1.
-adjacency_flip,id_map = flip_adjacency.flip_adjacency_1(adjacency_matrix_3d,num_row,num_col,num_plane)
-adjacency_matrix_1 = np.triu(adjacency_flip)
-G_1 = nx.DiGraph(adjacency_matrix_1)
-G_1 = nx.relabel_nodes(G_1,id_map,copy=True)
-plt.figure(4)
-nx.draw(G_1,nx.shell_layout(G_1),with_labels=True)
-plt.savefig('digraph1.pdf')
-
-adjacency_matrix_6 = np.tril(adjacency_flip)
-G_6 = nx.DiGraph(adjacency_matrix_6)
-G_6 = nx.relabel_nodes(G_6,id_map,copy=True)
-plt.figure(5)
-nx.draw(G_6,nx.shell_layout(G_6),with_labels=True)
-plt.savefig('digraph6.pdf')
-
-adjacency_flip,id_map = flip_adjacency.flip_adjacency_2(adjacency_matrix_3d,num_row,num_col,num_plane)
-adjacency_matrix_2 = np.triu(adjacency_flip)
-G_2 = nx.DiGraph(adjacency_matrix_2)
-G_2 = nx.relabel_nodes(G_2,id_map,copy=True)
-plt.figure(6)
-nx.draw(G_2,nx.shell_layout(G_2),with_labels=True)
-plt.savefig('digraph2.pdf')
-
-adjacency_matrix_5 = np.tril(adjacency_flip)
-G_5 = nx.DiGraph(adjacency_matrix_5)
-G_5 = nx.relabel_nodes(G_5,id_map,copy=True)
-plt.figure(7)
-nx.draw(G_5,nx.shell_layout(G_5),with_labels=True)
-plt.savefig('digraph5.pdf')
-
-adjacency_flip,id_map = flip_adjacency.flip_adjacency_3(adjacency_matrix_3d,num_row,num_col,num_plane)
-adjacency_matrix_3 = np.triu(adjacency_flip)
-G_3 = nx.DiGraph(adjacency_matrix_3)
-G_3 = nx.relabel_nodes(G_3,id_map,copy=True)
-plt.figure(8)
-nx.draw(G_3,nx.shell_layout(G_3),with_labels=True)
-plt.savefig('digraph3.pdf')
-
-adjacency_matrix_4 = np.tril(adjacency_flip)
-G_4 = nx.DiGraph(adjacency_matrix_4)
-G_4 = nx.relabel_nodes(G_4,id_map,copy=True)
-plt.figure(9)
-nx.draw(G_4,nx.shell_layout(G_4),with_labels=True)
-plt.savefig('digraph4.pdf')
-
-#Storing all the graphs in a list.
-graphs = [G,G_1,G_2,G_3,G_4,G_5,G_6,G_7]
-
-num_total_cells = 12000
-cell_dist = sweep_solver.get_subset_cell_dist(num_total_cells,global_3d_subset_boundaries)
-
-#Time to solve a cell (ns)
-solve_cell = 2.0
-#Time to communicate cell boundary info (ns)
-t_comm = 3.0
-
-#We need to acquire a cost distribution (cell solve time + comm time for each node in each graph)
-cost_distribution = sweep_solver.add_edge_cost(graphs,num_total_cells,global_3d_subset_boundaries,cell_dist,solve_cell,t_comm,num_row,num_col,num_plane)
+  #Storing all the graphs in a list.
+  graphs = [G,G_1,G_2,G_3,G_4,G_5,G_6,G_7]
+  
+  return graphs
 
 
-all_graph_time,time = sweep_solver.compute_solve_time(graphs,solve_cell,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)
+
+
+
