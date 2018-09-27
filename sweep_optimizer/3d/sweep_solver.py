@@ -1,7 +1,7 @@
 import numpy as np
 import warnings
 import networkx as nx
-import copy
+from copy import copy
 from utilities import get_ijk
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -47,6 +47,7 @@ def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   for s in range(0,num_subsets):
     #The boundaries for this node.
     bounds = global_subset_boundaries[s]
+    
     #Ratio of x-length to y-length of the subset.
     x_ratio = (bounds[1]-bounds[0])/(global_x_max - global_x_min)
     y_ratio = (bounds[3]-bounds[2])/(global_y_max - global_y_min)
@@ -60,71 +61,33 @@ def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
     
   return cells_per_subset
     
-  
-
-#Flattening the directed graph using a variant of Kahn's algorithm.
-def flatten_graph(graph,successors):
-  flattened_graph = []
-  #Finding nodes with no incoming edges.
-  starting_nodes = [x for x in graph.nodes() if graph.in_degree(x)==0]
-  st_nodes_copy = copy.copy(starting_nodes)
-  flattened_graph.append(st_nodes_copy)
-  #flattened_graph.pop(0)
-  while starting_nodes:
-    temp = []
-    st_nodes_copy = copy.copy(starting_nodes)
-    for i in range(0,len(st_nodes_copy)):
-      #Getting the node to start.
-      node = st_nodes_copy[i]
-      #temp.append(node)
-      #Successors to this node.
-      node_succ = successors[node]
-      #Removing this node from starting_nodes.
-      starting_nodes.remove(node)
-  
-      #Checking which successors go next.
-      for s in range(0,len(node_succ)):
-        test_node = node_succ[s]
-        #Removing the edge.
-        graph.remove_edge(node,test_node)
-        #Checking that this is the only edge coming into this node (ready to solve).
-        if graph.in_degree(test_node) == 0:
-          starting_nodes.append(test_node)
-          temp.append(test_node)
-        
-    flattened_graph.append(temp)
-    
-  flattened_graph = [x for x in flattened_graph if x]
-  return flattened_graph
-    
 #Checking if the current node shares x or y subset boundaries.
-def find_bounds(node,succ,num_row,num_col,num_plane):
+def find_shared_bound(node,succ,num_row,num_col,num_plane):
   bounds_check = []
-  for s in range(0,len(succ)):
-    test = succ[s]
-    i_node,j_node,k_node = get_ijk(node,num_row,num_col,num_plane)
-    i_succ,j_succ,k_succ = get_ijk(test,num_row,num_col,num_plane)
+  
+  i_node,j_node,k_node = get_ijk(node,num_row,num_col,num_plane)
+  i_succ,j_succ,k_succ = get_ijk(succ,num_row,num_col,num_plane)
+  
+  #If they are in different layers, we know the shared boundary is the xy plane.
+  if (k_node != k_succ):
+    bounds_check = 'xy'
+  #If the two subsets are in the same layer.
+  else:
+    if (i_node == i_succ):
+      bounds_check = 'xz'
+    else:
+      bounds_check = 'yz'
     
-    if (i_succ != i_node):
-      bounds_check.append('x')
-    if (j_node == j_succ + 1 or j_node == j_succ - 1) and (i_succ == i_node):
-      bounds_check.append('y')
-    if(k_node != k_succ):
-      bounds_check.append('z')
     
     
   return bounds_check
-  
 
-def compute_solve_time(graphs,t_byte,m_l,cells_per_subset,num_cells,global_subset_boundaries,num_row,num_col,num_plane):
-  time = 0
-  #Number of nodes in the graph.
-  num_nodes = nx.number_of_nodes(graphs[0])
-  all_graph_time = np.zeros(8)
-  #The time it takes to solve a cell.
-  solve_cell = 0.1
+def get_cost_dist(graphs,num_total_cells,global_subset_boundaries,cell_dist,num_row,num_col,num_plane):
   
-  num_mini_sub = num_cells/2.0
+  #Storing the cost distribution for each graph.
+  cost_dist = dict.fromkeys(range(len(graphs)))
+  
+  num_mini_sub = num_total_cells/2.0
   
   num_subsets = len(global_subset_boundaries)
   first_sub = global_subset_boundaries[0]
@@ -148,67 +111,50 @@ def compute_solve_time(graphs,t_byte,m_l,cells_per_subset,num_cells,global_subse
   nsy = b*pow((num_mini_sub/(a*b*c)),1/3)
   #Number of mini subs in z
   nsz = c*pow((num_mini_sub/(a*b*c)),1/3)
+  
+  for ig in range(len(graphs)):
+    graph = graphs[ig]
+    for e in graph.edges():
+      #The starting node of this edge.
+      node = e[0]
+      #The ending node of this edge.
+      succ = e[1]
+      #Finding the bounds shared by 
+      bounds_check = find_shared_bound(node,succ,num_row,num_col,num_plane)
+      print(bounds_check)
+      #Bounds of the current node.
+      bounds = global_subset_boundaries[node]    
+      #Getting boundary cells for each possible plane.
+      x_ratio = (bounds[1] - bounds[0])/a
+      y_ratio = (bounds[3] - bounds[2])/b
+      z_ratio = (bounds[5] - bounds[4])/c
+      bound_cell_x = 2.0*nsx*x_ratio
+      bound_cell_y = 2.0*nsy*y_ratio
+      bound_cell_z = 2.0*nsz*z_ratio
+      boundary_cells = 0.0
+      #Communicating across the z plane.
+      if (bounds_check == 'xy'):
+        boundary_cells = bound_cell_x*bound_cell_y
+      #Communicating across the y plane.
+      if (bounds_check == 'xz'):
+        boundary_cells = bound_cell_x*bound_cell_z
+      #Communicating across the x plane.
+      if(bounds_check == 'yz'):
+        boundary_cells = bound_cell_y*bound_cell_z
+      
+          
+  
+def compute_solve_time(graphs,t_byte,m_l,cells_per_subset,num_cells,global_subset_boundaries,num_row,num_col,num_plane):
+  time = 0
+  all_graph_time = np.zeros(8)
+
   #Looping over the graphs.
   for ig in range(0,len(graphs)):
-    #Time it takes to traverse this graph.
-    time_graph = 0.0
-    #The current graph
-    graph = graphs[ig]    
-    #Storing the successors and predecessors for each node in the graph.
-    successors = dict.fromkeys(range(num_nodes))
-    predecessors = dict.fromkeys(range(num_nodes))
-    for n in range(0,num_nodes):
-      successors[n] = list(graph.successors(n))
-      predecessors[n] = list(graph.predecessors(n))
-    
-    flat_graph = flatten_graph(graph,successors)
-    print(flat_graph)
-    for n in range(0,len(flat_graph)):
-      current_nodes = flat_graph[n]
-      max_time = 0.0
-      for cn in range(0,len(current_nodes)):
-        node = current_nodes[cn]
-        #The number of cells for this node in the tdg.
-        num_cells = cells_per_subset[node]
-        #Add communication time for this node.
-        #The boundaries for this node.
-        bounds = global_subset_boundaries[node]
-        #Ratio of x-length to y-length of the subset.
-        x_ratio = (bounds[1]-bounds[0])/(global_x_max - global_x_min)
-        y_ratio = (bounds[3]-bounds[2])/(global_y_max - global_y_min)
-        z_ratio = (bounds[5]-bounds[4])/(global_z_max - global_z_min)
-        #Approx number of mini subsets in each direction.
-        num_sub_y = nsy*y_ratio
-        num_sub_x = nsx*x_ratio
-        num_sub_z = nsz*z_ratio
-        #Approximate number of cells along x boundaries.
-        bound_cell_x = num_sub_x*2.0
-        #Approximate number of cells along y boundaries.
-        bound_cell_y = num_sub_y*2.0
-        #Approximate number of cells along z boundaries.
-        bound_cell_z = num_sub_z*2.0
-        #Need to find out which boundaries we communicate to.
-        node_succ = successors[node]
-        #Checking which boundaries are shared.
-        bounds_check = find_bounds(node,node_succ,num_row,num_col,num_plane)
-        #yz face
-        if 'x' in bounds_check: 
-          time_graph += bound_cell_y*bound_cell_z*3*t_byte
-        #xz face
-        if 'y' in bounds_check:
-          time_graph += bound_cell_x*bound_cell_z*3*t_byte
-        #xy face
-        if 'z' in bounds_check:
-          time_graph+= bound_cell_x*bound_cell_y*3*t_byte
-          
-        #Computing the time it would take to solve this node.
-        temp_time = num_cells*solve_cell
-        #In regular partitions, two subsets may solve at once, we take the max time.
-        if (temp_time > max_time):
-          max_time = temp_time
-      time_graph += max_time
+    time_graph = 0
+    time_graph += 1
       
     all_graph_time[ig] = time_graph  
-    time = np.average(all_graph_time)
+  
+  time = np.average(all_graph_time)
   return all_graph_time,time
     

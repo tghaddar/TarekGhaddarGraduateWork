@@ -18,6 +18,7 @@ import sweep_solver
 import networkx as nx
 import flip_adjacency
 import warnings
+from copy import copy
 warnings.filterwarnings("ignore") 
 
 plt.close("all")
@@ -292,11 +293,15 @@ plt.figure(9)
 nx.draw(G_4,nx.shell_layout(G_4),with_labels=True)
 plt.savefig('digraph4.pdf')
 
-num_total_cells = 12000
-cell_dist = sweep_solver.get_subset_cell_dist(num_total_cells,global_3d_subset_boundaries)
-
 #Storing all the graphs in a list.
 graphs = [G,G_1,G_2,G_3,G_4,G_5,G_6,G_7]
+
+num_total_cells = 12000
+cell_dist = sweep_solver.get_subset_cell_dist(num_total_cells,global_3d_subset_boundaries)
+#We need to acquire a cost distribution (cell solve time + comm time for each node in each graph)
+cost_distribution = sweep_solver.get_cost_dist(copy(graphs),num_total_cells,global_3d_subset_boundaries,cell_dist,num_row,num_col,num_plane)
+
+
 
 t_byte = 1e-9
 m_l = 1.0
