@@ -298,12 +298,15 @@ graphs = [G,G_1,G_2,G_3,G_4,G_5,G_6,G_7]
 
 num_total_cells = 12000
 cell_dist = sweep_solver.get_subset_cell_dist(num_total_cells,global_3d_subset_boundaries)
+
+#Time to solve a cell (ns)
+solve_cell = 2.0
+#Time to communicate cell boundary info (ns)
+t_comm = 3.0
+
 #We need to acquire a cost distribution (cell solve time + comm time for each node in each graph)
-cost_distribution = sweep_solver.get_cost_dist(copy(graphs),num_total_cells,global_3d_subset_boundaries,cell_dist,num_row,num_col,num_plane)
+cost_distribution = sweep_solver.add_edge_cost(graphs,num_total_cells,global_3d_subset_boundaries,cell_dist,solve_cell,t_comm,num_row,num_col,num_plane)
 
 
-
-t_byte = 1e-9
-m_l = 1.0
 
 all_graph_time,time = sweep_solver.compute_solve_time(graphs,t_byte,m_l,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)

@@ -82,11 +82,8 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
     
   return bounds_check
 
-def get_cost_dist(graphs,num_total_cells,global_subset_boundaries,cell_dist,num_row,num_col,num_plane):
-  
-  #Storing the cost distribution for each graph.
-  cost_dist = dict.fromkeys(range(len(graphs)))
-  
+def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solve_cell,t_comm,num_row,num_col,num_plane):
+    
   num_mini_sub = num_total_cells/2.0
   
   num_subsets = len(global_subset_boundaries)
@@ -121,7 +118,6 @@ def get_cost_dist(graphs,num_total_cells,global_subset_boundaries,cell_dist,num_
       succ = e[1]
       #Finding the bounds shared by 
       bounds_check = find_shared_bound(node,succ,num_row,num_col,num_plane)
-      print(bounds_check)
       #Bounds of the current node.
       bounds = global_subset_boundaries[node]    
       #Getting boundary cells for each possible plane.
@@ -141,6 +137,14 @@ def get_cost_dist(graphs,num_total_cells,global_subset_boundaries,cell_dist,num_
       #Communicating across the x plane.
       if(bounds_check == 'yz'):
         boundary_cells = bound_cell_y*bound_cell_z
+      
+      #Cells in this subset.
+      num_cells = cell_dist[node]
+      #The cost of this edge.
+      cost = num_cells*solve_cell + boundary_cells*t_comm
+      graph[e[0]][e[1]] = cost
+  return graphs
+      
       
           
   
