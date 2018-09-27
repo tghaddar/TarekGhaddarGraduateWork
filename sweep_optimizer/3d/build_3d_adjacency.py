@@ -307,6 +307,8 @@ t_comm = 3.0
 #We need to acquire a cost distribution (cell solve time + comm time for each node in each graph)
 cost_distribution = sweep_solver.add_edge_cost(graphs,num_total_cells,global_3d_subset_boundaries,cell_dist,solve_cell,t_comm,num_row,num_col,num_plane)
 
+for line in nx.generate_edgelist(G,data=True):
+  print(line)
 
 
-all_graph_time,time = sweep_solver.compute_solve_time(graphs,t_byte,m_l,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)
+#all_graph_time,time = sweep_solver.compute_solve_time(graphs,t_byte,m_l,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)

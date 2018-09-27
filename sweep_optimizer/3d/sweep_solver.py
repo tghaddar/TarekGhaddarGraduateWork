@@ -142,7 +142,7 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solv
       num_cells = cell_dist[node]
       #The cost of this edge.
       cost = num_cells*solve_cell + boundary_cells*t_comm
-      graph[e[0]][e[1]] = cost
+      graph[e[0]][e[1]]['weight'] = cost
   return graphs
       
       
