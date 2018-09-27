@@ -18,7 +18,6 @@ import sweep_solver
 import networkx as nx
 import flip_adjacency
 import warnings
-from copy import copy
 warnings.filterwarnings("ignore") 
 
 plt.close("all")
