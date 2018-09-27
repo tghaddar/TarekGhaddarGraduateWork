@@ -145,18 +145,36 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solv
       graph[e[0]][e[1]]['weight'] = cost
   return graphs
       
-      
+def sum_weights_of_path(graph,path):
+  weight_sum = 0.0
+  for n in range(0,len(path)-1):
+    node1 = path[n]
+    node2 = path[n+1]
+    weight = graph[node1][node2]['weight']
+    weight_sum += weight
+
+  return weight_sum      
           
   
-def compute_solve_time(graphs,t_byte,m_l,cells_per_subset,num_cells,global_subset_boundaries,num_row,num_col,num_plane):
+def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subset_boundaries,num_row,num_col,num_plane):
   time = 0
   all_graph_time = np.zeros(8)
 
   #Looping over the graphs.
   for ig in range(0,len(graphs)):
     time_graph = 0
-    time_graph += 1
-      
+    graph = graphs[ig]
+    start_node = [x for x in graph.nodes() if graph.in_degree(x) == 0][0]
+    end_node = [x for x in graph.nodes() if graph.out_degree(x) == 0][0]
+    
+    paths = nx.all_simple_paths(graph,start_node,end_node)
+    heaviest_path = 0.0
+    for path in paths:
+      path_weight = sum_weights_of_path(graph,path)
+      if path_weight > heaviest_path:
+        heaviest_path = path_weight
+    
+    time_graph = path_weight + solve_cell*cells_per_subset[end_node]
     all_graph_time[ig] = time_graph  
   
   time = np.average(all_graph_time)
