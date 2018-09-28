@@ -14,7 +14,6 @@ def sum_weights_of_path(graph,path):
     node1 = path[n]
     node2 = path[n+1]
     weight = graph[node1][node2]['weight']
-    print(weight)
     weight_sum += graph[node1][node2]['weight']
     
   
@@ -29,12 +28,15 @@ for n in range(0,8):
 G.add_edge(0,1,weight = 1)
 G.add_edge(0,2,weight = 1)
 
-G.add_edge(1,3,weight = 2)
+G.add_edge(1,3,weight = 100)
 G.add_edge(2,3,weight = 99)
 
 G.add_edge(1,5,weight = 2)
-G.add_edge(5,6,weight = 198)
+G.add_edge(5,6,weight = 1)
 G.add_edge(6,7,weight = 1)
+
+G.add_edge(3,8,weight = 3)
+G.add_edge(8,5,weight = 6)
 
 G.add_edge(3,4,weight = 3)
 G.add_edge(4,7,weight = 1)
@@ -47,6 +49,7 @@ paths = nx.all_simple_paths(G,0,7)
 
 max_weight = 0.0
 for path in paths:
+  print(path)
   weight = sum_weights_of_path(G,path)
   if weight > max_weight:
     max_weight = weight
