@@ -175,7 +175,7 @@ def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subse
         heaviest_path = path_weight
     
     time_graph = path_weight + solve_cell*3*cells_per_subset[end_node]
-    all_graph_time[ig] = time_graph  
+    all_graph_time[ig] = time_graph*10e-9 
   
   time = np.average(all_graph_time)
   return all_graph_time,time

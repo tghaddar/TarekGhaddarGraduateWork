@@ -143,6 +143,7 @@ def time_solver(param):
   
   #Solving for the amount of time.
   all_graph_time,time = sweep_solver.compute_solve_time(graphs,solve_cell,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)
+  #time = time*10e-9
   
   #Removing the global bounds.
   z_cuts.pop(0)
@@ -201,6 +202,7 @@ print(bds)
 print(con(param0))
 #time = time_solver(param0)
 sol = minimize(time_solver,param0,bounds=bds)
+
 
 #print(minimize(time_solver,param).x)
 
