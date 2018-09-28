@@ -82,7 +82,7 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
     
   return bounds_check
 
-def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solve_cell,t_comm,num_row,num_col,num_plane):
+def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solve_cell,t_comm,latency,m_l,num_row,num_col,num_plane):
     
   num_mini_sub = num_total_cells/2.0
   
@@ -141,7 +141,7 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solv
       #Cells in this subset.
       num_cells = cell_dist[node]
       #The cost of this edge.
-      cost = num_cells*solve_cell + boundary_cells*t_comm
+      cost = num_cells*3*solve_cell + (boundary_cells*2.0*t_comm + latency*m_l)
       graph[e[0]][e[1]]['weight'] = cost
   return graphs
       
@@ -174,7 +174,7 @@ def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subse
       if path_weight > heaviest_path:
         heaviest_path = path_weight
     
-    time_graph = path_weight + solve_cell*cells_per_subset[end_node]
+    time_graph = path_weight + solve_cell*3*cells_per_subset[end_node]
     all_graph_time[ig] = time_graph  
   
   time = np.average(all_graph_time)

@@ -16,16 +16,19 @@ import sweep_solver
 import networkx as nx
 import warnings
 from scipy.optimize import minimize
-from scipy.optimize import bounds
 warnings.filterwarnings("ignore")
 
 plt.close("all")
 
 num_total_cells = 12000
 #Time to solve a cell (ns)
-solve_cell = 2.0
+solve_cell = 3600.0
 #Time to communicate cell boundary info (ns)
-t_comm = 3.0 
+t_comm = 4.47
+#Latency
+latency = 4110.0
+#latency multiplier
+m_l = 1.0
 
 #Number of cuts in the x direction.
 N_x = 1
@@ -94,11 +97,15 @@ def con(t):
   
   return all(i > 0.0 for i in t) and all(i < 10.0 for i in t)
 
+param_list = []
+cell_dist_list = []
+iter = 0
+
 def time_solver(param):
   
-  x_cuts_i = param[0:num_plane*N_x]
-  y_cuts_i = param[num_plane*N_x:num_plane*N_x + num_plane*num_col*N_y]
-  z_cuts_i = param[num_plane*N_x + num_plane*num_col*N_y:]
+  x_cuts_i = list(param[0:num_plane*N_x])
+  y_cuts_i = list(param[num_plane*N_x:num_plane*N_x + num_plane*num_col*N_y])
+  z_cuts_i = list(param[num_plane*N_x + num_plane*num_col*N_y:])
   
   #Adding global z boundaries.
   z_cuts = [global_z_min] + z_cuts_i + [global_z_max]
@@ -106,13 +113,13 @@ def time_solver(param):
   #Adding x global boundaries
   x_cuts = []
   for p in range(0,num_plane):
-    p_x_cuts = x_cuts_i[p*N_z:N_z*(p+1)]
+    p_x_cuts = list(x_cuts_i[p*N_z:N_z*(p+1)])
     p_x_cuts = [global_x_min] + p_x_cuts + [global_x_max]
     x_cuts.append(p_x_cuts)
   
   y_cuts = []
   for p in range(0,num_plane):
-    p_y_cuts = y_cuts_i[p*num_col*N_y:(p+1)*num_col*N_y]
+    p_y_cuts = list(y_cuts_i[p*num_col*N_y:(p+1)*num_col*N_y])
     plane_cuts = []
     for c in range(0,num_col):
       pc_y_cuts = p_y_cuts[c*N_y:(c+1):N_y]
@@ -120,20 +127,19 @@ def time_solver(param):
       
     y_cuts.append(plane_cuts)
       
-      
-    
 
   #Building the global subset boundaries.
   global_3d_subset_boundaries = b3a.build_3d_global_subset_boundaries(N_x,N_y,N_z,x_cuts,y_cuts,z_cuts)
   
   cell_dist = sweep_solver.get_subset_cell_dist(num_total_cells,global_3d_subset_boundaries)
+  cell_dist_list.append(cell_dist)
   
   adjacency_matrix = b3a.build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane)
   
   graphs = b3a.build_graphs(adjacency_matrix,num_row,num_col,num_plane)
   
   #We need to acquire a cost distribution (cell solve time + comm time for each node in each graph)
-  graphs = sweep_solver.add_edge_cost(graphs,num_total_cells,global_3d_subset_boundaries,cell_dist,solve_cell,t_comm,num_row,num_col,num_plane)
+  graphs = sweep_solver.add_edge_cost(graphs,num_total_cells,global_3d_subset_boundaries,cell_dist,solve_cell,t_comm,latency,m_l,num_row,num_col,num_plane)
   
   #Solving for the amount of time.
   all_graph_time,time = sweep_solver.compute_solve_time(graphs,solve_cell,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)
@@ -161,6 +167,9 @@ def time_solver(param):
   c = [item for sublist in y_cuts for item in sublist]
   c = [item for sublist in c for item in sublist]
   param = b+c+z_cuts
+  param = tuple(param)
+  
+  param_list.append(param)
   
   return time
 
@@ -175,12 +184,23 @@ c = [item for sublist in y_cuts for item in sublist]
 c = [item for sublist in c for item in sublist]
 #param0 = np.array([x_cuts,y_cuts,z_cuts])
 param0 = b + c + z_cuts
+param0 = tuple(param0)
+
+bds = ()
+for i in range(0,len(b)):
+  bds += ((global_x_min*0.9,global_x_max*0.9),)
+
+for j in range(0,len(c)):
+  bds += ((global_y_min*0.9,global_y_max*0.9),)
+
+for k in range(0,len(z_cuts)):
+  bds += ((global_z_min*0.9,global_z_max*0.9),)
+  
+print(bds)
 
 print(con(param0))
 #time = time_solver(param0)
-cons = {'type':'ineq', 'fun':con}
-
-sol = minimize(time_solver,param0,constraints=cons)
+sol = minimize(time_solver,param0,bounds=bds)
 
 #print(minimize(time_solver,param).x)
 
