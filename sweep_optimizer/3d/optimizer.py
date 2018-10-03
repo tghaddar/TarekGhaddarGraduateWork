@@ -109,12 +109,14 @@ def time_solver(param):
   
   #Adding global z boundaries.
   z_cuts = [global_z_min] + z_cuts_i + [global_z_max]
+  z_cuts.sort()
   
   #Adding x global boundaries
   x_cuts = []
   for p in range(0,num_plane):
     p_x_cuts = list(x_cuts_i[p*N_z:N_z*(p+1)])
     p_x_cuts = [global_x_min] + p_x_cuts + [global_x_max]
+    p_x_cuts.sort()
     x_cuts.append(p_x_cuts)
   
   y_cuts = []
@@ -123,7 +125,9 @@ def time_solver(param):
     plane_cuts = []
     for c in range(0,num_col):
       pc_y_cuts = p_y_cuts[c*N_y:(c+1):N_y]
-      plane_cuts.append([global_y_min] + pc_y_cuts + [global_y_max])
+      pc_y_cuts = [global_y_min] + pc_y_cuts + [global_y_max]
+      pc_y_cuts.sort()
+      plane_cuts.append(pc_y_cuts)
       
     y_cuts.append(plane_cuts)
       
@@ -142,7 +146,7 @@ def time_solver(param):
   graphs = sweep_solver.add_edge_cost(graphs,num_total_cells,global_3d_subset_boundaries,cell_dist,solve_cell,t_comm,latency,m_l,num_row,num_col,num_plane)
   
   #Solving for the amount of time.
-  all_graph_time,time = sweep_solver.compute_solve_time(graphs,solve_cell,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)
+  all_graph_time,time,heaviest_paths = sweep_solver.compute_solve_time(graphs,solve_cell,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)
   #time = time*10e-9
   
   #Removing the global bounds.
@@ -172,7 +176,7 @@ def time_solver(param):
   
   param_list.append(param)
   
-  return time
+  return time,heaviest_paths
 
 #Assuming the order of cutting is z,x,y.
 z_cuts = [5]
@@ -200,8 +204,8 @@ for k in range(0,len(z_cuts)):
 print(bds)
 
 print(con(param0))
-#time = time_solver(param0)
-sol = minimize(time_solver,param0,bounds=bds)
+time,heaviest_paths = time_solver(param0)
+#sol = minimize(time_solver,param0,bounds=bds)
 
 
 #print(minimize(time_solver,param).x)

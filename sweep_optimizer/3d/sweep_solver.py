@@ -15,6 +15,8 @@ t_byte = 1e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
 m_l = 1
+T_m = 35.0
+T_g = 60.0
 
 def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   
@@ -141,7 +143,7 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solv
       #Cells in this subset.
       num_cells = cell_dist[node]
       #The cost of this edge.
-      cost = num_cells*3*solve_cell + (boundary_cells*2.0*t_comm + latency*m_l)
+      cost = num_cells*solve_cell + (boundary_cells*2.0*t_comm + latency*m_l)
       graph[e[0]][e[1]]['weight'] = cost
   return graphs
       
@@ -154,18 +156,26 @@ def sum_weights_of_path(graph,path):
     weight_sum += weight
 
   return weight_sum      
-          
+
+
+#This function corrects edge weighting for conflicts.
+def correct_conflict(graphs,heaviest_paths):
+  
+  
+
   
 def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subset_boundaries,num_row,num_col,num_plane):
   time = 0
   all_graph_time = np.zeros(8)
+  heaviest_paths = []
 
   #Looping over the graphs.
   for ig in range(0,len(graphs)):
     time_graph = 0
     graph = graphs[ig]
-    start_node = [x for x in graph.nodes() if graph.in_degree(x) == 0][0]
-    end_node = [x for x in graph.nodes() if graph.out_degree(x) == 0][0]
+    copy_graph = copy(graph)
+    start_node = [x for x in copy_graph.nodes() if copy_graph.in_degree(x) == 0][0]
+    end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
     
     paths = nx.all_simple_paths(graph,start_node,end_node)
     heaviest_path = 0.0
@@ -173,10 +183,12 @@ def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subse
       path_weight = sum_weights_of_path(graph,path)
       if path_weight > heaviest_path:
         heaviest_path = path_weight
+        index = path
     
+    heaviest_paths.append(index)
     time_graph = path_weight + solve_cell*3*cells_per_subset[end_node]
     all_graph_time[ig] = time_graph*10e-9 
   
   time = np.average(all_graph_time)
-  return all_graph_time,time
+  return all_graph_time,time,heaviest_paths
     
