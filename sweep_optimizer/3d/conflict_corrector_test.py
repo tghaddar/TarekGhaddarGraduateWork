@@ -54,7 +54,7 @@ for i in range(1,num_nodes-1):
     node2 = primary_path[j+1]
     weight_sum += G[node1][node2]['weight']
   
-  
+  #Looping through other paths for this node.
   for p in range(1,len(paths)):
     
     path = paths[p]
@@ -63,9 +63,18 @@ for i in range(1,num_nodes-1):
     
     weight_sum_path = 0.0
     #Getting the sum of the wieghts up to this node.
+  
     for j in range(0,node_position):
       node1 = path[j]
       node2 = path[j+1]
       weight_sum_path += G2[node1][node2]['weight']
     
-    print(weight_sum_path)
+    #If the primary path is faster than the secondary path to reach this node, then we set faster_path to True.
+    faster_path = False
+    if weight_sum_path > weight_sum:
+      faster_path = True
+    
+    if (faster_path):
+      #Get the time to solve this node.
+      time_to_solve = G[current_node][primary_path[i+1]]
+      
