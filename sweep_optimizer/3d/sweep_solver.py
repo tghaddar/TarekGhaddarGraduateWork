@@ -161,8 +161,28 @@ def sum_weights_of_path(graph,path):
 #This function corrects edge weighting for conflicts.
 def correct_conflict(graphs,heaviest_paths):
   
+  primary_graph = graphs[0]
+  primary_path = heaviest_paths[0]
   
-
+  num_graphs = len(graphs)
+  num_nodes = primary_graph.number_of_nodes()
+  
+  for n in range(0,num_nodes):
+    current_node = primary_path[n]
+    #Getting the time to get to this node.
+    weight_sum = 0.0
+    for j in range(0,n):
+      node1 = primary_path[j]
+      node2 = primary_path[j+1]
+      weight_sum += primary_graph[node1][node2]['weight']
+    
+    #Looping through other paths to check conflicts with this node.
+    for p in range(1,num_graphs):
+      
+      path = heaviest_paths[p]
+      node_position = -1
+      try:
+        node_position = path.index(current_node)
   
 def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subset_boundaries,num_row,num_col,num_plane):
   time = 0
