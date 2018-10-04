@@ -157,6 +157,21 @@ def sum_weights_of_path(graph,path):
 
   return weight_sum      
 
+#Gets the path that gets fastest to a node.
+def get_fastest_path(graphs,paths,node):
+  
+  check_paths = copy(paths)
+  num_paths = len(paths)
+  #Checks if the node is in the path.
+  for p in range(0,num_paths):
+    path = check_paths[p]
+    node_index = -1
+    try:
+      node_index = path.index(node)
+    except:
+      del check_paths[p]
+    
+    
 
 #This function corrects edge weighting for conflicts.
 def correct_conflict(graphs,heaviest_paths):
@@ -183,6 +198,9 @@ def correct_conflict(graphs,heaviest_paths):
       node_position = -1
       try:
         node_position = path.index(current_node)
+      except:
+        continue 
+    
   
 def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subset_boundaries,num_row,num_col,num_plane):
   time = 0
