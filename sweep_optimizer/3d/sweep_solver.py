@@ -1,6 +1,8 @@
 import numpy as np
 import warnings
 import networkx as nx
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from copy import copy
 from utilities import get_ijk
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -62,7 +64,46 @@ def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
     cells_per_subset.append(cells_in_subset)
     
   return cells_per_subset
+
+def plot_subset_boundaries(global_3d_subset_boundaries,num_subsets):
+  fig = plt.figure(1)
+  ax = fig.gca(projection='3d')
+  subset_centers = []
+  layer_colors = ['b','r']
+  layer = 0
+  for i in range(0,num_subsets):
+  
+    subset_boundary = global_3d_subset_boundaries[i]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+    zmin = subset_boundary[4]
+    zmax = subset_boundary[5]
+    if (zmax == 10.0):
+      layer = 1
+    else:
+      layer = 0
+  
+    center_x = (xmin+xmax)/2
+    center_y = (ymin+ymax)/2
+    center_z = (zmin+zmax)/2
+  
+    subset_centers.append([center_x, center_y, center_z])
+  
+    x = [xmin, xmax, xmax, xmin, xmin,xmax,xmax,xmin,xmin,xmin,xmin,xmin,xmax,xmax,xmin,xmin]
+    y = [ymin, ymin, ymax, ymax, ymin,ymin,ymin,ymin,ymin,ymax,ymax,ymin,ymin,ymax,ymax,ymin]
+    z = [zmin, zmin, zmin, zmin, zmin,zmin,zmax,zmax,zmin,zmin,zmax,zmax,zmax,zmax,zmax,zmax]
+  
+    ax.plot(x,y,z,layer_colors[layer])
     
+    x2 = [xmax,xmax]
+    y2 = [ymax,ymax]
+    z2 = [zmax,zmin]
+    ax.plot(x2,y2,z2,layer_colors[layer])
+  
+  plt.savefig("subset_plot.pdf")
+  
 #Checking if the current node shares x or y subset boundaries.
 def find_shared_bound(node,succ,num_row,num_col,num_plane):
   bounds_check = []

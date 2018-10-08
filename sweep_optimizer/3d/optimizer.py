@@ -54,44 +54,6 @@ num_row = N_y + 1
 num_col = N_x + 1
 num_plane = N_z + 1
 
-def plot_subset_boundaries(global_3d_subset_boundaries,num_subsets):
-  fig = plt.figure(1)
-  ax = fig.gca(projection='3d')
-  subset_centers = []
-  layer_colors = ['b','r']
-  layer = 0
-  for i in range(0,num_subsets):
-  
-    subset_boundary = global_3d_subset_boundaries[i]
-    xmin = subset_boundary[0]
-    xmax = subset_boundary[1]
-    ymin = subset_boundary[2]
-    ymax = subset_boundary[3]
-    zmin = subset_boundary[4]
-    zmax = subset_boundary[5]
-    if (zmax == 10.0):
-      layer = 1
-    else:
-      layer = 0
-  
-    center_x = (xmin+xmax)/2
-    center_y = (ymin+ymax)/2
-    center_z = (zmin+zmax)/2
-  
-    subset_centers.append([center_x, center_y, center_z])
-  
-    x = [xmin, xmax, xmax, xmin, xmin,xmax,xmax,xmin,xmin,xmin,xmin,xmin,xmax,xmax,xmin,xmin]
-    y = [ymin, ymin, ymax, ymax, ymin,ymin,ymin,ymin,ymin,ymax,ymax,ymin,ymin,ymax,ymax,ymin]
-    z = [zmin, zmin, zmin, zmin, zmin,zmin,zmax,zmax,zmin,zmin,zmax,zmax,zmax,zmax,zmax,zmax]
-  
-    ax.plot(x,y,z,layer_colors[layer])
-    
-    x2 = [xmax,xmax]
-    y2 = [ymax,ymax]
-    z2 = [zmax,zmin]
-    ax.plot(x2,y2,z2,layer_colors[layer])
-  
-  plt.savefig("subset_plot.pdf")
 
 def con(t):
   
