@@ -71,11 +71,11 @@ def overlap(s_bounds,n_bounds):
   n_botright = [n_bounds[1],n_bounds[2]]
   
   #If one rectangle is left of the other.
-  if ( (s_topleft[0] > n_botright[0]) or (n_topleft[0] > s_botright[0]) ):
+  if ( (s_topleft[0] >= n_botright[0]) or (n_topleft[0] >= s_botright[0]) ):
     return False
   
   #If one rectangle is above the other.
-  if ( (s_topleft[1] < n_botright[1]) or (n_topleft[1] < s_botright[1]) ):
+  if ( (s_topleft[1] <= n_botright[1]) or (n_topleft[1] <= s_botright[1]) ):
     return False
   
   return True
