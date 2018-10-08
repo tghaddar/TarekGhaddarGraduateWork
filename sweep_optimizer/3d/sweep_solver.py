@@ -265,7 +265,7 @@ def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subse
         index = path
     
     heaviest_paths.append(index)
-    time_graph = path_weight + solve_cell*3*cells_per_subset[end_node]
+    time_graph = path_weight + solve_cell*cells_per_subset[end_node]
     all_graph_time[ig] = time_graph*10e-9 
   
   time = np.average(all_graph_time)
