@@ -7,8 +7,9 @@ Unit test for conflict corrector.
 """
 import networkx as nx
 import matplotlib.pyplot as plt
+import warnings
 
-#plt.close("all")
+plt.close("all")
 
 G = nx.DiGraph()
 G2 = nx.DiGraph()
@@ -23,16 +24,16 @@ G.add_edge(0,1,weight = 3)
 G.add_edge(1,2,weight = 10)
 G.add_edge(2,3,weight = 2)
 G.add_edge(3,4,weight = 8)
-#plt.figure("Graph 1")
-#nx.draw(G,nx.shell_layout(G),with_labels = True)
+plt.figure("Graph 1")
+nx.draw(G,nx.shell_layout(G),with_labels = True)
 
 G2.add_edge(4,3,weight = 1)
 G2.add_edge(3,2,weight = 8)
 G2.add_edge(2,1,weight = 2)
 G2.add_edge(1,0,weight = 10)
 
-#plt.figure("Graph 2")
-#nx.draw(G2,nx.shell_layout(G2),with_labels = True)
+plt.figure("Graph 2")
+nx.draw(G2,nx.shell_layout(G2),with_labels = True)
 
 path1 = nx.all_simple_paths(G,0,4)
 path2 = nx.all_simple_paths(G2,4,0)
