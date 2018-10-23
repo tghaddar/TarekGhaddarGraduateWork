@@ -8,6 +8,7 @@ Unit test for conflict corrector.
 import networkx as nx
 import matplotlib.pyplot as plt
 import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 plt.close("all")
 

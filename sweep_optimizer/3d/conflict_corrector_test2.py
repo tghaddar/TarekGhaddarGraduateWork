@@ -7,26 +7,53 @@ A different method of correcting conflicts with 4 paths.
 """
 
 import networkx as nx
+import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+from sweep_solver import get_fastest_path
+from sweep_solver import sum_weights_of_path
+from sweep_solver import get_heaviest_path
+
+plt.close("all")
 
 G = nx.DiGraph()
-G1 = nx.DiGraph()
 G2 = nx.DiGraph()
-G3 = nx.DiGraph()
 
-for n in range(0,4):
+num_nodes = 5
+
+for n in range(0,num_nodes):
   G.add_node(n)
-  G1.add_node(n)
   G2.add_node(n)
-  G3.add_node(n)
 
-G.add_edge(0,1)
-G.add_edge(0,2)
-G.add_edge(1,2)
-G.add_edge(1,3)
-G.add_edge(2,3)
+G.add_edge(0,1,weight = 3)
+G.add_edge(1,2,weight = 10)
+G.add_edge(2,3,weight = 2)
+G.add_edge(3,4,weight = 8)
+#plt.figure("Graph 1")
+#nx.draw(G,nx.shell_layout(G),with_labels = True)
 
-G1.add_edge(1,0)
-G1.add_edge(1,2)
-G1.add_edge(1,3)
-G1.add_edge(0,2)
-G1.add_edge(0,)
+G2.add_edge(4,3,weight = 1)
+G2.add_edge(3,2,weight = 8)
+G2.add_edge(2,1,weight = 2)
+G2.add_edge(1,0,weight = 10)
+
+#plt.figure("Graph 2")
+#nx.draw(G2,nx.shell_layout(G2),with_labels = True)
+
+path1 = nx.all_simple_paths(G,0,4)
+path2 = nx.all_simple_paths(G2,4,0)
+
+
+
+graphs = [G,G2]
+paths = [path1,path2]
+#Getting the heaviest path in each graph.
+for p in range(0,len(paths)):
+  current_path = paths[p]
+  heavy_path = get_heaviest_path(graphs[p],current_path)
+  paths[p] = heavy_path
+
+
+for n in range(0,num_nodes):
+  fastest_path,weight_sum = get_fastest_path(graphs,paths,n)
+  print(fastest_path,weight_sum)

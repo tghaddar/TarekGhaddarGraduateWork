@@ -198,19 +198,49 @@ def sum_weights_of_path(graph,path):
 
   return weight_sum      
 
+#Takes all simple paths in a graph and returns the heaviest one.
+def get_heaviest_path(graph,paths):
+  heaviest_path = 0
+  for path in paths:
+    path_weight = sum_weights_of_path(graph,path)
+    if path_weight > heaviest_path:
+      heaviest_path = path
+    
+  return heaviest_path
+      
+    
+
 #Gets the path that gets fastest to a node.
 def get_fastest_path(graphs,paths,node):
   
   check_paths = copy(paths)
-  num_paths = len(paths)
   #Checks if the node is in the path.
-  for p in range(0,num_paths):
-    path = check_paths[p]
+  weight_sum = 1e8
+  fastest_path = 0
+  index = 0
+  for path in check_paths:
+    graph = graphs[index]
     node_index = -1
     try:
       node_index = path.index(node)
     except:
-      del check_paths[p]
+      continue
+    
+    weight_sum_path = 0.0
+    for j in range(0,node_index):
+      node1 = path[j]
+      node2 = path[j+1]
+      weight_sum_path += graph[node1][node2]['weight']
+    
+    #If this path is fastest (smallest weight), we update our fastest_path variable.
+    if (weight_sum_path < weight_sum):
+      weight_sum = weight_sum_path
+      fastest_path = index
+    
+    index += 1
+  
+  return fastest_path,weight_sum
+    
     
     
 
