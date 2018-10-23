@@ -68,8 +68,7 @@ for i in range(1,num_nodes-1):
     node_position = path.index(current_node)
     
     weight_sum_path = 0.0
-    #Getting the sum of the wieghts up to this node.
-  
+    #Getting the sum of the weights up to this node.
     for j in range(0,node_position):
       node1 = path[j]
       node2 = path[j+1]

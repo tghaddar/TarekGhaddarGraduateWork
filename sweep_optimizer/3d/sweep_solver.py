@@ -208,7 +208,24 @@ def get_heaviest_path(graph,paths):
     
   return heaviest_path
       
-    
+#Get the sum of weights to a path.
+def get_weight_sum(graph,path,node):
+  weight_sum = 0.0
+  node_index = -1
+  try:
+    node_index = path.index(node)
+  except:
+    #If this node is not this path, we return a very large sum.
+    return 1e8
+  
+  weight_sum = 0.0
+  for j in range(0,node_index):
+    node1 = path[j]
+    node2 = path[j+1]
+    weight_sum += graph[node1][node2]['weight']
+  
+  return weight_sum  
+  
 
 #Gets the path that gets fastest to a node.
 def get_fastest_path(graphs,paths,node):
