@@ -56,4 +56,4 @@ for p in range(0,len(paths)):
 
 for n in range(0,num_nodes):
   fastest_path,weight_sum = get_fastest_path(graphs,paths,n)
-  print(fastest_path,weight_sum)
+  
