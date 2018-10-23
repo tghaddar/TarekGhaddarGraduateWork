@@ -18,6 +18,7 @@ import sweep_solver
 import networkx as nx
 import flip_adjacency
 import warnings
+from copy import copy
 warnings.filterwarnings("ignore") 
 
 plt.close("all")
@@ -168,7 +169,7 @@ def build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane):
 
 #Creating the graphs.
 def build_graphs(adjacency_matrix_3d,num_row,num_col,num_plane):
-  
+
   #Getting the upper triangular portion of the adjacency_matrix
   adjacency_matrix_0 = np.triu(adjacency_matrix_3d)
   #Time to build the graph for octant 0
@@ -176,6 +177,7 @@ def build_graphs(adjacency_matrix_3d,num_row,num_col,num_plane):
   plt.figure(2)
   nx.draw(G,nx.shell_layout(G),with_labels = True)
   plt.savefig('digraph.pdf')
+  
   
   #Lower triangular matrix.
   adjacency_matrix_7 = np.tril(adjacency_matrix_3d)
@@ -234,7 +236,16 @@ def build_graphs(adjacency_matrix_3d,num_row,num_col,num_plane):
   #Storing all the graphs in a list.
   graphs = [G,G_1,G_2,G_3,G_4,G_5,G_6,G_7]
   
-  return graphs
+  #Storing all simple paths for each graph.
+  paths = []
+  for graph in graphs:
+    copy_graph = copy(graph)
+    start_node = [x for x in copy_graph.nodes() if copy_graph.in_degree(x) == 0][0]
+    end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
+    simple_paths = nx.all_simple_paths(graph,start_node,end_node)
+    paths.append(simple_paths)
+  
+  return graphs,paths
 
 
 

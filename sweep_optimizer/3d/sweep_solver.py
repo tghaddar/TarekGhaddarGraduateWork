@@ -201,12 +201,14 @@ def sum_weights_of_path(graph,path):
 #Takes all simple paths in a graph and returns the heaviest one.
 def get_heaviest_path(graph,paths):
   heaviest_path = 0
+  heaviest_path_weight = 0.0
   for path in paths:
     path_weight = sum_weights_of_path(graph,path)
-    if path_weight > heaviest_path:
+    if path_weight > heaviest_path_weight:
       heaviest_path = path
+      heaviest_path_weight = path_weight
     
-  return heaviest_path
+  return heaviest_path,heaviest_path_weight
       
 #Get the sum of weights to a path.
 def get_weight_sum(graph,path,node):
@@ -231,7 +233,7 @@ def add_conflict_weights(graphs,paths):
   num_nodes = graphs[0].number_of_nodes()
   for p in range(0,len(paths)):
     current_path = paths[p]
-    heavy_path = get_heaviest_path(graphs[p],current_path)
+    heavy_path,path_weight = get_heaviest_path(graphs[p],current_path)
     paths[p] = heavy_path
   
   
@@ -302,7 +304,6 @@ def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subse
   time = 0
   all_graph_time = np.zeros(8)
   heaviest_paths = []
-
   #Looping over the graphs.
   for ig in range(0,len(graphs)):
     time_graph = 0
@@ -312,14 +313,15 @@ def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subse
     end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
     
     paths = nx.all_simple_paths(graph,start_node,end_node)
-    heaviest_path = 0.0
-    for path in paths:
-      path_weight = sum_weights_of_path(graph,path)
-      if path_weight > heaviest_path:
-        heaviest_path = path_weight
-        index = path
-    
-    heaviest_paths.append(index)
+#    heaviest_path = 0.0
+#    for path in paths:
+#      path_weight = sum_weights_of_path(graph,path)
+#      if path_weight > heaviest_path:
+#        heaviest_path = path_weight
+#        index = path
+#    
+#    heaviest_paths.append(index)
+    heaviest_path,path_weight = get_heaviest_path(graph,paths)
     time_graph = path_weight + solve_cell*cells_per_subset[end_node]
     all_graph_time[ig] = time_graph*10e-9 
   

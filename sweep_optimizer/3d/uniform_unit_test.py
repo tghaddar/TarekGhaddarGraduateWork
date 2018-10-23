@@ -11,6 +11,7 @@ from build_3d_adjacency import build_adjacency_matrix
 from build_3d_adjacency import build_graphs
 from sweep_solver import plot_subset_boundaries
 from sweep_solver import add_edge_cost
+from sweep_solver import add_conflict_weights
 #from sweep_solver import 
 import warnings
 import networkx as nx
@@ -58,7 +59,7 @@ fig = plot_subset_boundaries(global_subset_boundaries,num_subsets)
 
 adjacency_matrix = build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane)
 
-graphs = build_graphs(adjacency_matrix,num_row,num_col,num_plane)
+graphs,all_simple_paths = build_graphs(adjacency_matrix,num_row,num_col,num_plane)
 
 #Equivalent number of cells per subset.
 cell_dist = []
@@ -68,6 +69,8 @@ for i in range(0,num_subsets):
 num_total_cells = sum(cell_dist)
 
 graphs = add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solve_cell,t_comm,latency,m_l,num_row,num_col,num_plane)
+
+graphs = add_conflict_weights(graphs,all_simple_paths)
 
 for ig in range(0,len(graphs)):
   for line in nx.generate_edgelist(graphs[ig],data=True):
