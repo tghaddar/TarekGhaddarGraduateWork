@@ -225,8 +225,47 @@ def get_weight_sum(graph,path,node):
     weight_sum += graph[node1][node2]['weight']
   
   return weight_sum  
-  
 
+def add_conflict_weights(graphs,paths):
+  
+  num_nodes = graphs[0].number_of_nodes()
+  for p in range(0,len(paths)):
+    current_path = paths[p]
+    heavy_path = get_heaviest_path(graphs[p],current_path)
+    paths[p] = heavy_path
+  
+  
+  for n in range(0,num_nodes):
+    fastest_path,weight_sum = get_fastest_path(graphs,paths,n)
+      
+    primary_graph = graphs[fastest_path]
+    primary_path = paths[fastest_path]
+    primary_index = primary_path.index(n)
+    
+    #Looping through remaining path to add potential delays for this node.
+    for p in range(0,len(paths)):
+      secondary_path = paths[p]
+      secondary_graph = graphs[p]
+      if p == fastest_path:
+        continue
+      #Check if this node exists in the secondary path.
+      secondary_index = -1
+      try:
+        secondary_index = secondary_path.index(n)
+      except:
+        continue
+      
+      weight_sum_secondary = get_weight_sum(graphs[p],paths[p],n)
+      delay = weight_sum_secondary - weight_sum
+      time_to_solve = primary_graph[n][primary_path[primary_index+1]]['weight']
+      delay = time_to_solve - delay
+      if (delay > 0):
+        #Add this delay to the current node's solve time in the secondary graph.
+        next_node = secondary_path[secondary_index+1]
+        secondary_graph[n][next_node]['weight'] += delay
+    
+  return graphs
+  
 #Gets the path that gets fastest to a node.
 def get_fastest_path(graphs,paths,node):
   
