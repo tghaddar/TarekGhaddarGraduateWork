@@ -227,9 +227,21 @@ def get_weight_sum(graph,path,node):
     node2 = path[j+1]
     weight_sum += graph[node1][node2]['weight']
   
-  return weight_sum  
+  return weight_sum
 
-def add_conflict_weights(graphs,paths):
+#Returns the depth of graph remaining.
+def get_DOG(graph,path,node):
+  
+  weight_sum = 0.0
+  node_index = path.index(node)
+  for n in range(node_index,len(path)-1):
+    node1 = path[n]
+    node2 = path[n+1]
+    weight_sum += graph[node1][node2]['weight']
+  
+  return weight_sum
+
+def add_conflict_weights(graphs,paths,latency):
   
   num_nodes = graphs[0].number_of_nodes()
   for p in range(0,len(paths)):
@@ -263,8 +275,9 @@ def add_conflict_weights(graphs,paths):
       time_to_solve = primary_graph[n][primary_path[primary_index+1]]['weight']
       delay = time_to_solve - delay
       #If two graphs reach each other at the same time, we have to resort to depth of graph.
-      if (isclose(delay,0.0,rel_tol=1e-09)):
+      if (isclose(delay,0.0,rel_tol=1e-4*latency)):
         print("same time")
+        
       elif (delay > 0):
         #Add this delay to the current node's solve time in the secondary graph.
         next_node = secondary_path[secondary_index+1]

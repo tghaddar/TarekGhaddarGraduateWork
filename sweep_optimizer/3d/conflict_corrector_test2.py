@@ -11,10 +11,13 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from sweep_solver import add_conflict_weights
+from sweep_solver import get_heaviest_path
+from sweep_solver import get_DOG
 plt.close("all")
 
 G = nx.DiGraph()
 G2 = nx.DiGraph()
+latency = 4110.0
 
 num_nodes = 5
 
@@ -43,7 +46,7 @@ path2 = nx.all_simple_paths(G2,4,0)
 graphs = [G,G2]
 paths = [path1,path2]
 
-graphs = add_conflict_weights(graphs,paths)
+graphs = add_conflict_weights(graphs,paths,latency)
 
 G = graphs[0]
 G2 = graphs[1]
