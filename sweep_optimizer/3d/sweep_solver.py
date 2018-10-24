@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from copy import copy
 from utilities import get_ijk
+from math import isclose
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 #This function computes the solve time for a sweep for each octant. 
@@ -261,10 +262,14 @@ def add_conflict_weights(graphs,paths):
       delay = weight_sum_secondary - weight_sum
       time_to_solve = primary_graph[n][primary_path[primary_index+1]]['weight']
       delay = time_to_solve - delay
-      if (delay > 0):
+      #If two graphs reach each other at the same time, we have to resort to depth of graph.
+      if (isclose(delay,0.0,rel_tol=1e-09)):
+        print("same time")
+      elif (delay > 0):
         #Add this delay to the current node's solve time in the secondary graph.
         next_node = secondary_path[secondary_index+1]
         secondary_graph[n][next_node]['weight'] += delay
+      
     
   return graphs
   
