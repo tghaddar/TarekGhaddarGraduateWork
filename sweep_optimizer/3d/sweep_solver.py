@@ -184,7 +184,7 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solv
       #Cells in this subset.
       num_cells = cell_dist[node]
       #The cost of this edge.
-      cost = num_cells*solve_cell + (boundary_cells*2.0*t_comm + latency*m_l)
+      cost = num_cells*solve_cell + (boundary_cells*t_comm + latency*m_l)
       graph[e[0]][e[1]]['weight'] = cost
   return graphs
       
@@ -268,17 +268,15 @@ def add_conflict_weights(graphs,paths):
     
   return graphs
   
-#Gets the path that gets fastest to a node.
+#Gets the path that gets fastest to a node. Assumes that each graph has its heaviest path listed.
 def get_fastest_path(graphs,paths,node):
   
   check_paths = copy(paths)
-  print(node)
   #Checks if the node is in the path.
   weight_sum = 1e8
   fastest_path = 0
   index = 0
   for path in check_paths:
-    print(path)
     graph = graphs[index]
     node_index = -1
     try:
