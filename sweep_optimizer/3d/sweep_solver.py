@@ -272,16 +272,19 @@ def add_conflict_weights(graphs,paths):
 def get_fastest_path(graphs,paths,node):
   
   check_paths = copy(paths)
+  print(node)
   #Checks if the node is in the path.
   weight_sum = 1e8
   fastest_path = 0
   index = 0
   for path in check_paths:
+    print(path)
     graph = graphs[index]
     node_index = -1
     try:
       node_index = path.index(node)
     except:
+      index += 1
       continue
     
     weight_sum_path = 0.0

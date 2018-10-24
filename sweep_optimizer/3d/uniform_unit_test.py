@@ -12,6 +12,7 @@ from build_3d_adjacency import build_graphs
 from sweep_solver import plot_subset_boundaries
 from sweep_solver import add_edge_cost
 from sweep_solver import add_conflict_weights
+from sweep_solver import compute_solve_time
 #from sweep_solver import 
 import warnings
 import networkx as nx
@@ -71,6 +72,8 @@ num_total_cells = sum(cell_dist)
 graphs = add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solve_cell,t_comm,latency,m_l,num_row,num_col,num_plane)
 
 graphs = add_conflict_weights(graphs,all_simple_paths)
+
+all_graph_time,time,heaviest_paths = compute_solve_time(graphs,solve_cell,cell_dist,num_total_cells,global_subset_boundaries,num_row,num_col,num_plane)
 
 for ig in range(0,len(graphs)):
   for line in nx.generate_edgelist(graphs[ig],data=True):
