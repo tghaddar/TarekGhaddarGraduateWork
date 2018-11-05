@@ -36,7 +36,7 @@
 \renewcommand{\thetable}{\Roman{table}}
 \usepackage{fixltx2e}
 %Title Page
-\newcommand{\titles}{\LARGE \textbf{Load Balancing Unstructured Meshes for Massively Parallel Transport Sweeps}}
+\newcommand{\titles}{\LARGE \textbf{Performance Modeling for Potentially Unbalanced Partitions in Massively Parallel Transport Sweeps}}
 \newcommand{\authors}{\normalsize Tarek Ghaddar \\ Chair: Dr. Jean Ragusa \\ Committee: Dr. Jim Morel, Dr. Marvin Adams, Dr. Nancy Amato}
 \newcommand{\department}{\normalsize Nuclear Engineering Department}
 \newcommand{\university}{\normalsize Texas A\&M University}
@@ -490,20 +490,18 @@ Figure \ref{worst_partition} observes the worst theoretical sweep partitioning, 
   \label{worst_partition}
 \end{figure}
 
-Two things become immediately clear as a result of this study: perfect balance does not always yield the best parallel efficiency, and the stage count of a sweep is no longer as important. The concept of the stage is invalidated, becuase a stage relies on the assumption of perfect load balance. Once the time to compute a task changes throughout the problem domain, we must instead rely on the total time to solution as the most important metric, not the stage and the previously staged definition of parallel efficiency (Eq. \ref{paralleleff}). 
+Two things become immediately clear as a result of this study: perfect balance does not always yield the best parallel efficiency, and the stage count of a sweep is no longer as important. The concept of the stage is invalidated, because a stage relies on the assumption of perfect load balance. Once the time to compute a task changes throughout the problem domain, we must instead rely on the total time to solution as the most important metric, not the stage and the previously staged definition of parallel efficiency (Eq. \ref{paralleleff}). 
 
 \section{Goals and Proposed Plan}
 
 \begin{itemize}
-\item Create test problem to gather data for unbalanced, partially balanced, and load balanced runs to study how time to solution behaves in a real problem. 
-\item Develop a cost function that correlates imbalanced partitioning to time to solution.
-\item Utilize this cost function in a updated transport sweep performance model.
-\item Implement this model in PDT.
+\item Build load balancing by dimension algorithm in PDT.
+\item Write OpenFOAM to PDT meshing interface. 
+\item Build time-to-solution estimator that estimates the time to solution based on a given partitioning scheme.
+\item Test time-to-solution estimator against existing PDT problems for structured meshes.
+\item Use the time-to-solution estimator to optimize the partitioning scheme based on the time to solution. 
 \end{itemize}
-\subsection{Possible Outlook for Research}
-\begin{itemize}
-\item Propose a scaling study for unstructured meshes in PDT, similar to PDT's Zerr problem.
-\end{itemize}
+
 
 \bibliographystyle{plain}
 \bibliography{./Proposal}
