@@ -340,7 +340,7 @@ This orthogonal grid is superimposed and each subset is meshed in parallel.  Sub
 
 \subsection{Triangular Meshes in PDT}
 
-When using the unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). After superimposing the orthogonal grid, a PSLG is created for each subset, and meshed. Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. Obviously, this is not as good as a unstructured tetrahedral mesh, but for many problems, it is a great capability to have. 
+When using the Triangle unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). After superimposing the orthogonal grid, a PSLG is created for each subset, and meshed.  Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. Obviously, this is not as good as a unstructured tetrahedral mesh, but for many problems, it is a great capability to have. 
 
 \subsection{OpenFOAM Meshes in PDT}
 
@@ -372,7 +372,7 @@ PDT has recently acquired the ability to read in OpenFOAM meshes and sweep on th
 
 As shown in Fig. \ref{comparison_slice_zoom}, the other advantage of the OpenFOAM meshes is the ability to maintain good mesh quality with a relatively smaller number of cells. Due to the extrusion process in the triangular prism meshes, any spherical or cylindrical shapes are stair-stepped in 2D, and need a lot more triangular cells to maintain a good mesh quality.
 
-However, the OpenFOAM meshes due pose a challenge. When aggregating angles during the sweep, cycles occur. This prevents PDT from sweeping on these meshes unless using single angle aggregation, and most sweeps on large problems time out. A sweep structure that detects and addresses cycles is currently being implemented by the PDT development team, making OpenFOAM meshes practical and useable.
+However, the OpenFOAM meshes due pose a challenge. When aggregating angles during the sweep, cycles occur. This prevents PDT from sweeping on these meshes unless using single angle aggregation, and most sweeps on large problems time out. A sweep structure that detects and addresses cycles is currently being implemented by the PDT development team, making OpenFOAM meshes practical for realistic problems.
 
 \subsection{Spiderweb Meshes in PDT}
 
@@ -457,12 +457,12 @@ If the number of cells in each subset can be reasonably balanced, then the probl
 
 In previous work, load balancing proved to be successful, but not as successful as initially expected. It became clear that when creating an unstructured mesh in PDT, the iterative nature of our algorithm did not work as effectively when using the Triangle Mesh Generator. 
 
-An improved load balancing algorithm was implemented that significantly improved our metric. Rather than load balancing both dimensions within an iteration, one dimension is balanced first for all iterations, and then the cut lines that yielded the best metric for that dimension are chosen. Then the next dimension is balanced within the first dimension. For example, if the $x$ cut lines are balanced first, the $y$ cut lines would be balanced \textit{within} each column.
+An improved load balancing algorithm was implemented that significantly improved our metric. Rather than load balancing both dimensions within an iteration, one dimension is balanced first for all iterations, and then the cut lines that yielded the best metric for that dimension are chosen. Then the next dimension is balanced within the first dimension. For example, if the $x$ cut lines are balanced first, the $y$ cut lines would be balanced \textit{within} each column. When load balancing by dimension is used via Rick Vega's code, excellent metrics within 5\% of unity are consistently obtained.
 
 However, upon further study of the load balancing by dimension algorithm, it is clear the most efficient partitioning scheme is not being used. A cost function that takes into account the best partitioning scheme and best balance needs to be studied. The best balanced partition may not be the best partition for a parallel transport sweep.
 
 
-\section{Preliminary Results}
+\section{Drawbacks of Load Balancing Unstructured Meshes for Transport Sweeps}
 
 While perfect load balance was the initial goal, we need to know how this affects the efficiency of our parallel transport sweep. Figures \ref{regular_partition}-\ref{worst_partition} showcase the theoretical effect of perfect load balance on the transport sweep.
 
