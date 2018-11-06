@@ -71,7 +71,7 @@ num_total_cells = sum(cell_dist)
 
 graphs = add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solve_cell,t_comm,latency,m_l,num_row,num_col,num_plane)
 
-graphs = add_conflict_weights(graphs,all_simple_paths)
+graphs = add_conflict_weights(graphs,all_simple_paths,latency)
 
 all_graph_time,time,heaviest_paths = compute_solve_time(graphs,solve_cell,cell_dist,num_total_cells,global_subset_boundaries,num_row,num_col,num_plane)
 
