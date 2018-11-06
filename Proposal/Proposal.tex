@@ -326,7 +326,7 @@ Cycle detection utilizes two operations: trim and mark. Trimming identifies and 
 
 \section{Unstructured Meshing in PDT}
 
-The capability for PDT to generate and run on an unstructured mesh is important because it allows us to run problems without having to conform our mesh to the problem as much. The idea is to have a logically Cartesian grid (creating orthogonal ``subsets") with an unstructured mesh inside each subset. These logically Cartesian subdomains are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator. 
+The capability for PDT to generate and run on an unstructured mesh is important because it allows us to run problems without having to conform our mesh to the problem. The idea is to have a logically Cartesian grid (creating orthogonal ``subsets") with an unstructured mesh inside each subset. These logically Cartesian subdomains are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -338,7 +338,33 @@ The capability for PDT to generate and run on an unstructured mesh is important 
 
 This orthogonal grid is superimposed and each subset is meshed in parallel.  Subsets are now the base structured unit when calculating our parallel efficiency. Discontinuities along the boundary are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, there is no problem solving on degenerate polygons. 
 
+\subsection{Triangular Meshes in PDT}
+
 When using the unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). After superimposing the orthogonal grid, a PSLG is created for each subset, and meshed. Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. Obviously, this is not as good as a unstructured tetrahedral mesh, but for many problems, it is a great capability to have. 
+
+\subsection{Cubit/OpenFOAM Meshes in PDT}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.17]{../figures/im1_228.png}
+\includegraphics[scale=0.17]{../figures/im1c_prism.png}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+  \includegraphics[scale=0.17]{../figures/im1_cubit_slice.png}
+  \includegraphics[scale=0.17]{../figures/im1c_prism_slice_q.png}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+  \includegraphics[scale=0.17]{../figures/im1_cubit_slice_zoom.png}
+  \includegraphics[scale=0.17]{../figures/im1c_prism_slice_zoom_q.png}
+\end{figure}
+
+\subsection{Spiderweb Meshes in PDT}
+
+\section{Load Balancing}
 
 When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to ``balance'' the number of cells. Ideally, each processor will be responsible for an equal number of cells. 
 
@@ -494,7 +520,7 @@ Two things become immediately clear as a result of this study: perfect balance d
 
 \begin{itemize}
 \item Build load balancing by dimension algorithm in PDT.
-\item Write OpenFOAM to PDT meshing interface. 
+\item Write Cubit/OpenFOAM to PDT meshing interface. 
 \item Build time-to-solution estimator that estimates the time to solution based on a given partitioning scheme.
 \item Test time-to-solution estimator against existing PDT problems for structured meshes.
 \item Use the time-to-solution estimator to optimize the partitioning scheme based on the time to solution. 
