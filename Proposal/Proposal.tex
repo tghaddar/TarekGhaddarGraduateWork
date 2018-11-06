@@ -342,25 +342,37 @@ This orthogonal grid is superimposed and each subset is meshed in parallel.  Sub
 
 When using the unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). After superimposing the orthogonal grid, a PSLG is created for each subset, and meshed. Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. Obviously, this is not as good as a unstructured tetrahedral mesh, but for many problems, it is a great capability to have. 
 
-\subsection{Cubit/OpenFOAM Meshes in PDT}
+\subsection{OpenFOAM Meshes in PDT}
+
+PDT has recently acquired the ability to read in OpenFOAM meshes and sweep on them. Rick Vega (a Texas A\&M graduate under Marvin Adams) adapted the load balancing by dimension algorithm used in PDT into a fully 3D case (discussed later). His code accepts a fluent mesh file, load balances it, and dumps the balanced mesh in OpenFOAM format. PDT then reads in the OpenFOAM formatted file and sweeps on that mesh. This approach has major advantages to the Triangle approach, because it allows a user with an existing mesh (generated via Cubit, Star CCM, TetGen, etc.) to simply save the mesh as a fluent file and have PDT read it in and sweep on it. Figures \ref{comparison}, \ref{comparison_slice}, and \ref{comparison_slice_zoom} show the differences in the two above approaches for the IM1C experiment run at Texas A\&M University.
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.17]{../figures/im1_228.png}
 \includegraphics[scale=0.17]{../figures/im1c_prism.png}
+\caption{A comparison of the two meshing approaches for the IM1C experiment.}
+\label{comparison}
 \end{figure}
 
 \begin{figure}[H]
 \centering
   \includegraphics[scale=0.17]{../figures/im1_cubit_slice.png}
   \includegraphics[scale=0.17]{../figures/im1c_prism_slice_q.png}
+  \caption{A comparison of the two meshing approaches for a slice into the detector of the IM1C experiment.}
+  \label{comparison_slice}
 \end{figure}
 
 \begin{figure}[H]
 \centering
   \includegraphics[scale=0.17]{../figures/im1_cubit_slice_zoom.png}
   \includegraphics[scale=0.17]{../figures/im1c_prism_slice_zoom_q.png}
+  \caption{A closer look at the detector region of the two meshing approaches.}
+  \label{comparison_slice_zoom}
 \end{figure}
+
+As shown in Fig. \ref{comparison_slice_zoom}, the other advantage of the OpenFOAM meshes is the ability to maintain good mesh quality with a relatively smaller number of cells. Due to the extrusion process in the triangular prism meshes, any spherical or cylindrical shapes are stair-stepped in 2D, and need a lot more triangular cells to maintain a good mesh quality.
+
+However, the OpenFOAM meshes due pose a challenge. When aggregating angles during the sweep, cycles occur. This prevents PDT from sweeping on these meshes unless using single angle aggregation, and most sweeps on large problems time out. A sweep structure that detects and addresses cycles is currently being implemented by the PDT development team, making OpenFOAM meshes practical and useable.
 
 \subsection{Spiderweb Meshes in PDT}
 
