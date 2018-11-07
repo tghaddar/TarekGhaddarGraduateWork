@@ -555,7 +555,11 @@ Given that we know the machine parameters (grind time, latency, message communic
 
 Once this is done for all edges in all TDGs, we have to address sweep conflicts. Some simplifications are made without losing generality in order to detect sweep conflicts. For each TDG, we acquire all simple paths to get from its initial subset to its final subset. In the TDG shown in Fig. \ref{digraph}, this would return all simple paths to get from subset 0 to 7. For each TDG, the heaviest simple path is chosen. This represents the best estimate for the time to get sweep across the TDG, as it takes into account all dependencies for downstream subsets. 
 
-We check for conflicts only among the heaviest path in each octant. Two forms of conflict resolution are being explored, depth-of-graph remaining and first come first serve. Due to the imbalanced nature of the problems, each subset will take a different amount of time to solve and communicate. It follows that if two heavy paths arrive at a particular subset at different times, the subset that arrives first starts solving immediately. To reflect this, a delay is added to the edge of the conflicting heavy path. This reflects the first come first serve conflict resolution. We will explore the depth-of-graph conflict resolution in addition as a comparison. 
+We check for conflicts only among the heaviest path in each octant. Two forms of conflict resolution are being explored, depth-of-graph remaining and first come first serve. Due to the imbalanced nature of the problems, each subset will take a different amount of time to solve and communicate. It follows that if two heavy paths arrive at a particular subset at different times, the subset that arrives first starts solving immediately. To reflect this, a delay is added to the edge of the conflicting heavy path. This reflects the first come first serve conflict resolution. We will explore the depth-of-graph conflict resolution as a comparison to this, particularly for perfectly balanced and uniformly partitioned cases.
+
+\subsection{Optimizing the Time to Solution}
+
+Once the heaviest paths of each TDG are weighted appropriately with conflicts taken into account, we simply sum the weights of the path to get the time to complete the sweep. The octant with the heaviest sweep time is used as the time to solution for a given partitioning scheme. We will use a python optimization tool in order to minimize the time to solution with the cut lines defining the partitioning scheme as the parameter space.
 
 \section{Goals and Proposed Plan}
 
