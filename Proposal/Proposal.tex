@@ -488,7 +488,6 @@ Figure \ref{regular_partition} shows a sweep domain with a regular partition wit
 
 With the improved load balancing by dimension, we are likely to see a partition similar to the partitioning shown in Fig. \ref{random_partition} for all geometries. It is immediately observable that we don't have the same wavelike transport sweep, as communication penalties take their toll. As a result, this sweep completes in 101 stages, as opposed to 40 stages for the regular partition.
 
-\section{Preliminary Work}
 
 \begin{figure}[H]
   \centering
@@ -529,6 +528,32 @@ Figure \ref{worst_partition} observes the worst theoretical sweep partitioning, 
 \end{figure}
 
 Two things become immediately clear as a result of this study: perfect balance does not always yield the best parallel efficiency, and the stage count of a sweep is no longer as important. The concept of the stage is invalidated, because a stage relies on the assumption of perfect load balance. Once the time to compute a task changes throughout the problem domain, we must instead rely on the total time to solution as the most important metric, not the stage and the previously staged definition of parallel efficiency (Eq. \ref{paralleleff}). 
+
+\section{Preliminary and Proposed Work}
+
+In order to optimize the location of the cut lines based on balance and sweep efficiency, we must build a time to solution estimator. For a given partition, this tool will estimate the time to solution. This is done by building directed task dependence graphs for each octant (quadrant in 2D) and weighting the graph edges based on certain criteria discussed Section \ref{weighting_graphs} Figure \ref{subset_plot} shows an example subset partitioning scheme in 3D, and the corresponding task dependence graph (TDG) for the front bottom octant is shown in Fig. \ref{digraph}.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../figures/subset_plot.pdf}
+\caption{An example uniform partitioning scheme.}
+\label{subset_plot}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics{../figures/digraph.pdf}
+\caption{The task dependence graph for the front bottom octant in Fig. \ref{subset_plot}.}
+\label{digraph}
+\end{figure}
+
+\subsection{Weighting the Task Dependence Graph}\label{weighting_graphs}
+
+The time to solution relies on weighting the graph correctly to determine the traversal time for each octant. In order to correctly estimate the time to solution, two pieces of information are initially required: the number of cells per subset, and the number of boundary cells per subset. In order to obtain this information, a very fine grid is superimposed upon the domain partitioning, with each grid unit containing $x$ cells. Given that we know the number of mesh cells in the entire domain, this information is combined with the partitioning information to obtain the crucial cells per subset and boundary cells per subset variables. 
+
+Given that we know the machine parameters (grind time, latency, message communication time) we can estimate how long it takes to solve and communicate all unknowns in a given subset. We weight the TDG for each octant according to this information. For example, the edge between subsets 0 and 1 for the TDG in Fig. \ref{digraph} would be weighted with the time it takes to solve the cells in subset 0 and communicate the boundary information to subset 1. 
+
+Once this is done for all edges in all TDGs, we have to address sweep conflicts. Some simplifications are made without losing generality in order to detect sweep conflicts. For each TDG, we acquire all simple paths to get from its initial subset to its final subset. In the TDG shown in Fig. \ref{digraph}, this would return all simple paths to get from subset 0 to 7. 
 
 \section{Goals and Proposed Plan}
 
