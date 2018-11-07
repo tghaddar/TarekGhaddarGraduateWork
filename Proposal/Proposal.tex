@@ -457,9 +457,16 @@ If the number of cells in each subset can be reasonably balanced, then the probl
 
 In previous work, load balancing proved to be successful, but not as successful as initially expected. It became clear that when creating an unstructured mesh in PDT, the iterative nature of our algorithm did not work as effectively when using the Triangle Mesh Generator. 
 
-An improved load balancing algorithm was implemented that significantly improved our metric. Rather than load balancing both dimensions within an iteration, one dimension is balanced first for all iterations, and then the cut lines that yielded the best metric for that dimension are chosen. Then the next dimension is balanced within the first dimension. For example, if the $x$ cut lines are balanced first, the $y$ cut lines would be balanced \textit{within} each column. When full 3D load balancing by dimension is used via Rick Vega's code, excellent metrics within 5\% of unity are consistently obtained.
+An improved load balancing algorithm was implemented that significantly improved our metric. Rather than load balancing both dimensions within an iteration, one dimension is balanced first for all iterations, and then the cut lines that yielded the best metric for that dimension are chosen. Then the next dimension is balanced within the first dimension. For example, if the $x$ cut lines are balanced first, the $y$ cut lines would be balanced \textit{within} each column. When full 3D load balancing by dimension (shown in Fig. \ref{lbd} is used via Rick Vega's code, excellent metrics within 5\% of unity are consistently obtained.
 
-However, upon further study of the load balancing by dimension algorithm, it is clear the most efficient partitioning scheme is not being used. A cost function that takes into account the best partitioning scheme and best balance needs to be studied. The best balanced partition may not be the best partition for a parallel transport sweep.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{../figures/im1_foam_448.png}
+\caption{A slice of the IM1C experiment showcasing load balancing by dimension in 3D with an OpenFOAM mesh.}
+\label{lbd}
+\end{figure}
+
+Upon further study of the load balancing by dimension algorithm, it is clear the most efficient partitioning scheme is not being used. A cost function that takes into account the best partitioning scheme and best balance needs to be studied. The best balanced partition may not be the best partition for a parallel transport sweep.
 
 
 \section{Drawbacks of Load Balancing Unstructured Meshes for Transport Sweeps}
