@@ -81,7 +81,7 @@
 \section{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically cartesian grids. However, structured meshes are somewhat limiting when attempting to simulate more complex problems and experiments, paving the path for the use of unstructured meshes in transport sweeps. While unstructured meshes provide the ability to simulate realistic problems, they introduce some challenges as well. They introduce unbalanced partitions, which can drive up the solve time of a problem past the wall clock limit of many supercomputers. To combat this, PDT, Texas A\&M University's massively parallel deterministic transport code introduced two load balancing algorithms that rely on moving the spatial partitions, or cut lines, throughout the mesh in order to obtain a roughly equivalent amount of cells per processor. However, this sacrifices the optimal partitioning scheme detailed in favor of balance. The work proposed works to balance perfect load balancing and perfect sweep partitioning in order to achieve the best possible time to solution.
 
 \subsection{Review of Neutron Transport and the Transport Sweep}
 
@@ -159,7 +159,7 @@ The number in each cell represents the order in which the cells are solved. All 
 \end{minipage}
 \smallskip
 
-The concepts presented in this introduction are used by PDT, Texas A\&M University's massively parallel deterministic transport code. It is capable of multi-group simulations and employs discrete ordinates for angular discretization. PDT features steady-state, time-dependent, criticality, and depletion simulations, and solves the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation. PDT  has been shown to scale on logically Cartesian grids out to \tcr{750,000} cores. Logically Cartesian grids contain regular convex grid units that allow for vertex motion inside them, in order to conform to curved shapes. All work proposed in this document has been and will be implemented in PDT. Much of the work described in this proposal was implemented and generated using PDT.
+The concepts presented in this introduction are used by PDT, Texas A\&M University's massively parallel deterministic transport code. It is capable of multi-group simulations and employs discrete ordinates for angular discretization. PDT features steady-state, time-dependent, criticality, and depletion simulations, and solves the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation. PDT has been shown to scale on logically Cartesian grids out to \tcr{750,000} cores. Logically Cartesian grids contain regular convex grid units that allow for vertex motion inside them, in order to conform to curved shapes. All work proposed in this document has been and will be implemented in PDT. Much of the work described in this proposal was implemented and generated using PDT.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
