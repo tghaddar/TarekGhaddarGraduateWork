@@ -82,6 +82,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+\subsection{Review of Neutron Transport and the Transport Sweep}
+
 The steady-state neutron transport equation describes the behavior of neutrons in a medium and is given by Eq.~\eqref{continuous transport}:
 \begin{equation}
 \vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  =
@@ -453,7 +456,7 @@ If the number of cells in each subset can be reasonably balanced, then the probl
 \rule{\textwidth}{0.4pt}
 \end{minipage}
 
-\subsection{Load Balancing by Dimension}
+\subsection{Load Balancing by Dimension} \label{lbd_section}
 
 In previous work, load balancing proved to be successful, but not as successful as initially expected. It became clear that when creating an unstructured mesh in PDT, the iterative nature of our algorithm did not work as effectively when using the Triangle Mesh Generator. 
 
@@ -536,7 +539,7 @@ Figure \ref{worst_partition} observes the worst theoretical sweep partitioning, 
 
 Two things become immediately clear as a result of this study: perfect balance does not always yield the best parallel efficiency, and the stage count of a sweep is no longer as important. The concept of the stage is invalidated, because a stage relies on the assumption of perfect load balance. Once the time to compute a task changes throughout the problem domain, we must instead rely on the total time to solution as the most important metric, not the stage and the previously staged definition of parallel efficiency (Eq. \ref{paralleleff}). 
 
-\section{Time to Solution Estimation}
+\section{Time to Solution Estimation} \label{TOS}
 
 In order to optimize the location of the cut lines based on balance and sweep efficiency without relying on a costly iterative process, we must build a time to solution estimator. For a given partition, this tool will estimate the time to solution. This is done by building directed task dependence graphs for each octant (quadrant in 2D) and weighting the graph edges based on certain criteria discussed Section \ref{weighting_graphs} Figure \ref{subset_plot} shows an example subset partitioning scheme in 3D, and the corresponding task dependence graph (TDG) for the front bottom octant is shown in Fig. \ref{digraph}.
 
@@ -577,26 +580,36 @@ n_{y} &= b \cdot \Big(\frac{n_s}{a\cdot b \cdot c}\Big)^{1/3} \\
 n_{z} &= c \cdot \Big(\frac{n_s}{a\cdot b \cdot c}\Big)^{1/3} 
 \label{num_z}
 \end{align}
-Given that we know the number of mesh cells in the entire domain, this information is combined with the partitioning information to obtain the crucial cells per subset and boundary cells per subset variables. 
 
-Given that we know the machine parameters (grind time, latency, message communication time) we can estimate how long it takes to solve and communicate all unknowns in a given subset. We weight the TDG for each octant according to this information. For example, the edge between subsets 0 and 1 for the TDG in Fig. \ref{digraph} would be weighted with the time it takes to solve the cells in subset 0 and communicate the boundary information to subset 1. 
+Combining $n_x, n_y, \text{and } n_z$ with the cut line information in each direction allows us to compute the find grid units in each subset and along each boundary.  
 
-Once this is done for all edges in all TDGs, we have to address sweep conflicts. Some simplifications are made without losing generality in order to detect sweep conflicts. For each TDG, we acquire all simple paths to get from its initial subset to its final subset. In the TDG shown in Fig. \ref{digraph}, this would return all simple paths to get from subset 0 to 7. For each TDG, the heaviest simple path is chosen. This represents the best estimate for the time to get sweep across the TDG, as it takes into account all dependencies for downstream subsets. 
+Given that we know the machine parameters (grind time, latency, message communication time), Eq. \ref{cost_calculation} estimates how long it takes to solve and communicate all unknowns in a given subset:
+
+\begin{equation}
+\text{cost} = N_s\cdot T_g + N_b\cdot T_{\text{comm}} + \text{latency}\cdot M_l,
+\label{cost_calculation}
+\end{equation}
+%end eq
+where $N_u$ is the number of unknowns in the subset, $T_g$ is the grind time, $N_b$ is the number of unknowns along the subset boundaries, $T_\text{comm}$ is the communication time per unknown, and $M_l$ is the machine dependent latency multiplier. The edges in each graph are weighted according to this calculation.
+
+Once this is done for all edges in all TDGs, we have to address sweep conflicts. Some simplifications are made without losing generality in order to detect sweep conflicts. For each TDG, we acquire all simple paths to get from its initial subset to its final subset.  For each TDG, the heaviest simple path is chosen. This represents the best estimate for the time to get sweep across the TDG, as it takes into account all dependencies for downstream subsets. 
 
 We check for conflicts only among the heaviest path in each octant. Two forms of conflict resolution are being explored, depth-of-graph remaining and first come first serve. Due to the imbalanced nature of the problems, each subset will take a different amount of time to solve and communicate. It follows that if two heavy paths arrive at a particular subset at different times, the subset that arrives first starts solving immediately. To reflect this, a delay is added to the edge of the conflicting heavy path. This reflects the first come first serve conflict resolution. We will explore the depth-of-graph conflict resolution as a comparison to this, particularly for perfectly balanced and uniformly partitioned cases.
 
-\subsection{Optimizing the Time to Solution}
+\subsection{Optimizing the Time to Solution}\label{optimize}
 
-Once the heaviest paths of each TDG are weighted appropriately with conflicts taken into account, we simply sum the weights of the path to get the time to complete the sweep. The octant with the heaviest sweep time is used as the time to solution for a given partitioning scheme. We will use a python optimization tool in order to minimize the time to solution with the cut lines defining the partitioning scheme as the parameter space.
+Once the heaviest paths of each TDG are weighted appropriately with conflicts taken into account, we simply sum the weights of the path to get the time to complete the sweep. The octant with the heaviest sweep time is used as the time to solution for a given partitioning scheme. We will use a python optimization tool in order to get the best partitioning scheme possible. The cut lines will be the input parameter, and the tool will iterate on this parameter to minimize the time to solution. 
 
 \section{Goals and Proposed Plan}
 
 \begin{itemize}
-\item Build load balancing by dimension algorithm in PDT.
-\item Write Cubit/OpenFOAM to PDT meshing interface. 
-\item Build time-to-solution estimator that estimates the time to solution based on a given partitioning scheme.
-\item Test time-to-solution estimator against existing PDT problems for structured meshes.
-\item Use the time-to-solution estimator to optimize the partitioning scheme based on the time to solution. 
+\item Devise and implement a load balancing by dimension algorithm in PDT (Section \ref{lbd_section}).
+\item Devise and implement a time-to-solution estimator that returns the maximum time to solution for a given partitioning scheme (Section \ref{TOS}).
+\item Test and verify the time-to-solution estimator against the existing PDT scheduler for structured grids.
+\begin{itemize}
+\item The PDT scheduler will not utilize any aggregation parameters in order to remain consistent with this time-to-solution estimator.
+\end{itemize}
+\item Use the time-to-solution estimator to optimize cut line locations to get the best partitioning scheme (Section \ref{optimize}). 
 \end{itemize}
 
 
