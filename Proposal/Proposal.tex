@@ -289,6 +289,18 @@ The optimal efficiency formula changes slightly from the KBA and hybrid KBA part
 \label{overloadpartitioning}
 \end{equation}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Extension of Parallel Transport by Pautz and Bailey}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Pautz and Bailey\cite{PautzBailey} extended the work of Adams et al with overloaded unstructured partitioning. From their article, Figs. 3 through 9\cite{PautzBailey} showcase the different partitioning schemes used.  Weak scaling results were generated using the SCEPTRE transport code\cite{sceptre}. From these studies, Pautz and Bailey made the following observations:
+\begin{enumerate}
+	\item At low levels of parallelism, increased amounts of overloading lead to increased run times.
+	\item With higher core counts, improvements are seen when the amount of overloading is increased.
+	\item Results from unstructured and structured overloading are comparable. 
+	\item Hybrid KBA often, but not always, outperformed overloaded partitions. If sufficient overloading was used, the results were comparable.
+	\item Results in two dimensions are more pronounced that in three dimensions.
+\end{enumerate}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Unstructured Transport Sweep}
@@ -607,7 +619,7 @@ Once the heaviest paths of each TDG are weighted appropriately with conflicts ta
 \item Devise and implement a time-to-solution estimator that returns the maximum time to solution for a given partitioning scheme (Section \ref{TOS}).
 \item Test and verify the time-to-solution estimator against the existing PDT scheduler for structured grids.
 \begin{itemize}
-\item The PDT scheduler will not utilize any aggregation parameters in order to remain consistent with this time-to-solution estimator.
+\item The PDT scheduler will not utilize any aggregation parameters in order to remain consistent with the proposed time-to-solution estimator.
 \end{itemize}
 \item Use the time-to-solution estimator to optimize cut line locations to get the best partitioning scheme (Section \ref{optimize}). 
 \end{itemize}
