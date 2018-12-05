@@ -197,7 +197,7 @@ def sum_weights_of_path(graph,path):
     weight = graph[node1][node2]['weight']
     weight_sum += weight
 
-  return weight_sum      
+  return weight_sum
 
 #Takes all simple paths in a graph and returns the heaviest one.
 def get_heaviest_path(graph,paths):
@@ -229,9 +229,9 @@ def get_weight_sum(graph,path,node):
   
   return weight_sum
 
-#Returns the depth of graph remaining.
+#Returns the depth of graph remaining given a heavy path.
 def get_DOG(graph,path,node):
-  
+
   weight_sum = 0.0
   node_index = path.index(node)
   for n in range(node_index,len(path)-1):
@@ -241,7 +241,7 @@ def get_DOG(graph,path,node):
   
   return weight_sum
 
-def add_conflict_weights(graphs,paths,latency):
+def add_conflict_weights(graphs,paths,latency,num_row,num_col,num_plane):
   
   num_nodes = graphs[0].number_of_nodes()
   for p in range(0,len(paths)):
@@ -277,6 +277,17 @@ def add_conflict_weights(graphs,paths,latency):
       #If two graphs reach each other at the same time, we have to resort to depth of graph.
       if (isclose(delay,0.0,rel_tol=1e-4*latency)):
         print("same time")
+        dog_primary = get_DOG(primary_graph,primary_path,n)
+        dog_secondary = get_DOG(secondary_graph,secondary_path,n)
+        if (dog_primary > dog_secondary):
+          next_node = secondary_path[secondary_index+1]
+          secondary_graph[n][next_node]['weight'] += time_to_solve
+        elif (dog_secondary > dog_primary):
+          next_node = primary_path[primary_index+1]
+          primary_graph[n][next_node]['weight'] += time_to_solve
+        else:
+          #Need to figure out which octant has priority.
+          i,j,k = get_ijk(n,num_row,num_col,num_plane)
         
       elif (delay > 0):
         #Add this delay to the current node's solve time in the secondary graph.
