@@ -241,6 +241,39 @@ def get_DOG(graph,path,node):
   
   return weight_sum
 
+#We are figuring out which is the path with priority based on which octant it belongs to.
+def get_priority_octant(path1,path2):
+  
+  #Boolean checking if omega_x > 0 for both paths.
+  path1_ox = (path1 == 0 or path1 == 1 or path1 == 4 or path1 == 5)
+  path2_ox = (path2 == 0 or path2 == 1 or path2 == 4 or path2 == 5)
+  #Boolean checking if omega_y > 0 for both paths.
+  path1_oy = (path1 == 0 or path1 == 2 or path1 == 4 or path1 == 6)
+  path2_oy = (path2 == 0 or path2 == 2 or path2 == 4 or path2 == 6)
+  #Boolean checking if omega_z > 0 for both paths
+  path1_oz = (path1 == 0 or path1 == 1 or path1 == 2 or path1 == 3)
+  path2_oz = (path2 == 0 or path2 == 1 or path2 == 2 or path2 == 3)
+  
+  #Checking who has omega_x > 0.
+  if (path1_ox == True and path2_ox == False):
+    return "primary"
+  elif (path1_ox == False and path2_ox == True):
+    return "secondary"
+  #If both have omega_x > 0 or omega_x < 0 then we check omega_y
+  else:
+    if (path1_oy == True and path2_oy == False):
+      return "primary"
+    elif (path1_oy == False and path2_oy == True):
+      return "secondary"
+    #If both omega_x and omega_y > 0 for both paths then check omega_z
+    else:
+      if (path1_oz == True and path2_oz == False):
+        return "primary"
+      elif (path1_oz == False and path2_oz == True):
+        return "secondary"
+      else:
+        return "problem"
+        
 def add_conflict_weights(graphs,paths,latency,num_row,num_col,num_plane):
   
   num_nodes = graphs[0].number_of_nodes()
@@ -286,9 +319,16 @@ def add_conflict_weights(graphs,paths,latency,num_row,num_col,num_plane):
           next_node = primary_path[primary_index+1]
           primary_graph[n][next_node]['weight'] += time_to_solve
         else:
-          #Need to figure out which octant has priority.
-          i,j,k = get_ijk(n,num_row,num_col,num_plane)
-        
+          #Need to figure out which path has priority based on octant
+          which_path = get_priority_octant(fastest_path,p)
+          if (which_path == "primary"):
+            next_node = secondary_path[secondary_index+1]
+            secondary_graph[n][next_node]['weight'] += delay
+          elif(which_path == "secondary"):
+            next_node = primary_path[primary_index+1]
+            primary_graph[n][next_node]['weight'] += time_to_solve
+          else:
+            print("here")
       elif (delay > 0):
         #Add this delay to the current node's solve time in the secondary graph.
         next_node = secondary_path[secondary_index+1]

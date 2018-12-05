@@ -19,6 +19,9 @@ plt.close("all")
 G = nx.DiGraph()
 G2 = nx.DiGraph()
 latency = 4110.0
+num_row = 4
+num_col = 1
+num_plane = 1
 
 num_nodes = 5
 
@@ -50,7 +53,7 @@ path2 = nx.all_simple_paths(G2,4,0)
 graphs = [G,G2]
 paths = [path1,path2]
 
-graphs = add_conflict_weights(graphs,paths,latency)
+graphs = add_conflict_weights(graphs,paths,latency,num_row,num_col,num_plane)
 
 G = graphs[0]
 G2 = graphs[1]
