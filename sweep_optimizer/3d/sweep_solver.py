@@ -146,12 +146,6 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solv
   b = global_y_max - global_y_min
   #global z length
   c = global_z_max - global_z_min
-  #Number of mini subs in x
-  nsx = a*pow((num_mini_sub/(a*b*c)),1/3)
-  #Number of mini subs in y
-  nsy = b*pow((num_mini_sub/(a*b*c)),1/3)
-  #Number of mini subs in z
-  nsz = c*pow((num_mini_sub/(a*b*c)),1/3)
   
   for ig in range(len(graphs)):
     graph = graphs[ig]
@@ -168,22 +162,22 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solv
       x_ratio = (bounds[1] - bounds[0])/a
       y_ratio = (bounds[3] - bounds[2])/b
       z_ratio = (bounds[5] - bounds[4])/c
-      bound_cell_x = 2.0*nsx*x_ratio
-      bound_cell_y = 2.0*nsy*y_ratio
-      bound_cell_z = 2.0*nsz*z_ratio
-      boundary_cells = 0.0
-      #Communicating across the z plane.
-      if (bounds_check == 'xy'):
-        boundary_cells = bound_cell_x*bound_cell_y
-      #Communicating across the y plane.
-      if (bounds_check == 'xz'):
-        boundary_cells = bound_cell_x*bound_cell_z
-      #Communicating across the x plane.
-      if(bounds_check == 'yz'):
-        boundary_cells = bound_cell_y*bound_cell_z
       
       #Cells in this subset.
       num_cells = cell_dist[node]
+      
+      boundary_cells = pow(num_cells,2/3)
+#      #Communicating across the z plane.
+#      if (bounds_check == 'xy'):
+#        boundary_cells = bound_cell_x*bound_cell_y
+#      #Communicating across the y plane.
+#      if (bounds_check == 'xz'):
+#        boundary_cells = bound_cell_x*bound_cell_z
+#      #Communicating across the x plane.
+#      if(bounds_check == 'yz'):
+#        boundary_cells = bound_cell_y*bound_cell_z
+#      
+      
       #The cost of this edge.
       cost = num_cells*solve_cell + (boundary_cells*t_comm + latency*m_l)
       graph[e[0]][e[1]]['weight'] = cost
