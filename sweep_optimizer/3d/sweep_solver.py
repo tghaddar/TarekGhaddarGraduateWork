@@ -278,7 +278,6 @@ def convert_generator(simple_paths):
   for i in range(0,len(simple_paths)):
     newpath = simple_paths[i]
     newpath = list(newpath)
-    print(newpath)
     new_simple_paths.append(newpath)
   
   return new_simple_paths
@@ -287,12 +286,17 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
   
   num_nodes = graphs[0].number_of_nodes()
   
-  all_simple_paths = convert_generator(all_simple_paths)
   
   #A boolean value that checks if we are perfectly balanced.
   is_perfect = all(x == cell_dist[0] for x in cell_dist)
   #We use a slightly different conflict resolution for perfectly balanced problems.
   if (is_perfect):
+    #Length of each individual path.
+    path_length = 0
+    #Converting to a list of lists rather than a list of generators for iterative purposes.
+    all_simple_paths = convert_generator(all_simple_paths)
+    #Path for each octant for each node.
+    all_octant_paths = []
     for n in range(0,num_nodes):
       octant_paths = []
       #Looping through all paths for all graphs in order to determine a path for each octant that contains this node.
@@ -301,15 +305,30 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
         perf_paths = copy(all_simple_paths)
         this_simple_paths = perf_paths[p]
         for path in this_simple_paths:
-          print(n,p,path)
+          path_length = len(path)
           if (n in path):
             octant_paths.append(path)
             break
-            
-      print("Octant Paths")
-      print(octant_paths)
-      print("\n")
+      #We use these octant paths to figure out if we have any conflicts.
+      
+      #For this node, find out which paths will conflict. We know the path with the node as it's originator won't conflict ever.
+      #Looping over to see which nodes potentially conflict on these paths.
+      for c in range(1,path_length-1):
+        conflicting_paths = []
+        conflicting_indices = []
+        for p in range(0,len(octant_paths)):
+          index = octant_paths[p].index(n)
+          if (index == c):
+            conflicting_paths.append(octant_paths[p])
+            conflicting_indices.append(p)
+        
+        if (len(conflicting_paths) > 1):
+          new_graphs = graphs[conflicting_indices]
+          
 
+      all_octant_paths.append(octant_paths)
+      
+    #print(all_octant_paths)
   else:
   
     for p in range(0,len(all_simple_paths)):
