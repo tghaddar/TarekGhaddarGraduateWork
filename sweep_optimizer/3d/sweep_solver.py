@@ -126,10 +126,8 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
     
   return bounds_check
 
-def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solve_cell,t_comm,latency,m_l,num_row,num_col,num_plane):
+def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,upc, upbc,t_comm,latency,m_l,num_row,num_col,num_plane):
     
-  num_mini_sub = num_total_cells/2.0
-  
   num_subsets = len(global_subset_boundaries)
   first_sub = global_subset_boundaries[0]
   last_sub = global_subset_boundaries[num_subsets-1]
@@ -178,8 +176,9 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solv
 #        boundary_cells = bound_cell_y*bound_cell_z
 #      
       
-      #The cost of this edge.
-      cost = num_cells*solve_cell + (boundary_cells*t_comm + latency*m_l)
+      #The cost of this edge. upc = uknowns per cell
+      #upbc = unkowns per boundary cell
+      cost = num_cells*t_u*upc + (boundary_cells*upbc*t_comm + latency*m_l)
       graph[e[0]][e[1]]['weight'] = cost
   return graphs
       
@@ -267,68 +266,110 @@ def get_priority_octant(path1,path2):
         return "secondary"
       else:
         return "problem"
-        
-def add_conflict_weights(graphs,paths,latency,num_row,num_col,num_plane):
+
+#Takes simple paths for a graph and dumps them out.
+def print_simple_paths(path_gen):
+  for p in path_gen:
+    print(p)
+
+def convert_generator(simple_paths):
+  
+  new_simple_paths = []
+  for i in range(0,len(simple_paths)):
+    newpath = simple_paths[i]
+    newpath = list(newpath)
+    print(newpath)
+    new_simple_paths.append(newpath)
+  
+  return new_simple_paths
+
+def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_col,num_plane):
   
   num_nodes = graphs[0].number_of_nodes()
-  for p in range(0,len(paths)):
-    current_path = paths[p]
-    heavy_path,path_weight = get_heaviest_path(graphs[p],current_path)
-    paths[p] = heavy_path
   
+  all_simple_paths = convert_generator(all_simple_paths)
   
-  for n in range(0,num_nodes):
-    fastest_path,weight_sum = get_fastest_path(graphs,paths,n)
-      
-    primary_graph = graphs[fastest_path]
-    primary_path = paths[fastest_path]
-    primary_index = primary_path.index(n)
+  #A boolean value that checks if we are perfectly balanced.
+  is_perfect = all(x == cell_dist[0] for x in cell_dist)
+  #We use a slightly different conflict resolution for perfectly balanced problems.
+  if (is_perfect):
+    for n in range(0,num_nodes):
+      octant_paths = []
+      #Looping through all paths for all graphs in order to determine a path for each octant that contains this node.
+      for p in range(0,len(graphs)):
+        #Simple paths for this octant.
+        perf_paths = copy(all_simple_paths)
+        this_simple_paths = perf_paths[p]
+        for path in this_simple_paths:
+          print(n,p,path)
+          if (n in path):
+            octant_paths.append(path)
+            break
+            
+      print("Octant Paths")
+      print(octant_paths)
+      print("\n")
+
+  else:
+  
+    for p in range(0,len(all_simple_paths)):
+      current_path = all_simple_paths[p]
+      heavy_path,path_weight = get_heaviest_path(graphs[p],current_path)
+      all_simple_paths[p] = heavy_path
     
-    #Looping through remaining path to add potential delays for this node.
-    for p in range(0,len(paths)):
-      secondary_path = paths[p]
-      secondary_graph = graphs[p]
-      if p == fastest_path:
-        continue
-      #Check if this node exists in the secondary path.
-      secondary_index = -1
-      try:
-        secondary_index = secondary_path.index(n)
-      except:
-        continue
+    
+    for n in range(0,num_nodes):
+      fastest_path,weight_sum = get_fastest_path(graphs,all_simple_paths,n)
+        
+      primary_graph = graphs[fastest_path]
+      primary_path = all_simple_paths[fastest_path]
+      primary_index = primary_path.index(n)
       
-      weight_sum_secondary = get_weight_sum(graphs[p],paths[p],n)
-      delay = weight_sum_secondary - weight_sum
-      time_to_solve = primary_graph[n][primary_path[primary_index+1]]['weight']
-      delay = time_to_solve - delay
-      #If two graphs reach each other at the same time, we have to resort to depth of graph.
-      if (isclose(delay,0.0,rel_tol=1e-4*latency)):
-        print("same time")
-        dog_primary = get_DOG(primary_graph,primary_path,n)
-        dog_secondary = get_DOG(secondary_graph,secondary_path,n)
-        if (dog_primary > dog_secondary):
-          next_node = secondary_path[secondary_index+1]
-          secondary_graph[n][next_node]['weight'] += time_to_solve
-        elif (dog_secondary > dog_primary):
-          next_node = primary_path[primary_index+1]
-          primary_graph[n][next_node]['weight'] += time_to_solve
-        else:
-          #Need to figure out which path has priority based on octant
-          which_path = get_priority_octant(fastest_path,p)
-          if (which_path == "primary"):
+      #Looping through remaining path to add potential delays for this node.
+      for p in range(0,len(all_simple_paths)):
+        secondary_path = all_simple_paths[p]
+        secondary_graph = graphs[p]
+        if p == fastest_path:
+          continue
+        #Check if this node exists in the secondary path.
+        secondary_index = -1
+        try:
+          secondary_index = secondary_path.index(n)
+        except:
+          continue
+        
+        weight_sum_secondary = get_weight_sum(graphs[p],all_simple_paths[p],n)
+        delay = weight_sum_secondary - weight_sum
+        time_to_solve = primary_graph[n][primary_path[primary_index+1]]['weight']
+        delay = time_to_solve - delay
+        #If two graphs reach each other at the same time, we have to resort to depth of graph.
+        if (isclose(delay,0.0,rel_tol=1e-4*latency)):
+          print("same time")
+          dog_primary = get_DOG(primary_graph,primary_path,n)
+          dog_secondary = get_DOG(secondary_graph,secondary_path,n)
+          if (dog_primary > dog_secondary):
             next_node = secondary_path[secondary_index+1]
-            secondary_graph[n][next_node]['weight'] += delay
-          elif(which_path == "secondary"):
+            secondary_graph[n][next_node]['weight'] += time_to_solve
+          elif (dog_secondary > dog_primary):
             next_node = primary_path[primary_index+1]
             primary_graph[n][next_node]['weight'] += time_to_solve
           else:
-            raise("Error, we need a primary")
-      elif (delay > 0):
-        #Add this delay to the current node's solve time in the secondary graph.
-        next_node = secondary_path[secondary_index+1]
-        secondary_graph[n][next_node]['weight'] += delay
+            #Need to figure out which path has priority based on octant
+            which_path = get_priority_octant(fastest_path,p)
+            if (which_path == "primary"):
+              next_node = secondary_path[secondary_index+1]
+              secondary_graph[n][next_node]['weight'] += delay
+            elif(which_path == "secondary"):
+              next_node = primary_path[primary_index+1]
+              primary_graph[n][next_node]['weight'] += time_to_solve
+            else:
+              raise("Error, we need a primary")
+        elif (delay > 0):
+          #Add this delay to the current node's solve time in the secondary graph.
+          next_node = secondary_path[secondary_index+1]
+          secondary_graph[n][next_node]['weight'] += delay
+        
       
-    
   return graphs
   
 #Gets the path that gets fastest to a node. Assumes that each graph has its heaviest path listed.

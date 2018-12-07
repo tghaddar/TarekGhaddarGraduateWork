@@ -9,19 +9,23 @@ Created on Mon Oct  8 11:14:51 2018
 from build_3d_adjacency import build_3d_global_subset_boundaries
 from build_3d_adjacency import build_adjacency_matrix
 from build_3d_adjacency import build_graphs
+from copy import copy
 from sweep_solver import plot_subset_boundaries
 from sweep_solver import add_edge_cost
 from sweep_solver import add_conflict_weights
 from sweep_solver import compute_solve_time
+from sweep_solver import print_simple_paths
 #from sweep_solver import 
 import warnings
 import networkx as nx
 warnings.filterwarnings("ignore")
 
-solve_cell = 1.0
+t_u = 1.0
 m_l = 1.0
 t_comm = 1.0
 latency = 1.0
+upc = 8.0
+upbc = 4.0
 
 
 #Number of cuts in the x direction.
@@ -62,6 +66,7 @@ adjacency_matrix = build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,n
 
 graphs,all_simple_paths = build_graphs(adjacency_matrix,num_row,num_col,num_plane)
 
+
 #Equivalent number of cells per subset.
 cell_dist = []
 for i in range(0,num_subsets):
@@ -69,13 +74,23 @@ for i in range(0,num_subsets):
 
 num_total_cells = sum(cell_dist)
 
-graphs = add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,solve_cell,t_comm,latency,m_l,num_row,num_col,num_plane)
+graphs = add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,upc,upbc,t_comm,latency,m_l,num_row,num_col,num_plane)
 
-graphs = add_conflict_weights(graphs,all_simple_paths,latency,num_row,num_col,num_plane)
+##Storing all simple paths for each graph.
+#all_simple_paths = []
+#for graph in graphs:
+#  copy_graph = copy(graph)
+#  start_node = [x for x in copy_graph.nodes() if copy_graph.in_degree(x) == 0][0]
+#  end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
+#  simple_paths = nx.all_simple_paths(graph,start_node,end_node)
+#  all_simple_paths.append(simple_paths)
 
-all_graph_time,time,heaviest_paths = compute_solve_time(graphs,solve_cell,cell_dist,num_total_cells,global_subset_boundaries,num_row,num_col,num_plane)
 
-for ig in range(0,len(graphs)):
-  for line in nx.generate_edgelist(graphs[ig],data=True):
-    print(line)
-  print("\n")
+graphs = add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_col,num_plane)
+
+all_graph_time,time,heaviest_paths = compute_solve_time(graphs,t_u,cell_dist,num_total_cells,global_subset_boundaries,num_row,num_col,num_plane)
+
+#for ig in range(0,len(graphs)):
+#  for line in nx.generate_edgelist(graphs[ig],data=True):
+#    print(line)
+#  print("\n")
