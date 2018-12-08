@@ -332,7 +332,9 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
             
         if (len(conflicting_paths) > 1):
           new_graphs = graphs[conflicting_indices]
-          
+          tied = all(x == conflicting_dog[0] for x in conflicting_dog)
+          if (tied):
+            
           
 
       all_octant_paths.append(octant_paths)
