@@ -316,14 +316,23 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
       for c in range(1,path_length-1):
         conflicting_paths = []
         conflicting_indices = []
+        #DOG remaining for all paths.
+        conflicting_dog_remaining = []
+        #DOG for all conflicting paths
+        conflicting_dog = []
         for p in range(0,len(octant_paths)):
           index = octant_paths[p].index(n)
           if (index == c):
             conflicting_paths.append(octant_paths[p])
             conflicting_indices.append(p)
-        
+            dog_remaining = get_DOG(graphs[p],octant_paths[p],n)
+            dog = get_weight_sum(graphs[p],octant_paths[p],n)
+            conflicting_dog_remaining.append(dog_remaining)
+            conflicting_dog.append(dog)
+            
         if (len(conflicting_paths) > 1):
           new_graphs = graphs[conflicting_indices]
+          
           
 
       all_octant_paths.append(octant_paths)
