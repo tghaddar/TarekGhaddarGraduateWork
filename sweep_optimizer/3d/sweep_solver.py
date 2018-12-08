@@ -234,6 +234,31 @@ def get_DOG(graph,path,node):
   
   return weight_sum
 
+#Sorts path indices based on priority octants.
+def sort_priority(paths):
+  #The true octant priorities.
+  true_priorities = [0,4,1,5,2,6,3,7]
+  #test_paths = copy(paths)
+  test_indices = []
+  for p in range(0,len(paths)):
+    path = paths[p]
+    test_indices.append(true_priorities.index(path))
+    
+  test_indices = sorted(test_indices)
+  for i in range(0,len(test_indices)):
+    index = test_indices[i]
+    paths[i] = true_priorities[index]
+#  for p in range(0,len(test_paths)-1):
+#    path1 = paths[p]
+#    path2 = paths[p+1]
+#    
+#    a,b = true_priorities.index(path1),true_priorities.index(path2)
+#    if a > b:
+#      paths[p],paths[p+1] = paths[p+1],paths[p]
+
+  return paths
+
+
 #We are figuring out which is the path with priority based on which octant it belongs to.
 def get_priority_octant(path1,path2):
   
@@ -331,12 +356,29 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
             conflicting_dog.append(dog)
             
         if (len(conflicting_paths) > 1):
-          new_graphs = graphs[conflicting_indices]
           tied = all(x == conflicting_dog[0] for x in conflicting_dog)
           if (tied):
+            dog_remaining_tie = all(x == conflicting_dog_remaining[0] for x in conflicting_dog_remaining)
+            #Check if the depth of graph remaining is equivalent.
+            if (dog_remaining_tie):
+              #Evaluate based on priorities.
+              indices_check = copy(conflicting_indices)
+              for i in range(0,len(indices_check)-1):
+                path1 = indices_check[i]
+                path2 = indices_check[i+1]
+                priority_path = get_priority_octant(path1,path2)
+                if (priority_path == "primary"):
+                  next_node2 = conflicting_paths[path2][c][c+1]
+                  next_node1 = conflicgting_paths[path1][c][c+1]
+                  graphs[path2][n][next_node2]['weight'] += graphs[path1][n][next_node1]['weight']
+                elif(priority_path == "secondary"):
+                  next_node2 = conflicting_paths[path2][c][c+1]
+                  next_node1 = conflicgting_paths[path1][c][c+1]
+                  graphs[path1][n][next_node1]['weight'] += graphs[path2][n][next_node2]['weight']
+          else:
+            #Get minimum dog, then judge the remaining by dog remaining and prioritization.
+            print("nothing")
             
-          
-
       all_octant_paths.append(octant_paths)
       
     #print(all_octant_paths)
