@@ -351,47 +351,73 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
             conflicting_dog_remaining.append(dog_remaining)
             conflicting_dog.append(dog)
             
-        if (len(conflicting_paths) > 1):
-          p = 0
+        
           #Loop over all conflicting paths and remove winners one by one until all delays are addressed.
           while p < len(conflicting_paths):
-            #Check if all nodes are ready to solve.
-            tied = all(x == conflicting_dog[0] for x in conflicting_dog)
-            if (tied):
-              #Check if all nodes have the same depth of graph remaining.
-              dog_remaining_tie = all(x == conflicting_dog_remaining[0] for x in conflicting_dog_remaining)
-              #Check if the depth of graph remaining is equivalent.
-              if (dog_remaining_tie):
-                #Resorting everything based on priority octant rules.
-                conflicting_indices,conflicting_paths,conflicting_dog,conflicting_dog_remaining = sort_priority(conflicting_indices)
-                winning_path = conflicting_indices[0]
-                winning_next_node = conflicting_paths[0][c+1]
-                #Solve time of the winning path (corresponding to the delay other paths have).
-                delay = graphs[winning_path][n][winning_next_node]
-                del conflicting_indices[0]
-                del conflicting_paths[0]
-                del conflicting_dog[0]
-                del conflicting_dog_remaining[0]
+            if (len(conflicting_paths) > 1):
+              p = 0
+              #Check if all nodes are ready to solve.
+              tied = all(x == conflicting_dog[0] for x in conflicting_dog)
+              if (tied):
+                #Check if all nodes have the same depth of graph remaining.
+                dog_remaining_tie = all(x == conflicting_dog_remaining[0] for x in conflicting_dog_remaining)
+                #Check if the depth of graph remaining is equivalent.
+                if (dog_remaining_tie):
+                  #Resorting everything based on priority octant rules.
+                  conflicting_indices,conflicting_paths,conflicting_dog,conflicting_dog_remaining = sort_priority(conflicting_indices)
+                  winning_path = conflicting_indices[0]
+                  winning_next_node = conflicting_paths[0][c+1]
+                  #Solve time of the winning path (corresponding to the delay other paths have).
+                  delay = graphs[winning_path][n][winning_next_node]['weight']
+                  del conflicting_indices[0]
+                  del conflicting_paths[0]
+                  del conflicting_dog[0]
+                  del conflicting_dog_remaining[0]
+                  for i in range(0,len(conflicting_indices)):
+                    index = conflicting_indices[i]
+                    losing_next_node = octant_paths[index][c][c+1]
+                    graphs[index][n][losing_next_node] += delay
+  
+                  p -= 1
+                else:
+                  #The one with the maximum dog_remaining wins.
+                  max_dog_remaining = max(conflicting_dog_remaining)
+                  max_dog_remaining_index = conflicting_dog_remaining.index(max_dog_remaining)
+                  winning_path = conflicting_indices[max_dog_remaining_index]
+                  winning_next_node = conflicting_paths[max_dog_remaining_index][c+1]
+                  delay = graphs[winning_path][n][winning_next_node]['weight']
+                  #Removing this path from conflicting paths since it gets priority and starts solving.
+                  del conflicting_paths[max_dog_remaining_index]
+                  del conflicting_indices[max_dog_remaining_index]
+                  del conflicting_dog[max_dog_remaining_index]
+                  del conflicting_dog_remaining[max_dog_remaining_index]
+                  for i in range(0,len(conflicting_indices)):
+                    index = conflicting_indices[i]
+                    losing_next_node = octant_paths[index][c][c+1]
+                    graphs[index][n][losing_next_node]
+                  p -=1
+                  
+              else:
+                #Get minimum dog (corresponds to the path that reaches first).
+                min_dog = min(conflicting_dog)
+                min_dog_index = conflicting_dog.index(min_dog)
+                winning_path = conflicting_indices[min_dog_index]
+                winning_next_node = conflicting_paths[min_dog_index][c+1]
+                delay = graphs[winning_path][n][winning_next_node]['weight']
+                
+                del conflicting_paths[min_dog_index]
+                del conflicting_indices[min_dog_index]
+                del conflicting_dog[min_dog_index]
+                del conflicting_dog_remaining[min_dog_index]
+                
                 for i in range(0,len(conflicting_indices)):
                   index = conflicting_indices[i]
                   losing_next_node = octant_paths[index][c][c+1]
-                  graphs[index][n][losing_next_node] += delay
-
+                  graphs[index][n][losing_next_node]
+                
                 p -= 1
-              else:
-                #The one with the maximum dog_remaining wins.
-                max_dog_remaining = max(conflicting_dog_remaining)
-                max_dog_remaining_index = conflicting_dog_remaining.index(max_dog_remaining)
-                #Removing this path from conflicting paths since it gets priority and starts solving.
-                del conflicting_paths[max_dog_remaining_index]
-                del conflicting_indices[max_dog_remaining_index]
-                del conflicting_dog[max_dog_remaining_index]
-                del conflicting_dog_remaining[max_dog_remaining_index]
-                
-                
-            else:
-              #Get minimum dog, then judge the remaining by dog remaining and prioritization.
-              print("nothing")
+            
+            p += 1
             
       all_octant_paths.append(octant_paths)
       
