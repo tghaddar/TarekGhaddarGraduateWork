@@ -26,18 +26,30 @@ plt.close("all")
 
 
 #Number of cuts in the x direction.
-N_x = 2
+N_x = 3
 #Number of cuts in the y direction.
-N_y = 2
+N_y = 3
 
 num_row = N_y + 1
 num_col = N_x + 1
 num_plane = 0
 
 #The subset boundaries.
-step = (10.0)/N_x
-x_cuts = [0.0, 5, 10.0]
-y_cuts = [[0.0, 5, 10.0],[0.0, 5, 10.0]]
+step = (10.0)/num_col
+x_cuts = [0.0,10.0]
+y_cuts = []
+for i in range(0,N_x):
+  y_cuts.append([0,10.0])
+
+for i in range(0,N_x):
+  x_cuts.append((i+1)*step)
+  for j in range(0,N_y):
+    y_cuts[i].append((j+1)*step)
+  y_cuts[i] = sorted(y_cuts[i])
+
+y_cuts.append(y_cuts[0])
+x_cuts = sorted(x_cuts)
+    
 
 global_subset_boundaries = build_global_subset_boundaries(N_x,N_y,x_cuts,y_cuts)
 adjacency_matrix = build_adjacency(global_subset_boundaries,N_x, N_y, y_cuts)

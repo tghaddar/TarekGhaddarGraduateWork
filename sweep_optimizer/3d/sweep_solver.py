@@ -424,8 +424,8 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
             #Checking to see if the two graphs have the same DOG remaining.
             if (dog_remaining_tied):
               
-              indices = sort_priority(indices,paths,dogs,dogs_remaining)
-              for i in range(1,len(conflicting_indices)):
+              indices,paths,dogs,dogs_remaining = sort_priority(indices,paths,dogs,dogs_remaining)
+              for i in range(1,len(indices)):
                 index = indices[i]
                 next_node_index = paths[i].index(n)+1
                 losing_next_node = octant_paths[index][next_node_index]
