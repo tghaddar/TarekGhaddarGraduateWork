@@ -85,7 +85,7 @@ num_subsets = (N_x+1)*(N_y+1)
 #Equivalent number of cells per subset.
 cell_dist = []
 for i in range(0,num_subsets):
-  cell_dist.append(4096)
+  cell_dist.append(4096.0)
 
 
 num_total_cells = sum(cell_dist)
