@@ -14,7 +14,6 @@ from utilities import get_ijk
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
-import sweep_solver
 import networkx as nx
 import flip_adjacency
 import warnings

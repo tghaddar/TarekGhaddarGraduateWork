@@ -1,7 +1,7 @@
 import numpy as np
 import warnings
 import networkx as nx
-g
+import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from copy import copy
 from utilities import get_ijk
@@ -128,20 +128,14 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
 
 def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,upc, upbc,t_comm,latency,m_l,num_row,num_col,num_plane):
     
-  num_subsets = len(graphs)
-  first_sub = global_subset_boundaries[0]
-  last_sub = global_subset_boundaries[num_subsets-1]
-  global_x_min = first_sub[0]
-  global_y_min = first_sub[2]
-  global_z_min = first_sub[4]
+  num_graphs = len(graphs)
+
   
-  global_x_max = last_sub[1]
-  global_y_max = last_sub[3]
-  global_z_max = last_sub[5]
-  
-  for ig in range(len(graphs)):
+  for ig in range(0,num_graphs):
     graph = graphs[ig]
     for e in graph.edges():
+      #The starting node of this edge.
+      node = e[0]
       #Cells in this subset.
       num_cells = cell_dist[node]
       
@@ -299,8 +293,7 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
     path_length = 0
     #Converting to a list of lists rather than a list of generators for iterative purposes.
     all_simple_paths = convert_generator(all_simple_paths)
-    #Path for each octant for each node.
-    all_octant_paths = []
+
     for n in range(0,num_nodes):
       octant_paths = []
       #Looping through all paths for all graphs in order to determine a path for each octant that contains this node.
@@ -317,7 +310,7 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
       
       #For this node, find out which paths will conflict. We know the path with the node as it's originator won't conflict ever.
       #Looping over to see which nodes potentially conflict on these paths.
-      for c in range(1,path_length-1):
+      for c in range(1,path_length):
         conflicting_paths = []
         conflicting_indices = []
         #DOG remaining for all paths.
@@ -335,69 +328,66 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
             conflicting_dog.append(dog)
             
         
-          #Loop over all conflicting paths and remove winners one by one until all delays are addressed.
-          p = 0
-          while p < len(conflicting_paths):
-            if (len(conflicting_paths) > 1):
-              #Check if all nodes are ready to solve.
-              tied = all(x == conflicting_dog[0] for x in conflicting_dog)
-              if (tied):
-                #Check if all nodes have the samef  depth of graph remaining.
-                dog_remaining_tie = all(x == conflicting_dog_remaining[0] for x in conflicting_dog_remaining)
-                #Check if the depth of graph remaining is equivalent.
-                if (dog_remaining_tie):
-                  #Resorting everything based on priority octant rules.
-                  conflicting_indices,conflicting_paths,conflicting_dog,conflicting_dog_remaining = sort_priority(conflicting_indices,conflicting_paths,conflicting_dog,conflicting_dog_remaining)
-                  
-                  del conflicting_indices[0]
-                  del conflicting_paths[0]
-                  del conflicting_dog[0]
-                  del conflicting_dog_remaining[0]
-                  for i in range(0,len(conflicting_indices)):
-                    index = conflicting_indices[i]
-                    losing_next_node = octant_paths[index][c+1]
-                    graphs[index][n][losing_next_node]['weight'] += delay
-  
-                  p -= 1
-                else:
-                  #The one with the maximum dog_remaining wins.
-                  max_dog_remaining = max(conflicting_dog_remaining)
-                  max_dog_remaining_index = conflicting_dog_remaining.index(max_dog_remaining)
-
-
-                  #Removing this path from conflicting paths since it gets priority and starts solving.
-                  del conflicting_paths[max_dog_remaining_index]
-                  del conflicting_indices[max_dog_remaining_index]
-                  del conflicting_dog[max_dog_remaining_index]
-                  del conflicting_dog_remaining[max_dog_remaining_index]
-                  for i in range(0,len(conflicting_indices)):
-                    index = conflicting_indices[i]
-                    losing_next_node = octant_paths[index][c+1]
-                    graphs[index][n][losing_next_node]['weight'] += delay
-                  p -=1
-                  
-              else:
-                #Get minimum dog (corresponds to the path that reaches first).
-                min_dog = min(conflicting_dog)
-                min_dog_index = conflicting_dog.index(min_dog)
+        #Loop over all conflicting paths and remove winners one by one until all delays are addressed.
+        p = 0
+        while p < len(conflicting_paths):
+          if (len(conflicting_paths) > 1):
+            #Check if all nodes are ready to solve.
+            tied = all(x == conflicting_dog[0] for x in conflicting_dog)
+            if (tied):
+              #Check if all nodes have the samef  depth of graph remaining.
+              dog_remaining_tie = all(x == conflicting_dog_remaining[0] for x in conflicting_dog_remaining)
+              #Check if the depth of graph remaining is equivalent.
+              if (dog_remaining_tie):
+                #Resorting everything based on priority octant rules.
+                conflicting_indices,conflicting_paths,conflicting_dog,conflicting_dog_remaining = sort_priority(conflicting_indices,conflicting_paths,conflicting_dog,conflicting_dog_remaining)
                 
-                del conflicting_paths[min_dog_index]
-                del conflicting_indices[min_dog_index]
-                del conflicting_dog[min_dog_index]
-                del conflicting_dog_remaining[min_dog_index]
-                
+                del conflicting_indices[0]
+                del conflicting_paths[0]
+                del conflicting_dog[0]
+                del conflicting_dog_remaining[0]
                 for i in range(0,len(conflicting_indices)):
                   index = conflicting_indices[i]
                   losing_next_node = octant_paths[index][c+1]
                   graphs[index][n][losing_next_node]['weight'] += delay
-                
+
                 p -= 1
+              else:
+                #The one with the maximum dog_remaining wins.
+                max_dog_remaining = max(conflicting_dog_remaining)
+                max_dog_remaining_index = conflicting_dog_remaining.index(max_dog_remaining)
+
+
+                #Removing this path from conflicting paths since it gets priority and starts solving.
+                del conflicting_paths[max_dog_remaining_index]
+                del conflicting_indices[max_dog_remaining_index]
+                del conflicting_dog[max_dog_remaining_index]
+                del conflicting_dog_remaining[max_dog_remaining_index]
+                for i in range(0,len(conflicting_indices)):
+                  index = conflicting_indices[i]
+                  losing_next_node = octant_paths[index][c+1]
+                  graphs[index][n][losing_next_node]['weight'] += delay
+                p -=1
+                
+            else:
+              #Get minimum dog (corresponds to the path that reaches first).
+              min_dog = min(conflicting_dog)
+              min_dog_index = conflicting_dog.index(min_dog)
+              
+              del conflicting_paths[min_dog_index]
+              del conflicting_indices[min_dog_index]
+              del conflicting_dog[min_dog_index]
+              del conflicting_dog_remaining[min_dog_index]
+              
+              for i in range(0,len(conflicting_indices)):
+                index = conflicting_indices[i]
+                losing_next_node = octant_paths[index][c+1]
+                graphs[index][n][losing_next_node]['weight'] += delay
+              
+              p -= 1
             
-            p += 1
-            
-      all_octant_paths.append(octant_paths)
-      
-    #print(all_octant_paths)
+          p += 1
+                  
   else:
   
     for p in range(0,len(all_simple_paths)):
@@ -495,7 +485,7 @@ def get_fastest_path(graphs,paths,node):
 
 def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subset_boundaries,num_row,num_col,num_plane):
   time = 0
-  all_graph_time = np.zeros(8)
+  all_graph_time = np.zeros(len(graphs))
   heaviest_paths = []
   #Looping over the graphs.
   for ig in range(0,len(graphs)):
