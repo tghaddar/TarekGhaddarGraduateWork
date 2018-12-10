@@ -26,15 +26,16 @@ plt.close("all")
 
 
 #Number of cuts in the x direction.
-N_x = 1
+N_x = 2
 #Number of cuts in the y direction.
-N_y = 1
+N_y = 2
 
 num_row = N_y + 1
 num_col = N_x + 1
 num_plane = 0
 
 #The subset boundaries.
+step = (10.0)/N_x
 x_cuts = [0.0, 5, 10.0]
 y_cuts = [[0.0, 5, 10.0],[0.0, 5, 10.0]]
 

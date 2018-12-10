@@ -443,15 +443,22 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
               index = indices[0]
               next_node_index = paths[0].index(n)+1
               losing_next_node = octant_paths[index][next_node_index]
-              graphs[index][n][losing_next_node] += delay
+              graphs[index][n][losing_next_node]['weight'] += delay
           else:
             min_dog = min(dogs)
             min_dog_index = dogs.index(min_dog)
             
-            del paths[min_dog_index]
-            del indices[min_dog_index]
-            del dogs[min_dog_index]
-            del dogs_remaining[min_dog_index]
+            if (abs(dog1 - dog2) >= delay):
+              continue
+            else:
+              del paths[min_dog_index]
+              del indices[min_dog_index]
+              del dogs[min_dog_index]
+              del dogs_remaining[min_dog_index]
+              index = indices[0]
+              next_node_index = paths[0].index(n)+1
+              losing_next_node = octant_paths[index][next_node_index]
+              graphs[index][n][losing_next_node]['weight'] += delay
   
   else:
   
