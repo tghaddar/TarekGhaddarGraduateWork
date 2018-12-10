@@ -93,7 +93,7 @@ graphs = add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist
 
 graphs = add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_col,num_plane)
 
-all_graph_time,time,heaviest_paths = compute_solve_time(graphs,t_u,cell_dist,num_total_cells,global_subset_boundaries,num_row,num_col,num_plane)
+all_graph_time,time,heaviest_paths = compute_solve_time(graphs,cell_dist,t_u,upc,global_subset_boundaries,num_row,num_col,num_plane)
 
 print(all_graph_time)
 for ig in range(0,len(graphs)):

@@ -409,6 +409,8 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
         
         for pi in range(p+1,len(octant_paths)):
           path2 = octant_paths[pi]
+          if (path1[0] == path2[0]):
+            continue
           dog2 = get_weight_sum(graphs[pi],path2,n)
           dog_remaining2 = get_DOG(graphs[pi],path2,n)
           
@@ -555,7 +557,7 @@ def get_fastest_path(graphs,paths,node):
   return fastest_path,weight_sum
 
 
-def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subset_boundaries,num_row,num_col,num_plane):
+def compute_solve_time(graphs,cells_per_subset,t_u,upc,global_subset_boundaries,num_row,num_col,num_plane):
   time = 0
   all_graph_time = np.zeros(len(graphs))
   heaviest_paths = []
@@ -577,8 +579,9 @@ def compute_solve_time(graphs,solve_cell,cells_per_subset,num_cells,global_subse
 #    
 #    heaviest_paths.append(index)
     heaviest_path,path_weight = get_heaviest_path(graph,paths)
-    time_graph = path_weight + solve_cell*cells_per_subset[end_node]
-    all_graph_time[ig] = time_graph*10e-9 
+    heaviest_paths.append(heaviest_path)
+    time_graph = path_weight + t_u*upc*cells_per_subset[end_node]
+    all_graph_time[ig] = time_graph 
   
   time = np.average(all_graph_time)
   return all_graph_time,time,heaviest_paths

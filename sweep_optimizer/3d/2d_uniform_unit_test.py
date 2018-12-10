@@ -26,9 +26,9 @@ plt.close("all")
 
 
 #Number of cuts in the x direction.
-N_x = 3
+N_x = 2
 #Number of cuts in the y direction.
-N_y = 3
+N_y = 2
 
 num_row = N_y + 1
 num_col = N_x + 1

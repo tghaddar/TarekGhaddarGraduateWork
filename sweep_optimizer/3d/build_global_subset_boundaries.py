@@ -18,7 +18,6 @@ def build_global_subset_boundaries(N_x, N_y,x_cuts,y_cuts):
     #Getting x_min, x_max, y_min, y_max of current subset
     x_min = x_cuts[current_column]
     x_max = x_cuts[current_column+1]
-    print(current_column,current_row)
     y_min = y_cuts[current_column][current_row]
     y_max = y_cuts[current_column][current_row+1]
   
