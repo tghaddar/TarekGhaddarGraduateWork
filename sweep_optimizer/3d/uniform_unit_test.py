@@ -53,7 +53,12 @@ num_col = N_x + 1
 num_plane = N_z + 1
 
 #Assuming the order of cutting is z,x,y.
+step_z = float((global_z_max - global_z_min)/(N_z+1))
+step_y = float((global_y_max - global_y_min)/(N_y+1))
+step_x = float((global_x_max - global_x_min)/(N_x+1))
+
 z_cuts = [global_z_min,5,global_z_max]
+  
 #X_cuts per plane.
 x_cuts = [[global_x_min,5,global_x_max],[global_x_min,5,global_x_max]]
 #y_cuts per column per plane.
@@ -70,7 +75,7 @@ graphs,all_simple_paths = build_graphs(adjacency_matrix,num_row,num_col,num_plan
 #Equivalent number of cells per subset.
 cell_dist = []
 for i in range(0,num_subsets):
-  cell_dist.append(10)
+  cell_dist.append(4096)
 
 num_total_cells = sum(cell_dist)
 
@@ -90,7 +95,8 @@ graphs = add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,
 
 all_graph_time,time,heaviest_paths = compute_solve_time(graphs,t_u,cell_dist,num_total_cells,global_subset_boundaries,num_row,num_col,num_plane)
 
-for ig in range(0,len(graphs)):
-  for line in nx.generate_edgelist(graphs[ig],data=True):
-    print(line)
-  print("\n")
+print(all_graph_time)
+#for ig in range(0,len(graphs)):
+#  for line in nx.generate_edgelist(graphs[ig],data=True):
+#    print(line)
+#  print("\n")

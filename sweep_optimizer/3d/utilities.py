@@ -18,3 +18,8 @@ def get_ijk(ss_id,num_row,num_col,num_plane):
   
   
   return i,j,k
+
+def get_ij(ss_id,numrow,numcol):
+  j = int(ss_id % numrow)
+  i = int((ss_id - j)/numrow)
+  return i,j
