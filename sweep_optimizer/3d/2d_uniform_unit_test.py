@@ -26,9 +26,9 @@ plt.close("all")
 
 
 #Number of cuts in the x direction.
-N_x = 2
+N_x = 1
 #Number of cuts in the y direction.
-N_y = 2
+N_y = 1
 
 num_row = N_y + 1
 num_col = N_x + 1
@@ -106,7 +106,7 @@ num_total_cells = sum(cell_dist)
 graphs = add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,upc,upbc,t_comm,latency,m_l,num_row,num_col,num_plane)
 graphs = add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_col,num_plane)
 
-all_graph_time,time,heaviest_paths = compute_solve_time(graphs,t_u,cell_dist,num_total_cells,global_subset_boundaries,num_row,num_col,num_plane)
+all_graph_time,time,heaviest_paths = compute_solve_time(graphs,cell_dist,t_u,upc,global_subset_boundaries,num_row,num_col,num_plane)
 print(all_graph_time)
 for ig in range(0,len(graphs)):
   for line in nx.generate_edgelist(graphs[ig],data=True):
