@@ -549,8 +549,12 @@ def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_c
               raise("Error, we need a primary")
         elif (delay > 0):
           #Add this delay to the current node's solve time in the secondary graph.
+          current_node = copy(n)
           next_node = secondary_path[secondary_index+1]
-          secondary_graph[n][next_node]['weight'] += delay
+          if (secondary_index == len(secondary_path)-1):
+            next_node = secondary_path[secondary_index]
+            current_node = secondary_path[secondary_index-1]
+          secondary_graph[current_node][next_node]['weight'] += delay
         
       
   return graphs

@@ -7,6 +7,7 @@ from sweep_solver import print_simple_paths
 from sweep_solver import convert_generator
 from build_adjacency_matrix import build_adjacency
 from flip_adjacency_2d import flip_adjacency
+from sweep_solver import get_heaviest_path
 import matplotlib.pyplot as plt
 import numpy as np
 from build_global_subset_boundaries import build_global_subset_boundaries
@@ -72,7 +73,7 @@ for i in range(0,4):
   plt.plot(x,y,'b')
   plt.text(center_x,center_y,str(cell_dist[i]),fontsize=20)
 
-plt.savefig("2d_layer.pdf")
+plt.savefig("../../Prelim/figures/2d_layer.pdf")
 
 #Getting the upper triangular portion of the adjacency_matrix
 adjacency_matrix_0 = np.triu(adjacency_matrix)
@@ -124,7 +125,38 @@ num_subsets = (N_x+1)*(N_y+1)
 num_total_cells = sum(cell_dist)
 
 graphs = add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,upc,upbc,t_comm,latency,m_l,num_row,num_col,num_plane)
+
+for ig in range(0,len(graphs)):
+  for line in nx.generate_edgelist(graphs[ig],data=True):
+    print(line)
+  print("\n")
+
+heaviest_paths_edge = []
+for g in range(0,len(graphs)):
+  copy_graph = copy(graphs[g])
+  simple_paths = all_simple_paths[g]
+  heaviest_path,heaviest_path_weight = get_heaviest_path(copy_graph,simple_paths)
+  heaviest_paths_edge.append(heaviest_path)
+  
+  
+#Storing all simple paths for each graph.
+all_simple_paths = []
+for graph in graphs:
+  copy_graph = copy(graph)
+  start_node = [x for x in copy_graph.nodes() if copy_graph.in_degree(x) == 0][0]
+  end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
+  simple_paths = nx.all_simple_paths(graph,start_node,end_node)
+  all_simple_paths.append(simple_paths)
+  
+#for ig in range(0,len(graphs)):
+#  for line in nx.generate_edgelist(graphs[ig],data=True):
+#    print(line)
+#  print("\n")
+
 graphs = add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_col,num_plane)
+
+
+
 
 all_graph_time,time,heaviest_paths = compute_solve_time(graphs,cell_dist,t_u,upc,global_subset_boundaries,num_row,num_col,num_plane)
 print(all_graph_time)

@@ -308,6 +308,17 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 
 \section{Preliminary Results and Setbacks}
 
+\begin{frame}[t]\frametitle{Uniform Unbalanced Test (2D)}
+\centering
+\includegraphics[trim={1cm 0cm 1cm 1cm},clip,scale=0.75]{figures/2d_layer.pdf}
+\end{frame}
+
+\begin{frame}[t]{Longest Paths per Octant}
+
+
+\end{frame}
+
+
 \begin{frame}[t]\frametitle{Uniform Unbalanced Test}
 \centering
 	\includegraphics[trim={1cm 1cm 1cm 1cm},clip,scale=0.75]{figures/uniform_unbalanced_partitioning.pdf}
@@ -346,12 +357,24 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 
 \section{Future Work}
 
-\begin{frame}[t]\frametitle{Future Work}
+\begin{frame}[t]\frametitle{Goals of the Dissertation}
+\begin{block}{Immediate Priorities}
+\begin{itemize}
+	\item Correctly estimate sweep time for perfectly balanced partitions.
+	\item Add options for angular and spatial aggregation.
+	\item Match PDT's results for scaling on perfectly balanced partitions.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Goals of the Dissertation}
 \begin{block}{}
 \begin{itemize}
-	\item Now that we have the time to solution estimator for a given partition, we will use this to optimize the partitioning scheme. 
-	\item We will optimize the cut lines by using a minimizing tool (via python or other) that will return the minimum time to solution with the cut lines as the parameter.
+	\item Verify time to solution estimator matches PDT's sweep time.
+	\item Test time to solution estimator against unstructured PDT meshes.
+	\item Use time to solution estimator to optimize cut line locations via an optimization library.
 	\item We will also explore adding the thread map as a variable to our parameter space in addition to the cut lines.
+	\item Test optimizer against PDT's load balancing algorithms.
 \end{itemize}
 \end{block}
 \end{frame}
