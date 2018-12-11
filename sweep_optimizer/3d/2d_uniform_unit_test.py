@@ -79,31 +79,43 @@ plt.savefig("../../Prelim/figures/2d_layer.pdf")
 adjacency_matrix_0 = np.triu(adjacency_matrix)
 #Time to build the graph
 G = nx.DiGraph(adjacency_matrix_0)
-plt.figure("G")
-nx.draw(G,with_labels = True)
+
 
 #Test what lower triangular looks like
 adjacency_matrix_3 = np.tril(adjacency_matrix)
 G_3 = nx.DiGraph(adjacency_matrix_3)
-plt.figure("G_3")
-nx.draw(G_3,with_labels = True)
+
 
 #To get the top left and bottom right quadrants, we have to reverse our ordering by column.
 adjacency_flip,id_map = flip_adjacency(adjacency_matrix,N_y+1,N_x+1)
 adjacency_matrix_1 = np.triu(adjacency_flip)
-plt.figure("G_1")
+
 G_1 = nx.DiGraph(adjacency_matrix_1)
 G_1 = nx.relabel_nodes(G_1,id_map,copy=True)
-nx.draw(G_1,with_labels = True)
+
 
 #Bottom right quadrant.
 adjacency_matrix_2 = np.tril(adjacency_flip)
 plt.figure("G_2")
 G_2 = nx.DiGraph(adjacency_matrix_2)
 G_2 = nx.relabel_nodes(G_2,id_map,copy=True)
-nx.draw(G_2,with_labels = True)
 
 graphs = [G,G_1,G_2,G_3]
+
+for g in range(0, len(graphs)):
+  copy_graph = copy(graphs[g])
+  end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
+  graphs[g].add_node(-1)
+  graphs[g].add_edge(end_node,-1)
+
+plt.figure("G")
+nx.draw(graphs[0],with_labels = True)
+plt.figure("G_3")
+nx.draw(graphs[3],with_labels = True)
+plt.figure("G_1")
+nx.draw(graphs[1],with_labels = True)
+plt.figure("G_2")
+nx.draw(graphs[2],with_labels = True)
 
 #Storing all simple paths for each graph.
 all_simple_paths = []

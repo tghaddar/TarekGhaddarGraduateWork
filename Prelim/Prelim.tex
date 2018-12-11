@@ -111,8 +111,8 @@
 	\item Structured meshes are somewhat limiting when attempting to simulate more complex problems and experiments.
 	\item Unstructured meshes allow us to simulate realistic problems, but introduce unbalanced partitions. 
 	\item PDT (Texas A\&M's massively parallel transport code) introduced two load balancing algorithms that repartition the mesh in order to obtain a roughly equivalent amount of cells per processor. 
-	\item However, this can sacrifice the optimal sweep partitioning in favor of balance. 
-	\item The work proposed will balance perfect load balancing and perfect sweep partitioning in order to achieve the best possible time to solution.
+	\item However, this can sacrifice the optimal sweep partitioning (cut lines all the way through the domain) in favor of balance. 
+	\item The work proposed will balance perfect load balancing and optimal sweep partitioning in order to achieve the best possible time to solution.
 \end{itemize}
 \end{block}
 \end{frame}
@@ -122,7 +122,7 @@
   \begin{itemize}
     \item Max cells per subodmain divided by the average cells per subdomain:
       \begin{itemize}
-        \item$f =\frac{\underset{ij}{\text{max}}(N_{ijk})}{\frac{N_{tot}}{I\cdot J\cdot K}}$
+        \item$f =\frac{\underset{ij}{\text{max}}(N_{ij})}{\frac{N_{tot}}{I\cdot J}}$
       \end{itemize}
     \item Column-wise metric: $f_I = \underset{i}{\text{max}}[\sum_{j} N_{ij}]/\frac{N_{tot}}{I}$
     \item Row-wise metric: $f_J = \underset{j}{\text{max}}[\sum_{i} N_{ij}]/\frac{N_{tot}}{J}$
@@ -139,7 +139,7 @@
 \includegraphics[scale=0.25]{figures/im12d_nolb.png}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Original Load Balancing, f = 2.97}
+\begin{frame}[t]\frametitle{Load Balancing, f = 2.97}
 \centering
 \includegraphics[scale=0.22]{figures/im12d_oldlb.png}
 \end{frame}
@@ -160,6 +160,11 @@
 \begin{frame}[t]\frametitle{Load Balancing By Dimension, f = 2.02}
 \centering
 \includegraphics[scale=0.22]{figures/im12d_newlb.png}
+\end{frame}
+
+\begin{frame}[t]\frametitle{3D Load Balancing By Dimension}
+\centering
+\includegraphics[trim={0cm 1cm 0cm 3cm},clip,scale=0.27]{figures/im1_foam_448.png}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Consequences of Load Balancing By Dimension}
@@ -206,7 +211,7 @@
 \begin{frame}[t]\frametitle{Time to Solution Estimator}
 \begin{block}{}
 \begin{itemize}
-  \item For a given partition, this tool will build directed task dependence graphs for each octant, and weight the edges of that graph based on a set of criteria.
+  \item For a given partition, this tool will build cellset-level (not cell level) directed task dependence graphs for each octant, and weight the edges of that graph based on a set of criteria.
   \item The estimator returns the maximum time to sweep across one of the graphs.
   \item The maximum sweep time corresponds to the graph that has the maximum longest weighted path. 
 \end{itemize}
@@ -226,7 +231,11 @@ This process assumes that there are NO cycles in the TDGs. All graphs are acycli
 \begin{enumerate}
 	\item Given a partitioning scheme (cut lines), build adjacency matrix.
 	\item Build Directed Acyclic Graphs (DAGs) from the adjacency matrix, one for each octant.
-	\item Weight the DAGs.
+	\item Weight the DAG's edges based on:
+	\begin{itemize}
+		\item Solve and communication of each subset to it's neighbors.
+		\item Conflicts that arise between DAGs due to the sweep.
+	\end{itemize}
 	\item Compute solve time by getting the maximum of the longest paths for all DAGs.
 \end{enumerate}
 \end{block}
@@ -300,7 +309,7 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 \begin{block}{}
 \begin{itemize}
 	\item Now that all TDGs are weighted based on solve time, communication time, and delays, we can easily calculate the time it takes each octant to sweep across the graph. 
-	\item The sum of the longest path in each graph represents the time each octant takes to complete its sweep.
+	\item The sum of the  longest path in each graph represents the time each octant takes to complete its sweep.
 	\item The maximum of these 8 longest paths is the estimated time to solution that we use.
 \end{itemize}
 \end{block}
@@ -357,8 +366,8 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 
 \section{Future Work}
 
-\begin{frame}[t]\frametitle{Goals of the Dissertation}
-\begin{block}{Immediate Priorities}
+\begin{frame}[t]\frametitle{Immediate Priorities}
+\begin{block}{}
 \begin{itemize}
 	\item Correctly estimate sweep time for perfectly balanced partitions.
 	\item Add options for angular and spatial aggregation.
@@ -370,11 +379,11 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 \begin{frame}[t]\frametitle{Goals of the Dissertation}
 \begin{block}{}
 \begin{itemize}
-	\item Verify time to solution estimator matches PDT's sweep time.
-	\item Test time to solution estimator against unstructured PDT meshes.
-	\item Use time to solution estimator to optimize cut line locations via an optimization library.
-	\item We will also explore adding the thread map as a variable to our parameter space in addition to the cut lines.
-	\item Test optimizer against PDT's load balancing algorithms.
+	\item Verify time-to-solution estimator matches PDT's sweep time.
+	\item Test time-to-solution estimator against unstructured PDT meshes.
+	\item Use time-to-solution estimator to optimize cut line locations via an optimization library.
+	\item Explore adding the threads per subset as a variable to our parameter space in addition to the cut lines.
+	\item Test optimizer against PDT's load balancing algorithms. 
 \end{itemize}
 \end{block}
 \end{frame}
