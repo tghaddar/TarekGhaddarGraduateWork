@@ -1,0 +1,13 @@
+\makeatletter
+% prevent a package from loading
+\newcommand{\dontusepackage}[2][]{%
+    \@namedef{ver@#2.sty}{9999/12/31}%
+    \@namedef{opt@#2.sty}{#1}
+}
+
+% a macro to load packages only if they are not yet loaded, needed for combination of beamer and hyperref
+\newcommand{\usepackagesave}[2][{}]{
+    \ltx@ifpackageloaded{#2}{}{
+        \usepackage[#1]{#2}}
+}
+\makeatother
