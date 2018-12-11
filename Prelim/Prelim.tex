@@ -318,6 +318,32 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 \includegraphics[trim={1cm 0cm 1cm 1cm},clip,scale=0.42]{figures/layer2partitioning.pdf}
 \end{frame}
 
+\begin{frame}[t]\frametitle{Longest Path per Octant}
+\begin{block}{After Mesh Information Only}
+  \begin{enumerate}
+  \item 0, 1, 3, 7
+  \item 1, 3, 7, 6
+  \item 2, 3, 1, 5
+  \item 3, 1, 0, 4
+  \item 4, 0, 1, 3
+  \item 5, 1, 3, 2
+  \item 6, 7, 3, 1
+  \item 7, 3, 1, 0
+  \end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Current Setbacks}
+\begin{block}{}
+\begin{itemize}
+	\item For perfectly balanced problems, every simple path is the longest path.
+	\item Each octant should finish sweeping in the same amount of time.
+	\item Current conflict resolution attempts achieve the correct answer for small problems (4-9 subsets), but as the number of paths grows, the octants sweep times no longer match.
+	\item Correctly estimating sweep time for perfectly balanced problems is an immediate priority.
+\end{itemize}
+\end{block}
+\end{frame}
+
 \section{Future Work}
 
 \begin{frame}[t]\frametitle{Future Work}

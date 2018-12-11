@@ -50,9 +50,29 @@ for i in range(0,N_x):
 y_cuts.append(y_cuts[0])
 x_cuts = sorted(x_cuts)
     
+cell_dist = [4096,5880,1000,10000]
 
 global_subset_boundaries = build_global_subset_boundaries(N_x,N_y,x_cuts,y_cuts)
 adjacency_matrix = build_adjacency(global_subset_boundaries,N_x, N_y, y_cuts)
+plt.figure("2d_layer")
+for i in range(0,4):
+  
+  subset_boundary = global_subset_boundaries[i]
+  
+  xmin = subset_boundary[0]
+  xmax = subset_boundary[1]
+  ymin = subset_boundary[2]
+  ymax = subset_boundary[3]
+  
+  x = [xmin,xmax,xmax,xmin,xmin]
+  y = [ymin,ymin,ymax,ymax,ymin]
+  center_x = (xmin+xmax)/2
+  center_y = (ymin+ymax)/2
+  
+  plt.plot(x,y,'b')
+  plt.text(center_x,center_y,str(cell_dist[i]),fontsize=20)
+
+plt.savefig("2d_layer.pdf")
 
 #Getting the upper triangular portion of the adjacency_matrix
 adjacency_matrix_0 = np.triu(adjacency_matrix)
@@ -96,9 +116,9 @@ for graph in graphs:
 
 num_subsets = (N_x+1)*(N_y+1)
 #Equivalent number of cells per subset.
-cell_dist = []
-for i in range(0,num_subsets):
-  cell_dist.append(4096.0)
+
+#for i in range(0,num_subsets):
+#  cell_dist.append(4096.0)
 
 
 num_total_cells = sum(cell_dist)
