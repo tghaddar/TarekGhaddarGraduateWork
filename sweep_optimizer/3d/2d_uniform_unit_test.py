@@ -165,7 +165,7 @@ for graph in graphs:
 #    print(line)
 #  print("\n")
 
-graphs = add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,num_row,num_col,num_plane)
+graphs = add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,t_u,upc,t_comm,upbc,m_l,num_row,num_col,num_plane)
 
 
 
