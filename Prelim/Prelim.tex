@@ -178,8 +178,6 @@
   \end{block}
 \end{frame}
 
-
-
 \begin{frame}[t]\frametitle{Sweep on Regular Grid with 3 Angle Sets}
 	\animategraphics[loop,controls,width=0.8\linewidth]{10}{figures/sweep_figs/sweeps_png/sweep_regular_20x20_as3_dog/sweep_regular_20x20_as3_dog_}{1}{48}
 	%\href{run:figures/sweep_figs/sweeps_png/sweep_regular_20x20_as3_dog/animation.gif}{Animation.gif}
@@ -303,11 +301,26 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 \begin{frame}[t]\frametitle{Conflict Detection}
 	\centering
  	\includegraphics[scale=0.35]{figures/preconflict.png}
+	
+	\begin{block}{}
+		\begin{itemize}
+			\item A conflict arises at Node 1. The first path arrives at $t=3$, but takes 10 seconds to solve.
+			\item The second path arrives at $t= 11$, while the first path is solving Node 1.
+		\end{itemize}
+	\end{block}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Conflict Resolution}
+	\centering
 	\includegraphics[scale=0.35]{figures/postconflict.png}
-
+	
+	\begin{block}{}
+	\begin{itemize}
+		\item The second path waits 2 seconds to solve Node 1.
+		\item This delay is added to the edge weight between Node 1 and Node 0 to reflect the new total solve time for Node 1 in the second path.
+	\end{itemize}
+	\end{block}
+	
 \end{frame}
 
 \begin{frame}[t]\frametitle{General Conflict Resolution Algorithm}
@@ -317,7 +330,7 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 \FOR{$node = 1$ to $N$}
 \STATE Find fastest path to $node$
 \STATE Add delays to slower paths
-\STATE Delete fastest path to $node$
+\STATE Remove fastest path to $node$ for future iterations
 \ENDFOR
 \ENDFOR	
 \label{conflict}
