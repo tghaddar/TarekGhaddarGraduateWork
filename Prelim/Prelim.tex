@@ -415,11 +415,37 @@ On future slides you will see a dummy node with the label "-1".
 \begin{block}{}
 \begin{itemize}
 \item Still no conflicts at Node 0 or Node 2.
-\item Path 1 is still solving Node 1 when Path 3 arrives. Delay of $48345-40292$ is added.
+\item Path 1 is still solving Node 1 when Path 3 arrives. Delay of $48345-40292=7416$ is added.
 \item Path 2 starts solving Node 3 at t=40929. Path 1 is delayed a further 40929 (Node 3's solve time). 
-\item Path 0 can solve Node 3 at t=48345. Path 2 is not finished solving until t=81858. Delay of $8185-48345=33513$ added.
+\item Path 0 can solve Node 3 at t=48345. Path 2 is not finished solving until t=81858. Delay of $81858-48345=33513$ added.
 \end{itemize}
 \end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Iteration 2}
+\centering
+\includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/iteration2.pdf}
+\end{frame}
+
+\begin{frame}[t]{Conflicts at Iteration 2}
+\centering
+\includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/iteration2_conflicts.pdf}
+\end{frame}
+
+\begin{frame}[t]{Resolving Iteration 2}
+\centering
+\includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.2]{figures/iteration2_conflicts.pdf}
+\begin{block}{}
+\begin{itemize}
+	\item No conflicts at Nodes 0,1, or 2.
+	\item Path 1 is done solving Node 3 at t=122787. Path 2 is delayed a further 40929 (Node 3's solve time).
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{Final Weights}
+\centering
+\includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/final.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Current Setbacks}
