@@ -241,7 +241,7 @@ This process assumes that there are NO cycles in the TDGs. All graphs are acycli
 	\item Build Directed Acyclic Graphs (DAGs) from the adjacency matrix, one for each octant.
 	\item Weight the DAG's edges based on:
 	\begin{itemize}
-		\item Solve and communication of each subset to its neighbors.
+		\item Solve and communication time of each subset to its neighbors.
 		\item Conflicts that arise between DAGs due to the sweep.
 		\item This final edge weight reflects the amount of time it takes to solve the base node.
 	\end{itemize}
