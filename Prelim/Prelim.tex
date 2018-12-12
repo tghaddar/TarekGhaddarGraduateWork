@@ -233,8 +233,9 @@ This process assumes that there are NO cycles in the TDGs. All graphs are acycli
 	\begin{itemize}
 		\item Solve and communication of each subset to its neighbors.
 		\item Conflicts that arise between DAGs due to the sweep.
+		\item This final edge weight reflects the amount of time it takes to solve the base node.
 	\end{itemize}
-	\item Compute solve time by getting the maximum of the longest paths for all DAGs.
+	\item Compute solve time by getting the maximum edge-weighted sum of the longest paths for all DAGs.
 \end{enumerate}
 \end{block}
 \end{frame}
@@ -293,7 +294,7 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 \end{block}
 \begin{block}{Potential Future Work: hybrid depth-of-graph/first come first serve conflict resolution}
 \begin{itemize}
-	\item Two (or more) paths arrive to a node at different time, when that node is free to solve, the path with the greater depth-of-graph remaining solves first.
+	\item Two (or more) paths arrive to a node at different time, and when that node is free to solve, the path with the greater depth-of-graph remaining solves first.
 \end{itemize}
 \end{block}
 \end{frame}
@@ -350,8 +351,8 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 \begin{block}{}
 \begin{itemize}
 	\item Now that all TDGs are weighted based on solve time, communication time, and delays, we can easily calculate the time it takes each octant to sweep across the graph. 
-	\item The sum of the  longest path in each graph represents the time each octant takes to complete its sweep.
-	\item The maximum of these 8 longest paths is the estimated time to solution that we use.
+	\item The sum of the  longest path's edge weights in each graph represents the time each octant takes to complete its sweep.
+	\item The maximum weighted edge sum of these longest paths is the estimated time to solution that we use.
 \end{itemize}
 \end{block}
 \end{frame}
@@ -372,7 +373,18 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 		\item 3,1,0
 	\end{enumerate}
 \end{block}
+On future slides you will see a dummy node with the label "-1".
 \includegraphics[trim={1cm 0cm 1cm 1cm},clip,scale=0.4]{figures/2d_layer.pdf}
+\end{frame}
+
+\begin{frame}[t]{Graph Weights with Solve and Comm. Time Only}
+\centering
+\includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/solve_only.pdf}
+\end{frame}
+
+\begin{frame}[t]{Conflicts at Iteration 0}
+\centering
+\includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/solve_only_conflicts.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Current Setbacks}
