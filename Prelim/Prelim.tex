@@ -233,7 +233,7 @@ This process assumes that there are NO cycles in the TDGs. All graphs are acycli
 	\item Build Directed Acyclic Graphs (DAGs) from the adjacency matrix, one for each octant.
 	\item Weight the DAG's edges based on:
 	\begin{itemize}
-		\item Solve and communication of each subset to it's neighbors.
+		\item Solve and communication of each subset to its neighbors.
 		\item Conflicts that arise between DAGs due to the sweep.
 	\end{itemize}
 	\item Compute solve time by getting the maximum of the longest paths for all DAGs.
@@ -303,6 +303,29 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 \begin{frame}[t]\frametitle{Conflict Resolution}
 	\includegraphics[scale=0.35]{figures/postconflict.png}
 
+\end{frame}
+
+\begin{frame}[t]\frametitle{General Conflict Resolution Algorithm}
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\FOR{$g = 1$ to $G-1$}
+\FOR{$node = 1$ to $N$}
+\STATE Find fastest path to $node$
+\STATE Add delays to slower paths
+\STATE Delete fastest path to $node$
+\ENDFOR
+\ENDFOR	
+\label{conflict}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{block}{}
+\begin{itemize}
+	\item $G$ is the total number of DAGs.
+	\item N is the total number of nodes per DAG.
+	\item It is necessary to have $G-1$ iterations so that slower paths to each node will address conflicts with each other. This will be illustrated in the test case shown.
+\end{itemize}
+\end{block}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Sweeping the Graph}

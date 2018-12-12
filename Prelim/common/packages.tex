@@ -58,10 +58,7 @@
 %Allows .eps to be used.
 \usepackage{epstopdf}
 
-% source code and algorithms
-\usepackage{algorithmicx} % newer version of algorithmic - https://www.ctan.org/pkg/algorithmicx
-\usepackage{listings} 	% source code listings - http://www.ctan.org/pkg/listings
-\usepackage{verbatim}   % verbatim - https://www.ctan.org/pkg/verbatim
+
 
 % misc packages
 \usepackage{url}        % provide \url command for web addresses - https://www.ctan.org/pkg/url
@@ -81,11 +78,14 @@
 % reference packages
 % hyperref must be loaded before amsmath to avoid problems with subequations and align
 \usepackage{hyperref}		% Extensive support for hypertext - https://www.ctan.org/pkg/hyperref
-
+% source code and algorithms
+\usepackage{algorithm2e} % newer version of algorithmic - https://www.ctan.org/pkg/algorithmicx
+\usepackage{algorithmic}
+\usepackage{listings} 	% source code listings - http://www.ctan.org/pkg/listings
+\usepackage{verbatim}   % verbatim - https://www.ctan.org/pkg/verbatim
 
 % packages that must be loaded after hyperref - http://tex.stackexchange.com/questions/1863/which-packages-should-be-loaded-after-hyperref-instead-of-before
 \usepackage{geometry}		% Flexible and complete interface to document dimensions - https://www.ctan.org/pkg/geometry
-\usepackage{algorithm}  % algorithm enviroment
 
 % ams math packages
 \usepackage{amsmath}    % mathematical facilities - https://www.ctan.org/pkg/amsmath
