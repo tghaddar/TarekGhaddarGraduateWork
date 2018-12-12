@@ -387,6 +387,41 @@ On future slides you will see a dummy node with the label "-1".
 \includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/solve_only_conflicts.pdf}
 \end{frame}
 
+\begin{frame}[t]{Resolving Iteration 0}
+\centering
+\includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.2]{figures/solve_only_conflicts.pdf}
+\begin{block}{}
+\begin{itemize}
+\item There are conflicts at Node 0 or Node 2. The fastest paths finish by the time the slower paths arrive.
+\item Path 1 is still solving Node 1 when Path 0 arrives. Delay of $24172-16897=7275$ added to Path 0.
+\item Paths 1 and 2 arrive at Node 3 before Path 3 finishes solving. Delays of $40929-24172=16757$ and $40929-4201=36728$  are added.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]{Iteration 1}
+\centering
+\includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/iteration1.pdf}
+\end{frame}
+
+\begin{frame}[t]{Conflicts at Iteration 1}
+\centering
+\includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/iteration1_conflicts.pdf}
+\end{frame}
+
+\begin{frame}[t]{Resolving Iteration 1}
+\centering
+\includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.2]{figures/iteration1_conflicts.pdf}
+\begin{block}{}
+\begin{itemize}
+\item Still no conflicts at Node 0 or Node 2.
+\item Path 1 is still solving Node 1 when Path 3 arrives. Delay of $48345-40292$ is added.
+\item Path 2 starts solving Node 3 at t=40929. Path 1 is delayed a further 40929 (Node 3's solve time). 
+\item Path 0 can solve Node 3 at t=48345. Path 2 is not finished solving until t=81858. Delay of $8185-48345=33513$ added.
+\end{itemize}
+\end{block}
+\end{frame}
+
 \begin{frame}[t]\frametitle{Current Setbacks}
 \begin{block}{}
 \begin{itemize}
