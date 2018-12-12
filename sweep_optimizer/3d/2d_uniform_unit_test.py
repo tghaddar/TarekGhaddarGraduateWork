@@ -71,7 +71,7 @@ for i in range(0,4):
   center_y = (ymin+ymax)/2
   
   plt.plot(x,y,'b')
-  plt.text(center_x,center_y,str(cell_dist[i]),fontsize=20)
+  plt.text(center_x-1,center_y,str(i)+";"+str(cell_dist[i]),fontsize=18)
 
 plt.savefig("../../Prelim/figures/2d_layer.pdf")
 
