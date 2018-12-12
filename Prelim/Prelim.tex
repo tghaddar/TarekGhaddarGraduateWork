@@ -370,8 +370,16 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 \section{Preliminary Results and Setbacks}
 
 \begin{frame}[t]\frametitle{Uniform Unbalanced Test (2D)}
+\begin{block}{Machine Parameters Used}
+\begin{itemize}
+	\item $T_u = 1$s
+	\item $T_{\text{comm}} = 1$s
+	\item $latency = 1$s, $m_l = 1$
+	\item $\text{upc}=4$, $\text{upbc}=2$
+\end{itemize}
+\end{block}
 \centering
-\includegraphics[trim={1cm 0cm 1cm 1cm},clip,scale=0.75]{figures/2d_layer.pdf}
+\includegraphics[trim={1cm 0cm 1cm 1cm},clip,scale=0.44]{figures/2d_layer.pdf}
 \end{frame}
 
 \begin{frame}[t]{Longest Paths per Quadrant}
