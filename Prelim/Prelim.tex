@@ -382,7 +382,7 @@ N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary ce
 \includegraphics[trim={1cm 0cm 1cm 1cm},clip,scale=0.44]{figures/2d_layer.pdf}
 \end{frame}
 
-\begin{frame}[t]{Longest Paths per Quadrant}
+\begin{frame}[t]\frametitle{Longest Paths per Quadrant}
 \begin{block}{}
 	\begin{enumerate}
 		\item 0,1,3
@@ -395,17 +395,17 @@ On future slides you will see a dummy node with the label "-1".
 \includegraphics[trim={1cm 0cm 1cm 1cm},clip,scale=0.4]{figures/2d_layer.pdf}
 \end{frame}
 
-\begin{frame}[t]{Graph Weights with Solve and Comm. Time Only}
+\begin{frame}[t]\frametitle{Graph Weights with Solve and Comm. Time Only}
 \centering
 \includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/solve_only.pdf}
 \end{frame}
 
-\begin{frame}[t]{Conflicts at Iteration 0}
+\begin{frame}[t]\frametitle{Conflicts at Iteration 0}
 \centering
 \includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/solve_only_conflicts.pdf}
 \end{frame}
 
-\begin{frame}[t]{Resolving Iteration 0}
+\begin{frame}[t]\frametitle{Resolving Iteration 0}
 \centering
 \includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.2]{figures/solve_only_conflicts.pdf}
 \begin{block}{}
@@ -417,17 +417,17 @@ On future slides you will see a dummy node with the label "-1".
 \end{block}
 \end{frame}
 
-\begin{frame}[t]{Iteration 1}
+\begin{frame}[t]\frametitle{Iteration 1}
 \centering
 \includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/iteration1.pdf}
 \end{frame}
 
-\begin{frame}[t]{Conflicts at Iteration 1}
+\begin{frame}[t]\frametitle{Conflicts at Iteration 1}
 \centering
 \includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/iteration1_conflicts.pdf}
 \end{frame}
 
-\begin{frame}[t]{Resolving Iteration 1}
+\begin{frame}[t]\frametitle{Resolving Iteration 1}
 \centering
 \includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.2]{figures/iteration1_conflicts.pdf}
 \begin{block}{}
@@ -445,12 +445,12 @@ On future slides you will see a dummy node with the label "-1".
 \includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/iteration2.pdf}
 \end{frame}
 
-\begin{frame}[t]{Conflicts at Iteration 2}
+\begin{frame}[t]\frametitle{Conflicts at Iteration 2}
 \centering
 \includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/iteration2_conflicts.pdf}
 \end{frame}
 
-\begin{frame}[t]{Resolving Iteration 2}
+\begin{frame}[t]\frametitle{Resolving Iteration 2}
 \centering
 \includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.2]{figures/iteration2_conflicts.pdf}
 \begin{block}{}
@@ -461,9 +461,21 @@ On future slides you will see a dummy node with the label "-1".
 \end{block}
 \end{frame}
 
-\begin{frame}[t]{Final Weights}
+\begin{frame}[t]\frametitle{Final Weights}
 \centering
 \includegraphics[trim={2cm 2cm 4cm 2cm},clip,scale=0.45]{figures/final.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Final Result}
+\begin{block}{}
+	\begin{enumerate}
+		\item 0,1,3 = \tcr{163717}
+		\item 1,3,2 = 126989
+		\item 2,3,1 = 106031
+		\item 3,1,0 = 89414
+	\end{enumerate}
+\end{block}
+\includegraphics[trim={1cm 0cm 1cm 1cm},clip,scale=0.4]{figures/2d_layer.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Current Setbacks}
