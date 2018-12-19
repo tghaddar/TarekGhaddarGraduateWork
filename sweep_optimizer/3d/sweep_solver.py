@@ -156,7 +156,25 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,
       cost = num_cells*t_u*upc + (boundary_cells*upbc*t_comm + latency*m_l)
       graph[e[0]][e[1]]['weight'] = cost
   return graphs
-      
+
+#Converts the edge weighting to a universal time. An edge will now represent the time on a universal scale. For instance, if we have an edge that starts at node A and ends at node B, the edge represents the total time it takes that path to get to node B. 
+def make_edges_universal(graphs):
+  
+  num_nodes = graphs[0].number_of_nodes()-1
+  num_graphs = len(graphs)
+  
+  #Looping over all graphs.
+  for graph in range(0,num_graphs):
+    #A copy of the graph so that we don't erase it when reading it for info.
+    copy_graph = copy(graph)
+    #The current_graph which we will alter.
+    current_graph = graphs[graph]
+    
+    #Getting the starting node of this graph.
+    start_node = [x for x in copy_graph.nodes() if copy_graph.in_degree(x) == 0][0]
+#    sucessors = 
+    
+
 def sum_weights_of_path(graph,path):
   weight_sum = 0.0
   for n in range(0,len(path)-1):
@@ -292,14 +310,15 @@ def convert_generator(simple_paths):
 
 def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,t_u,upc,t_c,upbc,m_l, num_row,num_col,num_plane):
   
-  #The number of nodes in the graphs.
-  num_nodes = graphs[0].number_of_nodes()
-  graphs_copy = copy(graphs)
+  #The number of nodes in the graphs excluding the "-1" node added for the final edge.
+  num_nodes = graphs[0].number_of_nodes() - 1
+  #The number of graphs.
+  num_graphs = len(graphs)
   
   
   
   return graphs
-  
+
 #Gets the path that gets fastest to a node. Assumes that each graph has its heaviest path listed.
 def get_fastest_path(graphs,paths,node):
   
