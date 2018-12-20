@@ -9,6 +9,8 @@ This code tests dfs algorithms that I may want to use.
 import networkx as nx
 import matplotlib.pyplot as plt
 from copy import copy
+from sweep_solver import get_weight_sum
+from sweep_solver import get_heaviest_path
 
 #Number of cuts in x.
 N_x = 2
@@ -51,10 +53,10 @@ G.add_edge(6,7,weight = 20)
 #Node 7 edge.
 G.add_edge(7,8,weight = 15)
 
-plt.figure("Graph 0 Pre Universal Time")
-edge_labels_1 = nx.get_edge_attributes(G,'weight')
-nx.draw(G,nx.shell_layout(G),with_labels = True)
-nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
+#plt.figure("Graph 0 Pre Universal Time")
+#edge_labels_1 = nx.get_edge_attributes(G,'weight')
+#nx.draw(G,nx.shell_layout(G),with_labels = True)
+#nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
 
 #We need to find the number of depth levels.
 
@@ -62,6 +64,7 @@ nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
 copy_graph = copy(G)
 #Getting the starting node.
 start_node = [x for x in copy_graph.nodes() if copy_graph.in_degree(x) == 0][0]
+end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
 #Getting successors to the starting node.
 successors = list(copy_graph.successors(start_node))
 s = 0
@@ -106,8 +109,34 @@ while s < len(successors):
       continue
   count += 1
 
+successors = list(copy_graph.successors(start_node))
 
-plt.figure("Graph 0 Post Universal ish Time")
-edge_labels_1 = nx.get_edge_attributes(G,'weight')
-nx.draw(G,nx.shell_layout(G),with_labels = True)
-nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
+#We now sum the weights along each path in order to 
+s = 0
+while s < len(successors):
+  #Make the list of successors unique.
+  successors = list(set(successors))
+  #Current successor.
+  succ = successors[s]
+  #Predecessors of this successor.
+  predecessors = list(G.predecessors(succ))
+  
+  #Getting paths to this successor.
+  succ_simple_paths = nx.all_simple_paths(G,predecessors[0],succ)
+  #Getting the heaviest of the simple paths from our predecessor.
+  
+  
+  #We remove this from our list of successors.
+  successors.remove(succ)
+  try:
+    successors += list(copy_graph.successors(succ))
+  except:
+    continue
+  
+  
+  
+
+#plt.figure("Graph 0 Post Universal ish Time")
+#edge_labels_1 = nx.get_edge_attributes(G,'weight')
+#nx.draw(G,nx.shell_layout(G),with_labels = True)
+#nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
