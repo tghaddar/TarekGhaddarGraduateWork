@@ -160,20 +160,44 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,
 #Converts the edge weighting to a universal time. An edge will now represent the time on a universal scale. For instance, if we have an edge that starts at node A and ends at node B, the edge represents the total time it takes that path to get to node B. 
 def make_edges_universal(graphs):
   
-  num_nodes = graphs[0].number_of_nodes()-1
+  num_nodes = graphs[0].number_of_nodes()
   num_graphs = len(graphs)
   
   #Looping over all graphs.
-  for graph in range(0,num_graphs):
-    #A copy of the graph so that we don't erase it when reading it for info.
-    copy_graph = copy(graph)
+  for g in range(0,num_graphs):
     #The current_graph which we will alter.
-    current_graph = graphs[graph]
+    G = graphs[g]
     
     #Getting the starting node of this graph.
-    start_node = [x for x in copy_graph.nodes() if copy_graph.in_degree(x) == 0][0]
-#    sucessors = 
-    
+    start_node = [x for x in G.nodes() if G.in_degree(x) == 0][0]
+    #A list storing the heaviest path length to each node.
+    heavy_path_lengths = [None]*num_nodes
+    #Looping over nodes to get the longest path to each node.
+    for n in range(0,num_nodes):
+      
+      #Getting all simple paths to the node.
+      simple_paths = nx.all_simple_paths(G,start_node,n)
+      #The heaviest path and the length of the heaviest path.
+      heaviest_path,heaviest_path_length = get_heaviest_path(G,simple_paths)
+      
+      #Storing this value in heavy_path_lengths.
+      heavy_path_lengths[n] = heaviest_path_length
+      
+    #Storing the heavy path lengths as the weight value to all preceding edges.
+    for n in range(0,num_nodes):
+      
+      #The starting node has no preceding edges so we skip it.
+      if (n != start_node):
+        #Getting the weight we want for preceding edges.
+        new_weight = heavy_path_lengths[n]
+        #Getting the predecessors to this node in the graph.
+        predecessors = list(G.predecessors(n))
+        num_pred = len(predecessors)
+        for p in range(0,num_pred):
+          pred = predecessors[p]
+          G[pred][n]['weight'] = new_weight
+
+  return graphs
 
 def sum_weights_of_path(graph,path):
   weight_sum = 0.0
