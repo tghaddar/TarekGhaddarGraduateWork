@@ -53,10 +53,10 @@ G.add_edge(6,7,weight = 20)
 #Node 7 edge.
 G.add_edge(7,8,weight = 15)
 
-#plt.figure("Graph 0 Pre Universal Time")
-#edge_labels_1 = nx.get_edge_attributes(G,'weight')
-#nx.draw(G,nx.shell_layout(G),with_labels = True)
-#nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
+plt.figure("Graph 0 Pre Universal Time")
+edge_labels_1 = nx.get_edge_attributes(G,'weight')
+nx.draw(G,nx.shell_layout(G),with_labels = True)
+nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
 
 #We need to find the number of depth levels.
 
@@ -65,78 +65,36 @@ copy_graph = copy(G)
 #Getting the starting node.
 start_node = [x for x in copy_graph.nodes() if copy_graph.in_degree(x) == 0][0]
 end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
-#Getting successors to the starting node.
-successors = list(copy_graph.successors(start_node))
-s = 0
-count = 0
-while s < len(successors):
-  #Make the list of successors unique each time.
-  successors = list(set(successors))
-  #Current successor.
-  succ = successors[s]
+
+#A list storing the heaviest path length to each node.
+heavy_path_lengths = [None]*num_nodes
+#Looping over nodes to get the longest path to each node.
+for n in range(0,num_nodes):
   
-  #Check the predecessors of this successor.
-  predecessors = list(copy_graph.predecessors(succ))
-  num_preds = len(predecessors)
+  #Getting all simple paths to the node.
+  simple_paths = nx.all_simple_paths(G,start_node,n)
+  #The heaviest path and the length of the heaviest path.
+  heaviest_path,heaviest_path_length = get_heaviest_path(G,simple_paths)
   
-  #If there is only one predecessor, we remove this from our list of successors, as there is nothing to evaluate, and add it's successors to the list.
-  if num_preds == 1:
-    successors.remove(succ)
-    try:
-      successors += list(copy_graph.successors(succ))
-    except:
-      continue
-  #Otherwise we check who has the largest edge weight and set those to that.
-  else:
-    max_weight = 0
-    for p in range(0,num_preds):
+  #Storing this value in heavy_path_lengths.
+  heavy_path_lengths[n] = heaviest_path_length
+  
+#Storing the heavy path lengths as the weight value to all preceding edges.
+for n in range(0,num_nodes):
+  
+  #The starting node has no preceding edges so we skip it.
+  if (n != start_node):
+    #Getting the weight we want for preceding edges.
+    new_weight = heavy_path_lengths[n]
+    #Getting the predecessors to this node in the graph.
+    predecessors = list(G.predecessors(n))
+    num_pred = len(predecessors)
+    for p in range(0,num_pred):
       pred = predecessors[p]
-      edge_weight = G[pred][succ]['weight']
-      if (edge_weight > max_weight):
-        max_weight = edge_weight
+      G[pred][n]['weight'] = new_weight
     
-    #Now that we have the max weight, we set that as the new edge weight for all predecessors.
-    for p in range(0,num_preds):
-      pred = predecessors[p]
-      G[pred][succ]['weight'] = max_weight
-    
-    #We remove this from our list of successors.
-    successors.remove(succ)
-    #We add in the successors of this node.
-    try:
-      successors += list(copy_graph.successors(succ))
-    except:
-      continue
-  count += 1
 
-successors = list(copy_graph.successors(start_node))
-
-#We now sum the weights along each path in order to 
-s = 0
-while s < len(successors):
-  #Make the list of successors unique.
-  successors = list(set(successors))
-  #Current successor.
-  succ = successors[s]
-  #Predecessors of this successor.
-  predecessors = list(G.predecessors(succ))
-  
-  #Getting paths to this successor.
-  succ_simple_paths = nx.all_simple_paths(G,predecessors[0],succ)
-  #Getting the heaviest of the simple paths from our predecessor.
-  
-  
-  #We remove this from our list of successors.
-  successors.remove(succ)
-  try:
-    successors += list(copy_graph.successors(succ))
-  except:
-    continue
-  
-  
-  
-
-#plt.figure("Graph 0 Post Universal ish Time")
-#edge_labels_1 = nx.get_edge_attributes(G,'weight')
-#nx.draw(G,nx.shell_layout(G),with_labels = True)
-#nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
+plt.figure("Graph 0 Post Universal ish Time")
+edge_labels_1 = nx.get_edge_attributes(G,'weight')
+nx.draw(G,nx.shell_layout(G),with_labels = True)
+nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
