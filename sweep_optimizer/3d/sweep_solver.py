@@ -166,19 +166,19 @@ def make_edges_universal(graphs):
   #Looping over all graphs.
   for g in range(0,num_graphs):
     #The current_graph which we will alter.
-    G = graphs[g]
+    graph = graphs[g]
     
     #Getting the starting node of this graph.
-    start_node = [x for x in G.nodes() if G.in_degree(x) == 0][0]
+    start_node = [x for x in graph.nodes() if graph.in_degree(x) == 0][0]
     #A list storing the heaviest path length to each node.
     heavy_path_lengths = [None]*num_nodes
     #Looping over nodes to get the longest path to each node.
     for n in range(0,num_nodes):
       
       #Getting all simple paths to the node.
-      simple_paths = nx.all_simple_paths(G,start_node,n)
+      simple_paths = nx.all_simple_paths(graph,start_node,n)
       #The heaviest path and the length of the heaviest path.
-      heaviest_path,heaviest_path_length = get_heaviest_path(G,simple_paths)
+      heaviest_path,heaviest_path_length = get_heaviest_path(graph,simple_paths)
       
       #Storing this value in heavy_path_lengths.
       heavy_path_lengths[n] = heaviest_path_length
@@ -191,12 +191,13 @@ def make_edges_universal(graphs):
         #Getting the weight we want for preceding edges.
         new_weight = heavy_path_lengths[n]
         #Getting the predecessors to this node in the graph.
-        predecessors = list(G.predecessors(n))
+        predecessors = list(graph.predecessors(n))
         num_pred = len(predecessors)
         for p in range(0,num_pred):
           pred = predecessors[p]
-          G[pred][n]['weight'] = new_weight
-
+          graph[pred][n]['weight'] = new_weight
+    
+    graphs[g] = graph
   return graphs
 
 #A weight based traversal of a graph G. In the context of our problem, this returns all nodes solving at time t = weight_limit.

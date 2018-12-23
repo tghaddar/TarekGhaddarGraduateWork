@@ -97,11 +97,6 @@ G2.add_edge(8,5,weight = 1)
 G2.add_edge(8,7,weight = 1)
 G3.add_edge(8,5,weight = 1)
 
-plt.figure("Graph 0 Pre Universal Time")
-edge_labels_1 = nx.get_edge_attributes(G,'weight')
-nx.draw(G,nx.shell_layout(G),with_labels = True)
-nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
-
 #Putting universal times on the weights.
 graphs = [G,G1,G2,G3]
 
@@ -115,6 +110,21 @@ edge_labels_1 = nx.get_edge_attributes(G,'weight')
 nx.draw(G,nx.shell_layout(G),with_labels = True)
 nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
 
+plt.figure("Graph 1 Post Universal Time")
+edge_labels_1 = nx.get_edge_attributes(G1,'weight')
+nx.draw(G1,nx.shell_layout(G1),with_labels = True)
+nx.draw_networkx_edge_labels(G1,nx.shell_layout(G1),edge_labels=edge_labels_1)
+
+plt.figure("Graph 2 Post Universal Time")
+edge_labels_1 = nx.get_edge_attributes(G2,'weight')
+nx.draw(G2,nx.shell_layout(G2),with_labels = True)
+nx.draw_networkx_edge_labels(G2,nx.shell_layout(G2),edge_labels=edge_labels_1)
+
+
+plt.figure("Graph 3 Post Universal Time")
+edge_labels_1 = nx.get_edge_attributes(G3,'weight')
+nx.draw(G3,nx.shell_layout(G3),with_labels = True)
+nx.draw_networkx_edge_labels(G3,nx.shell_layout(G3),edge_labels=edge_labels_1)
 ##Testing our weight-based traversal.
 #We try an arbitrary weight limit. 
 weight_limit = 20.0
