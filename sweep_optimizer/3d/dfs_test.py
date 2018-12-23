@@ -10,6 +10,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from copy import copy
 from sweep_solver import make_edges_universal
+from sweep_solver import nodes_being_solved
 
 #Number of cuts in x.
 N_x = 2
@@ -63,9 +64,18 @@ graphs = [G]
 graphs = make_edges_universal(graphs)
 
 G = graphs[0]
-    
 
-plt.figure("Graph 0 Post Universal ish Time")
+
+plt.figure("Graph 0 Post Universal Time")
 edge_labels_1 = nx.get_edge_attributes(G,'weight')
 nx.draw(G,nx.shell_layout(G),with_labels = True)
 nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
+
+##Testing our weight-based traversal.
+#We try an arbitrary weight limit. 
+weight_limit = 20.0
+
+current_nodes = nodes_being_solved(G,weight_limit)
+print(current_nodes)
+
+

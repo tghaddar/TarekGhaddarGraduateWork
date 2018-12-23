@@ -199,6 +199,35 @@ def make_edges_universal(graphs):
 
   return graphs
 
+#A weight based traversal of a graph G. In the context of our problem, this returns all nodes solving at time t = weight_limit.
+def nodes_being_solved(G,weight_limit):
+  #starting_node
+  start_node = [x for x in G.nodes() if G.in_degree(x) == 0][0]
+  #ending_node 
+  end_node =  [x for x in G.nodes() if G.out_degree(x) == 0][0]
+
+  #A list to store the nodes that are being solved at time t = weight_limit.
+  nodes_being_solved = []
+  #The simple paths of this graph.
+  simple_paths = nx.all_simple_paths(G,start_node,end_node)
+  
+  for path in simple_paths:
+    
+    #Number of nodes in this path
+    num_nodes_path = len(path)
+    for n in range(1,num_nodes_path):
+      node1 = path[n-1]
+      node2 = path[n]
+      #Checking if the node is solving by the weight limit.
+      if (G[node1][node2]['weight'] >= weight_limit):
+        nodes_being_solved.append(node1)
+        break
+  
+  #Making the list unique.
+  nodes_being_solved = list(set(nodes_being_solved))
+  
+  return nodes_being_solved
+  
 def sum_weights_of_path(graph,path):
   weight_sum = 0.0
   for n in range(0,len(path)-1):
