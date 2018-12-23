@@ -361,12 +361,16 @@ def convert_generator(simple_paths):
   
   return new_simple_paths
 
-def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,t_u,upc,t_c,upbc,m_l, num_row,num_col,num_plane):
+def add_conflict_weights(graphs):
   
-  #The number of nodes in the graphs excluding the "-1" node added for the final edge.
-  num_nodes = graphs[0].number_of_nodes() - 1
+  #The number of nodes in the graphs.
+  num_nodes = graphs[0].number_of_nodes()
   #The number of graphs.
   num_graphs = len(graphs)
+  
+  #The initial reference graph.
+  ref_graph = graphs[0]
+  ref_start_node = [x for x in ref_graph.nodes() if ref_graph.in_degree(x) == 0][0]
   
   
   
