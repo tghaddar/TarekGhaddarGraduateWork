@@ -92,7 +92,7 @@ G3.add_edge(7,4,weight = 15)
 G3.add_edge(7,8,weight = 15)
 
 #Node 8 edge.
-G1.add_edge(8,1,weight = 1)
+G1.add_edge(8,7,weight = 1)
 G2.add_edge(8,5,weight = 1)
 G2.add_edge(8,7,weight = 1)
 G3.add_edge(8,5,weight = 1)

@@ -179,7 +179,7 @@ def make_edges_universal(graphs):
       simple_paths = nx.all_simple_paths(graph,start_node,n)
       #The heaviest path and the length of the heaviest path.
       heaviest_path,heaviest_path_length = get_heaviest_path(graph,simple_paths)
-      
+
       #Storing this value in heavy_path_lengths.
       heavy_path_lengths[n] = heaviest_path_length
       
