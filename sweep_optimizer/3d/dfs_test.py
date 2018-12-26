@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from copy import copy
 from sweep_solver import make_edges_universal
 from sweep_solver import nodes_being_solved
+from sweep_solver import add_conflict_weights
 
 #Number of cuts in x.
 N_x = 2
@@ -132,4 +133,5 @@ weight_limit = 20.0
 current_nodes = nodes_being_solved(G,weight_limit)
 print(current_nodes)
 
+graphs = add_conflict_weights(graphs)
 

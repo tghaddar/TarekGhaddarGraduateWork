@@ -371,7 +371,22 @@ def add_conflict_weights(graphs):
   
   #The initial reference graph.
   ref_graph = graphs[0]
+  ref_graph_index = 0
   ref_start_node = [x for x in ref_graph.nodes() if ref_graph.in_degree(x) == 0][0]
+  ref_start_successor = list(ref_graph.successors(ref_start_node))[0]
+  ref_nodes = list(ref_graph.successors(ref_start_node))
+  time = ref_graph[ref_start_node][ref_start_successor]['weight']
+  
+  for g in range(0,num_graphs):
+    
+    if (g != ref_graph_index):
+      sec_graph = graphs[g]
+      g_nodes = nodes_being_solved(sec_graph,time)
+      
+      
+      
+  print(ref_start_successor)
+
   
   
   
