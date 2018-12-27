@@ -226,7 +226,7 @@ def nodes_being_solved(G,weight_limit):
   
   #Making the list unique.
   nodes_being_solved = list(set(nodes_being_solved))
-  
+  nodes_being_solved = sorted(nodes_being_solved)
   return nodes_being_solved
   
 def sum_weights_of_path(graph,path):
@@ -395,9 +395,24 @@ def find_conflicts(nodes):
   
   #A dict storing the conflicting graphs for each node that is in conflict.
   conflicting_nodes = {}
-  
-  for g in range(0,num_graphs):
-    
+  for g in range(0,num_graphs-1):
+    #The current graph's conflicting nodes.
+    primary_nodes = nodes[g]
+    for g2 in range(g+1,num_graphs):
+      secondary_nodes = nodes[g2]
+      
+      nodes_in_conflict = list(set(primary_nodes) & set(secondary_nodes))
+      num_nodes_in_conflict = len(nodes_in_conflict)
+      
+      for n in range(0,num_nodes_in_conflict):
+        
+        node = nodes_in_conflict[n]
+        try:
+          conflicting_nodes[node].append(g)
+        except:
+          conflicting_nodes[node] = [g]
+          
+        conflicting_nodes[node].append(g2)
   
   return conflicting_nodes
 
