@@ -12,6 +12,7 @@ from copy import copy
 from sweep_solver import make_edges_universal
 from sweep_solver import nodes_being_solved
 from sweep_solver import add_conflict_weights
+from sweep_solver import find_next_interaction
 
 #Number of cuts in x.
 N_x = 2
@@ -128,10 +129,15 @@ nx.draw(G3,nx.shell_layout(G3),with_labels = True)
 nx.draw_networkx_edge_labels(G3,nx.shell_layout(G3),edge_labels=edge_labels_1)
 ##Testing our weight-based traversal.
 #We try an arbitrary weight limit. 
-weight_limit = 20.0
+weight_limit = 14.0
 
-current_nodes = nodes_being_solved(G,weight_limit)
-print(current_nodes)
+#for g in range(0,len(graphs)):
+#  
+#  current_nodes = nodes_being_solved(graphs[g],weight_limit)
+#  print(current_nodes)
+
+
+#Testing the next interaction function.
+next_time = find_next_interaction(graphs,7.1)
 
 graphs = add_conflict_weights(graphs)
-

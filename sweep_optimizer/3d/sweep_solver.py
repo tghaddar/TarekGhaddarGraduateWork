@@ -362,6 +362,32 @@ def convert_generator(simple_paths):
   
   return new_simple_paths
 
+#Finds the next time where a node is ready to solve. This is the time where we solve for conflicts.
+def find_next_interaction(graphs,start_time):
+  
+  num_graphs = len(graphs)
+  
+  next_time = float("inf")
+  for g in range(0,num_graphs):
+    
+    graph = graphs[g]
+    #Getting the nodes being solved at the start time.
+    start_nodes = nodes_being_solved(graph,start_time)
+    end_node = [x for x in graph.nodes() if graph.out_degree(x) == 0][0]
+    
+    for node in start_nodes:
+      #Getting all the paths froward from this node till the end.
+      simple_paths = nx.all_simple_paths(graph,node,end_node)
+      #Getting the next time of interaction (when the next node is ready to solve)
+      for path in simple_paths:
+        next_node = path[1]
+        #Getting the time the next node is ready to solve.
+        next_node_solve = graph[node][next_node]['weight']
+        if next_node_solve < next_time:
+          next_time = next_node_solve
+      
+  return next_time
+
 def add_conflict_weights(graphs):
   
   #The number of nodes in the graphs.
@@ -385,7 +411,7 @@ def add_conflict_weights(graphs):
       
       
       
-  print(ref_start_successor)
+  #print(ref_start_successor)
 
   
   
