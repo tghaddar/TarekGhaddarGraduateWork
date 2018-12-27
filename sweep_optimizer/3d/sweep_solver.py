@@ -431,6 +431,7 @@ def add_conflict_weights(graphs):
     starting_nodes.append(nodes_being_solved(graphs[g],t))
   
   #Check for conflicts.
+  conflicting_nodes = find_conflicts(starting_nodes)
   
   
   return graphs
