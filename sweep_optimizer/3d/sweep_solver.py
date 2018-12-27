@@ -388,6 +388,19 @@ def find_next_interaction(graphs,start_time):
       
   return next_time
 
+#Checks if there are conflicts.
+def find_conflicts(nodes):
+  
+  num_graphs = len(nodes)
+  
+  #A dict storing the conflicting graphs for each node that is in conflict.
+  conflicting_nodes = {}
+  
+  for g in range(0,num_graphs):
+    
+  
+  return conflicting_nodes
+
 def add_conflict_weights(graphs):
   
   #The number of nodes in the graphs.
@@ -395,25 +408,14 @@ def add_conflict_weights(graphs):
   #The number of graphs.
   num_graphs = len(graphs)
   
-  #The initial reference graph.
-  ref_graph = graphs[0]
-  ref_graph_index = 0
-  ref_start_node = [x for x in ref_graph.nodes() if ref_graph.in_degree(x) == 0][0]
-  ref_start_successor = list(ref_graph.successors(ref_start_node))[0]
-  ref_nodes = list(ref_graph.successors(ref_start_node))
-  time = ref_graph[ref_start_node][ref_start_successor]['weight']
-  
+  #We start with time of 0 s.
+  t = 0.0 
+  #Finding the starting nodes and making sure that none are being solved at the same time.
+  starting_nodes = []
   for g in range(0,num_graphs):
-    
-    if (g != ref_graph_index):
-      sec_graph = graphs[g]
-      g_nodes = nodes_being_solved(sec_graph,time)
-      
-      
-      
-  #print(ref_start_successor)
-
+    starting_nodes.append(nodes_being_solved(graphs[g],t))
   
+  #Check for conflicts.
   
   
   return graphs

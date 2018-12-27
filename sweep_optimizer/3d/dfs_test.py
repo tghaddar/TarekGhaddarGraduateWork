@@ -129,15 +129,15 @@ nx.draw(G3,nx.shell_layout(G3),with_labels = True)
 nx.draw_networkx_edge_labels(G3,nx.shell_layout(G3),edge_labels=edge_labels_1)
 ##Testing our weight-based traversal.
 #We try an arbitrary weight limit. 
-weight_limit = 14.0
+weight_limit = 0.0
 
-#for g in range(0,len(graphs)):
-#  
-#  current_nodes = nodes_being_solved(graphs[g],weight_limit)
-#  print(current_nodes)
+for g in range(0,len(graphs)):
+  
+  current_nodes = nodes_being_solved(graphs[g],weight_limit)
+  print(current_nodes)
 
 
 #Testing the next interaction function.
-next_time = find_next_interaction(graphs,7.1)
+next_time = find_next_interaction(graphs,0.0)
 
 graphs = add_conflict_weights(graphs)
