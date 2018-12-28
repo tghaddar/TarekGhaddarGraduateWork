@@ -36,6 +36,7 @@ for n in range(0,num_nodes):
 #Node 0 edges.
 G.add_edge(0,1,weight = 3)
 G.add_edge(0,3,weight = 3)
+G2.add_edge(0,-1,weight = 3)
 G1.add_edge(0,3,weight = 3)
 G3.add_edge(0,1,weight = 3)
 
@@ -52,6 +53,7 @@ G.add_edge(2,5,weight = 7)
 G1.add_edge(2,1,weight = 7)
 G1.add_edge(2,5,weight = 7)
 G2.add_edge(2,1,weight = 7)
+G3.add_edge(2,-1,weight = 7)
 
 #Node 3 edges.
 G.add_edge(3,6,weight = 5)
@@ -81,6 +83,7 @@ G3.add_edge(5,2,weight = 9)
 
 #Node 6 edges.
 G.add_edge(6,7,weight = 20)
+G1.add_edge(6,-1,weight = 20)
 G2.add_edge(6,3,weight = 20)
 G3.add_edge(6,3,weight = 20)
 G3.add_edge(6,7,weight = 20)
@@ -94,6 +97,7 @@ G3.add_edge(7,4,weight = 15)
 G3.add_edge(7,8,weight = 15)
 
 #Node 8 edge.
+G.add_edge(8,-1,weight = 1)
 G1.add_edge(8,7,weight = 1)
 G2.add_edge(8,5,weight = 1)
 G2.add_edge(8,7,weight = 1)
@@ -138,7 +142,6 @@ for g in range(0,len(graphs)):
   current_nodes.append(nodes_being_solved(graphs[g],weight_limit))
 
 
-print(current_nodes)
 #Testing the next interaction function.
 next_time = find_next_interaction(graphs,0.0)
 

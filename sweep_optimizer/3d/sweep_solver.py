@@ -160,7 +160,7 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,
 #Converts the edge weighting to a universal time. An edge will now represent the time on a universal scale. For instance, if we have an edge that starts at node A and ends at node B, the edge represents the total time it takes that path to get to node B. 
 def make_edges_universal(graphs):
   
-  num_nodes = graphs[0].number_of_nodes()
+  num_nodes = graphs[0].number_of_nodes()-1
   num_graphs = len(graphs)
   
   #Looping over all graphs.
@@ -196,6 +196,11 @@ def make_edges_universal(graphs):
         for p in range(0,num_pred):
           pred = predecessors[p]
           graph[pred][n]['weight'] = new_weight
+    
+    #Adding the value of the last edge (end_node to the dummy -1 node).
+    true_end_node = list(graph.predecessors(-1))[0]
+    pred_end_node = list(graph.predecessors(true_end_node))[0]
+    graph[true_end_node][-1]['weight'] += graph[pred_end_node][true_end_node]['weight']
     
     graphs[g] = graph
   return graphs
@@ -270,7 +275,7 @@ def get_weight_sum(graph,path,node):
   return weight_sum
 
 #Returns the depth of graph remaining given a heavy path.
-def get_DOG(graph,path,node):
+def get_DOG_remaining(graph,path,node):
 
   weight_sum = 0.0
   node_index = path.index(node)
@@ -419,9 +424,15 @@ def find_conflicts(nodes):
 def add_conflict_weights(graphs):
   
   #The number of nodes in the graphs.
-  num_nodes = graphs[0].number_of_nodes()
+  num_nodes = graphs[0].number_of_nodes()-1
   #The number of graphs.
   num_graphs = len(graphs)
+  
+  #Storing the ending nodes of all graphs.
+  end_nodes = {}
+  for g in range(0,num_graphs):
+    graph = graphs[g]
+    end_nodes[g] = list(graph.predecessors(-1))[0]
   
   #We start with time of 0 s.
   t = 0.0 
@@ -430,10 +441,28 @@ def add_conflict_weights(graphs):
   for g in range(0,num_graphs):
     starting_nodes.append(nodes_being_solved(graphs[g],t))
   
+  print(starting_nodes)
   #Check for conflicts.
   conflicting_nodes = find_conflicts(starting_nodes)
+  print(conflicting_nodes)
+  
+  #Checking if there is a conflict on the starting nodes.
+  if bool(conflicting_nodes):
+    #Address the conflict.
+    print("here")
+  else:
+    t = find_next_interaction(graphs,0.0)
   
   
+  finished_graphs = 0
+#  #Keep iterating until all graphs have finished.
+#  while finished_graphs < num_graphs:
+#    
+#    
+#    
+#    #Checking if any of the graphs have finished.
+#    for g in range(0,num_graphs):
+      
   return graphs
 
 #Gets the path that gets fastest to a node. Assumes that each graph has its heaviest path listed.
