@@ -421,6 +421,18 @@ def find_conflicts(nodes):
   
   return conflicting_nodes
 
+#Finds the first conflict in a group of conflicting nodes. This will affect downstream nodes.
+def find_first_conflict(conflicting_nodes):
+  
+  #The number of nodes in conflict.
+  num_conflicting_nodes = len(conflicting_nodes)
+  
+  for n in range(0,num_conflicting_nodes):
+    conflicting_graphs = conflicting_nodes[n]
+    
+  
+  return first_node
+
 def add_conflict_weights(graphs):
   
   #The number of nodes in the graphs.
@@ -434,35 +446,46 @@ def add_conflict_weights(graphs):
     graph = graphs[g]
     end_nodes[g] = list(graph.predecessors(-1))[0]
   
-  #We start with time of 0 s.
-  t = 0.0 
-  #Finding the starting nodes and making sure that none are being solved at the same time.
-  starting_nodes = []
-  for g in range(0,num_graphs):
-    starting_nodes.append(nodes_being_solved(graphs[g],t))
-  
-  print(starting_nodes)
-  #Check for conflicts.
-  conflicting_nodes = find_conflicts(starting_nodes)
-  print(conflicting_nodes)
-  
-  #Checking if there is a conflict on the starting nodes.
-  if bool(conflicting_nodes):
-    #Address the conflict.
-    print("here")
-  else:
-    t = find_next_interaction(graphs,0.0)
-  
-  
-  finished_graphs = 0
-#  #Keep iterating until all graphs have finished.
-#  while finished_graphs < num_graphs:
-#    
-#    
-#    
-#    #Checking if any of the graphs have finished.
-#    for g in range(0,num_graphs):
+  #The number of graphs that have finished.
+  num_finished_graphs = 0
+  #The list of finished graphs.
+  finished_graphs = [False]*num_graphs
+  #The current time (starts at 0.0 s)
+  t = 0.0
+  #Keep iterating until all graphs have finished.
+  while num_finished_graphs < num_graphs:
+    
+    #Getting the nodes that are being solved at time t for all graphs.
+    all_nodes_being_solved = [None]*num_graphs
+    for g in range(0,num_graphs):
+      graph = graphs[g]
+      all_nodes_being_solved[g] = nodes_being_solved(graph,t)
       
+    #Finding any nodes in conflict at time t.
+    conflicting_nodes = find_conflicts(all_nodes_being_solved)
+    
+    #If no nodes are in conflict, we continue to the next interaction.
+    if bool(conflicting_nodes) == False:
+      t = find_next_interaction(graphs,t)
+    #Otherwise, we address the conflicts between nodes across all graphs.
+    else:
+      #Find first conflict.
+      b = 5
+    
+    #Checking if any of the graphs have finished.
+    for g in range(0,num_graphs):
+      if finished_graphs[g]:
+        continue
+      #The end node of this graph.
+      end_node = end_nodes[g]
+      #The time it takes to finish this graph.
+      time_to_finish = graphs[g][end_node][-1]['weight']
+      #If the current universal time is greater than the time to finish sweeping the graph, we say this graph is finished.
+      if t >= time_to_finish:
+        finished_graphs[g] = True
+    
+    num_finished_graphs = len([x for x in finished_graphs if finished_graphs[x] == True])
+    
   return graphs
 
 #Gets the path that gets fastest to a node. Assumes that each graph has its heaviest path listed.
