@@ -422,15 +422,29 @@ def find_conflicts(nodes):
   return conflicting_nodes
 
 #Finds the first conflict in a group of conflicting nodes. This will affect downstream nodes.
-def find_first_conflict(conflicting_nodes):
+def find_first_conflict(conflicting_nodes,graphs):
   
-  #The number of nodes in conflict.
-  num_conflicting_nodes = len(conflicting_nodes)
-  
-  for n in range(0,num_conflicting_nodes):
+  first_node = -1
+  min_ready_to_solve = float("inf")
+  for n in conflicting_nodes:
+    #Which graphs are conflicting on this node.
     conflicting_graphs = conflicting_nodes[n]
-    
-  
+    num_conflicting_graphs = len(conflicting_graphs)
+    #Looping through the conflicting graphs.
+    for g in range(0,num_conflicting_graphs):
+      graph = graphs[conflicting_graphs[g]]
+      #Getting the inbound edges to our node.
+      in_edges_n = list(graph.in_edges(n,'weight'))
+      #If there are no inbound edges to the node, it means that it is the initial node in the graph. This means that it must be the first conflict.
+      if not in_edges_n:
+        first_node = n
+        return first_node
+      else:
+        ready_to_solve = in_edges_n[0][2]
+        if ready_to_solve < min_ready_to_solve:
+          min_ready_to_solve = ready_to_solve
+          first_node = n
+          
   return first_node
 
 def add_conflict_weights(graphs):

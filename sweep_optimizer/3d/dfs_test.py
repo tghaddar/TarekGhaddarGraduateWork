@@ -13,6 +13,8 @@ from sweep_solver import make_edges_universal
 from sweep_solver import nodes_being_solved
 from sweep_solver import add_conflict_weights
 from sweep_solver import find_next_interaction
+from sweep_solver import find_conflicts
+from sweep_solver import find_first_conflict
 
 #Number of cuts in x.
 N_x = 2
@@ -110,7 +112,6 @@ graphs = make_edges_universal(graphs)
 
 G = graphs[0]
 
-
 plt.figure("Graph 0 Post Universal Time")
 edge_labels_1 = nx.get_edge_attributes(G,'weight')
 nx.draw(G,nx.shell_layout(G),with_labels = True)
@@ -144,5 +145,8 @@ for g in range(0,len(graphs)):
 
 #Testing the next interaction function.
 next_time = find_next_interaction(graphs,0.0)
+conflicting_nodes = find_conflicts(current_nodes)
 
-graphs = add_conflict_weights(graphs)
+first_node = find_first_conflict(conflicting_nodes,graphs)
+
+#graphs = add_conflict_weights(graphs)
