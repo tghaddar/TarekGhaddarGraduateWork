@@ -276,17 +276,13 @@ def get_weight_sum(graph,path,node):
   
   return weight_sum
 
-#Returns the depth of graph remaining given a heavy path.
-def get_DOG_remaining(graph,path,node):
+#Returns the depth of graph remaining.
+def get_DOG_remaining(graph):
 
-  weight_sum = 0.0
-  node_index = path.index(node)
-  for n in range(node_index,len(path)-1):
-    node1 = path[n]
-    node2 = path[n+1]
-    weight_sum += graph[node1][node2]['weight']
-  
-  return weight_sum
+  #Getting the final sweep time for this graph.
+  final_sweep_time = list(graph.in_edges(-1,'weight'))[0][2]
+
+  return final_sweep_time
 
 #Sorts path indices based on priority octants.
 def sort_priority(path_indices,paths,dogs,dogs_remaining,graph_indices):
@@ -455,8 +451,12 @@ def find_first_conflict(conflicting_nodes,graphs):
 def find_first_graph(conflicting_graphs,graphs,node):
   
   num_conflicting_graphs = len(conflicting_graphs)
+  #Stores the amount of time it takes each conflicting graph to arrive at the node.
   graph_times = [None]*num_conflicting_graphs
+  #Stores the index into the list of graphs of the conflicting graphs.
+  graph_indices = =[None]*num_conflicting_graphs
   for g in range(0,num_conflicting_graphs):
+    #The original index of the conflicting graphs.
     graph_index = conflicting_graphs[g]
     graph = graphs[graph_index]
     #The incoming edges to our node.
@@ -464,11 +464,45 @@ def find_first_graph(conflicting_graphs,graphs,node):
     #The time it takes for this graph to get to the node.
     time_to_node = in_edges[0][2]
     graph_times[g] = time_to_node
+    graph_indices[g] = graph_index
   
+  #We pull the graph with the minimum time to node.
+  min_time_to_node = min(graph_times)
   #We check if there are multiple graphs ready at the same time. This line will return true if there are duplicates.
-  if (len(graph_times) != len(set(graph_times))):
-    #Find the graphs with the same time to node.
-
+  if len(graph_times) != len(set(graph_times)):
+    #We check if there are multiple instances of the min_time_to_node
+    min_times = []
+    for g in range(0,len(graph_times)):
+      if graph_times[g] == min_time_to_node:
+        min_times.append(graph_indices[g])
+    #If multiple graphs are ready to solve the node at the minimum time, we resort to a depth of graph remaining test.
+    len_min_times = len(min_times)
+    if len_min_times > 1:
+      #Storing the depth of graphs remaining for all tied graphs.
+      dogs_remaining = []
+      #Storing the graph indices.
+      dogs_graph_indices = []
+      for i in range(0,len_min_times):
+        #Getting the graph index of the tied graph.
+        graph_index = min_times[i]
+        graph = graphs[graph_index]
+        #The depth of graph remaining in this graph. This is equivalent to the time it takes to sweep the graph.
+        dog_remaining = get_DOG_remaining(graph)
+        dogs_remaining.append(dog_remaining)
+        dogs_graph_indices.append(graph_index)
+      
+      #We check if there are multiple graphs with the same DOG remaining.
+      if len(dogs_remaining) != len(set(dogs_remaining)):
+        max_dog_remaining = max(dogs_remaining)
+        #Checking if the maximum depth of graph is tied or just secondary depths of graph.
+        max_dogs = []
+        max_dogs_indices = []
+        for d in range(0,len(dogs_remaining)):
+          if dogs_remaining[d] == max_dog_remaining:
+            max_dogs.append(dogs_graph_indices[g])
+        
+          
+    
 def add_conflict_weights(graphs):
   
   #The number of nodes in the graphs.
