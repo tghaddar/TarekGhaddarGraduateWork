@@ -134,7 +134,7 @@ nx.draw(G3,nx.shell_layout(G3),with_labels = True)
 nx.draw_networkx_edge_labels(G3,nx.shell_layout(G3),edge_labels=edge_labels_1)
 ##Testing our weight-based traversal.
 #We try an arbitrary weight limit. 
-weight_limit = 14.0
+weight_limit = 21.0
 
 current_nodes = []
 

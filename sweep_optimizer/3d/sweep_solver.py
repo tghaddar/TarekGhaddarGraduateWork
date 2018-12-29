@@ -228,7 +228,9 @@ def nodes_being_solved(G,weight_limit):
       if (G[node1][node2]['weight'] >= weight_limit):
         nodes_being_solved.append(node1)
         break
-  
+#      elif (G[node1][node2]['weight'] == weight_limit):
+#        nodes_being_solved.append(node2)
+#        break
   #Making the list unique.
   nodes_being_solved = list(set(nodes_being_solved))
   nodes_being_solved = sorted(nodes_being_solved)
@@ -418,6 +420,8 @@ def find_conflicts(nodes):
           conflicting_nodes[node] = [g]
           
         conflicting_nodes[node].append(g2)
+        #Making the list unique.
+        conflicting_nodes[node] = list(set(conflicting_nodes[node]))
   
   return conflicting_nodes
 
@@ -446,6 +450,24 @@ def find_first_conflict(conflicting_nodes,graphs):
           first_node = n
           
   return first_node
+
+#Finds the first graph to get to a conflicted node. In case they arrive at the same time, we return the graph that has a greater depth of graph remaining. In case of a tie with the DOG remaining, we return the graph that has the priority octant.
+def find_first_graph(conflicting_graphs,graphs,node):
+  
+  num_conflicting_graphs = len(conflicting_graphs)
+  graph_times = [None]*num_conflicting_graphs
+  for g in range(0,num_conflicting_graphs):
+    graph_index = conflicting_graphs[g]
+    graph = graphs[graph_index]
+    #The incoming edges to our node.
+    in_edges = list(graph.in_edges(node,'weight'))
+    #The time it takes for this graph to get to the node.
+    time_to_node = in_edges[0][2]
+    graph_times[g] = time_to_node
+  
+  #We check if there are multiple graphs ready at the same time. This line will return true if there are duplicates.
+  if (len(graph_times) != len(set(graph_times))):
+    #Find the graphs with the same time to node.
 
 def add_conflict_weights(graphs):
   
@@ -484,7 +506,13 @@ def add_conflict_weights(graphs):
     #Otherwise, we address the conflicts between nodes across all graphs.
     else:
       #Find first conflict.
-      b = 5
+      first_node = find_first_conflict(conflicting_nodes,graphs)
+      #The conflicting grpahs at this node.
+      conflicting_graphs = conflicting_nodes[first_node]
+      #Number of conflicting graphs.
+      num_conflicting_graphs = len(conflicting_graphs)
+      #Finds the winning graph in the conflicting graphs.
+      first_graph = find_first_graph(conflicting_graphs,first_node)        
     
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
