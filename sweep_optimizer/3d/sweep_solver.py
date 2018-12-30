@@ -285,13 +285,9 @@ def get_DOG_remaining(graph):
   return final_sweep_time
 
 #Sorts path indices based on priority octants.
-def sort_priority(path_indices,paths,dogs,dogs_remaining,graph_indices):
+def sort_priority(graph_indices):
   #The true octant priorities.
   true_priorities = [0,4,1,5,2,6,3,7]
-  original_indices = copy(path_indices)
-  original_paths = copy(paths)
-  original_dogs = copy(dogs)
-  original_dogs_remaining = copy(dogs_remaining)
   original_graph_indices = copy(graph_indices)
   test_indices = []
   for p in range(0,len(graph_indices)):
@@ -307,14 +303,7 @@ def sort_priority(path_indices,paths,dogs,dogs_remaining,graph_indices):
     old_index = original_graph_indices.index(graph_indices[i])
     index_map[i] = old_index
     
-  for i in range(0,len(paths)):
-    old_index = index_map[i]
-    paths[i] = original_paths[old_index]
-    dogs[i] = original_dogs[old_index]
-    dogs_remaining[i] = original_dogs_remaining[old_index]
-    path_indices[i]= original_indices[old_index]
-    
-  return path_indices,paths,dogs,dogs_remaining,graph_indices
+  return graph_indices
 
 
 #We are figuring out which is the path with priority based on which octant it belongs to.
@@ -454,7 +443,7 @@ def find_first_graph(conflicting_graphs,graphs,node):
   #Stores the amount of time it takes each conflicting graph to arrive at the node.
   graph_times = [None]*num_conflicting_graphs
   #Stores the index into the list of graphs of the conflicting graphs.
-  graph_indices = =[None]*num_conflicting_graphs
+  graph_indices = [None]*num_conflicting_graphs
   for g in range(0,num_conflicting_graphs):
     #The original index of the conflicting graphs.
     graph_index = conflicting_graphs[g]
@@ -496,12 +485,31 @@ def find_first_graph(conflicting_graphs,graphs,node):
         max_dog_remaining = max(dogs_remaining)
         #Checking if the maximum depth of graph is tied or just secondary depths of graph.
         max_dogs = []
-        max_dogs_indices = []
         for d in range(0,len(dogs_remaining)):
           if dogs_remaining[d] == max_dog_remaining:
             max_dogs.append(dogs_graph_indices[g])
         
-          
+        #Once we have the graph indices of the tied graphs (according to DOG remaining), the priority octant wins.
+        max_dogs = sort_priority(max_dogs)
+        first_graph = max_dogs[0]
+      
+      #We only need to look at the graph with the max DOG remaining. It is the first graph that should start solving.
+      else:
+        max_dog_remaining_index = dogs_remaining.index(max(dogs_remaining))
+        #This is the first graph that will start solving.
+        first_graph = dogs_graph_indices[max_dog_remaining_index]
+    
+    #If only one graph is ready to solve at the minimum time, that graph is our first graph.    
+    else:
+      min_time_to_node_index = graph_times.index(min(graph_times))
+      first_graph = graph_indices[min_time_to_node_index]
+  
+  #We take the graph that gets to the node first and that is our first graph.
+  else:
+    min_time_to_node_index = graph_times.index(min(graph_times))
+    first_graph = graph_indices[min_time_to_node_index]
+      
+  return first_graph          
     
 def add_conflict_weights(graphs):
   
@@ -543,10 +551,8 @@ def add_conflict_weights(graphs):
       first_node = find_first_conflict(conflicting_nodes,graphs)
       #The conflicting grpahs at this node.
       conflicting_graphs = conflicting_nodes[first_node]
-      #Number of conflicting graphs.
-      num_conflicting_graphs = len(conflicting_graphs)
       #Finds the winning graph in the conflicting graphs.
-      first_graph = find_first_graph(conflicting_graphs,first_node)        
+      first_graph = find_first_graph(conflicting_graphs,graphs,first_node)        
     
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
