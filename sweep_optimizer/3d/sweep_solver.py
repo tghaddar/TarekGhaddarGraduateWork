@@ -552,7 +552,10 @@ def add_conflict_weights(graphs):
       #The conflicting grpahs at this node.
       conflicting_graphs = conflicting_nodes[first_node]
       #Finds the winning graph in the conflicting graphs.
-      first_graph = find_first_graph(conflicting_graphs,graphs,first_node)        
+      first_graph = find_first_graph(conflicting_graphs,graphs,first_node)
+      #Once we have the first graph, we need to modify the weights of the secondary graphs.        
+      
+    
     
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):

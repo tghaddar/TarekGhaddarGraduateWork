@@ -15,6 +15,7 @@ from sweep_solver import add_conflict_weights
 from sweep_solver import find_next_interaction
 from sweep_solver import find_conflicts
 from sweep_solver import find_first_conflict
+from sweep_solver import find_first_graph
 
 #Number of cuts in x.
 N_x = 2
@@ -148,5 +149,7 @@ next_time = find_next_interaction(graphs,0.0)
 conflicting_nodes = find_conflicts(current_nodes)
 
 first_node = find_first_conflict(conflicting_nodes,graphs)
+conflicting_graphs = conflicting_nodes[first_node]
+first_graph = find_first_graph(conflicting_graphs,graphs,first_node)
 
 #graphs = add_conflict_weights(graphs)
