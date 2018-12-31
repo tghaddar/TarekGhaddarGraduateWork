@@ -16,6 +16,7 @@ from sweep_solver import find_next_interaction
 from sweep_solver import find_conflicts
 from sweep_solver import find_first_conflict
 from sweep_solver import find_first_graph
+from sweep_solver import modify_secondary_graphs
 
 #Number of cuts in x.
 N_x = 2
@@ -106,6 +107,9 @@ G2.add_edge(8,5,weight = 1)
 G2.add_edge(8,7,weight = 1)
 G3.add_edge(8,5,weight = 1)
 
+#A list that stores the time to solve each node.
+time_to_solve = [3,10,7,5,8,9,20,15,1]
+
 #Putting universal times on the weights.
 graphs = [G,G1,G2,G3]
 
@@ -141,15 +145,23 @@ current_nodes = []
 
 for g in range(0,len(graphs)):
   
-  current_nodes.append(nodes_being_solved(graphs[g],weight_limit))
+  current_nodes.append(nodes_being_solved(graphs[g],weight_limit,time_to_solve))
 
 
 #Testing the next interaction function.
-next_time = find_next_interaction(graphs,0.0)
+next_time = find_next_interaction(graphs,0.0,time_to_solve)
 conflicting_nodes = find_conflicts(current_nodes)
 
 first_node = find_first_conflict(conflicting_nodes,graphs)
 conflicting_graphs = conflicting_nodes[first_node]
 first_graph = find_first_graph(conflicting_graphs,graphs,first_node)
+conflicting_graphs.remove(first_graph)
+
+graphs = modify_secondary_graphs(graphs,first_graph,conflicting_graphs,first_node)
+
+plt.figure("Graph 2 Post Delay Mod")
+edge_labels_1 = nx.get_edge_attributes(G2,'weight')
+nx.draw(G2,nx.shell_layout(G2),with_labels = True)
+nx.draw_networkx_edge_labels(G2,nx.shell_layout(G2),edge_labels=edge_labels_1)
 
 #graphs = add_conflict_weights(graphs)

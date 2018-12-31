@@ -206,7 +206,7 @@ def make_edges_universal(graphs):
   return graphs
 
 #A weight based traversal of a graph G. In the context of our problem, this returns all nodes solving at time t = weight_limit.
-def nodes_being_solved(G,weight_limit):
+def nodes_being_solved(G,weight_limit,time_to_solve):
   #starting_node
   start_node = [x for x in G.nodes() if G.in_degree(x) == 0][0]
   #ending_node 
@@ -224,9 +224,18 @@ def nodes_being_solved(G,weight_limit):
     for n in range(1,num_nodes_path):
       node1 = path[n-1]
       node2 = path[n]
+      current_weight = G[node1][node2]['weight']
       #Checking if the node is solving by the weight limit.
-      if (G[node1][node2]['weight'] >= weight_limit):
-        nodes_being_solved.append(node1)
+      if ( current_weight >= weight_limit):
+        #The time this node starts solving at.
+        try:
+          start_time = list(G.in_edges(node1,'weight'))[0][2]
+        except:
+          start_time = 0.0
+        #Is this node is actually being solved? Or just waiting to communicate?
+        if (start_time+time_to_solve[node1] > weight_limit):
+          #The node is actually being solved.
+          nodes_being_solved.append(node1)
         break
 #      elif (G[node1][node2]['weight'] == weight_limit):
 #        nodes_being_solved.append(node2)
@@ -355,7 +364,7 @@ def convert_generator(simple_paths):
   return new_simple_paths
 
 #Finds the next time where a node is ready to solve. This is the time where we solve for conflicts.
-def find_next_interaction(graphs,start_time):
+def find_next_interaction(graphs,start_time,time_to_solve):
   
   num_graphs = len(graphs)
   
@@ -364,7 +373,7 @@ def find_next_interaction(graphs,start_time):
     
     graph = graphs[g]
     #Getting the nodes being solved at the start time.
-    start_nodes = nodes_being_solved(graph,start_time)
+    start_nodes = nodes_being_solved(graph,start_time,time_to_solve)
     end_node = [x for x in graph.nodes() if graph.out_degree(x) == 0][0]
     
     for node in start_nodes:
@@ -510,8 +519,63 @@ def find_first_graph(conflicting_graphs,graphs,node):
     first_graph = graph_indices[min_time_to_node_index]
       
   return first_graph          
+
+#Modifies the weights of the secondary conflicting graphs at a particular node.
+def modify_secondary_graphs(graphs,first_graph,conflicting_graphs,node):
+  
+  #The number of secondary conflicting graphs.
+  num_conflicting_graphs = len(conflicting_graphs)
+  
+  for g in range(0,num_conflicting_graphs):
+    second_graph = conflicting_graphs[g]
+    #The delay the second_graph will incur.
+    delay = calculate_delay(first_graph,second_graph,graphs,node)
+    #The secondary graph who's weights we are modifying.
+    secondary_graph = graphs[second_graph]
+    #All paths from the node in conflict until the end of the graph.
+    secondary_paths = nx.all_simple_paths(secondary_graph,node,-1)
     
-def add_conflict_weights(graphs):
+    #Looping over all of the secondary paths.
+    for path in secondary_paths:
+      
+      len_path = len(path)-1
+      for n in range(0,len_path):
+        node1 = path[n]
+        node2 = path[n+1]
+        #Adding the delay 
+        secondary_graph[node1][node2]['weight'] += delay
+    
+    graphs[second_graph] = secondary_graph
+
+    #Make sure all incoming edges to all nodes match up.
+    
+  return graphs
+
+
+  
+#Calculates the delay that is incurred to a secondary graph by the winning graph at the node.
+def calculate_delay(first_graph,second_graph,graphs,node):
+  
+  #The start time of the first graph.
+  first_start_time = 0.0
+  try:
+    first_start_time = list(graphs[first_graph].in_edges(node,'weight'))[0][2]
+  except:
+    first_start_time = 0.0
+  
+  #The start time of the second graph.
+  second_start_time = 0.0
+  try:
+    second_start_time = list(graphs[second_graph].in_edges(node,'weight'))[0][2]
+  except:
+    second_start_time = 0.0
+  
+  #The delay is the difference in start times.
+  delay = second_start_time - first_start_time
+  
+  return delay
+    
+def add_conflict_weights(graphs,time_to_solve):
   
   #The number of nodes in the graphs.
   num_nodes = graphs[0].number_of_nodes()-1
@@ -544,7 +608,7 @@ def add_conflict_weights(graphs):
     
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
-      t = find_next_interaction(graphs,t)
+      t = find_next_interaction(graphs,t,time_to_solve)
     #Otherwise, we address the conflicts between nodes across all graphs.
     else:
       #Find first conflict.
@@ -553,9 +617,12 @@ def add_conflict_weights(graphs):
       conflicting_graphs = conflicting_nodes[first_node]
       #Finds the winning graph in the conflicting graphs.
       first_graph = find_first_graph(conflicting_graphs,graphs,first_node)
+      #Removing the first_graph from the graphs in conflict.
+      conflicting_graphs.remove(first_graph)
+      #Number of conflicting_graphs.
+      num_conflicting_graphs = len(conflicting_graphs)
       #Once we have the first graph, we need to modify the weights of the secondary graphs.        
-      
-    
+      graphs = modify_secondary_graphs(graphs,conflicting_graphs,first_node)
     
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
