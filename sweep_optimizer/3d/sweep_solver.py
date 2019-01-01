@@ -236,7 +236,7 @@ def nodes_being_solved(G,weight_limit,time_to_solve):
         if (start_time+time_to_solve[node1] > weight_limit):
           #The node is actually being solved.
           nodes_being_solved.append(node1)
-        break
+          break
 #      elif (G[node1][node2]['weight'] == weight_limit):
 #        nodes_being_solved.append(node2)
 #        break
@@ -631,7 +631,7 @@ def add_conflict_weights(graphs,time_to_solve):
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
       graph = graphs[g]
-      all_nodes_being_solved[g] = nodes_being_solved(graph,t)
+      all_nodes_being_solved[g] = nodes_being_solved(graph,t,time_to_solve)
       
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
@@ -650,7 +650,7 @@ def add_conflict_weights(graphs,time_to_solve):
       #Removing the first_graph from the graphs in conflict.
       conflicting_graphs.remove(first_graph)
       #Once we have the first graph, we need to modify the weights of the secondary graphs.        
-      graphs = modify_secondary_graphs(graphs,conflicting_graphs,first_node,time_to_solve[first_node])
+      graphs = modify_secondary_graphs(graphs,first_graph,conflicting_graphs,first_node,time_to_solve[first_node])
     
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):

@@ -140,7 +140,7 @@ nx.draw(G3,nx.shell_layout(G3),with_labels = True)
 nx.draw_networkx_edge_labels(G3,nx.shell_layout(G3),edge_labels=edge_labels_1)
 ##Testing our weight-based traversal.
 #We try an arbitrary weight limit. 
-weight_limit = 21.0
+weight_limit = 7.0
 
 current_nodes = []
 
@@ -160,9 +160,9 @@ conflicting_graphs.remove(first_graph)
 
 graphs = modify_secondary_graphs(graphs,first_graph,conflicting_graphs,first_node,time_to_solve[first_node])
 
-plt.figure("Graph 2 Post Delay Mod")
-edge_labels_1 = nx.get_edge_attributes(G2,'weight')
-nx.draw(G2,nx.shell_layout(G2),with_labels = True)
-nx.draw_networkx_edge_labels(G2,nx.shell_layout(G2),edge_labels=edge_labels_1)
+#plt.figure("Graph 2 Post Delay Mod")
+#edge_labels_1 = nx.get_edge_attributes(G2,'weight')
+#nx.draw(G2,nx.shell_layout(G2),with_labels = True)
+#nx.draw_networkx_edge_labels(G2,nx.shell_layout(G2),edge_labels=edge_labels_1)
 
-#graphs = add_conflict_weights(graphs)
+#graphs = add_conflict_weights(graphs,time_to_solve)
