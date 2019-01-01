@@ -17,6 +17,7 @@ from sweep_solver import find_conflicts
 from sweep_solver import find_first_conflict
 from sweep_solver import find_first_graph
 from sweep_solver import modify_secondary_graphs
+from sweep_solver import match_delay_weights
 
 #Number of cuts in x.
 N_x = 2
@@ -157,7 +158,7 @@ conflicting_graphs = conflicting_nodes[first_node]
 first_graph = find_first_graph(conflicting_graphs,graphs,first_node)
 conflicting_graphs.remove(first_graph)
 
-graphs = modify_secondary_graphs(graphs,first_graph,conflicting_graphs,first_node)
+graphs = modify_secondary_graphs(graphs,first_graph,conflicting_graphs,first_node,time_to_solve[first_node])
 
 plt.figure("Graph 2 Post Delay Mod")
 edge_labels_1 = nx.get_edge_attributes(G2,'weight')
