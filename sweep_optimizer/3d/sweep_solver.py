@@ -651,6 +651,7 @@ def add_conflict_weights(graphs,time_to_solve):
       conflicting_graphs.remove(first_graph)
       #Once we have the first graph, we need to modify the weights of the secondary graphs.        
       graphs = modify_secondary_graphs(graphs,first_graph,conflicting_graphs,first_node,time_to_solve[first_node])
+      #To finish marching through, we need to update t here, with a find_next_interaction. However, this may  not handle secondary graphs conflicting with each other. It could work if we add a num_secondary_graph-1 recursive technique in modify_secondary_graphs
     
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
