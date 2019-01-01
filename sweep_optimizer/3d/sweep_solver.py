@@ -521,34 +521,45 @@ def find_first_graph(conflicting_graphs,graphs,node):
   return first_graph          
 
 #Modifies the weights of the secondary conflicting graphs at a particular node.
-def modify_secondary_graphs(graphs,first_graph,conflicting_graphs,node,time_to_solve_node):
+def modify_secondary_graphs(graphs,conflicting_graphs,node,time_to_solve_node):
   
   #The number of secondary conflicting graphs.
-  num_conflicting_graphs = len(conflicting_graphs)
-  
-  for g in range(0,num_conflicting_graphs):
-    second_graph = conflicting_graphs[g]
-    #The delay the second_graph will incur.
-    delay = calculate_delay(first_graph,second_graph,graphs,node,time_to_solve_node)
-    #The secondary graph who's weights we are modifying.
-    secondary_graph = graphs[second_graph]
-    #All paths from the node in conflict until the end of the graph.
-    secondary_paths = nx.all_simple_paths(secondary_graph,node,-1)
-    
-    #Looping over all of the secondary paths.
-    for path in secondary_paths:
-      
-      len_path = len(path)-1
-      for n in range(0,len_path):
-        node1 = path[n]
-        node2 = path[n+1]
-        #Adding the delay 
+  num_conflicting_graphs = copy(len(conflicting_graphs))
+  for outer in range(0,num_conflicting_graphs-1):
+    #The fastest graph to the node.
+    first_graph = find_first_graph(conflicting_graphs,graphs,node)
+    #Removed from conflicting graphs.
+    conflicting_graphs.remove(first_graph)
+    #Loop over the secondary graphs.
+    for g in range(0,len(conflicting_graphs)):
+      second_graph = conflicting_graphs[g]
+      #The delay the second_graph will incur.
+      delay = calculate_delay(first_graph,second_graph,graphs,node,time_to_solve_node)
+      #The secondary graph who's weights we are modifying.
+      secondary_graph = graphs[second_graph]
+      #We need to first add the delay to the preceding edges, in order to update the time this node is ready to solve at.
+      edges = list(secondary_graph.in_edges(node))
+      num_edges = len(edges)
+      for e in range(0,num_edges):
+        node1,node2 = edges[e]
         secondary_graph[node1][node2]['weight'] += delay
-    
-    #Make sure all incoming edges to all nodes match up.
-    secondary_graph = match_delay_weights(secondary_graph)
-    
-    graphs[second_graph] = secondary_graph
+      #All paths from the node in conflict until the end of the graph.
+      secondary_paths = nx.all_simple_paths(secondary_graph,node,-1)
+      
+      #Looping over all of the secondary paths.
+      for path in secondary_paths:
+        
+        len_path = len(path)-1
+        for n in range(0,len_path):
+          node1 = path[n]
+          node2 = path[n+1]
+          #Adding the delay 
+          secondary_graph[node1][node2]['weight'] += delay
+      
+      #Make sure all incoming edges to all nodes match up.
+      secondary_graph = match_delay_weights(secondary_graph)
+      
+      graphs[second_graph] = secondary_graph
 
   return graphs
 
@@ -645,12 +656,8 @@ def add_conflict_weights(graphs,time_to_solve):
       first_node = find_first_conflict(conflicting_nodes,graphs)
       #The conflicting grpahs at this node.
       conflicting_graphs = conflicting_nodes[first_node]
-      #Finds the winning graph in the conflicting graphs.
-      first_graph = find_first_graph(conflicting_graphs,graphs,first_node)
-      #Removing the first_graph from the graphs in conflict.
-      conflicting_graphs.remove(first_graph)
       #Once we have the first graph, we need to modify the weights of the secondary graphs.        
-      graphs = modify_secondary_graphs(graphs,first_graph,conflicting_graphs,first_node,time_to_solve[first_node])
+      graphs = modify_secondary_graphs(graphs,conflicting_graphs,first_node,time_to_solve[first_node])
       #To finish marching through, we need to update t here, with a find_next_interaction. However, this may  not handle secondary graphs conflicting with each other. It could work if we add a num_secondary_graph-1 recursive technique in modify_secondary_graphs
     
     #Checking if any of the graphs have finished.
