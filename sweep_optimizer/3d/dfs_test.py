@@ -163,4 +163,4 @@ edge_labels_1 = nx.get_edge_attributes(G2,'weight')
 nx.draw(G2,nx.shell_layout(G2),with_labels = True)
 nx.draw_networkx_edge_labels(G2,nx.shell_layout(G2),edge_labels=edge_labels_1)
 
-#graphs = add_conflict_weights(graphs,time_to_solve)
+graphs = add_conflict_weights(graphs,time_to_solve)
