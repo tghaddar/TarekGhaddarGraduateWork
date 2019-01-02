@@ -552,7 +552,7 @@ def modify_secondary_graphs(graphs,conflicting_graphs,node,time_to_solve_node):
       #All paths from the node in conflict until the end of the graph.
       secondary_paths = nx.all_simple_paths(secondary_graph,node,-1)
       
-      #Looping over all of the secondary paths.
+      #Looping over all of downstream secondary paths.
       for path in secondary_paths:
         
         len_path = len(path)-1
@@ -647,9 +647,14 @@ def add_conflict_weights(graphs,time_to_solve):
     for g in range(0,num_graphs):
       graph = graphs[g]
       all_nodes_being_solved[g] = nodes_being_solved(graph,t,time_to_solve)
-      
+    
+    
+    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
+    num_conflicting_nodes = len(conflicting_nodes)
+    
+    print(conflicting_nodes)
     
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
@@ -663,7 +668,8 @@ def add_conflict_weights(graphs,time_to_solve):
       #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
       graphs = modify_secondary_graphs(graphs,conflicting_graphs,first_node,time_to_solve[first_node])
       #To update our march through, we need to update t here, with a find_next_interaction.
-      t = find_next_interaction(graphs,t,time_to_solve)
+      if (num_conflicting_nodes == 1):
+        t = find_next_interaction(graphs,t,time_to_solve)
       
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
