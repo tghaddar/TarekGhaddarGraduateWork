@@ -122,8 +122,6 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
     else:
       bounds_check = 'yz'
     
-    
-    
   return bounds_check
 
 def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,upc, upbc,t_comm,latency,m_l,num_row,num_col,num_plane):
@@ -268,24 +266,6 @@ def get_heaviest_path(graph,paths):
     
   return heaviest_path,heaviest_path_weight
       
-#Get the sum of weights to a path.
-def get_weight_sum(graph,path,node):
-  weight_sum = 0.0
-  node_index = -1
-  try:
-    node_index = path.index(node)
-  except:
-    #If this node is not this path, we return a very large sum.
-    return 1e8
-  
-  weight_sum = 0.0
-  for j in range(0,node_index):
-    node1 = path[j]
-    node2 = path[j+1]
-    weight_sum += graph[node1][node2]['weight']
-  
-  return weight_sum
-
 #Returns the depth of graph remaining.
 def get_DOG_remaining(graph):
 
@@ -316,53 +296,10 @@ def sort_priority(graph_indices):
   return graph_indices
 
 
-#We are figuring out which is the path with priority based on which octant it belongs to.
-def get_priority_octant(path1,path2):
-  
-  #Boolean checking if omega_x > 0 for both paths.
-  path1_ox = (path1 == 0 or path1 == 1 or path1 == 4 or path1 == 5)
-  path2_ox = (path2 == 0 or path2 == 1 or path2 == 4 or path2 == 5)
-  #Boolean checking if omega_y > 0 for both paths.
-  path1_oy = (path1 == 0 or path1 == 2 or path1 == 4 or path1 == 6)
-  path2_oy = (path2 == 0 or path2 == 2 or path2 == 4 or path2 == 6)
-  #Boolean checking if omega_z > 0 for both paths
-  path1_oz = (path1 == 0 or path1 == 1 or path1 == 2 or path1 == 3)
-  path2_oz = (path2 == 0 or path2 == 1 or path2 == 2 or path2 == 3)
-  
-  #Checking who has omega_x > 0.
-  if (path1_ox == True and path2_ox == False):
-    return "primary"
-  elif (path1_ox == False and path2_ox == True):
-    return "secondary"
-  #If both have omega_x > 0 or omega_x < 0 then we check omega_y
-  else:
-    if (path1_oy == True and path2_oy == False):
-      return "primary"
-    elif (path1_oy == False and path2_oy == True):
-      return "secondary"
-    #If both omega_x and omega_y > 0 for both paths then check omega_z
-    else:
-      if (path1_oz == True and path2_oz == False):
-        return "primary"
-      elif (path1_oz == False and path2_oz == True):
-        return "secondary"
-      else:
-        return "problem"
-
 #Takes simple paths for a graph and dumps them out.
 def print_simple_paths(path_gen):
   for p in path_gen:
     print(p)
-
-def convert_generator(simple_paths):
-  
-  new_simple_paths = []
-  for i in range(0,len(simple_paths)):
-    newpath = simple_paths[i]
-    newpath = list(newpath)
-    new_simple_paths.append(newpath)
-  
-  return new_simple_paths
 
 #Finds the next time where a node is ready to solve. This is the time where we solve for conflicts.
 def find_next_interaction(graphs,start_time,time_to_solve):
@@ -690,40 +627,6 @@ def add_conflict_weights(graphs,time_to_solve):
     
   return graphs
 
-#Gets the path that gets fastest to a node. Assumes that each graph has its heaviest path listed.
-def get_fastest_path(graphs,paths,node):
-  
-  check_paths = copy(paths)
-  #Checks if the node is in the path.
-  weight_sum = 1e8
-  fastest_path_index = 0
-  fastest_path = []
-  index = 0
-  for path in check_paths:
-    graph = graphs[index]
-    node_index = -1
-    try:
-      node_index = path.index(node)
-    except:
-      index += 1
-      continue
-    
-    weight_sum_path = 0.0
-    for j in range(0,node_index):
-      node1 = path[j]
-      node2 = path[j+1]
-      weight_sum_path += graph[node1][node2]['weight']
-    
-    #If this path is fastest (smallest weight), we update our fastest_path variable.
-    if (weight_sum_path < weight_sum):
-      weight_sum = weight_sum_path
-      fastest_path_index = index
-    
-    index += 1
-  
-  fastest_path = paths[fastest_path_index]
-  return fastest_path_index,weight_sum
-
 
 def compute_solve_time(graphs,cells_per_subset,t_u,upc,global_subset_boundaries,num_row,num_col,num_plane):
   time = 0
@@ -738,14 +641,7 @@ def compute_solve_time(graphs,cells_per_subset,t_u,upc,global_subset_boundaries,
     end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
     
     paths = nx.all_simple_paths(graph,start_node,end_node)
-#    heaviest_path = 0.0
-#    for path in paths:
-#      path_weight = sum_weights_of_path(graph,path)
-#      if path_weight > heaviest_path:
-#        heaviest_path = path_weight
-#        index = path
-#    
-#    heaviest_paths.append(index)
+
     heaviest_path,path_weight = get_heaviest_path(graph,paths)
     heaviest_paths.append(heaviest_path)
     time_graph = path_weight #+ t_u*upc*cells_per_subset[end_node]
