@@ -232,14 +232,15 @@ def nodes_being_solved(G,weight_limit,time_to_solve):
           start_time = list(G.in_edges(node1,'weight'))[0][2]
         except:
           start_time = 0.0
+        #If the start time of the node has already passed t, we break out of the loop.
+        if (start_time > weight_limit):
+          break
         #Is this node is actually being solved? Or just waiting to communicate?
-        if (start_time+time_to_solve[node1] > weight_limit):
+        elif (start_time+time_to_solve[node1] > weight_limit):
           #The node is actually being solved.
           nodes_being_solved.append(node1)
           break
-#      elif (G[node1][node2]['weight'] == weight_limit):
-#        nodes_being_solved.append(node2)
-#        break
+
   #Making the list unique.
   nodes_being_solved = list(set(nodes_being_solved))
   nodes_being_solved = sorted(nodes_being_solved)
@@ -682,6 +683,8 @@ def add_conflict_weights(graphs,time_to_solve):
       #If the current universal time is greater than the time to finish sweeping the graph, we say this graph is finished.
       if t >= time_to_finish:
         finished_graphs[g] = True
+    
+    print(finished_graphs)
     
     num_finished_graphs = len([x for x in finished_graphs if finished_graphs[x] == True])
     
