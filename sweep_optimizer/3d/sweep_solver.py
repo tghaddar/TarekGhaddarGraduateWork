@@ -407,7 +407,7 @@ def find_first_graph(conflicting_graphs,graphs,node):
   
   #We pull the graph with the minimum time to node.
   min_time_to_node = min(graph_times)
-  #We check if there are multiple graphs ready at the same time. This line will return true if there are duplicates.
+  #We check if there are multiple graphs ready at the same time (no guarantee same time is the minimum time). This line will return true if there are duplicates.
   if len(graph_times) != len(set(graph_times)):
     #We check if there are multiple instances of the min_time_to_node
     min_times = []
@@ -470,8 +470,6 @@ def modify_secondary_graphs(graphs,conflicting_graphs,node,time_to_solve_node):
   for outer in range(0,num_conflicting_graphs-1):
     #The fastest graph to the node.
     first_graph = find_first_graph(conflicting_graphs,graphs,node)
-    if node == 6:
-      print(conflicting_graphs)
     #Removed from conflicting graphs.
     conflicting_graphs.remove(first_graph)
     #Loop over the secondary graphs.

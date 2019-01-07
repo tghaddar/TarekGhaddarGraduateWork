@@ -19,10 +19,6 @@ from sweep_solver import find_first_graph
 from sweep_solver import modify_secondary_graphs
 from sweep_solver import match_delay_weights
 
-#Number of cuts in x.
-N_x = 2
-#Number of cuts in y.
-N_y = 2
 
 num_nodes = 9
 plt.close("all")
