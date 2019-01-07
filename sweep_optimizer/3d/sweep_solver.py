@@ -122,8 +122,6 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
     else:
       bounds_check = 'yz'
     
-    
-    
   return bounds_check
 
 def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,upc, upbc,t_comm,latency,m_l,num_row,num_col,num_plane):
@@ -156,7 +154,96 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,
       cost = num_cells*t_u*upc + (boundary_cells*upbc*t_comm + latency*m_l)
       graph[e[0]][e[1]]['weight'] = cost
   return graphs
+
+#Converts the edge weighting to a universal time. An edge will now represent the time on a universal scale. For instance, if we have an edge that starts at node A and ends at node B, the edge represents the total time it takes that path to get to node B. 
+def make_edges_universal(graphs):
+  
+  num_nodes = graphs[0].number_of_nodes()-1
+  num_graphs = len(graphs)
+  
+  #Looping over all graphs.
+  for g in range(0,num_graphs):
+    #The current_graph which we will alter.
+    graph = graphs[g]
+    
+    #Getting the starting node of this graph.
+    start_node = [x for x in graph.nodes() if graph.in_degree(x) == 0][0]
+    #A list storing the heaviest path length to each node.
+    heavy_path_lengths = [None]*num_nodes
+    #Looping over nodes to get the longest path to each node.
+    for n in range(0,num_nodes):
       
+      #Getting all simple paths to the node.
+      simple_paths = nx.all_simple_paths(graph,start_node,n)
+      #The heaviest path and the length of the heaviest path.
+      heaviest_path,heaviest_path_length = get_heaviest_path(graph,simple_paths)
+
+      #Storing this value in heavy_path_lengths.
+      heavy_path_lengths[n] = heaviest_path_length
+      
+    #Storing the heavy path lengths as the weight value to all preceding edges.
+    for n in range(0,num_nodes):
+      
+      #The starting node has no preceding edges so we skip it.
+      if (n != start_node):
+        #Getting the weight we want for preceding edges.
+        new_weight = heavy_path_lengths[n]
+        #Getting the predecessors to this node in the graph.
+        predecessors = list(graph.predecessors(n))
+        num_pred = len(predecessors)
+        for p in range(0,num_pred):
+          pred = predecessors[p]
+          graph[pred][n]['weight'] = new_weight
+    
+    #Adding the value of the last edge (end_node to the dummy -1 node).
+    true_end_node = list(graph.predecessors(-1))[0]
+    pred_end_node = list(graph.predecessors(true_end_node))[0]
+    graph[true_end_node][-1]['weight'] += graph[pred_end_node][true_end_node]['weight']
+    
+    graphs[g] = graph
+  return graphs
+
+#A weight based traversal of a graph G. In the context of our problem, this returns all nodes solving at time t = weight_limit.
+def nodes_being_solved(G,weight_limit,time_to_solve):
+  #starting_node
+  start_node = [x for x in G.nodes() if G.in_degree(x) == 0][0]
+  #ending_node 
+  end_node =  [x for x in G.nodes() if G.out_degree(x) == 0][0]
+
+  #A list to store the nodes that are being solved at time t = weight_limit.
+  nodes_being_solved = []
+  #The simple paths of this graph.
+  simple_paths = nx.all_simple_paths(G,start_node,end_node)
+  
+  for path in simple_paths:
+    
+    #Number of nodes in this path
+    num_nodes_path = len(path)
+    for n in range(1,num_nodes_path):
+      node1 = path[n-1]
+      node2 = path[n]
+      current_weight = G[node1][node2]['weight']
+      #Checking if the node is solving by the weight limit.
+      if ( current_weight >= weight_limit):
+        #The time this node starts solving at.
+        try:
+          start_time = list(G.in_edges(node1,'weight'))[0][2]
+        except:
+          start_time = 0.0
+        #If the start time of the node has already passed t, we break out of the loop.
+        if (start_time > weight_limit):
+          break
+        #Is this node is actually being solved? Or just waiting to communicate?
+        elif (start_time+time_to_solve[node1] > weight_limit):
+          #The node is actually being solved.
+          nodes_being_solved.append(node1)
+          break
+
+  #Making the list unique.
+  nodes_being_solved = list(set(nodes_being_solved))
+  nodes_being_solved = sorted(nodes_being_solved)
+  return nodes_being_solved
+  
 def sum_weights_of_path(graph,path):
   weight_sum = 0.0
   for n in range(0,len(path)-1):
@@ -179,44 +266,18 @@ def get_heaviest_path(graph,paths):
     
   return heaviest_path,heaviest_path_weight
       
-#Get the sum of weights to a path.
-def get_weight_sum(graph,path,node):
-  weight_sum = 0.0
-  node_index = -1
-  try:
-    node_index = path.index(node)
-  except:
-    #If this node is not this path, we return a very large sum.
-    return 1e8
-  
-  weight_sum = 0.0
-  for j in range(0,node_index):
-    node1 = path[j]
-    node2 = path[j+1]
-    weight_sum += graph[node1][node2]['weight']
-  
-  return weight_sum
+#Returns the depth of graph remaining.
+def get_DOG_remaining(graph):
 
-#Returns the depth of graph remaining given a heavy path.
-def get_DOG(graph,path,node):
+  #Getting the final sweep time for this graph.
+  final_sweep_time = list(graph.in_edges(-1,'weight'))[0][2]
 
-  weight_sum = 0.0
-  node_index = path.index(node)
-  for n in range(node_index,len(path)-1):
-    node1 = path[n]
-    node2 = path[n+1]
-    weight_sum += graph[node1][node2]['weight']
-  
-  return weight_sum
+  return final_sweep_time
 
 #Sorts path indices based on priority octants.
-def sort_priority(path_indices,paths,dogs,dogs_remaining,graph_indices):
+def sort_priority(graph_indices):
   #The true octant priorities.
   true_priorities = [0,4,1,5,2,6,3,7]
-  original_indices = copy(path_indices)
-  original_paths = copy(paths)
-  original_dogs = copy(dogs)
-  original_dogs_remaining = copy(dogs_remaining)
   original_graph_indices = copy(graph_indices)
   test_indices = []
   for p in range(0,len(graph_indices)):
@@ -232,520 +293,337 @@ def sort_priority(path_indices,paths,dogs,dogs_remaining,graph_indices):
     old_index = original_graph_indices.index(graph_indices[i])
     index_map[i] = old_index
     
-  for i in range(0,len(paths)):
-    old_index = index_map[i]
-    paths[i] = original_paths[old_index]
-    dogs[i] = original_dogs[old_index]
-    dogs_remaining[i] = original_dogs_remaining[old_index]
-    path_indices[i]= original_indices[old_index]
-    
-  return path_indices,paths,dogs,dogs_remaining,graph_indices
+  return graph_indices
 
-
-#We are figuring out which is the path with priority based on which octant it belongs to.
-def get_priority_octant(path1,path2):
-  
-  #Boolean checking if omega_x > 0 for both paths.
-  path1_ox = (path1 == 0 or path1 == 1 or path1 == 4 or path1 == 5)
-  path2_ox = (path2 == 0 or path2 == 1 or path2 == 4 or path2 == 5)
-  #Boolean checking if omega_y > 0 for both paths.
-  path1_oy = (path1 == 0 or path1 == 2 or path1 == 4 or path1 == 6)
-  path2_oy = (path2 == 0 or path2 == 2 or path2 == 4 or path2 == 6)
-  #Boolean checking if omega_z > 0 for both paths
-  path1_oz = (path1 == 0 or path1 == 1 or path1 == 2 or path1 == 3)
-  path2_oz = (path2 == 0 or path2 == 1 or path2 == 2 or path2 == 3)
-  
-  #Checking who has omega_x > 0.
-  if (path1_ox == True and path2_ox == False):
-    return "primary"
-  elif (path1_ox == False and path2_ox == True):
-    return "secondary"
-  #If both have omega_x > 0 or omega_x < 0 then we check omega_y
-  else:
-    if (path1_oy == True and path2_oy == False):
-      return "primary"
-    elif (path1_oy == False and path2_oy == True):
-      return "secondary"
-    #If both omega_x and omega_y > 0 for both paths then check omega_z
-    else:
-      if (path1_oz == True and path2_oz == False):
-        return "primary"
-      elif (path1_oz == False and path2_oz == True):
-        return "secondary"
-      else:
-        return "problem"
 
 #Takes simple paths for a graph and dumps them out.
 def print_simple_paths(path_gen):
   for p in path_gen:
     print(p)
 
-def convert_generator(simple_paths):
+#Finds the next time where a node is ready to solve. This is the time where we solve for conflicts.
+def find_next_interaction(graphs,start_time,time_to_solve):
   
-  new_simple_paths = []
-  for i in range(0,len(simple_paths)):
-    newpath = simple_paths[i]
-    newpath = list(newpath)
-    new_simple_paths.append(newpath)
+  num_graphs = len(graphs)
   
-  return new_simple_paths
-
-def add_conflict_weights(graphs,all_simple_paths,latency,cell_dist,t_u,upc,t_c,upbc,m_l, num_row,num_col,num_plane):
-  
-  num_nodes = graphs[0].number_of_nodes()
-  
-  
-  #A boolean value that checks if we are perfectly balanced.
-  is_perfect = all(x == cell_dist[0] for x in cell_dist)
-  #We use a slightly different conflict resolution for perfectly balanced problems.
-  if (is_perfect):
-    #The static delay added in conflicts is just the wait to solve and communicate.
-    delay = copy(graphs[0][0][1]['weight'])
-    #Length of each individual path.
-    path_length = 0
-    #Converting to a list of lists rather than a list of generators for iterative purposes.
-    all_simple_paths = convert_generator(all_simple_paths)
+  next_time = float("inf")
+  for g in range(0,num_graphs):
     
-    all_octant_paths = []
-    all_graph_correspondence = []
-    for n in range(0,num_nodes):
-      octant_paths = []
-      graph_correspondence = []
-      #Looping through all paths for all graphs in order to determine a path for each octant that contains this node.
-      for p in range(0,len(graphs)):
-        #Simple paths for this octant.
-        perf_paths = copy(all_simple_paths)
-        this_simple_paths = perf_paths[p]
-        for path in this_simple_paths:
-          path_length = len(path)
-          if (n in path):
-            octant_paths.append(path)
-            graph_correspondence.append(p)
-            #break
-#      We use these octant paths to figure out if we have any conflicts.    
-#      For this node, find out which paths will conflict. We know the path with the node as it's originator won't conflict ever.
-#      Looping over to see which nodes potentially conflict on these paths.
-      for c in range(1,path_length-1):
-        conflicting_paths = []
-        conflicting_indices = []
-        #DOG remaining for all paths.
-        conflicting_dog_remaining = []
-        #DOG for all conflicting paths
-        conflicting_dog = []
-        conflicting_graph_indices = []
-        for p in range(0,len(octant_paths)):
-          index = octant_paths[p].index(n)
-          if (index == c):
-            conflicting_paths.append(octant_paths[p])
-            conflicting_indices.append(p)
-            conflicting_graph_indices.append(graph_correspondence[p])
-            dog_remaining = get_DOG(graphs[graph_correspondence[p]],octant_paths[p],n)
-            dog = get_weight_sum(graphs[graph_correspondence[p]],octant_paths[p],n)
-            conflicting_dog_remaining.append(dog_remaining)
-            conflicting_dog.append(dog)
-            
+    graph = graphs[g]
+    #Getting the nodes being solved at the start time.
+    start_nodes = nodes_being_solved(graph,start_time,time_to_solve)
+    end_node = [x for x in graph.nodes() if graph.out_degree(x) == 0][0]
+    
+    for node in start_nodes:
+      #Getting all the paths froward from this node till the end.
+      simple_paths = nx.all_simple_paths(graph,node,end_node)
+      #Getting the next time of interaction (when the next node is ready to solve)
+      for path in simple_paths:
+        next_node = path[1]
+        #Getting the time the next node is ready to solve.
+        next_node_solve = graph[node][next_node]['weight']
+        if next_node_solve < next_time:
+          next_time = next_node_solve
+      
+  return next_time
+
+#Checks if there are conflicts.
+def find_conflicts(nodes):
+  
+  num_graphs = len(nodes)
+  
+  #A dict storing the conflicting graphs for each node that is in conflict.
+  conflicting_nodes = {}
+  for g in range(0,num_graphs-1):
+    #The current graph's conflicting nodes.
+    primary_nodes = nodes[g]
+    for g2 in range(g+1,num_graphs):
+      secondary_nodes = nodes[g2]
+      
+      nodes_in_conflict = list(set(primary_nodes) & set(secondary_nodes))
+      num_nodes_in_conflict = len(nodes_in_conflict)
+      
+      for n in range(0,num_nodes_in_conflict):
         
-        #Loop over all conflicting paths and remove winners one by one until all delays are addressed. 
-        p = 0
-        while p < len(conflicting_paths):
-          if (len(conflicting_paths) > 1):
-            #Check if all nodes are ready to solve.
-            tied = all(x == conflicting_dog[0] for x in conflicting_dog)
-            if (tied):
-              #Check if all nodes have the samef  depth of graph remaining.
-              dog_remaining_tie = all(x == conflicting_dog_remaining[0] for x in conflicting_dog_remaining)
-              #Check if the depth of graph remaining is equivalent.
-              if (dog_remaining_tie):
-                #Resorting everything based on priority octant rules.
-                conflicting_indices,conflicting_paths,conflicting_dog,conflicting_dog_remaining,conflicting_graph_indices = sort_priority(conflicting_indices,conflicting_paths,conflicting_dog,conflicting_dog_remaining,conflicting_graph_indices)
-                
-                del conflicting_indices[0]
-                del conflicting_paths[0]
-                del conflicting_dog[0]
-                del conflicting_dog_remaining[0]
-                del conflicting_graph_indices[0]
-                for i in range(0,len(conflicting_indices)):
-                  #index = conflicting_indices[i]
-                  graph_index = conflicting_graph_indices[i]
-                  losing_next_node = conflicting_paths[i][c+1]
-                  graphs[graph_index][n][losing_next_node]['weight'] += delay
-
-                p -= 1
-              else:
-                #The one with the maximum dog_remaining wins.
-                max_dog_remaining = max(conflicting_dog_remaining)
-                max_dog_remaining_index = conflicting_dog_remaining.index(max_dog_remaining)
-
-
-                #Removing this path from conflicting paths since it gets priority and starts solving.
-                del conflicting_paths[max_dog_remaining_index]
-                del conflicting_indices[max_dog_remaining_index]
-                del conflicting_dog[max_dog_remaining_index]
-                del conflicting_dog_remaining[max_dog_remaining_index]
-                del conflicting_graph_indices[max_dog_remaining_index]
-                for i in range(0,len(conflicting_indices)):
-                  index = conflicting_indices[i]
-                  graph_index = conflicting_graph_indices[i]
-                  losing_next_node = conflicting_paths[i][c+1]
-                  graphs[graph_index][n][losing_next_node]['weight'] += delay
-                p -=1
-                
-            else:
-              #Get minimum dog (corresponds to the path that reaches first).
-              min_dog = min(conflicting_dog)
-              min_dog_index = conflicting_dog.index(min_dog)
-              
-              del conflicting_paths[min_dog_index]
-              del conflicting_indices[min_dog_index]
-              del conflicting_dog[min_dog_index]
-              del conflicting_dog_remaining[min_dog_index]
-              del conflicting_graph_indices[min_dog_index]
-              
-              for i in range(0,len(conflicting_indices)):
-                index = conflicting_indices[i]
-                graph_index = conflicting_graph_indices[i]
-                losing_next_node = conflicting_paths[i][c+1]
-                graphs[graph_index][n][losing_next_node]['weight'] += delay
-              
-              p -= 1
+        node = nodes_in_conflict[n]
+        try:
+          conflicting_nodes[node].append(g)
+        except:
+          conflicting_nodes[node] = [g]
           
-          p += 1
-      all_octant_paths.append(octant_paths)
-      all_graph_correspondence.append(graph_correspondence)
+        conflicting_nodes[node].append(g2)
+        #Making the list unique.
+        conflicting_nodes[node] = list(set(conflicting_nodes[node]))
   
-    #Picking up delays we missed.
-    count = 0
-    while(count < 1):
-      for n in range(0,num_nodes):
-        octant_paths = all_octant_paths[n]
-        graph_correspondence = all_graph_correspondence[n]
-        for p in range(0,len(octant_paths)):
-          path1 = octant_paths[p]
-          graph_index1 = graph_correspondence[p]
-          graph1 = graphs[graph_index1]
-          dog1 = get_weight_sum(graph1,path1,n)
-          dog_remaining1 = get_DOG(graph1,path1,n)
+  return conflicting_nodes
+
+#Finds the first conflict in a group of conflicting nodes. This will affect downstream nodes.
+def find_first_conflict(conflicting_nodes,graphs):
+  
+  first_node = -1
+  min_ready_to_solve = float("inf")
+  for n in conflicting_nodes:
+    #Which graphs are conflicting on this node.
+    conflicting_graphs = conflicting_nodes[n]
+    num_conflicting_graphs = len(conflicting_graphs)
+    #Looping through the conflicting graphs.
+    for g in range(0,num_conflicting_graphs):
+      graph = graphs[conflicting_graphs[g]]
+      #Getting the inbound edges to our node.
+      in_edges_n = list(graph.in_edges(n,'weight'))
+      #If there are no inbound edges to the node, it means that it is the initial node in the graph. This means that it must be the first conflict.
+      if not in_edges_n:
+        first_node = n
+        return first_node
+      else:
+        ready_to_solve = in_edges_n[0][2]
+        if ready_to_solve < min_ready_to_solve:
+          min_ready_to_solve = ready_to_solve
+          first_node = n
           
-          for pi in range(p+1,len(octant_paths)):
-            path2 = octant_paths[pi]
-            graph_index2 = graph_correspondence[pi]
-            graph2 = graphs[graph_index2]
-            if (path1[0] == path2[0]):
-              continue
-            if (path1[-1] == n or path2[-1] == n):
-              continue
-            dog2 = get_weight_sum(graph2,path2,n)
-            dog_remaining2 = get_DOG(graph2,path2,n)
-            
-            dog_remaining_tied = (dog_remaining1 == dog_remaining2)
-            graph_indices = [graph_index1,graph_index2]
-            indices = [p,pi]
-            paths = [path1,path2]
-            dogs_remaining = [dog_remaining1,dog_remaining2]
-            dogs = [dog1,dog2]
-            #Checking if the two graphs have the same DOG.
-            tied = (dog1 == dog2)
-            if (tied):
-              
-              #Checking to see if the two graphs have the same DOG remaining.
-              if (dog_remaining_tied):
-                
-                indices,paths,dogs,dogs_remaining,graph_indices = sort_priority(indices,paths,dogs,dogs_remaining,graph_indices)
-                for i in range(1,len(indices)):
-                  #index = paths[i].index(n)
-                  graph_index = graph_indices[i]
-                  next_node_index = paths[i].index(n)+1
-                  losing_next_node = paths[i][next_node_index]
-                  graphs[graph_index][n][losing_next_node]['weight'] += delay
-              else:
-                max_dog_remaining = max(dogs_remaining)
-                max_dog_remaining_index = dogs_remaining.index(max_dog_remaining)
-                
-                #Removing this path from conflicting paths since it gets priority and starts solving.
-                del paths[max_dog_remaining_index]
-                del indices[max_dog_remaining_index]
-                del dogs[max_dog_remaining_index]
-                del dogs_remaining[max_dog_remaining_index]
-                del graph_indices[max_dog_remaining_index]
-                
-                #index = paths[0].index(n)
-                graph_index = graph_indices[0]
-                next_node_index = paths[0].index(n)+1
-                losing_next_node = paths[0][next_node_index]
-                graphs[graph_index][n][losing_next_node]['weight'] += delay
-            else:
-              min_dog = min(dogs)
-              min_dog_index = dogs.index(min_dog)
-              
-              if (abs(dog1 - dog2) >= delay):
-                continue
-              else:
-                del paths[min_dog_index]
-                del indices[min_dog_index]
-                del dogs[min_dog_index]
-                del dogs_remaining[min_dog_index]
-                del graph_indices[min_dog_index]
-                
-                #index = paths[0].index(n)
-                graph_index = graph_indices
-                next_node_index = paths[0].index(n)+1
-                losing_next_node = paths[0][next_node_index]
-                graphs[graph_index][n][losing_next_node]['weight'] += delay
-      count += 1
+  return first_node
+
+#Finds the first graph to get to a conflicted node. In case they arrive at the same time, we return the graph that has a greater depth of graph remaining. In case of a tie with the DOG remaining, we return the graph that has the priority octant.
+def find_first_graph(conflicting_graphs,graphs,node):
   
-  else:
-  
-    for p in range(0,len(all_simple_paths)):
-      current_path = all_simple_paths[p]
-      heavy_path,path_weight = get_heaviest_path(graphs[p],current_path)
-      all_simple_paths[p] = heavy_path
-    
-    
-    for n in range(0,num_nodes-1):
-      fastest_path_index,fastest_path,weight_sum = get_fastest_path(graphs,all_simple_paths,n)
-        
-      primary_graph = graphs[fastest_path_index]
-      primary_path = all_simple_paths[fastest_path_index]
-      primary_index = primary_path.index(n)
-      
-      #Looping through remaining path to add potential delays for this node.
-      for p in range(0,len(all_simple_paths)):
-        secondary_path = all_simple_paths[p]
-        secondary_graph = graphs[p]
-        if p == fastest_path_index:
-          continue
-        #Check if this node exists in the secondary path.
-        secondary_index = -1
-        try:
-          secondary_index = secondary_path.index(n)
-        except:
-          continue
-        
-        weight_sum_secondary = get_weight_sum(graphs[p],all_simple_paths[p],n)
-        delay = weight_sum_secondary - weight_sum
-        time_to_solve = primary_graph[n][primary_path[primary_index+1]]['weight']
-        delay = time_to_solve - delay
-        #If two graphs reach each other at the same time, we have to resort to depth of graph.
-        if (isclose(delay,0.0,rel_tol=1e-4*latency)):
-          print("same time")
-          dog_primary = get_DOG(primary_graph,primary_path,n)
-          dog_secondary = get_DOG(secondary_graph,secondary_path,n)
-          if (dog_primary > dog_secondary):
-            next_node = secondary_path[secondary_index+1]
-            secondary_graph[n][next_node]['weight'] += time_to_solve
-          elif (dog_secondary > dog_primary):
-            next_node = primary_path[primary_index+1]
-            primary_graph[n][next_node]['weight'] += time_to_solve
-          else:
-            #Need to figure out which path has priority based on octant
-            which_path = get_priority_octant(fastest_path_index,p)
-            if (which_path == "primary"):
-              next_node = secondary_path[secondary_index+1]
-              secondary_graph[n][next_node]['weight'] += delay
-            elif(which_path == "secondary"):
-              next_node = primary_path[primary_index+1]
-              primary_graph[n][next_node]['weight'] += time_to_solve
-            else:
-              raise("Error, we need a primary")
-        elif (delay > 0):
-          #Add this delay to the current node's solve time in the secondary graph.
-          next_node = secondary_path[secondary_index+1]
-          if (n == 0 and next_node ==1 ):
-            print("here")
-          secondary_graph[n][next_node]['weight'] += delay
-    
-    #Looping again.
-    for n in range(0,num_nodes-1):
-      new_simple_paths = copy(all_simple_paths)
-      new_graphs = copy(graphs)
-      fastest_path_index1,fastest_path,weight_sum = get_fastest_path(graphs,all_simple_paths,n)
-      
-#      primary_graph = graphs[fastest_path]
-#      primary_path = all_simple_paths[fastest_path]
-#      primary_index = primary_path.index(n)
-      
-      del new_simple_paths[fastest_path_index1]
-      del new_graphs[fastest_path_index1]
-      #Recalculating the fastest path.
-      fastest_path_index,fastest_path,weight_sum = get_fastest_path(new_graphs,new_simple_paths,n)
-      fastest_path_index = all_simple_paths.index(fastest_path)
-      primary_graph = graphs[fastest_path_index]
-      primary_path = fastest_path
-      primary_index = primary_path.index(n)
-
-      #Looping through remaining path to add potential delays for this node.
-      for p in range(0,len(all_simple_paths)):
-        secondary_path = all_simple_paths[p]
-
-        secondary_graph = graphs[p]
-        if p == fastest_path_index or p == fastest_path_index1:
-          continue
-        #Check if this node exists in the secondary path.
-        secondary_index = -1
-        try:
-          secondary_index = secondary_path.index(n)
-        except:
-          continue
-
-        weight_sum_secondary = get_weight_sum(graphs[p],all_simple_paths[p],n)
-        delay = weight_sum_secondary - weight_sum
-        #time_to_solve = primary_graph[n][primary_path[primary_index+1]]['weight']
-        num_cells = cell_dist[n]
-        boundary_cells = pow(num_cells,2/3)
-        time_to_solve = num_cells*t_u*upc + boundary_cells*upbc*t_c +latency*m_l
-        next_node_secondary = secondary_path[secondary_index+1]
-        has_been_delayed = (secondary_graph[n][next_node_secondary]['weight'] > time_to_solve)
-        if (has_been_delayed):
-          delay = time_to_solve
-        else:
-          next_node_primary = primary_path[primary_index+1]
-          delay = get_weight_sum(primary_graph,primary_path,next_node_primary) - weight_sum_secondary
-        #If two graphs reach each other at the same time, we have to resort to depth of graph.
-        if (isclose(delay,0.0,rel_tol=1e-4*latency)):
-          print("same time")
-          dog_primary = get_DOG(primary_graph,primary_path,n)
-          dog_secondary = get_DOG(secondary_graph,secondary_path,n)
-          if (dog_primary > dog_secondary):
-            next_node = secondary_path[secondary_index+1]
-            secondary_graph[n][next_node]['weight'] += time_to_solve
-          elif (dog_secondary > dog_primary):
-            next_node = primary_path[primary_index+1]
-            primary_graph[n][next_node]['weight'] += time_to_solve
-          else:
-            #Need to figure out which path has priority based on octant
-            which_path = get_priority_octant(fastest_path_index,p)
-            if (which_path == "primary"):
-              next_node = secondary_path[secondary_index+1]
-              secondary_graph[n][next_node]['weight'] += delay
-            elif(which_path == "secondary"):
-              next_node = primary_path[primary_index+1]
-              primary_graph[n][next_node]['weight'] += time_to_solve
-            else:
-              raise("Error, we need a primary")
-        elif (delay > 0):
-          #Add this delay to the current node's solve time in the secondary graph.
-          next_node = secondary_path[secondary_index+1]
-          if (has_been_delayed):
-            secondary_graph[n][next_node]['weight'] += time_to_solve
-          else:
-            secondary_graph[n][next_node]['weight'] += delay
-        
-    #Looping a third time.
-    for n in range(0,num_nodes-1):
-      new_simple_paths = copy(all_simple_paths)
-      new_graphs = copy(graphs)
-      fastest_path_index1,fastest_path,weight_sum = get_fastest_path(graphs,all_simple_paths,n)
-
-      del new_simple_paths[fastest_path_index1]
-      del new_graphs[fastest_path_index1]
-      
-      #Recalculating the fastest path.
-      fastest_path_index2,fastest_path,weight_sum = get_fastest_path(new_graphs,new_simple_paths,n)
-      del new_simple_paths[fastest_path_index2]
-      del new_graphs[fastest_path_index2]
-      fastest_path_index2 = all_simple_paths.index(fastest_path)
-      
-
-      fastest_path_index,fastest_path,weight_sum = get_fastest_path(new_graphs,new_simple_paths,n)
-      fastest_path_index = all_simple_paths.index(fastest_path)
-      primary_graph = graphs[fastest_path_index]
-      primary_path = fastest_path
-      try:
-        primary_index = primary_path.index(n)
-      except:
-        continue
-
-      #Looping through remaining path to add potential delays for this node.
-      for p in range(0,len(all_simple_paths)):
-        secondary_path = all_simple_paths[p]
-
-        secondary_graph = graphs[p]
-        if p == fastest_path_index or p == fastest_path_index1 or p==fastest_path_index2:
-          continue
-        #Check if this node exists in the secondary path.
-        secondary_index = -1
-        try:
-          secondary_index = secondary_path.index(n)
-        except:
-          continue
-
-        weight_sum_secondary = get_weight_sum(graphs[p],all_simple_paths[p],n)
-        delay = weight_sum_secondary - weight_sum
-        #time_to_solve = primary_graph[n][primary_path[primary_index+1]]['weight']
-        num_cells = cell_dist[n]
-        boundary_cells = pow(num_cells,2/3)
-        time_to_solve = num_cells*t_u*upc + boundary_cells*upbc*t_c +latency*m_l
-        next_node_secondary = secondary_path[secondary_index+1]
-        has_been_delayed = (secondary_graph[n][next_node_secondary]['weight'] > time_to_solve)
-        if (has_been_delayed):
-          delay = time_to_solve
-        else:
-          next_node_primary = primary_path[primary_index+1]
-          delay = get_weight_sum(primary_graph,primary_path,next_node_primary) - weight_sum_secondary
-        #If two graphs reach each other at the same time, we have to resort to depth of graph.
-        if (isclose(delay,0.0,rel_tol=1e-4*latency)):
-          print("same time")
-          dog_primary = get_DOG(primary_graph,primary_path,n)
-          dog_secondary = get_DOG(secondary_graph,secondary_path,n)
-          if (dog_primary > dog_secondary):
-            next_node = secondary_path[secondary_index+1]
-            secondary_graph[n][next_node]['weight'] += time_to_solve
-          elif (dog_secondary > dog_primary):
-            next_node = primary_path[primary_index+1]
-            primary_graph[n][next_node]['weight'] += time_to_solve
-          else:
-            #Need to figure out which path has priority based on octant
-            which_path = get_priority_octant(fastest_path_index,p)
-            if (which_path == "primary"):
-              next_node = secondary_path[secondary_index+1]
-              secondary_graph[n][next_node]['weight'] += delay
-            elif(which_path == "secondary"):
-              next_node = primary_path[primary_index+1]
-              primary_graph[n][next_node]['weight'] += time_to_solve
-            else:
-              raise("Error, we need a primary")
-        elif (delay > 0):
-          #Add this delay to the current node's solve time in the secondary graph.
-          next_node = secondary_path[secondary_index+1]
-          if (has_been_delayed):
-            secondary_graph[n][next_node]['weight'] += time_to_solve
-          else:
-            secondary_graph[n][next_node]['weight'] += delay
-  return graphs
-  
-#Gets the path that gets fastest to a node. Assumes that each graph has its heaviest path listed.
-def get_fastest_path(graphs,paths,node):
-  
-  check_paths = copy(paths)
-  #Checks if the node is in the path.
-  weight_sum = 1e8
-  fastest_path_index = 0
-  fastest_path = []
-  index = 0
-  for path in check_paths:
-    graph = graphs[index]
-    node_index = -1
+  num_conflicting_graphs = len(conflicting_graphs)
+  #Stores the amount of time it takes each conflicting graph to arrive at the node.
+  graph_times = [None]*num_conflicting_graphs
+  #Stores the index into the list of graphs of the conflicting graphs.
+  graph_indices = [None]*num_conflicting_graphs
+  for g in range(0,num_conflicting_graphs):
+    #The original index of the conflicting graphs.
+    graph_index = conflicting_graphs[g]
+    graph = graphs[graph_index]
+    #The incoming edges to our node.
+    in_edges = list(graph.in_edges(node,'weight'))
+    #The time it takes for this graph to get to the node. If there are no edges inbound to the node, then the time to get to the node is 0.0.
     try:
-      node_index = path.index(node)
+      time_to_node = in_edges[0][2]
     except:
-      index += 1
-      continue
-    
-    weight_sum_path = 0.0
-    for j in range(0,node_index):
-      node1 = path[j]
-      node2 = path[j+1]
-      weight_sum_path += graph[node1][node2]['weight']
-    
-    #If this path is fastest (smallest weight), we update our fastest_path variable.
-    if (weight_sum_path < weight_sum):
-      weight_sum = weight_sum_path
-      fastest_path_index = index
-    
-    index += 1
+      time_to_node = 0.0
+    graph_times[g] = time_to_node
+    graph_indices[g] = graph_index
   
-  fastest_path = paths[fastest_path_index]
-  return fastest_path_index,fastest_path,weight_sum
+  #We pull the graph with the minimum time to node.
+  min_time_to_node = min(graph_times)
+  #We check if there are multiple graphs ready at the same time (no guarantee same time is the minimum time). This line will return true if there are duplicates.
+  if len(graph_times) != len(set(graph_times)):
+    #We check if there are multiple instances of the min_time_to_node
+    min_times = []
+    for g in range(0,len(graph_times)):
+      if graph_times[g] == min_time_to_node:
+        min_times.append(graph_indices[g])
+    #If multiple graphs are ready to solve the node at the minimum time, we resort to a depth of graph remaining test.
+    len_min_times = len(min_times)
+    if len_min_times > 1:
+      #Storing the depth of graphs remaining for all tied graphs.
+      dogs_remaining = []
+      #Storing the graph indices.
+      dogs_graph_indices = []
+      for i in range(0,len_min_times):
+        #Getting the graph index of the tied graph.
+        graph_index = min_times[i]
+        graph = graphs[graph_index]
+        #The depth of graph remaining in this graph. This is equivalent to the time it takes to sweep the graph.
+        dog_remaining = get_DOG_remaining(graph)
+        dogs_remaining.append(dog_remaining)
+        dogs_graph_indices.append(graph_index)
+      
+      #We check if there are multiple graphs with the same DOG remaining.
+      if len(dogs_remaining) != len(set(dogs_remaining)):
+        max_dog_remaining = max(dogs_remaining)
+        #Checking if the maximum depth of graph is tied or just secondary depths of graph.
+        max_dogs = []
+        for d in range(0,len(dogs_remaining)):
+          if dogs_remaining[d] == max_dog_remaining:
+            max_dogs.append(dogs_graph_indices[g])
+        
+        #Once we have the graph indices of the tied graphs (according to DOG remaining), the priority octant wins.
+        max_dogs = sort_priority(max_dogs)
+        first_graph = max_dogs[0]
+      
+      #We only need to look at the graph with the max DOG remaining. It is the first graph that should start solving.
+      else:
+        max_dog_remaining_index = dogs_remaining.index(max(dogs_remaining))
+        #This is the first graph that will start solving.
+        first_graph = dogs_graph_indices[max_dog_remaining_index]
+    
+    #If only one graph is ready to solve at the minimum time, that graph is our first graph.    
+    else:
+      min_time_to_node_index = graph_times.index(min(graph_times))
+      first_graph = graph_indices[min_time_to_node_index]
+  
+  #We take the graph that gets to the node first and that is our first graph.
+  else:
+    min_time_to_node_index = graph_times.index(min(graph_times))
+    first_graph = graph_indices[min_time_to_node_index]
+      
+  return first_graph          
+
+#Modifies the weights of the secondary conflicting graphs at a particular node.
+def modify_secondary_graphs(graphs,conflicting_graphs,node,time_to_solve_node):
+  
+  #The number of secondary conflicting graphs.
+  num_conflicting_graphs = copy(len(conflicting_graphs))
+  
+  for outer in range(0,num_conflicting_graphs-1):
+    #The fastest graph to the node.
+    first_graph = find_first_graph(conflicting_graphs,graphs,node)
+    #Removed from conflicting graphs.
+    conflicting_graphs.remove(first_graph)
+    #Loop over the secondary graphs.
+    for g in range(0,len(conflicting_graphs)):
+      second_graph = conflicting_graphs[g]
+      #The delay the second_graph will incur.
+      delay = calculate_delay(first_graph,second_graph,graphs,node,time_to_solve_node)
+      #The secondary graph who's weights we are modifying.
+      secondary_graph = graphs[second_graph]
+      #We need to first add the delay to the preceding edges, in order to update the time this node is ready to solve at.
+      edges = list(secondary_graph.in_edges(node))
+      num_edges = len(edges)
+      for e in range(0,num_edges):
+        node1,node2 = edges[e]
+        secondary_graph[node1][node2]['weight'] += delay
+      #All paths from the node in conflict until the end of the graph.
+      secondary_paths = nx.all_simple_paths(secondary_graph,node,-1)
+      
+      #Looping over all of downstream secondary paths.
+      for path in secondary_paths:
+        
+        len_path = len(path)-1
+        for n in range(0,len_path):
+          node1 = path[n]
+          node2 = path[n+1]
+          #Adding the delay 
+          secondary_graph[node1][node2]['weight'] += delay
+      
+      #Make sure all incoming edges to all nodes match up.
+      secondary_graph = match_delay_weights(secondary_graph)
+      
+      graphs[second_graph] = secondary_graph
+
+  return graphs
+
+def match_delay_weights(graph):
+  
+  num_nodes = graph.number_of_nodes()-1
+  
+  for n in range(0,num_nodes):
+    
+    #The incoming edges to this node.
+    edges = list(graph.in_edges(n,'weight'))
+    num_edges = len(edges)
+    
+    #If the number of incoming edges is greater than one, we need to match the weights.
+    if num_edges > 1:
+      
+      #Get the weights of the edges.
+      weights = [z for x,y,z in edges]
+      #The maximum weight.
+      max_weight = copy(max(weights))
+      
+      #Looping through the edges 
+      for e in range(0,num_edges):
+        node1,node2,weight = edges[e]
+        if weight == max_weight:
+          continue
+        else:
+          graph[node1][node2]['weight'] = max_weight
+      
+ 
+  return graph   
+  
+#Calculates the delay that is incurred to a secondary graph by the winning graph at the node.
+def calculate_delay(first_graph,second_graph,graphs,node,time_to_solve_node):
+  #The start time of the first graph.
+  first_start_time = 0.0
+  try:
+    first_start_time = list(graphs[first_graph].in_edges(node,'weight'))[0][2]
+  except:
+    first_start_time = 0.0
+  
+  #The start time of the second graph.
+  second_start_time = 0.0
+  try:
+    second_start_time = list(graphs[second_graph].in_edges(node,'weight'))[0][2]
+  except:
+    second_start_time = 0.0
+  
+  #The delay is the difference in start times.
+  delay = first_start_time + time_to_solve_node - second_start_time
+  #If this delay value is less than zero, then the first graph has finished solving it by the time the second graph gets to it.
+  if delay < 0.0:
+    delay = 0.0
+  
+  return delay
+    
+def add_conflict_weights(graphs,time_to_solve):
+  
+  #The number of graphs.
+  num_graphs = len(graphs)
+  
+  #Storing the ending nodes of all graphs.
+  end_nodes = {}
+  for g in range(0,num_graphs):
+    graph = graphs[g]
+    end_nodes[g] = list(graph.predecessors(-1))[0]
+  
+  #The number of graphs that have finished.
+  num_finished_graphs = 0
+  #The list of finished graphs.
+  finished_graphs = [False]*num_graphs
+  #The current time (starts at 0.0 s)
+  t = 0.0
+  #Keep iterating until all graphs have finished.
+  while num_finished_graphs < num_graphs:
+    print('Time t = ', t)
+    #Getting the nodes that are being solved at time t for all graphs.
+    all_nodes_being_solved = [None]*num_graphs
+    for g in range(0,num_graphs):
+      graph = graphs[g]
+      all_nodes_being_solved[g] = nodes_being_solved(graph,t,time_to_solve)
+    
+    
+    print(all_nodes_being_solved)
+    #Finding any nodes in conflict at time t.
+    conflicting_nodes = find_conflicts(all_nodes_being_solved)
+    num_conflicting_nodes = len(conflicting_nodes)
+    
+    print(conflicting_nodes)
+    
+    #If no nodes are in conflict, we continue to the next interaction.
+    if bool(conflicting_nodes) == False:
+      t = find_next_interaction(graphs,t,time_to_solve)
+    #Otherwise, we address the conflicts between nodes across all graphs.
+    else:
+      #Find first conflict.
+      first_node = find_first_conflict(conflicting_nodes,graphs)
+      #The conflicting grpahs at this node.
+      conflicting_graphs = conflicting_nodes[first_node]
+      #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
+      graphs = modify_secondary_graphs(graphs,conflicting_graphs,first_node,time_to_solve[first_node])
+      #To update our march through, we need to update t here, with a find_next_interaction.
+      if (num_conflicting_nodes == 1):
+        t = find_next_interaction(graphs,t,time_to_solve)
+      
+    #Checking if any of the graphs have finished.
+    for g in range(0,num_graphs):
+      if finished_graphs[g]:
+        continue
+      #The end node of this graph.
+      end_node = end_nodes[g]
+      #The time it takes to finish this graph.
+      time_to_finish = graphs[g][end_node][-1]['weight']
+      #If the current universal time is greater than the time to finish sweeping the graph, we say this graph is finished.
+      if t >= time_to_finish:
+        finished_graphs[g] = True
+    
+    print(finished_graphs)
+    
+    num_finished_graphs = len([x for x in finished_graphs if finished_graphs[x] == True])
+    
+  return graphs
 
 
 def compute_solve_time(graphs,cells_per_subset,t_u,upc,global_subset_boundaries,num_row,num_col,num_plane):
@@ -761,14 +639,7 @@ def compute_solve_time(graphs,cells_per_subset,t_u,upc,global_subset_boundaries,
     end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
     
     paths = nx.all_simple_paths(graph,start_node,end_node)
-#    heaviest_path = 0.0
-#    for path in paths:
-#      path_weight = sum_weights_of_path(graph,path)
-#      if path_weight > heaviest_path:
-#        heaviest_path = path_weight
-#        index = path
-#    
-#    heaviest_paths.append(index)
+
     heaviest_path,path_weight = get_heaviest_path(graph,paths)
     heaviest_paths.append(heaviest_path)
     time_graph = path_weight #+ t_u*upc*cells_per_subset[end_node]

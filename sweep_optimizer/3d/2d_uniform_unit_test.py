@@ -117,6 +117,10 @@ nx.draw(graphs[1],with_labels = True)
 plt.figure("G_2")
 nx.draw(graphs[2],with_labels = True)
 
+test_branching = nx.dag.dag_to_branching(graphs[0])
+plt.figure("test")
+nx.draw(graphs[0],with_labels = True)
+
 #Storing all simple paths for each graph.
 all_simple_paths = []
 for graph in graphs:
@@ -137,11 +141,6 @@ num_subsets = (N_x+1)*(N_y+1)
 num_total_cells = sum(cell_dist)
 
 graphs = add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,upc,upbc,t_comm,latency,m_l,num_row,num_col,num_plane)
-
-for ig in range(0,len(graphs)):
-  for line in nx.generate_edgelist(graphs[ig],data=True):
-    print(line)
-  print("\n")
 
 heaviest_paths_edge = []
 for g in range(0,len(graphs)):
