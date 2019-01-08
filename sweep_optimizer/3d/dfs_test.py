@@ -132,27 +132,9 @@ nx.draw_networkx_edge_labels(G2,nx.shell_layout(G2),edge_labels=edge_labels_1)
 
 plt.figure("Graph 3 Post Universal Time")
 edge_labels_1 = nx.get_edge_attributes(G3,'weight')
-nx.draw(G3,nx.shell_layout(G3),with_labels = True)
-nx.draw_networkx_edge_labels(G3,nx.shell_layout(G3),edge_labels=edge_labels_1)
-##Testing our weight-based traversal.
-#We try an arbitrary weight limit. 
-#weight_limit = 21.0
-#
-#current_nodes = []
-#
-#for g in range(0,len(graphs)):
-#  
-#  current_nodes.append(nodes_being_solved(graphs[g],weight_limit,time_to_solve))
-#
-#
-##Testing the next interaction function.
-#conflicting_nodes = find_conflicts(current_nodes)
-#
-#first_node = find_first_conflict(conflicting_nodes,graphs)
-#conflicting_graphs = conflicting_nodes[first_node]
-#first_graph = find_first_graph(conflicting_graphs,graphs,first_node)
-#
-#graphs = modify_secondary_graphs(graphs,first_graph,conflicting_graphs,first_node,time_to_solve[first_node])
+nx.draw(G3,nx.spectral_layout(G3),with_labels = True)
+nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3),edge_labels=edge_labels_1)
+
 
 plt.figure("Graph 2 Post Delay Mod")
 edge_labels_1 = nx.get_edge_attributes(G2,'weight')
