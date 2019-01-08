@@ -437,7 +437,7 @@ def find_first_graph(conflicting_graphs,graphs,node):
         max_dogs = []
         for d in range(0,len(dogs_remaining)):
           if dogs_remaining[d] == max_dog_remaining:
-            max_dogs.append(dogs_graph_indices[g])
+            max_dogs.append(dogs_graph_indices[d])
         
         #Once we have the graph indices of the tied graphs (according to DOG remaining), the priority octant wins.
         max_dogs = sort_priority(max_dogs)
@@ -470,6 +470,8 @@ def modify_secondary_graphs(graphs,conflicting_graphs,node,time_to_solve_node):
   for outer in range(0,num_conflicting_graphs-1):
     #The fastest graph to the node.
     first_graph = find_first_graph(conflicting_graphs,graphs,node)
+    print("Conflicted Node: ", node)
+    print("First graph: ", first_graph)
     #Removed from conflicting graphs.
     conflicting_graphs.remove(first_graph)
     #Loop over the secondary graphs.
@@ -584,12 +586,13 @@ def add_conflict_weights(graphs,time_to_solve):
       graph = graphs[g]
       all_nodes_being_solved[g] = nodes_being_solved(graph,t,time_to_solve)
     
-    
+    print("Nodes being solved in each graph")
     print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
     num_conflicting_nodes = len(conflicting_nodes)
     
+    print("The graphs in conflict for each node")
     print(conflicting_nodes)
     
     #If no nodes are in conflict, we continue to the next interaction.
