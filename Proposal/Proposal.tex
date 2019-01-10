@@ -607,7 +607,7 @@ where $N_u$ is the number of unknowns in the subset, $T_g$ is the grind time, $N
 The cost value is used to help appropriately weight the edges in each TDG independently. We weight the TDGs according to the following algorithm:
 
 \begin{algorithm}[H]
-\begin{algorithmic}[1]
+\begin{algorithmic}
 \FOR{$node = 1$ to $N$}
 \STATE Weight outgoing edges with the cost of solving and communicating $node$.
 \ENDFOR
@@ -625,10 +625,18 @@ This algorithm effectively sets up the initial weights in each TDG to represent 
 
 Once this is done for all edges in all TDGs, we have to detect and address sweep conflicts between all the TDGs. We do so with the following algorithm:
 \begin{algorithm}[H]
-\begin{algorithmic}[2]
+\begin{algorithmic}[1]
 \STATE t = 0
-\WHILE{num_finished_graphs < num_graphs}
-\STATE print t
+\WHILE{num\_finished\_graphs $<$ num\_graphs}
+\STATE{Get nodes that are being solved at time t}
+\STATE{Find conflicting graphs in nodes being solved}
+\IF{No conflicting graphs in nodes being solved}
+	\STATE{Find next interaction}
+\ELSE
+	\STATE{Find first conflicted node}
+	\STATE{Get conflicting graphs at that node}
+	\STATE{Modify graph weights according to which graph wins the conflict}
+\ENDIF
 \ENDWHILE
 \label{conflict}
 \end{algorithmic}
