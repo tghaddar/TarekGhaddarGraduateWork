@@ -149,22 +149,22 @@ where the right hand side terms of Eq.~\eqref{angle} have been combined into one
 After the angular and energy dependence have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. We use a discontinuous Galerkin approximation in space,  and the solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. The solution is obtained by meshing the domain and solving the spatial problem one cell at a time for a given direction and a given group. 
 Figure~\ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
 
-\begin{figure}
-\centering
-\includegraphics[scale = 0.27]{figures/UnstructureMesh.pdf}
-\includegraphics[scale = 0.27]{figures/StructuredMesh.pdf}
-\caption{A demonstration of a sweep on a structured and unstructured mesh. }
-\label{sweeps}
-\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[scale = 0.27]{figures/UnstructureMesh.pdf}
+%\includegraphics[scale = 0.27]{figures/StructuredMesh.pdf}
+%\caption{A demonstration of a sweep on a structured and unstructured mesh. }
+%\label{sweeps}
+%\end{figure}
 
 The number in each cell represents the order in which the cells are solved. All cells must receive the solution downwind from them before solving for their own solution. This dependency can be represented and stored as a directed task dependence graph, shown in Fig.~\ref{tdg}.
 
-\begin{figure}
-\centering
-\includegraphics[scale = 0.4,trim = 0cm 3.5cm 0cm 3cm,clip]{figures/tdg.pdf}
-\caption{A task dependence graph of the unstructured mesh example in Fig. \ref{sweeps}.}
-\label{tdg}
-\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[scale = 0.4,trim = 0cm 3.5cm 0cm 3cm,clip]{figures/tdg.pdf}
+%\caption{A task dependence graph of the unstructured mesh example in Fig. \ref{sweeps}.}
+%\label{tdg}
+%\end{figure}
 
 The order in which radiation in a cell is solved is given by a task dependence graph. Transport sweep can be performed on parallel architectures in order to obtain the solution faster, as well as distribute the memory to many processors for memory intensive cases. Provably-optimal transport sweeping has been described in \cite{mpadams2013} and demonstrated in PDT using logically-Cartesian meshes. Our work utilizes that transport sweep machinery but adapts it to unstructured meshes. Performing a transport sweep on an unstructured mesh presents two challenges: (1) performing a transport sweep on a massively parallel scale in an efficient manner and (2) keeping non-concave sub-domains due to leverage fromt he provably-optimal transport sweep algorithms. 
 
@@ -399,57 +399,57 @@ For each test case, the 162 input inputs are run twice, once with no load balanc
 
 Figure \ref{oppnoiter} shows the metric behavior for Fig. \ref{opp}. The maximum metric value is 24.7650, and occurs when Fig. \ref{opp} is run with 8x8 subsets and a maximum triangle area of 1.6 cm\textsuperscript{2}. The minimum metric value is 1.0016 and occurs when Fig. \ref{opp} is run with 4x4 subsets and a maximum triangle area of 0.04 cm\textsuperscript{2}. The z axis in all figures is the value of the metric.
 
-\begin{figure}
-\centering
-\includegraphics[width=85mm, trim = 0cm 5cm 0cm 5cm,clip]{figures/OppNoIter.pdf}
-\caption{The metric behavior of the first test case run with no load balancing iterations.}
-\label{oppnoiter}
-\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[width=85mm, trim = 0cm 5cm 0cm 5cm,clip]{figures/OppNoIter.pdf}
+%\caption{The metric behavior of the first test case run with no load balancing iterations.}
+%\label{oppnoiter}
+%\end{figure}
 
 Figure \ref{oppiter} shows the metric behavior for Fig. \ref{opp} after 10 load balancing iterations. The maximum metric value is 5.0538 and occurs when Fig. \ref{opp} is run with 10x10 subsets and a maximum triangle area of 1.2 cm\textsuperscript{2}. The minimum metric value is 1.0017 and occurs when Fig. \ref{opp} is run with 4x4 subsets and a maximum triangle area of 0.04 cm\textsuperscript{2}.
 
-\begin{figure}
-\centering
-\includegraphics[width=85mm, trim = 0cm 5cm 0cm 5cm,clip]{figures/OppIter.pdf}
-\caption{The metric behavior of the first test case run with 10 load balancing iterations.}
-\label{oppiter}
-\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[width=85mm, trim = 0cm 5cm 0cm 5cm,clip]{figures/OppIter.pdf}
+%\caption{The metric behavior of the first test case run with 10 load balancing iterations.}
+%\label{oppiter}
+%\end{figure}
 
 Figure \ref{samenoiter} shows the metric behavior for Fig. \ref{same}. The maximum metric is 22.6654 and occurs when Fig. \ref{same} is run with 8x8 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0024 and occurs when Fig. \ref{same} is run with 2x2 subsets with a maximum triangle are of 0.01 cm\textsuperscript{2}.
 
-\begin{figure}
-\centering
-\includegraphics[width=85mm, trim = 2cm 5cm 0cm 5cm,clip]{figures/SameNoIter.pdf}
-\caption{The metric behavior of the second test case run with no load balancing iterations.}
-\label{samenoiter}
-\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[width=85mm, trim = 2cm 5cm 0cm 5cm,clip]{figures/SameNoIter.pdf}
+%\caption{The metric behavior of the second test case run with no load balancing iterations.}
+%\label{samenoiter}
+%\end{figure}
 
 Figure \ref{sameiter} shows the metric behavior for Fig. \ref{same} after ten load balancing iterations. The maximum metric is 3.9929 and occurs when Fig. \ref{same} is run with 10x10 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0024 and occurs when Fig. \ref{same} is run with 2x2 subsets with a maximum triangle are of 0.01 cm\textsuperscript{2}.
 
-\begin{figure}
-\centering
-\includegraphics[width=85mm, trim = 2cm 5cm 0cm 5cm,clip]{figures/SameIter.pdf}
-\caption{The metric behavior of the second test case run with 10 load balancing iterations.}
-\label{sameiter}
-\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[width=85mm, trim = 2cm 5cm 0cm 5cm,clip]{figures/SameIter.pdf}
+%\caption{The metric behavior of the second test case run with 10 load balancing iterations.}
+%\label{sameiter}
+%\end{figure}
 
 Figure \ref{latticenoiter} shows the metric behavior for Fig. \ref{lattice}. The maximum metric is 2.6489 and occurs when Fig. \ref{lattice} is run with 10x10 subsets with a maximum triangle area of 1.8 cm\textsuperscript{2}. The minimum metric is 1.0179 and occurs when Fig. \ref{lattice} is run with 2x2 subsets with a maximum triangle are of 0.08 cm\textsuperscript{2}.
 
-\begin{figure}
-\centering
-\includegraphics[width=85mm, trim = 0cm 5cm 0cm 5cm,clip]{figures/lattice_no_iter.pdf}
-\caption{The difference in metric behavior of the third test case with no load balancing iterations.}
-\label{latticenoiter}
-\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[width=85mm, trim = 0cm 5cm 0cm 5cm,clip]{figures/lattice_no_iter.pdf}
+%\caption{The difference in metric behavior of the third test case with no load balancing iterations.}
+%\label{latticenoiter}
+%\end{figure}
 
 Figure \ref{latticeiter} shows the metric behavior for Fig. \ref{lattice} after ten load balancing iterations. The maximum metric is 2.2660 and occurs when Fig. \ref{lattice} is run with 10x10 subsets with a maximum triangle area of 0.4 cm\textsuperscript{2}. The minimum metric is 1.0021 and occurs when Fig. \ref{lattice} is run with 2x2 subsets with the Triangle's coarsest possible mesh.
 
-\begin{figure}
-\centering
-\includegraphics[width=85mm, trim = 0cm 5cm 0cm 5cm,clip]{figures/lattice_iter.pdf}
-\caption{The difference in metric behavior of the third test case after ten load balancing iterations.}
-\label{latticeiter}
-\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[width=85mm, trim = 0cm 5cm 0cm 5cm,clip]{figures/lattice_iter.pdf}
+%\caption{The difference in metric behavior of the third test case after ten load balancing iterations.}
+%\label{latticeiter}
+%\end{figure}
 
 Because Fig. \ref{lattice} has more features and is more symmetric of a problem, the initial load balancing metric will not be as large as the load balancing metric of Figs. \ref{same} and \ref{opp}. As a result, the improvement in the load balancing metric after 10 iterations will not be as great in problems similar to Fig. \ref{lattice}. 
 
