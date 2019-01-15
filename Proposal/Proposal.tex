@@ -389,8 +389,6 @@ As shown in Fig. \ref{comparison_slice_zoom}, the other advantage of the OpenFOA
 
 However, the OpenFOAM meshes due pose a challenge. When aggregating angles during the sweep, cycles occur. This prevents PDT from sweeping on these meshes unless using single angle aggregation, and most sweeps on large problems time out. A sweep structure that detects and addresses cycles is currently being implemented by the PDT development team, making OpenFOAM meshes practical for realistic problems.
 
-\subsection{Spiderweb Meshes in PDT}
-
 \section{Issue and Approaches of Load Balancing on Unstructured Meshes}
 
 When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to ``balance'' the number of cells. Ideally, each processor will be responsible for an equal number of cells. 
@@ -619,35 +617,40 @@ The cost value is used to help appropriately weight the edges in each TDG indepe
 \end{algorithmic}
 \end{algorithm}
 
-This algorithm effectively sets up the initial weights in each TDG to represent a crucial piece of information: the time at which each node is ready to solve. To state this simply, all incoming weights to a node will share the same value, which represents the time that node is ready to solve factoring in upstream dependencies. 
+This algorithm effectively sets up the initial weights in each TDG to represent a crucial piece of information: the time at which each node is ready to solve. In other words, all incoming weights to a node will share the same value, which represents the time that node is ready to solve factoring in upstream dependencies. 
 
 \subsubsection{Conflict Detection and Resolution}
 
 Once this is done for all edges in all TDGs, we have to detect and address sweep conflicts between all the TDGs. We do so with the following algorithm:
 \begin{algorithm}[H]
-\begin{algorithmic}[1]
+\begin{algorithmic}
 \STATE t = 0
 \WHILE{num\_finished\_graphs $<$ num\_graphs}
 \STATE{Get nodes that are being solved at time t}
 \STATE{Find conflicting graphs in nodes being solved}
 \IF{No conflicting graphs in nodes being solved}
-	\STATE{Find next interaction}
+	\STATE{t = time of next interaction}
 \ELSE
 	\STATE{Find first conflicted node}
-	\STATE{Get conflicting graphs at that node}
+	\STATE{Get conflicting graphs at first conflicted node}
 	\STATE{Modify graph weights according to which graph wins the conflict}
+	\IF{Number of conflicted nodes is 1}
+	\STATE{t = time of next interaction}
+	\ENDIF
 \ENDIF
+\STATE{Check how many graphs have finished by time t}
 \ENDWHILE
 \label{conflict}
 \end{algorithmic}
 \end{algorithm}
 
+This algorithm marches along all TDGs and at every time $t$ that a node is reached, checks for conflicts and modifies downstream weights accordingly. 
 
-Two forms of conflict resolution are being explored, depth-of-graph remaining and first come first serve. Due to the imbalanced nature of the problems, each subset will take a different amount of time to solve and communicate. 
+Two forms of conflict resolution are being explored, depth-of-graph remaining and first come first serve. Due to the imbalanced nature of the problems, each subset will take a different amount of time to solve and communicate, defaulting conflict resolution to a first come first basis. If two graphs reach a node at the same time, then the graph with the greater depth-of-graph remaining wins. If there is still a tie, then the graph with the priority octant wins.
 
 \subsection{Optimizing the Time to Solution}\label{optimize}
 
-Once the heaviest paths of each TDG are weighted appropriately with conflicts taken into account, we simply sum the weights of the path to get the time to complete the sweep. The octant with the heaviest sweep time is used as the time to solution for a given partitioning scheme. We will use a python optimization tool in order to get the best partitioning scheme possible. The cut lines will be the input parameter, and the tool will iterate on this parameter to minimize the time to solution. 
+Once the heaviest paths of each TDG are weighted appropriately with conflicts taken into account, we simply take the final weight of the ending node as the time to solution for that graph. The octant with the heaviest sweep time is used as the time to solution for a given partitioning scheme. We will use a python optimization tool in order to get the best partitioning scheme possible. The cut lines will be the input parameter, and the tool will iterate on this parameter to minimize the time to solution. 
 
 \section{Goals and Proposed Plan}
 
