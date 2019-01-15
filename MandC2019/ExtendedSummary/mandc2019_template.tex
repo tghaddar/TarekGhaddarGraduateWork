@@ -43,6 +43,9 @@
 \usepackage{algorithmic}
 \usepackage{subcaption}
 
+\usepackage{color}
+\newcommand{\jcr}[1]{\textcolor{red}{#1}}
+
 %\usepackage[justification=centering]{caption}
 
 %
@@ -57,7 +60,7 @@ MASSIVELY PARALLEL TRANSPORT SWEEPS \\
 \author{%
   % FIRST AUTHORS 
   %
-  \textbf{Tarek Habib Ghaddar$^1$, Jean C. Ragusa$^1$}%\footnote{Footnote, if necessary, in Times New Roman font and font size 10} \\
+  \textbf{Tarek Habib Ghaddar$^1$, Jean C. Ragusa$^1$}\\%\footnote{Footnote, if necessary, in Times New Roman font and font size 10} \\
   $^1$Dept. of Nuclear Engineering, Texas  A\&M University \\
   College Station, TX, 77843-3133 \\ 
 \\
@@ -79,22 +82,27 @@ MASSIVELY PARALLEL TRANSPORT SWEEPS \\
 \maketitle
 \justify 
 
+\jcr{list of authors seems incomplete}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{INTRODUCTION} 
-When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, Texas A\&M's massively parallel radiation transport code, we are looking to ``balance'' the number of cells. Ideally, each processor will be responsible for an equal number of cells. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Optimal sweeps for $S_n$ radiation transport calculations on unstructured grids is an open research question. When assessing the scaling and parallel efficiency of transport sweeps on unstructured grids, the issue of load balancing  subdomain partitions is a key aspect but may not be the ultimate factor is addressing parallel efficiency. A load balanced problem has an equal number of degrees of freedom per processor. In transport sweeps, load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, Texas A\&M's massively parallel radiation transport code, we are looking to ``balance'' the number of cells. Ideally, each processor will be responsible for an equal number of cells. 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{UNSTRUCTURED MESHES IN PDT} 
 \label{sec:first}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In order to understand how load balancing is handled in PDT, we first describe the the partitioning scheme and how the mesh is distributed amongst processes.  In general:
+In order to understand how load balancing is handled in PDT, we first describe the partitioning scheme and how the mesh is distributed amongst processes.  In general:
 \vspace{-1cm}
 \begin{itemize}\itemsep 1pt \parskip 0pt \parsep 0pt
-\item ``Cut lines" (planes for 3D) are used to slice through the mesh in the x,y, and z dimensions.
+\item ``Cut lines" in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
 \item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
 \item The subsets are distributed amongst the processor domain.
 \end{itemize}
 \vspace{-1cm}
 
-Both approaches to load balancing discussed in this paper rely on the concept of a subset. Figure \ref{subset_example} illustrates a 2D example of a subset, where the lower left and lower right subsets are highlighted in blue and black boxes, respectively. 
+Both approaches \jcr{unclear what these 2 approaches are. this needs to be explained} to load balancing discussed in this paper rely on the concept of a subset. Figure \ref{subset_example} illustrates a 2D example of a subset, where the lower left and lower right subsets are highlighted in blue and black boxes, respectively. \jcr{why not highlight the 4 subsets on that figure?} \jcr{furthermore, point out the arbitrary polygons (2D) polyhedral cells (3D) generated in such a manner and add 2-3 PWLD references to briefly explain how we get away with such arbitrary polyhedra}
 
 \begin{figure}[H]
 \centering
@@ -103,7 +111,9 @@ Both approaches to load balancing discussed in this paper rely on the concept of
 \label{subset_example}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{LOAD BALANCING IN PDT}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 All approaches to load balancing in PDT rely on the movement of cut lines (or planes) to redistribute cells more evenly across all subsets. In general, this means moving cut lines into more mesh dense regions in order to better focus processing power. We first define a metric describing how imbalanced our problem is:
 \begin{equation}
@@ -113,6 +123,7 @@ f =\frac{\underset{ijk}{\text{max}}(N_{ijk})}{\frac{N_{tot}}{I\cdot J\cdot K}},
 where $f$ is the load balance metric, $N_{ijk}$ is the number of cells in subset $(i,j,k)$, $N_{tot}$ is the global number of cells in the problem, and $I$, $J$, and $K$ are the total number of subsets in the $x$, $y$, and $z$ direction, respectively. The metric is a measure of the maximum number of cells per subset divided by the average number of cells per subset.
 
 The load balancing algorithm moves cut planes based on dimensional sub-metrics, $f_d$ . Equation ~\eqref{submetric} defines these two parameters:
+\jcr{$f_d$ or $f_D$. which is it? More importantly, this paragraph is describing the weeds. What's the bigger idea. The reader will definitely be lost. You need to have a funnel vision, from big to details and at the summary level, details can be swept under the rug using 1-2 sentences rather than lengthy explanations but the big picture concept needs to to be clearly laid out}
 \begin{equation}
 f_{D} = \underset{d}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D}
 \label{submetric}
@@ -132,7 +143,8 @@ $f_{d}$ is calculated by taking the maximum number of cells per row, column, or 
 \end{algorithmic}
 \end{algorithm}
 
-Our initial approach to load balancing involved placing cut lines in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors. This was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches of high mesh density.
+\jcr{now you describe the big picture at bit. I am afraid this is too late. I prefer foreshadowing. You may have lost the reader by now.}
+Our initial approach to load balancing involved placing cut lines in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors. This was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. \jcr{now the issues with LB without dong it by dimension could stay here. This is a detail but putting up front the general idea about the 2 approaches is required} However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches of high mesh density.
 
 \begin{figure}[H]
 \centering
@@ -146,6 +158,7 @@ The subset layout is $[M(N+1)+1] \times [M(N+1)+1]$, but only $MN^2$ subset have
 f= \frac{\left( M(N+1)+1 \right)^2}{MN^2} \xrightarrow{N\to \infty} \frac{M^2N^2}{MN^2} = M.
 \end{equation}
 
+\jcr{you also definitely need sub headers to sort and organize this}
 An improved load balancing algorithm was implemented that significantly improved our metric. Rather than load balancing both dimensions within an iteration, one dimension is balanced first for all iterations, and then the cut lines that yielded the best metric for that dimension are chosen. Then the next dimension is balanced within the first dimension. For example, if the $x$ cut lines are balanced first, the $y$ cut lines would be balanced \textit{within} each column. When full 3D load balancing by dimension, shown in Fig. \ref{lbd}, excellent metrics within 5\% of unity are consistently obtained.
 
 \begin{figure}[H]
@@ -157,12 +170,14 @@ An improved load balancing algorithm was implemented that significantly improved
 
 The full paper will be showing scaling results obtained using load balanced meshes.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{CONCLUSIONS AND FUTURE WORK}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-While we obtain excellent imbalance factors utilizing the load balance by dimension algorithm (particularly for 3D cases), further study shows the possibility that the most efficient partitioning scheme is not being used. 
-While perfect load balance was the initial goal, we need to know how this affects the efficiency of our parallel transport sweep. Figures \ref{regular_partition}-\ref{worst_partition} showcase the theoretical effect of perfect load balance on the transport sweep.
+While we obtain excellent imbalance factors utilizing the load balance by dimension algorithm (particularly for 3D cases) \jcr{where's the data?????}, further study shows the possibility that the most efficient partitioning scheme is not being used. 
+While perfect load balance was the initial goal, we need to know how this affects the efficiency of our parallel transport sweep. Figures~\ref{regular_partition}-\ref{worst_partition} showcase the theoretical effect of perfect load balance on the transport sweep.
 
-Figure \ref{regular_partition} shows a sweep domain with a regular partition with perfect balance (equivalent number of cells per processor). The sweep maintains a mostly regular wavelike structure as each angle sweeps through the domain, and this sweep completes in 40 stages. This is the ideal partitioning for the transport sweep, but often hard to achieve with unstructured meshes \textbf{and} perfect balance.
+Figure~\ref{regular_partition} shows a sweep domain with a regular partition with perfect balance (equivalent number of cells per processor). The sweep maintains a mostly regular wavelike structure as each angle sweeps through the domain, and this sweep completes in 40 stages. This is the ideal partitioning for the transport sweep, but often hard to achieve with unstructured meshes \textbf{and} perfect balance.
 
 \begin{figure}[H]
   \centering
@@ -228,6 +243,7 @@ Future studies and research will attempt to find an optimal partitioning scheme 
 % You can enter a bibliography into the document using the following format, or use the 
 % bibliography style file "mandc.bst" found in the template directory.  You can use the bibliography style file
 % by replacing the current bibliography block with:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  \setlength{\baselineskip}{12pt}
  \bibliographystyle{mandc}
  \bibliography{mandc}
