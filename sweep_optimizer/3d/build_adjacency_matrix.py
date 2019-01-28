@@ -1,6 +1,8 @@
 import numpy as np
+import networkx as nx
 import matplotlib.pyplot as plt
 import warnings
+from flip_adjacency_2d import flip_adjacency
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 #This builds the adjacency matrix for all subsets. ycuts are stored by column. 
@@ -69,41 +71,6 @@ def build_adjacency(global_bounds,n_x, n_y, ycuts):
     
     adjacency_list.append(neighbors)        
 
-
-#  plt.figure(1)
-#  subset_centers = []
-#  for i in range(0,num_subsets):
-#    subset_boundary = global_bounds[i]
-#    xmin = subset_boundary[0]
-#    xmax = subset_boundary[1]
-#    ymin = subset_boundary[2]
-#    ymax = subset_boundary[3]
-#  
-#    center_x = (xmin+xmax)/2
-#    center_y = (ymin+ymax)/2
-#  
-#    subset_centers.append([center_x, center_y])
-#  
-#    x = [xmin, xmax, xmax, xmin, xmin]
-#    y = [ymin, ymin, ymax, ymax, ymin]
-#  
-#    plt.plot(x,y,'b')
-#  
-#  
-#  for i in range (0, num_subsets):
-#  
-#    neighbors = adjacency_list[i]
-#  
-#    for j in range(0, len(neighbors)):
-#      n = neighbors[j]
-#  
-#      x = [subset_centers[i][0], subset_centers[n][0]]
-#      y = [subset_centers[i][1], subset_centers[n][1]]
-#      plt.plot(x,y,'r-o')
-#  
-#  plt.savefig('adjacency_matrix.pdf')
-
-
   #The adjacency matrix in matrix form instead of in sparse list form.
   adjacency_matrix = np.zeros((num_subsets,num_subsets))
   
@@ -116,3 +83,46 @@ def build_adjacency(global_bounds,n_x, n_y, ycuts):
   
   return adjacency_matrix
 
+def build_graphs(adjacency_matrix,num_row,num_col):
+
+  #Getting the upper triangular portion of the adjacency_matrix
+  adjacency_matrix_0 = np.triu(adjacency_matrix)
+  #Time to build the graph
+  G = nx.DiGraph(adjacency_matrix_0)
+  #Adding the -1 node.
+  end_node = [x for x in G.nodes() if G.out_degree(x) == 0][0]
+  G.add_node(-1)
+  G.add_edge(end_node,-1)
+  
+  #Test what lower triangular looks like
+  adjacency_matrix_3 = np.tril(adjacency_matrix)
+  G3 = nx.DiGraph(adjacency_matrix_3)
+   #Adding the -1 node.
+  end_node = [x for x in G3.nodes() if G3.out_degree(x) == 0][0]
+  G3.add_node(-1)
+  G3.add_edge(end_node,-1)
+  
+  
+  #To get the top left and bottom right quadrants, we have to reverse our ordering by column.
+  adjacency_flip,id_map = flip_adjacency(adjacency_matrix,num_row,num_col)
+  adjacency_matrix_1 = np.triu(adjacency_flip)
+  
+  G1 = nx.DiGraph(adjacency_matrix_1)
+  G1 = nx.relabel_nodes(G1,id_map,copy=True)
+   #Adding the -1 node.
+  end_node = [x for x in G1.nodes() if G1.out_degree(x) == 0][0]
+  G1.add_node(-1)
+  G1.add_edge(end_node,-1)
+  
+  #Bottom right quadrant.
+  adjacency_matrix_2 = np.tril(adjacency_flip)
+  G2 = nx.DiGraph(adjacency_matrix_2)
+  G2 = nx.relabel_nodes(G2,id_map,copy=True)
+   #Adding the -1 node.
+  end_node = [x for x in G2.nodes() if G2.out_degree(x) == 0][0]
+  G2.add_node(-1)
+  G2.add_edge(end_node,-1)
+  
+  graphs = [G,G1,G2,G3]
+
+  return graphs
