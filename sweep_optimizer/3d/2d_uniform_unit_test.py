@@ -4,7 +4,6 @@ from sweep_solver import add_edge_cost
 from sweep_solver import add_conflict_weights
 from sweep_solver import compute_solve_time
 from sweep_solver import print_simple_paths
-from sweep_solver import convert_generator
 from build_adjacency_matrix import build_adjacency
 from flip_adjacency_2d import flip_adjacency
 from sweep_solver import get_heaviest_path

@@ -563,7 +563,7 @@ In order to optimize the location of the cut lines based on balance and sweep ef
 \begin{figure}[H]
 \centering
 \includegraphics{../figures/digraph.pdf}
-\caption{The task dependence graph for the front bottom octant in Fig. \ref{subset_plot}.}
+\caption{The task dependence graph for the front bottom octant in Fig. \ref{subset_plot} with weights assigned.}
 \label{digraph}
 \end{figure}
 
@@ -657,11 +657,12 @@ Once the heaviest paths of each TDG are weighted appropriately with conflicts ta
 \begin{itemize}
 \item Devise and implement a load balancing by dimension algorithm in PDT (Section \ref{lbd_section}).
 \item Devise and implement a time-to-solution estimator that returns the maximum time to solution for a given partitioning scheme (Section \ref{TOS}).
-\item Test and verify the time-to-solution estimator against the existing PDT scheduler for structured grids.
-\begin{itemize}
-\item The PDT scheduler will not utilize any aggregation parameters in order to remain consistent with the proposed time-to-solution estimator.
-\end{itemize}
-\item Use the time-to-solution estimator to optimize cut line locations to get the best partitioning scheme (Section \ref{optimize}). 
+\item Verify time-to-solution estimator matches PDT's sweep time with equivalent aggregation parameters and scheduling.
+\item Use time-to-solution estimator to optimize cut line locations by using it as a cost function in a Python optimization library (scipy.minimize, scipy.optimize, etc.). 
+\item Build test problems, in 2D and 3D, that balance approximately perfectly via both load balancing algorithms.
+\item Using these test problems, show that optimizing partitions with the proposed approach yields a better runtime.
+\item Implement these tests in PDT and show that the optimized partitions yield a better runtime than perfectly load balanced problems.
+\item Explore adding the threads per processor as a variable to our parameter space during optimization in addition to cut lines.
 \end{itemize}
 
 

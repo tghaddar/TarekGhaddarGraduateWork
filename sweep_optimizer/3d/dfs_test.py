@@ -114,10 +114,10 @@ graphs = make_edges_universal(graphs)
 
 G = graphs[0]
 
-plt.figure("Graph 0 Post Universal Time")
-edge_labels_1 = nx.get_edge_attributes(G,'weight')
-nx.draw(G,nx.shell_layout(G),with_labels = True)
-nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
+#plt.figure("Graph 0 Post Universal Time")
+#edge_labels_1 = nx.get_edge_attributes(G,'weight')
+#nx.draw(G,nx.shell_layout(G),with_labels = True)
+#nx.draw_networkx_edge_labels(G,nx.shell_layout(G),edge_labels=edge_labels_1)
 
 plt.figure("Graph 1 Post Universal Time")
 edge_labels_1 = nx.get_edge_attributes(G1,'weight')
@@ -142,3 +142,10 @@ nx.draw(G2,nx.shell_layout(G2),with_labels = True)
 nx.draw_networkx_edge_labels(G2,nx.shell_layout(G2),edge_labels=edge_labels_1)
 
 graphs = add_conflict_weights(graphs,time_to_solve)
+
+plt.figure("G Post Conflict")
+G = graphs[0]
+edge_labels_1 = nx.get_edge_attributes(G,'weight')
+nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
+nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
+plt.savefig("digraph.pdf")
