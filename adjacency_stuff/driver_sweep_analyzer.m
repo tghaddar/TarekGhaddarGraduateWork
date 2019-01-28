@@ -11,7 +11,7 @@ inp.save_ID = 0;
 inp.conflict_option = 'dog';
 
 % list of parameters that vary
-testname = 'jcr_v6a';
+testname = 'jcr_v1';
 switch testname
     case 'jcr_v1'
         cutx = [3 5 10 20 50];
