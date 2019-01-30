@@ -6,6 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from copy import copy
 from utilities import get_ijk
 from math import isclose
+from matplotlib.pyplot import imshow,pause
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 #This function computes the solve time for a sweep for each octant. 
@@ -533,7 +534,6 @@ def match_delay_weights(graph):
         else:
           graph[node1][node2]['weight'] = max_weight
       
- 
   return graph   
   
 #Calculates the delay that is incurred to a secondary graph by the winning graph at the node.
@@ -594,7 +594,7 @@ def add_conflict_weights(graphs,time_to_solve):
     
     print("The graphs in conflict for each node")
     print(conflicting_nodes)
-    
+    print("here")
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
       t = find_next_interaction(graphs,t,time_to_solve)
@@ -609,7 +609,31 @@ def add_conflict_weights(graphs,time_to_solve):
       #To update our march through, we need to update t here, with a find_next_interaction.
       if (num_conflicting_nodes == 1):
         t = find_next_interaction(graphs,t,time_to_solve)
-      
+    
+    plt.close("all")
+    G,G1,G2,G3 = graphs
+    plt.figure("G")
+    edge_labels_1 = nx.get_edge_attributes(G,'weight')
+    nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
+    nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
+    
+    plt.figure("G1")
+    edge_labels_1 = nx.get_edge_attributes(G1,'weight')
+    nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
+    nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
+    
+    plt.figure("G2")
+    edge_labels_1 = nx.get_edge_attributes(G2,'weight')
+    nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
+    nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
+    
+    plt.figure("G3")
+    edge_labels_1 = nx.get_edge_attributes(G3,'weight')
+    nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
+    nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
+    
+    pause(1)
+    print("here")
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
       if finished_graphs[g]:
