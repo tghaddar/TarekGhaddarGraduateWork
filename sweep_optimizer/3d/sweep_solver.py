@@ -540,36 +540,42 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
                 #Adding this edge to the modified edges.
                 modified_edges[second_graph].append(edge)
 
-      #Make sure all incoming edges to all nodes match up.
-      secondary_graph = match_delay_weights(secondary_graph)
+
       
       graphs[second_graph] = secondary_graph
     
-    plt.close("all")
-    G,G1,G2,G3 = graphs
-    plt.figure("G")
-    edge_labels_1 = nx.get_edge_attributes(G,'weight')
-    nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
     
-    plt.figure("G1")
-    edge_labels_1 = nx.get_edge_attributes(G1,'weight')
-    nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
     
-    plt.figure("G2")
-    edge_labels_1 = nx.get_edge_attributes(G2,'weight')
-    nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
     
-    plt.figure("G3")
-    edge_labels_1 = nx.get_edge_attributes(G3,'weight')
-    nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
-    
-    pause(1)
-    print("here")
-    
+#    plt.close("all")
+#    G,G1,G2,G3 = graphs
+#    plt.figure("G")
+#    edge_labels_1 = nx.get_edge_attributes(G,'weight')
+#    nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
+#    
+#    plt.figure("G1")
+#    edge_labels_1 = nx.get_edge_attributes(G1,'weight')
+#    nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
+#    
+#    plt.figure("G2")
+#    edge_labels_1 = nx.get_edge_attributes(G2,'weight')
+#    nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
+#    
+#    plt.figure("G3")
+#    edge_labels_1 = nx.get_edge_attributes(G3,'weight')
+#    nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
+#    
+#    pause(1)
+#    print("here")
+  
+  #Make sure all incoming edges to all nodes match up. We do this later in the multi-node case because this all occurs within one time iteration.
+  for g in range(0,num_graphs):
+    graphs[g] = match_delay_weights(graphs[g])
+  
   return graphs
 
 #Modifies the weights of the secondary conflicting graphs at a particular node.
@@ -740,30 +746,30 @@ def add_conflict_weights(graphs,time_to_solve):
         if (num_conflicting_nodes == 1):
           t = find_next_interaction(graphs,t,time_to_solve)
     
-    plt.close("all")
-    G,G1,G2,G3 = graphs
-    plt.figure("G")
-    edge_labels_1 = nx.get_edge_attributes(G,'weight')
-    nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
-    
-    plt.figure("G1")
-    edge_labels_1 = nx.get_edge_attributes(G1,'weight')
-    nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
-    
-    plt.figure("G2")
-    edge_labels_1 = nx.get_edge_attributes(G2,'weight')
-    nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
-    
-    plt.figure("G3")
-    edge_labels_1 = nx.get_edge_attributes(G3,'weight')
-    nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
-    
-    pause(1)
-    print("here")
+#    plt.close("all")
+#    G,G1,G2,G3 = graphs
+#    plt.figure("G")
+#    edge_labels_1 = nx.get_edge_attributes(G,'weight')
+#    nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
+#    
+#    plt.figure("G1")
+#    edge_labels_1 = nx.get_edge_attributes(G1,'weight')
+#    nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
+#    
+#    plt.figure("G2")
+#    edge_labels_1 = nx.get_edge_attributes(G2,'weight')
+#    nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
+#    
+#    plt.figure("G3")
+#    edge_labels_1 = nx.get_edge_attributes(G3,'weight')
+#    nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
+#    
+#    pause(1)
+#    print("here")
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
       if finished_graphs[g]:
