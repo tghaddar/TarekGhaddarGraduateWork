@@ -490,16 +490,22 @@ def modify_secondary_graphs(graphs,conflicting_graphs,node,time_to_solve_node):
         secondary_graph[node1][node2]['weight'] += delay
       #All paths from the node in conflict until the end of the graph.
       secondary_paths = nx.all_simple_paths(secondary_graph,node,-1)
-      
+      #A list of edges that have already been modified.
+      modified_edges = []
       #Looping over all of downstream secondary paths.
       for path in secondary_paths:
-        
         len_path = len(path)-1
         for n in range(0,len_path):
           node1 = path[n]
           node2 = path[n+1]
-          #Adding the delay 
-          secondary_graph[node1][node2]['weight'] += delay
+          #The edge.
+          edge = (node1,node2)
+          #Checking if this edge has already been modified. If it has, we DO NOT need to modify it again.
+          if (edge not in modified_edges):
+            #Adding the delay. 
+            secondary_graph[node1][node2]['weight'] += delay
+            #Adding this edge to the modified edges.
+            modified_edges.append(edge)
       
       #Make sure all incoming edges to all nodes match up.
       secondary_graph = match_delay_weights(secondary_graph)
