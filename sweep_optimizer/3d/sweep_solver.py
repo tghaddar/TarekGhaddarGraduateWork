@@ -4,6 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from copy import copy
+from copy import deepcopy
 from utilities import get_ijk
 from math import isclose
 from matplotlib.pyplot import imshow,pause
@@ -361,7 +362,8 @@ def find_conflicts(nodes):
 #Finds the first conflict in a group of conflicting nodes. This will affect downstream nodes.
 def find_first_conflict(conflicting_nodes,graphs):
   
-  first_node = -1
+  #A list to store the nodes that are ready to solve at the exact same time.
+  first_nodes = []
   min_ready_to_solve = float("inf")
   for n in conflicting_nodes:
     #Which graphs are conflicting on this node.
@@ -375,14 +377,33 @@ def find_first_conflict(conflicting_nodes,graphs):
       #If there are no inbound edges to the node, it means that it is the initial node in the graph. This means that it must be the first conflict.
       if not in_edges_n:
         first_node = n
-        return first_node
+        first_nodes.append(first_node)
+        return first_nodes
       else:
         ready_to_solve = in_edges_n[0][2]
         if ready_to_solve < min_ready_to_solve:
           min_ready_to_solve = ready_to_solve
-          first_node = n
-          
-  return first_node
+  
+  #Now that we have the minimum solve time, we can get all the nodes ready at this time.
+  
+  for n in conflicting_nodes:
+    #Which graphs are conflicting on this node.
+    conflicting_graphs = conflicting_nodes[n]
+    num_conflicting_graphs = len(conflicting_graphs)
+    #Looping through the conflicting graphs.
+    for g in range(0,num_conflicting_graphs):
+      graph = graphs[conflicting_graphs[g]]
+      #Getting the inbound edges to our node.
+      in_edges_n = list(graph.in_edges(n,'weight'))
+      
+      #Checking what time this node is ready to solve at.
+      ready_to_solve = in_edges_n[0][2]
+      #If this is ready to solve at the minimum ready to solve time, it belongs in first_nodes.
+      if ready_to_solve == min_ready_to_solve:
+        first_nodes.append(n)
+        break
+  
+  return first_nodes
 
 #Finds the first graph to get to a conflicted node. In case they arrive at the same time, we return the graph that has a greater depth of graph remaining. In case of a tie with the DOG remaining, we return the graph that has the priority octant.
 def find_first_graph(conflicting_graphs,graphs,node):
@@ -460,7 +481,96 @@ def find_first_graph(conflicting_graphs,graphs,node):
     min_time_to_node_index = graph_times.index(min(graph_times))
     first_graph = graph_indices[min_time_to_node_index]
       
-  return first_graph          
+  return first_graph
+
+#This function does the same thing as modify_secondary_graphs but in the case that multiple nodes are ready to solve at time t.
+def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_solve):
+  
+  #Get the graphs frozen at time t.
+  frozen_graphs = deepcopy(graphs)
+  num_graphs = len(graphs)
+  #Storing modified edges per graph at time t. Initializing with a dummy edge.
+  modified_edges = {k: [] for k in range(num_graphs)}
+  #We loop over all nodes ready to solve at time t.
+  for node in nodes:
+    #The time to solve this node.
+    time_to_solve_node = time_to_solve[node]
+    #We get the graphs in conflict at this node.
+    conflicting_graphs = conflicting_nodes[node]
+    num_conflicting_graphs = len(conflicting_graphs)
+    for outer in range(0,num_conflicting_graphs-1):
+      #The fastest graph to the node.
+      first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node)
+      print("Conflicted Node: ", node)
+      print("First graph: ", first_graph)
+      #Removed from conflicting graphs.
+      conflicting_graphs.remove(first_graph) 
+      #Loop over the secondary graphs.
+      for g in range(0,len(conflicting_graphs)):
+        second_graph = conflicting_graphs[g]
+        #The delay the second_graph will incur.
+        delay = calculate_delay(first_graph,second_graph,frozen_graphs,node,time_to_solve_node)
+        secondary_graph = graphs[second_graph]
+        #We need to first add the delay to the preceding edges, in order to update the time this node is ready to solve at.
+        edges = list(secondary_graph.in_edges(node))
+        num_edges = len(edges)
+        for e in range(0,num_edges):
+          node1,node2 = edges[e]
+          secondary_graph[node1][node2]['weight'] += delay
+        
+        #All paths from the node in conflict until the end of the graph.
+        secondary_paths = nx.all_simple_paths(secondary_graph,node,-1)
+        #Looping over all of downstream secondary paths.
+        for path in secondary_paths:
+          len_path = len(path)-1
+          for n in range(0,len_path):
+            node1 = path[n]
+            node2 = path[n+1]
+            #The edge.
+            edge = (node1,node2)
+            #Checking if this edge has already been modified. If it has, we DO NOT need to modify it again.
+            if not modified_edges[second_graph]:
+              #Adding the delay. 
+              secondary_graph[node1][node2]['weight'] += delay
+              #Adding this edge to the modified edges.
+              modified_edges[second_graph].append(edge)
+            elif(edge not in modified_edges[second_graph]):
+                #Adding the delay. 
+                secondary_graph[node1][node2]['weight'] += delay
+                #Adding this edge to the modified edges.
+                modified_edges[second_graph].append(edge)
+
+      #Make sure all incoming edges to all nodes match up.
+      secondary_graph = match_delay_weights(secondary_graph)
+      
+      graphs[second_graph] = secondary_graph
+    
+    plt.close("all")
+    G,G1,G2,G3 = graphs
+    plt.figure("G")
+    edge_labels_1 = nx.get_edge_attributes(G,'weight')
+    nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
+    nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
+    
+    plt.figure("G1")
+    edge_labels_1 = nx.get_edge_attributes(G1,'weight')
+    nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
+    nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
+    
+    plt.figure("G2")
+    edge_labels_1 = nx.get_edge_attributes(G2,'weight')
+    nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
+    nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
+    
+    plt.figure("G3")
+    edge_labels_1 = nx.get_edge_attributes(G3,'weight')
+    nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
+    nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
+    
+    pause(1)
+    print("here")
+    
+  return graphs
 
 #Modifies the weights of the secondary conflicting graphs at a particular node.
 def modify_secondary_graphs(graphs,conflicting_graphs,node,time_to_solve_node):
@@ -606,15 +716,29 @@ def add_conflict_weights(graphs,time_to_solve):
       t = find_next_interaction(graphs,t,time_to_solve)
     #Otherwise, we address the conflicts between nodes across all graphs.
     else:
-      #Find first conflict.
-      first_node = find_first_conflict(conflicting_nodes,graphs)
-      #The conflicting grpahs at this node.
-      conflicting_graphs = conflicting_nodes[first_node]
-      #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
-      graphs = modify_secondary_graphs(graphs,conflicting_graphs,first_node,time_to_solve[first_node])
-      #To update our march through, we need to update t here, with a find_next_interaction.
-      if (num_conflicting_nodes == 1):
-        t = find_next_interaction(graphs,t,time_to_solve)
+      #Find nodes ready to solve at time t that are in conflict.
+      first_nodes = find_first_conflict(conflicting_nodes,graphs)
+      print(first_nodes)
+      num_nodes_ready_to_solve = len(first_nodes)
+      if (num_nodes_ready_to_solve == 1):
+        first_node = first_nodes[0]
+        #The conflicting grpahs at this node.
+        conflicting_graphs = conflicting_nodes[first_node]
+        #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
+        graphs = modify_secondary_graphs(graphs,conflicting_graphs,first_node,time_to_solve[first_node])
+        #To update our march through, we need to update t here, with a find_next_interaction.
+        if (num_conflicting_nodes == 1):
+          t = find_next_interaction(graphs,t,time_to_solve)
+      
+      else:
+        if (t == 3):
+          print("stop for debug")
+        #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
+        graphs = modify_secondary_graphs_mult_node(graphs,conflicting_nodes,first_nodes,time_to_solve)
+        
+        #To update our march through, we need to update t here, with a find_next_interaction.
+        if (num_conflicting_nodes == 1):
+          t = find_next_interaction(graphs,t,time_to_solve)
     
     plt.close("all")
     G,G1,G2,G3 = graphs
