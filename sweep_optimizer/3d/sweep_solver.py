@@ -501,8 +501,6 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
     for outer in range(0,num_conflicting_graphs-1):
       #The fastest graph to the node.
       first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node)
-      print("Conflicted Node: ", node)
-      print("First graph: ", first_graph)
       #Removed from conflicting graphs.
       conflicting_graphs.remove(first_graph) 
       #Loop over the secondary graphs.
