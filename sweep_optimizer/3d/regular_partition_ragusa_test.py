@@ -10,7 +10,7 @@ plt.close("all")
 numrow = 4
 numcol = 4
 
-adjacency_matrix = np.genfromtxt('matrices.csv',delimiter=",")
+adjacency_matrix = np.genfromtxt('matrices_3_mild_random.csv',delimiter=",")
 
 graphs = build_graphs(adjacency_matrix,numrow,numcol)
 num_graphs = len(graphs)
@@ -21,6 +21,7 @@ for g in range(0,num_graphs):
   graph.add_weighted_edges_from((u,v,1) for u,v in graph.edges())
 
 G,G1,G2,G3 = graphs
+print("here")
 
 graphs = make_edges_universal(graphs)
 
@@ -45,7 +46,7 @@ graphs = make_edges_universal(graphs)
 #nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
 
 #A list that stores the time to solve each node.
-time_to_solve = [1]*16
+time_to_solve = [1]*numrow*numcol
 graphs = add_conflict_weights(graphs,time_to_solve)
 
 plt.figure("G")
