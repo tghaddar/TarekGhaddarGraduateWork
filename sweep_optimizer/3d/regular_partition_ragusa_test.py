@@ -7,13 +7,16 @@ import matplotlib.pyplot as plt
 
 plt.close("all")
 
-numrow = 4
-numcol = 4
+numrow = 2
+numcol = 2
 
-adjacency_matrix = np.genfromtxt('matrices_3_mild_random.csv',delimiter=",")
+adjacency_matrix = np.genfromtxt('matrices_1_mild_random.csv',delimiter=",")
+
 
 graphs = build_graphs(adjacency_matrix,numrow,numcol)
 num_graphs = len(graphs)
+
+print(graphs[0].edges())
 
 #Adding the uniform edge labels.
 for g in range(0,num_graphs):
@@ -27,8 +30,8 @@ graphs = make_edges_universal(graphs)
 
 #plt.figure("G")
 #edge_labels_1 = nx.get_edge_attributes(G,'weight')
-#nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
-#nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
+#nx.draw(G,nx.spectral_layout(G),with_labels = True)
+#nx.draw_networkx_edge_labels(G,nx.spectral_layout(G),edge_labels=edge_labels_1)
 #
 #plt.figure("G1")
 #edge_labels_1 = nx.get_edge_attributes(G1,'weight')
@@ -47,12 +50,13 @@ graphs = make_edges_universal(graphs)
 
 #A list that stores the time to solve each node.
 time_to_solve = [1]*numrow*numcol
+
 graphs = add_conflict_weights(graphs,time_to_solve)
 
 plt.figure("G")
 edge_labels_1 = nx.get_edge_attributes(G,'weight')
-nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
-nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
+nx.draw(G,nx.spectral_layout(G),with_labels = True)
+nx.draw_networkx_edge_labels(G,nx.spectral_layout(G),edge_labels=edge_labels_1)
 
 plt.figure("G1")
 edge_labels_1 = nx.get_edge_attributes(G1,'weight')
@@ -66,5 +70,5 @@ nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels
 
 plt.figure("G3")
 edge_labels_1 = nx.get_edge_attributes(G3,'weight')
-nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
-nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
+nx.draw(G3,nx.spectral_layout(G3),with_labels = True)
+nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3),edge_labels=edge_labels_1)
