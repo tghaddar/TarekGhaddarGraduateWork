@@ -43,5 +43,12 @@ plt.arrow(0.9,0.9+6.67,1.5,1.5,width=0.1,color='g')
 plt.arrow(0.9+3.33,3.33+0.9,1.5,1.5,width=0.1,color='g')
 plt.arrow(0.9+6.67,0.9,1.5,1.5,width=0.1,color='g')
 
+plt.text(1.5,1,"Angle 3")
+plt.text(1.5+3.33,1,"Angle 2")
+plt.text(1.5+6.67,1,"Angle 1")
+plt.text(1.5,1+3.33,"Angle 2")
+plt.text(1.5,1+6.67,"Angle 1")
+plt.text(1.5+3.33,1+3.33,"Angle 1")
+
 plt.axis('off')
 plt.savefig("../figures/pipeline_example.pdf",bbox_inches='tight')
