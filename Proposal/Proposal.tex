@@ -222,10 +222,9 @@ Before expanding on the proposed method of partitioning and scheduling for paral
 
 Several parallel transport sweep codes use KBA partitioning in their sweeping, such as Denovo \cite{denovo} and PARTISN \cite{partisn}. The KBA partitioning scheme and algorithm was developed by Koch, Baker, and Alcouffe \cite{partisn}.
 
-The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. There are two variants to the KBA algorithm, "successive in angle successive in quadrant", and "simultaneous in angle, successive in quadrant". 
+The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. In order to combat inefficiencies, KBA uses a "pipelining" or assembly line approach where new work is started before old work is fully completed. In other words, rather than a processor wait until all There are two variants to the KBA algorithm, "successive in angle successive in quadrant", and "simultaneous in angle, successive in quadrant".  KBA i
 
-In the first variant, "successive in angle, successive in quadrant", we 
-An angular quadrant consists of two opposing octants (also referred to as an octant-pair\ref{mpadams2013}) that have opposite sweep ordering. 
+An angular quadrant consists of two opposing octants (also referred to as an octant-pair\cite{mpadams2013}) that have opposite sweep ordering. 
 
 
 With the KBA algorithm, $2MN_k$ tasks are pipelined from a given corner of the 2D processor layout. The far corner processor remains idle for the first $P_x + P_y - 2 $ stages, which means that an octant-pair (or quadrant) sweep completes in $2MN_k + P_x + P_y - 2$ stages. If an octant-pair sweep does not begin until the previous pair's finishes, the full sweep requires $8MN_k + 4(P_x+P_y-2)$ stages, which means the KBA parallel efficiency is:
