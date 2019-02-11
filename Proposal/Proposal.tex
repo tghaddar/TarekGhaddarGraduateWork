@@ -211,10 +211,10 @@ T_{\text{comm}} = M_L T_{\text{latency}} + T_{\text{byte}} N_{\text{bytes}}
 \label{Tcomm}
 \end{equation}
 \begin{equation}
-T_{\text{task}} = A_x A_y A_z A_m A_g T_{\text{grind}},
+T_{\text{task}} = cA_x A_y A_z A_m A_g T_{\text{grind}},
 \label{Ttask}
 \end{equation}
-where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. If a high value of $M_L$ is necessary for the model to match computational results, improvements should be made in code implementation.
+where $c$ is an overhead constant, $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. If a high value of $M_L$ is necessary for the model to match computational results, improvements should be made in code implementation.
 
 Before expanding on the proposed method of partitioning and scheduling for parallel transport sweeps, a quick review of transport sweep algorithms is necessary. Our method will expand on PDT's sweep algorithm\cite{mpadams2013}, which is an extension of the popular KBA algorithm\cite{KBA}.
 
@@ -231,13 +231,32 @@ The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_
 \label{pipeline_example}
 \end{figure}
 
-In Fig. \ref{pipeline_example}, we see that as soon as soon as a processor is free to solve the next angle with the same sweep ordering, it begins immediately. KBA introduced pipelining in order to combat the inherent inefficiencies of waiting for all processors to complete a sweep in a direction before starting the next one. 
+In Fig. \ref{pipeline_example}, we see that as soon as soon as a processor is free to solve the next angle with the same sweep ordering, it begins immediately. KBA introduced pipelining in order to combat the inherent inefficiencies of waiting for all processors to complete a sweep in a direction before starting the next angle. 
 
-There are two variants to the KBA algorithm, ``successive in angle, successive in quadrant", and ``simultaneous in angle, successive in quadrant".  With "successive in angle, successive in quadrant", an octant pipelines it's angular work, and once all directions are complete the opposing octant pipelines them back. This is then done for the remaining octant pairs. With "simultaneous in angle, successive in quadrant", all angles from one octant are simultaneously solved, and upon completion the opposing octant solves them. This is then done for the remaining octant pairs.
+There are two variants to the KBA algorithm, ``successive in angle, successive in quadrant", and ``simultaneous in angle, successive in quadrant".  With "successive in angle, successive in quadrant", an octant pipelines it's angular work, and once all directions are complete the opposing octant pipelines them back. This is then done for the remaining octant pairs. With "simultaneous in angle, successive in quadrant", all angles from one octant are simultaneously solved, and upon completion the opposing octant solves them. This is then done for the remaining octant pairs. The KBA parallel efficiency\cite{mpadams2013} is:
+\begin{equation}
+  \epsilon_{KBA} \approx \frac{1}{[1 + \frac{4(P_x+P_y-2)}{8MN_k}][1 + \frac{T_{\text{comm}}}{T_{\text{{task}}}}]}.
+\end{equation}
 
 \subsection{PDT's extension of KBA}
 
 PDT's extension of KBA does not limit $P_z, A_m, G,$ or $A_g$. In addition, all 8 octants (4 quadrants in 2D) begin work immediately. Unlike KBA, PDT's scheduling requires conflict resolution in its algorithm, as the pipelines from all octants will end up intersecting toward the middle of the processor domain.
+
+If two or more tasks reach a processor at the same time, PDT employs a tie breaking strategy:
+
+\begin{enumerate}
+	\item The task with the greater depth-of-graph remaining (simply, more work remaining) goes first.
+	\item If the depth-of-graph remaining is tied, the task with $\Omega_x > 0$ wins.
+	\item If multiple tasks have $\Omega_x > 0$, then the task with $\Omega_y > 0$ wins.
+	\item If multiple tasks have $\Omega_y > 0$, then the task with $\Omega_z > 0$ wins.
+\end{enumerate}
+
+The PDT optimal parallel efficiency\cite{mpadams2013} is:
+\begin{equation}
+	\epsilon \approx \frac{1}{ [1 + \frac{P_x + P_y - 4 + N_k(P_z -2}{8MGN_k/(A_m A_G} ]  [ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}} ]}
+\end{equation}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Extension of Parallel Transport by Pautz and Bailey}
@@ -254,7 +273,7 @@ Pautz and Bailey\cite{PautzBailey} extended the work of Adams et al with overloa
 
 \section{Review of Unstructured Meshing in PDT}
 
-The capability for PDT to generate and run on an unstructured mesh is important because it allows us to run problems without having to conform our mesh to the problem. The idea is to have a logically Cartesian grid (creating orthogonal ``subsets") with an unstructured mesh inside each subset. These logically Cartesian subdomains are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator. 
+The capability for PDT to generate and run on an unstructured mesh is important because it allows us to run problems without having to conform our mesh to the problem. The idea is to have a logically Cartesian partition (creating orthogonal ``subsets") with an unstructured mesh inside each subset. These logically Cartesian subdomains are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -264,7 +283,7 @@ The capability for PDT to generate and run on an unstructured mesh is important 
 \label{grid}
 \end{minipage}
 
-This orthogonal grid is superimposed and each subset is meshed in parallel.  Subsets are now the base structured unit when calculating our parallel efficiency. Discontinuities along the boundary are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, there is no problem solving on degenerate polygons. 
+This orthogonal partition is superimposed and each subset is meshed in parallel.  Subsets are now the base structured unit when calculating our parallel efficiency. Discontinuities along the boundary are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, there is no problem solving on degenerate polygons. 
 
 \subsection{Triangular Meshes in PDT}
 
