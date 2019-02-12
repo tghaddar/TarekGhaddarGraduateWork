@@ -341,17 +341,27 @@ The initial approach to load balancing was implemented on 2D extruded meshes. Th
 \begin{algorithmic}
 
 \WHILE{$f > \text{tol}_{\text{subset}}$}
-  \IF {$f_I > \text{tol}_{\text{row}}$}
+  \IF {$f_I > \text{tol}_{\text{col}}$}
     \STATE Redistribute the X cut lines.
   \ENDIF
-  \IF {$f_J > \text{tol}_{\text{col}}$}
+  \IF {$f_J > \text{tol}_{\text{row}}$}
   	\STATE Redistribute the Y cut lines.
   \ENDIF
 \ENDWHILE
 \end{algorithmic}
 \end{algorithm}
 
-While the problem is not balanced, we check if the cells per row and cells per column metrics, $f_I$ and $f_J$, are balanced. If they are not, we redistribute the cut lines. 
+While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$, are balanced. If they are not, we redistribute the cut lines. Figure \ref{redistribute} helps illustrate the criteria used to balance the cells per column. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{../figures/redistribute_before.pdf}
+\includegraphics[scale=0.5]{../figures/redistribute_after.pdf}
+\caption{The use of the CDF of triangles per column to redistribute the cut lines in X.}
+\label{redistribute}
+\end{figure}
+
+The image on the left side of Fig. \ref{redistribute} shows the CDF of the triangles per column. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut lines are redistributed to. 
 
 \subsection{Load Balancing by Dimension} \label{lbd_section}
 
