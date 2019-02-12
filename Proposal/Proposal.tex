@@ -312,7 +312,7 @@ However, the 3D meshes do pose a challenge. When aggregating angles during the s
 
 While both unstructured meshing approaches allowed PDT to run problems it was more difficult to run on before, it introduced the issue of unbalanced partitions. When creating the subsets with cut planes or cut lines, there is no guarantee that each subset will have an equivalent amount of cells. Over the last few years, two load balancing algorithms were introduced to combat this issue.
 
-\section{Issue and Approaches of Load Balancing on Unstructured Meshes}
+\section{Approaches to Load Balancing Unstructured Meshes}
 
 When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor, and is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to balance the number of cells. Ideally, each processor will be responsible for an equal number of cells. Two approaches to load balancing were explored in PDT, which we refer to as "load balancing" and "load balancing by dimension". 
 Both load balancing algorithms rely on the movements of cut planes in order to redistribute high mesh-density areas to multiple processors.
@@ -365,9 +365,23 @@ The image on the left side of Fig. \ref{redistribute} shows the CDF of the trian
 
 \subsection{Load Balancing by Dimension} \label{lbd_section}
 
-In previous work, load balancing proved to be successful, but not as successful as initially expected. It became clear that when creating an unstructured mesh in PDT, the iterative nature of our algorithm did not work as effectively when using the Triangle Mesh Generator. 
+An improved load balancing algorithm was implemented that significantly improved our metric. Rather than load balancing all dimensions within an iteration, one dimension is balanced first for all iterations, and then the cut planes that yielded the best metric for that dimension are chosen. Then the next dimension is balanced within the first dimension. For example, if the $x$ cut planes are balanced first, the $y$ cut planes would be balanced \textit{within} each column. When full 3D load balancing by dimension (shown in Fig. \ref{lbd}) is used via Rick Vega's code, excellent metrics (shown in Table \ref{lbd_f}) within 6\% of unity are consistently obtained.
 
-An improved load balancing algorithm was implemented that significantly improved our metric. Rather than load balancing both dimensions within an iteration, one dimension is balanced first for all iterations, and then the cut lines that yielded the best metric for that dimension are chosen. Then the next dimension is balanced within the first dimension. For example, if the $x$ cut lines are balanced first, the $y$ cut lines would be balanced \textit{within} each column. When full 3D load balancing by dimension (shown in Fig. \ref{lbd} is used via Rick Vega's code, excellent metrics within 5\% of unity are consistently obtained.
+\begin{table}[H]
+\centering
+\begin{tabular}{c c}
+   \textbf{Subsets} & \textbf{$f$} \\
+   \hline
+   8 & 1.008 \\
+  27 & 1.017 \\
+  64 & 1.028 \\
+ 125 & 1.022 \\
+ 216 & 1.057 \\
+\hline
+\end{tabular}
+\caption{The imbalance factor $f$ for the IM1C experiment for different numbers of subsets after load balancing by dimension.}
+\label{lbd_f}
+\end{table}
 
 \begin{figure}[H]
 \centering
@@ -376,14 +390,13 @@ An improved load balancing algorithm was implemented that significantly improved
 \label{lbd}
 \end{figure}
 
-Upon further study of the load balancing by dimension algorithm, it is clear the most efficient partitioning scheme is not being used. A cost function that takes into account the best partitioning scheme and best balance needs to be studied. The best balanced partition may not be the best partition for a parallel transport sweep.
+Even with excellent load balancing metrics with the load balancing by dimension algorithm, concern arose that the transport sweep would be impacted by not sweeping across regular partitions (cut planes going all the way across the domain rather than being split by dimension). 
 
+\section{Issues of Load Balancing Unstructured Meshes for Transport Sweeps}
 
-\section{Drawbacks of Load Balancing Unstructured Meshes for Transport Sweeps}
+While perfect load balance was the initial goal, we needed to know if this affected the efficiency of the parallel transport sweep. Figures \ref{regular_partition}-\ref{worst_partition} showcase the theoretical effect of ideal load balance on the transport sweep.
 
-While perfect load balance was the initial goal, we need to know how this affects the efficiency of our parallel transport sweep. Figures \ref{regular_partition}-\ref{worst_partition} showcase the theoretical effect of perfect load balance on the transport sweep.
-
-Figure \ref{regular_partition} shows a sweep domain with a regular partition with perfect balance (equivalent number of cells per processor). The sweep maintains a mostly regular wavelike structure as each angle sweeps through the domain, and this sweep completes in 40 stages. This is the ideal partitioning for the transport sweep, but often hard to achieve with unstructured meshes \textbf{and} perfect balance.
+Figure \ref{regular_partition} shows a sweep domain with a regular partition with ideal load balance (equivalent number of cells per processor). The sweep maintains a mostly regular wavelike structure as each angle sweeps through the domain, and this sweep completes in 40 stages. This is the ideal partitioning for the transport sweep, but often hard to achieve with unstructured meshes \textbf{and} perfect balance.
 
 \begin{figure}[H]
   \centering
@@ -424,7 +437,7 @@ With the improved load balancing by dimension, we are likely to see a partition 
   \label{random_partition}
 \end{figure}
 
-Figure \ref{worst_partition} observes the worst theoretical sweep partitioning, where the transport sweep takes on a snake-like behavior. This partitioning yields a stage count of 230, which is far worse than even the random partitioning stage count of 101.
+Figure \ref{worst_partition} shows a worse theoretical sweep partitioning, where the transport sweep takes on a snake-like behavior. This partitioning yields a stage count of 230, which is far worse than even the random partitioning stage count of 101.
 
 \begin{figure}[H]
   \centering
@@ -446,7 +459,7 @@ Figure \ref{worst_partition} observes the worst theoretical sweep partitioning, 
 
 Two things become immediately clear as a result of this study: perfect balance does not always yield the best parallel efficiency, and the stage count of a sweep is no longer as important. The concept of the stage is invalidated, because a stage relies on the assumption of perfect load balance. Once the time to compute a task changes throughout the problem domain, we must instead rely on the total time to solution as the most important metric, not the stage and the previously staged definition of parallel efficiency (Eq. \ref{paralleleff}). 
 
-\section{Time to Solution Estimation} \label{TOS}
+\section{Time-to-Solution Estimation} \label{TOS}
 
 In order to optimize the location of the cut lines based on balance and sweep efficiency without relying on a costly iterative process, we must build a time to solution estimator. For a given partition, this tool will estimate the time to solution. This is done by building directed task dependence graphs for each octant (quadrant in 2D) and weighting the graph edges based on certain criteria discussed Section \ref{weighting_graphs} Figure \ref{subset_plot} shows an example subset partitioning scheme in 3D, and the corresponding task dependence graph (TDG) for the front bottom octant is shown in Fig. \ref{digraph}.
 
@@ -497,7 +510,7 @@ Given that we know the machine parameters (grind time, latency, message communic
 \label{cost_calculation}
 \end{equation}
 %end eq
-where $N_u$ is the number of unknowns in the subset, $T_g$ is the grind time, $N_b$ is the number of unknowns along the subset boundaries, $T_\text{comm}$ is the communication time per unknown, and $M_l$ is the machine dependent latency multiplier. 
+where $N_s$ is the number of unknowns in the subset, $T_g$ is the grind time, $N_b$ is the number of unknowns along the subset boundaries, $T_\text{comm}$ is the communication time per unknown, and $M_l$ is the machine dependent latency multiplier. 
 
 The cost value is used to help appropriately weight the edges in each TDG independently. We weight the TDGs according to the following algorithm:
 
@@ -555,11 +568,10 @@ Once the heaviest paths of each TDG are weighted appropriately with conflicts ta
 \item Devise and implement a load balancing by dimension algorithm in PDT (Section \ref{lbd_section}).
 \item Devise and implement a time-to-solution estimator that returns the maximum time to solution for a given partitioning scheme (Section \ref{TOS}).
 \item Verify time-to-solution estimator matches PDT's sweep time with equivalent aggregation parameters and scheduling.
-\item Use time-to-solution estimator to optimize cut line locations by using it as a cost function in a Python optimization library (scipy.minimize, scipy.optimize, etc.). 
+\item Use time-to-solution estimator to optimize cut plane locations by using it as a cost function in a Python optimization library (scipy.minimize, scipy.optimize, etc.). 
 \item Build test problems, in 2D and 3D, that balance approximately perfectly via both load balancing algorithms.
 \item Using these test problems, show that optimizing partitions with the proposed approach yields a better runtime.
 \item Implement these tests in PDT and show that the optimized partitions yield a better runtime than perfectly load balanced problems.
-\item Explore adding the threads per processor as a variable to our parameter space during optimization in addition to cut lines.
 \end{itemize}
 
 
