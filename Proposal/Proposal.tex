@@ -222,7 +222,7 @@ Before expanding on the proposed method of partitioning and scheduling for paral
 
 Several parallel transport sweep codes use KBA partitioning in their sweeping, such as Denovo \cite{denovo} and PARTISN \cite{partisn}. The KBA partitioning scheme and algorithm was developed by Koch, Baker, and Alcouffe \cite{KBA}.
 
-The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. KBA uses a "pipelining" or assembly line approach where new work is started before old work is fully completed. Figure \ref{pipeline_example} shows an example of pipelining the angular work of a quadrant.
+The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. This partitions the domain into longer, thin columns. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. KBA uses a "pipelining" or assembly line approach where new work is started before old work is fully completed. Figure \ref{pipeline_example} shows an example of pipelining the angular work of a quadrant.
 
 \begin{figure}[H]
 \centering
@@ -258,9 +258,9 @@ The PDT optimal parallel efficiency\cite{mpadams2013} is:
 
 PDT's partitioning and scheduling algorithm has been studied for balanced (equivalent amount of work per processor), regular hexahedral meshes. When PDT introduced support for unstructured meshes, it came at the cost of load-balanced grids. Before discussing how the transport sweep is scheduled on such grids, we'll focus on the generation, partitioning, and load balancing of unstructured meshing in PDT.
 
-\section{Review of Unstructured Meshing in PDT}
+\section{Review of Partitioning Unstructured Meshes in PDT}
 
-The capability for PDT to generate and run on an unstructured mesh gained importance as the need to simulate irregular problems arose. However, there was a desire to keep logically Cartesian partitions in order to preserve the existing sweep mechanics in the code. The result was a grid that had logically Cartesian partitions (creating orthogonal ``subsets") with an unstructured mesh inside each subset. Subsets are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator. 
+The capability for PDT to generate and run on an unstructured mesh gained importance as the need to simulate irregular problems arose. However, there was a desire to keep logically Cartesian partitions in order to preserve as much as the existing sweep mechanics in the code as possible. Each logically Cartesian partition is called a subset, which are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -270,15 +270,17 @@ The capability for PDT to generate and run on an unstructured mesh gained import
 \label{grid}
 \end{minipage}
 
-This orthogonal partition is superimposed and each subset is meshed in parallel.  Subsets are now the base structured unit when calculating our parallel efficiency. Discontinuities along the boundary are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, there is no problem solving on degenerate polygons. 
+Discontinuities along the boundary are fixed by ``stitching'' hanging nodes, creating degenerate polygons. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, degenerate polygons cause no issues in computing the solution. PDT employs two approaches to support unstructured meshing, a 2D mesh extruded in the third dimension, and a fully unstructured 3D mesh.
 
-\subsection{Triangular Meshes in PDT}
+\subsection{2D Extruded Meshes in PDT}
 
-When using the Triangle unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). After superimposing the orthogonal grid, a PSLG is created for each subset, and meshed.  Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. Obviously, this is not as good as a unstructured tetrahedral mesh, but for many problems, it is a great capability to have. 
+When using the 2D extruded unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). After superimposing the orthogonal partition, a PSLG is created for each subset, and meshed.  Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. This method works quite well for symmetric problems, but can cause some issues when meshing spheres, cylinders, and non-symmetric features. As a result, PDT required support for truly 3D unstructured meshes.
 
-\subsection{OpenFOAM Meshes in PDT}
+\subsection{3D Unstructured Meshes in PDT}
 
-PDT has recently acquired the ability to read in OpenFOAM meshes and sweep on them. Rick Vega (a Texas A\&M graduate under Marvin Adams) adapted the load balancing by dimension algorithm used in PDT into a fully 3D case (discussed later). His code accepts a fluent mesh file, load balances it, and dumps the balanced mesh in OpenFOAM format. PDT then reads in the OpenFOAM formatted file and sweeps on that mesh. This approach has major advantages to the Triangle approach, because it allows a user with an existing mesh (generated via Cubit, Star CCM, TetGen, etc.) to simply save the mesh as a fluent file and have PDT read it in and sweep on it. Figures \ref{comparison}, \ref{comparison_slice}, and \ref{comparison_slice_zoom} show the differences in the two above approaches for the IM1C experiment run at Texas A\&M University.
+The ability to read in meshes stored in the OpenFOAM format was developed recently in PDT. The OpenFOAM format was chosen for two reasons. First, OpenFOAM has many utilities to convert existing meshes in a variety of formats (such as Fluent) into the OpenFOAM format, which allows PDT to support users with pre-generated meshes. Second, as part of his PhD work, Rick Vega (a Texas A\&M graduate under Marvin Adams) wrote a code that takes the OpenFOAM-formatted mesh, partitions it with cut planes (preserving the logically Cartesian partitioning scheme), load balances it, and dumps the partitioned, balanced mesh for PDT to read in. 
+
+Figures \ref{comparison}, \ref{comparison_slice}, and \ref{comparison_slice_zoom} show the differences in the mesh between the 2D extruded and 3D approaches for the IM1C experiment run at Texas A\&M University.
 
 \begin{figure}[H]
 \centering
@@ -304,86 +306,52 @@ PDT has recently acquired the ability to read in OpenFOAM meshes and sweep on th
   \label{comparison_slice_zoom}
 \end{figure}
 
-As shown in Fig. \ref{comparison_slice_zoom}, the other advantage of the OpenFOAM meshes is the ability to maintain good mesh quality with a relatively smaller number of cells. Due to the extrusion process in the triangular prism meshes, any spherical or cylindrical shapes are stair-stepped in 2D, and need a lot more triangular cells to maintain a good mesh quality.
+As shown in Fig. \ref{comparison_slice_zoom}, the other advantage of the OpenFOAM meshes is the ability to maintain good mesh quality with a relatively smaller number of cells. Due to the extrusion process in the prismatic meshes, any spherical or cylindrical shapes are stair-stepped in 2D, and need a lot more cells to maintain a good mesh quality.
 
-However, the OpenFOAM meshes due pose a challenge. When aggregating angles during the sweep, cycles occur. This prevents PDT from sweeping on these meshes unless using single angle aggregation, and most sweeps on large problems time out. A sweep structure that detects and addresses cycles is currently being implemented by the PDT development team, making OpenFOAM meshes practical for realistic problems.
+However, the 3D meshes do pose a challenge. When aggregating angles during the sweep, cycles occur. This prevents PDT from sweeping on these meshes unless using single angle aggregation, and most sweeps on large problems time out. A sweep structure that detects and addresses cycles is currently being implemented by the PDT development team, making 3D meshes practical for most problems.
+
+While both unstructured meshing approaches allowed PDT to run problems it was more difficult to run on before, it introduced the issue of unbalanced partitions. When creating the subsets with cut planes or cut lines, there is no guarantee that each subset will have an equivalent amount of cells. Over the last few years, two load balancing algorithms were introduced to combat this issue.
 
 \section{Issue and Approaches of Load Balancing on Unstructured Meshes}
 
-When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor. Load balancing is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to ``balance'' the number of cells. Ideally, each processor will be responsible for an equal number of cells. 
+When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor, and is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to balance the number of cells. Ideally, each processor will be responsible for an equal number of cells. Two approaches to load balancing were explored in PDT, which we refer to as "load balancing" and "load balancing by dimension". 
+Both load balancing algorithms rely on the movements of cut planes in order to redistribute high mesh-density areas to multiple processors.
 
-If the number of cells in each subset can be reasonably balanced, then the problem is effectively load balanced. The Load Balance algorithm described below details how the subsets will be load balanced. In summary, the procedure of the algorithm involves moving the initially user specified $x$ and $y$ cut planes, re-meshing, and iterating until a reasonably load balanced problem is obtained. 
+Before describing either load balancing algorithm, we define metric describing how imbalanced our problem is:
 
-\noindent\begin{minipage}{\textwidth}
-\textbf{Load Balance:} A load balancing algorithm that equalizes the number of triangles per subset. \\
-\rule{\textwidth}{0.4pt}
+\begin{equation}
+f =\frac{\underset{ijk}{\text{max}}(N_{ijk})}{\frac{N_{tot}}{I\cdot J\cdot K}},
+\label{metric_def}
+\end{equation}
+where $f$ is the load balance metric, $N_{ijk}$ is the number of cells in subset $(i,j,k)$, $N_{tot}$ is the global number of cells in the problem, and $I$, $J$, and $K$ are the total number of subsets in the $x$, $y$, and $z$ direction, respectively. The metric is a measure of the maximum number of cells per subset divided by the average number of cells per subset. For a perfectly balanced problem, $f = 1$.
+
+Dimensional sub-metrics are defined to assist with the movement of the partitions:
+\begin{equation}
+f_{D} = \underset{d}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D}.
+\end{equation}
+$f_{D}$ is calculated by taking the maximum number of cells per row, column, or plane and dividing it by the average number of cells per the corresponding dimension. If this number is greater than predefined tolerances, the cut lines in the respective dimension are redistributed. 
+
+\subsection{Load Balancing}
+
+The initial approach to load balancing was implemented on 2D extruded meshes. This means the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. Algorithm \ref{initial_algorithm} summarizes the initial approach to load balancing meshes in PDT.
+
+\begin{algorithm}[H]
+\caption{The initial load balancing algorithm.}
+\label{initial_algorithm}
 \begin{algorithmic}
-\STATE  $I,J$ subsets specified by user
 
-\STATE Mesh all subsets
-
-\STATE  $N_{tot} = $ total number of triangles
-\STATE  $N_{ij} = $ number of triangles in subset $ij$
-
-\STATE $f =\underset{ij}{\text{max}}(N_{ij})/\frac{N_{tot}}{I\cdot J}$
-
-\COMMENT {//Check if all subsets meet the tolerance}
-\IF {$f < \text{tol}_{\text{subset}}$}
-	\STATE DONE with load balancing
-\ELSE
-	\STATE $f_I = \underset{i}{\text{max}}[\sum_{j} N_{ij}]/\frac{N_{tot}}{I}$
-	
-	\STATE $f_J = \underset{j}{\text{max}}[\sum_{i} N_{ij}]/\frac{N_{tot}}{J}$
-	
-	\IF {$f_I > \text{tol}_{\text{row}}$}
-		\STATE \textbf{Redistribute}($X_i$)
-	\ENDIF
-	
-	\IF{$f_J > \text{tol}_{\text{col}}$}
-		\STATE \textbf{Redistribute}($Y_j$)
-	\ENDIF 
-	
-	\IF {redistribution occured}
-		\STATE REMESH and repeat algorithm
-	\ENDIF
-	
-\ENDIF
-
-\IF {There is still a discrepancy amongst subsets}
-     \STATE Move cutplane segments on the subset level and remesh (may require changes to scheduling algorithm)
-\ENDIF
+\WHILE{$f > \text{tol}_{\text{subset}}$}
+  \IF {$f_I > \text{tol}_{\text{row}}$}
+    \STATE Redistribute the X cut lines.
+  \ENDIF
+  \IF {$f_J > \text{tol}_{\text{col}}$}
+  	\STATE Redistribute the Y cut lines.
+  \ENDIF
+\ENDWHILE
 \end{algorithmic}
-\rule{\textwidth}{0.4pt}
-\end{minipage}
+\end{algorithm}
 
-\bigskip
 
-\noindent\begin{minipage}{\textwidth}
-\textbf{Redistribute:} A function that moves cut lines in either X or Y. \\
-\rule{\textwidth}{0.4pt}
-\begin{algorithmic}
-\STATE \textbf{Input:}CutLines (X or Y vector that stores cut lines). 
-\STATE \textbf{Input:} num\_tri\_row or num\_tri\_col, a pArray containing number of triangles in each row or column 
-\STATE \textbf{Input:} The total number of triangles in the domain, $N_{tot}$
-
-\STATE stapl::array\_view num\_tri\_view, over num\_tri\_row/column
-\STATE stapl::array\_vew offset\_view
-
-\STATE stapl::partial\_sum(num\_tri\_view) \COMMENT {Perform prefix sum}
-
-\COMMENT {We now have a cumulative distribution stored in offset\_view}
-
-\FOR {$i = 1$ :CutLines.size()-1}
-
-	\STATE vector $<$double$>$ pt1 = [CutLines(i-1), offset\_view(i-1)]
-	\STATE vector $<$double$>$ pt2 = [CutLines(i), offset\_view(i)]
-	\STATE ideal\_value = $i\cdot \frac{N_{tot}}{\text{CutLines.size()}-1}$
-	\STATE X-intersect(pt1,pt2,ideal\_value) \COMMENT{Calculates the X-intersect of the line formed by pt1 and pt2 and the line y = ideal\_value.}
-	\STATE CutLines(i) = X-intersect
-\ENDFOR
-\end{algorithmic}
-\rule{\textwidth}{0.4pt}
-\end{minipage}
 
 \subsection{Load Balancing by Dimension} \label{lbd_section}
 
