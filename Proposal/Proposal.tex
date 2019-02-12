@@ -256,24 +256,11 @@ The PDT optimal parallel efficiency\cite{mpadams2013} is:
 	\epsilon \approx \frac{1}{ [1 + \frac{P_x + P_y - 4 + N_k(P_z -2}{8MGN_k/(A_m A_G} ]  [ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}} ]}
 \end{equation}
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Extension of Parallel Transport by Pautz and Bailey}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Pautz and Bailey\cite{PautzBailey} extended the work of Adams et al with overloaded unstructured partitioning. From their article, Figs. 3 through 9\cite{PautzBailey} showcase the different partitioning schemes used.  Weak scaling results were generated using the SCEPTRE transport code\cite{sceptre}. From these studies, Pautz and Bailey made the following observations:
-\begin{enumerate}
-	\item At low levels of parallelism, increased amounts of overloading lead to increased run times.
-	\item With higher core counts, improvements are seen when the amount of overloading is increased.
-	\item Results from unstructured and structured overloading are comparable. 
-	\item Hybrid KBA often, but not always, outperformed overloaded partitions. If sufficient overloading was used, the results were comparable.
-	\item Results in two dimensions are more pronounced that in three dimensions.
-\end{enumerate}
-
+PDT's partitioning and scheduling algorithm has been studied for balanced (equivalent amount of work per processor), regular hexahedral meshes. When PDT introduced support for unstructured meshes, it came at the cost of load-balanced grids. Before discussing how the transport sweep is scheduled on such grids, we'll focus on the generation, partitioning, and load balancing of unstructured meshing in PDT.
 
 \section{Review of Unstructured Meshing in PDT}
 
-The capability for PDT to generate and run on an unstructured mesh is important because it allows us to run problems without having to conform our mesh to the problem. The idea is to have a logically Cartesian partition (creating orthogonal ``subsets") with an unstructured mesh inside each subset. These logically Cartesian subdomains are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator. 
+The capability for PDT to generate and run on an unstructured mesh gained importance as the need to simulate irregular problems arose. However, there was a desire to keep logically Cartesian partitions in order to preserve the existing sweep mechanics in the code. The result was a grid that had logically Cartesian partitions (creating orthogonal ``subsets") with an unstructured mesh inside each subset. Subsets are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator. 
 
 \noindent\begin{minipage}{\textwidth}
 \centering
