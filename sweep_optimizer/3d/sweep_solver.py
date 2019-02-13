@@ -298,6 +298,7 @@ def nodes_being_solved(G,weight_limit,time_to_solve):
   return nodes_being_solved
   
 def sum_weights_of_path(graph,path):
+  start_func = time.time()
   weight_sum = 0.0
   path_length = len(path) - 1
   for n in range(0,path_length):
@@ -306,6 +307,8 @@ def sum_weights_of_path(graph,path):
     weight = graph[node1][node2]['weight']
     weight_sum += weight
 
+  end_func = time.time()
+  print("within func: " , end_func-start_func)
   return weight_sum
 
 #Takes all simple paths in a graph and returns the heaviest one.
@@ -329,11 +332,14 @@ def get_heaviest_path_faster(graph,paths):
   #Storing all the path weights.
   path_weights = []
   start1 = time.time()
-  for path in paths:
-    path_weights.append(sum_weights_of_path(graph,path))
-  
+#  for path in paths:
+#    start_append = time.time()
+#    path_weights.append(sum_weights_of_path(graph,path))
+#    end_append = time.time()
+#    print("append: ", end_append - start_append)
+  path_weights = [sum_weights_of_path(graph,path) for path in paths]
   end1 = time.time()
-  
+  print(path_weights)
   print("sum_of_weights time: ", end1-start1)
   #Getting the max weight and index of max weight.
   heaviest_path_weight = max(path_weights)
