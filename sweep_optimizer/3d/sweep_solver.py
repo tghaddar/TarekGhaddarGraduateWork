@@ -159,6 +159,14 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,
       graph[e[0]][e[1]]['weight'] = cost
   return graphs
 
+#This inverts the weights of a graph in order to be able to calculate the true longest path.
+def invert_weights(graph):
+  
+  for u,v,d in graph.edges(data=True):
+    d['weight'] = pow(d['weight'],-1)
+  
+  return graph
+
 #Converts the edge weighting to a universal time. An edge will now represent the time on a universal scale. For instance, if we have an edge that starts at node A and ends at node B, the edge represents the total time it takes that path to get to node B. 
 def make_edges_universal(graphs):
   
