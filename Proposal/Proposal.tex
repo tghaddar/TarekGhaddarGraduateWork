@@ -238,7 +238,7 @@ There are two variants to the KBA algorithm, ``successive in angle, successive i
   \epsilon_{KBA} \approx \frac{1}{[1 + \frac{4(P_x+P_y-2)}{8MN_k}][1 + \frac{T_{\text{comm}}}{T_{\text{{task}}}}]}.
 \end{equation}
 
-\subsection{PDT's extension of KBA}
+\subsection{PDT's extension of KBA}\label {pdt_extension}
 
 PDT's extension of KBA does not limit $P_z, A_m, G,$ or $A_g$. In addition, all 8 octants (4 quadrants in 2D) begin work immediately. Unlike KBA, PDT's scheduling requires conflict resolution in its algorithm, as the pipelines from all octants will end up intersecting toward the middle of the processor domain.
 
@@ -308,14 +308,14 @@ Figures \ref{comparison}, \ref{comparison_slice}, and \ref{comparison_slice_zoom
 
 As shown in Fig. \ref{comparison_slice_zoom}, the other advantage of the OpenFOAM meshes is the ability to maintain good mesh quality with a relatively smaller number of cells. Due to the extrusion process in the prismatic meshes, any spherical or cylindrical shapes are stair-stepped in 2D, and need a lot more cells to maintain a good mesh quality.
 
-However, the 3D meshes do pose a challenge. When aggregating angles during the sweep, cycles occur. This prevents PDT from sweeping on these meshes unless using single angle aggregation, and most sweeps on large problems time out. A sweep structure that detects and addresses cycles is currently being implemented by the PDT development team, making 3D meshes practical for most problems.
+However, the 3D meshes do pose a challenge. When aggregating angles during the sweep, cycles occur. This prevents PDT from sweeping on these meshes unless using single angle aggregation, and most sweeps on large problems take far too long to run. A sweep structure that detects and addresses cycles is currently being implemented by the PDT development team, making 3D meshes practical for most problems.
 
 While both unstructured meshing approaches allowed PDT to run problems it was more difficult to run on before, it introduced the issue of unbalanced partitions. When creating the subsets with cut planes or cut lines, there is no guarantee that each subset will have an equivalent amount of cells. Over the last few years, two load balancing algorithms were introduced to combat this issue.
 
 \section{Approaches to Load Balancing Unstructured Meshes}
 
 When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor, and is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to balance the number of cells. Ideally, each processor will be responsible for an equal number of cells. Two approaches to load balancing were explored in PDT, which we refer to as "load balancing" and "load balancing by dimension". 
-Both load balancing algorithms rely on the movements of cut planes in order to redistribute high mesh-density areas to multiple processors.
+Both load balancing algorithms rely on the movement of cut planes in order to redistribute high mesh-density areas to multiple processors.
 
 Before describing either load balancing algorithm, we define metric describing how imbalanced our problem is:
 
@@ -396,7 +396,7 @@ Even with excellent load balancing metrics with the load balancing by dimension 
 
 While perfect load balance was the initial goal, we needed to know if this affected the efficiency of the parallel transport sweep. Figures \ref{regular_partition}-\ref{worst_partition} showcase the theoretical effect of ideal load balance on the transport sweep.
 
-Figure \ref{regular_partition} shows a sweep domain with a regular partition with ideal load balance (equivalent number of cells per processor). The sweep maintains a mostly regular wavelike structure as each angle sweeps through the domain, and this sweep completes in 40 stages. This is the ideal partitioning for the transport sweep, but often hard to achieve with unstructured meshes \textbf{and} perfect balance.
+Figure \ref{regular_partition} shows a sweep domain with a regular partition, $P_x = 20, P_y = 20$, and ideal load balance (equivalent number of cells per processor). The sweep maintains a mostly regular wavelike structure as each angle sweeps through the domain, and this sweep completes in 40 stages. This is the ideal partitioning for the transport sweep, but often hard to achieve with unstructured meshes \textbf{and} perfect balance.
 
 \begin{figure}[H]
   \centering
@@ -416,7 +416,7 @@ Figure \ref{regular_partition} shows a sweep domain with a regular partition wit
   \label{regular_partition}
 \end{figure}
 
-With the improved load balancing by dimension, we are likely to see a partition similar to the partitioning shown in Fig. \ref{random_partition} for all geometries. It is immediately observable that we don't have the same wavelike transport sweep, as communication penalties take their toll. As a result, this sweep completes in 101 stages, as opposed to 40 stages for the regular partition.
+With the improved load balancing by dimension, we are likely to see a partition similar to the partitioning shown in Fig. \ref{random_partition} for all geometries. It is immediately observable that we do not have the nice wavelike transport sweep, as communication penalties take their toll. As a result, this sweep completes in 101 stages, as opposed to 40 stages for the regular partition.
 
 
 \begin{figure}[H]
@@ -457,11 +457,11 @@ Figure \ref{worst_partition} shows a worse theoretical sweep partitioning, where
   \label{worst_partition}
 \end{figure}
 
-Two things become immediately clear as a result of this study: perfect balance does not always yield the best parallel efficiency, and the stage count of a sweep is no longer as important. The concept of the stage is invalidated, because a stage relies on the assumption of perfect load balance. Once the time to compute a task changes throughout the problem domain, we must instead rely on the total time to solution as the most important metric, not the stage and the previously staged definition of parallel efficiency (Eq. \ref{paralleleff}). 
+Two things become immediately clear as a result of this study: ideal balance does not always yield the best parallel efficiency, and the stage count of a sweep is no longer as important. The importance of the stage decreases, because a stage relies on the assumption of perfect load balance. Once the time to compute a task changes throughout the problem domain, we must instead rely on the total time to solution as the most important metric, not the stage and the previously stated definition of parallel efficiency (Eq. \ref{paralleleff}). 
 
 \section{Time-to-Solution Estimation} \label{TOS}
 
-In order to optimize the location of the cut lines based on balance and sweep efficiency without relying on a costly iterative process, we must build a time to solution estimator. For a given partition, this tool will estimate the time to solution. This is done by building directed task dependence graphs for each octant (quadrant in 2D) and weighting the graph edges based on certain criteria discussed Section \ref{weighting_graphs} Figure \ref{subset_plot} shows an example subset partitioning scheme in 3D, and the corresponding task dependence graph (TDG) for the front bottom octant is shown in Fig. \ref{digraph}.
+In order to optimize the location of the cut planes based on balance and sweep efficiency without relying on a costly iterative process, we must build a time to solution estimator. For a given partition, this tool will estimate the time to solution. This is done by building directed task dependence graphs for each octant (quadrant in 2D) and weighting the graph edges based on certain criteria discussed Section \ref{weighting_graphs} Figure \ref{subset_plot} shows an example subset partitioning scheme in 3D, and the corresponding task dependence graph (TDG) for the front bottom octant is shown in Fig. \ref{digraph}.
 
 \begin{figure}[H]
 \centering
@@ -501,7 +501,7 @@ n_{z} &= c \cdot \Big(\frac{n_s}{a\cdot b \cdot c}\Big)^{1/3}
 \label{num_z}
 \end{align}
 
-Combining $n_x, n_y, \text{and } n_z$ with the cut line information in each direction allows us to compute the fine grid units in each subset and along each boundary.  
+Combining $n_x, n_y, \text{and } n_z$ with the cut line information in each direction allows us to estimate the fine grid units in each subset and along each boundary.  
 
 Given that we know the machine parameters (grind time, latency, message communication time), Eq. \ref{cost_calculation} estimates how long it takes to solve and communicate all unknowns in a given subset:
 
@@ -510,11 +510,13 @@ Given that we know the machine parameters (grind time, latency, message communic
 \label{cost_calculation}
 \end{equation}
 %end eq
-where $N_s$ is the number of unknowns in the subset, $T_g$ is the grind time, $N_b$ is the number of unknowns along the subset boundaries, $T_\text{comm}$ is the communication time per unknown, and $M_l$ is the machine dependent latency multiplier. 
+where $N_s$ is the number of unknowns in the subset, $T_g$ is the grind time, $N_b$ is the number of unknowns along the subset boundaries, $T_\text{comm}$ is the communication time per unknown, and $M_l$ is the machine-dependent latency multiplier. 
 
-The cost value is used to help appropriately weight the edges in each TDG independently. We weight the TDGs according to the following algorithm:
+The cost value is used to help appropriately weight the edges in each TDG independently. The outgoing edges of each node are weighted with this cost value, representing the time it takes to solve and communicate information to neighboring nodes. Once this is done, all incoming edges to each node are set to the value of the longest path to the node. Every incoming edge now represents the time each node is ready to solve, taking into account upstream dependencies. Algorithm \ref{weighting_algorithm} summarizes this process:
 
 \begin{algorithm}[H]
+\caption{Weighting the TDGs.}
+\label{weighting_algorithm}
 \begin{algorithmic}
 \FOR{$node = 1$ to $N$}
 \STATE Weight outgoing edges with the cost of solving and communicating $node$.
@@ -527,12 +529,15 @@ The cost value is used to help appropriately weight the edges in each TDG indepe
 \end{algorithmic}
 \end{algorithm}
 
-This algorithm effectively sets up the initial weights in each TDG to represent a crucial piece of information: the time at which each node is ready to solve. In other words, all incoming weights to a node will share the same value, which represents the time that node is ready to solve factoring in upstream dependencies. 
+Now that each TDG is independently weighted, we need to address conflicts across all TDGs. This will also be done by modifying the weights of each TDG to reflect these conflicts.
 
 \subsubsection{Conflict Detection and Resolution}
 
-Once this is done for all edges in all TDGs, we have to detect and address sweep conflicts between all the TDGs. We do so with the following algorithm:
+The conflict detection process is best explained as a ``marching" process. We begin at time $t = 0$, and march along each TDG until one of the TDGs reaches a node. Recall that the incoming weight to a node reflects the time $t$ that it is ready to solve. If at time $t$, multiple TDGs are solving the same node, this means we have a conflict. Whichever TDGs lose the conflict modify their downstream weights according to how long they are delayed. Algorithm \label{conflict_algorithm} summarizes conflict detection and resolution.
+%%%%conflict detection alg%
 \begin{algorithm}[H]
+\caption{The conflict detection and resolution algorithm.}
+\label{conflict_algorithm}
 \begin{algorithmic}
 \STATE t = 0
 \WHILE{num\_finished\_graphs $<$ num\_graphs}
@@ -544,34 +549,35 @@ Once this is done for all edges in all TDGs, we have to detect and address sweep
 	\STATE{Find first conflicted node}
 	\STATE{Get conflicting graphs at first conflicted node}
 	\STATE{Modify graph weights according to which graph wins the conflict}
-	\IF{Number of conflicted nodes is 1}
 	\STATE{t = time of next interaction}
-	\ENDIF
 \ENDIF
-\STATE{Check how many graphs have finished by time t}
+\STATE{Check how many graphs have finished sweeping by time t}
 \ENDWHILE
-\label{conflict}
 \end{algorithmic}
 \end{algorithm}
+%%%%%
+Due to the potentially imbalanced nature of problems, each subset could take a different amount of time to solve and communicate it's information.  Conflicts are resolved by one of two methods, first-come-first-serve and depth-of-graph remaining. If a conflict arises between two or more TDGs, the following process is followed:
+\begin{enumerate}
+	\item Whichever TDG reaches the conflicted node first, wins.
+	\item If two or more TDGs reach the conflicted node at the same time, the TDG with the greater depth-of-graph remaining wins.
+	\item If two or more TDGs have the same depth-of-graph remaining, the graph with the priority octant wins (the same as PDT's priority octant system described in Section \ref{pdt_extension}).
+\end{enumerate}
 
-This algorithm marches along all TDGs and at every time $t$ that a node is reached, checks for conflicts and modifies downstream weights accordingly. 
-
-Two forms of conflict resolution are being explored, depth-of-graph remaining and first come first serve. Due to the imbalanced nature of the problems, each subset will take a different amount of time to solve and communicate, defaulting conflict resolution to a first come first basis. If two graphs reach a node at the same time, then the graph with the greater depth-of-graph remaining wins. If there is still a tie, then the graph with the priority octant wins.
+Once all TDGs have had their weights modified to address conflicts, it is extremely simple to estimation the time-to-solution. The maximum value of the final weight (for example, the weight from node 8 to node -1 in Fig. \ref{TDG}) across all TDGs is the time-to-solution. 
 
 \subsection{Optimizing the Time to Solution}\label{optimize}
 
-Once the heaviest paths of each TDG are weighted appropriately with conflicts taken into account, we simply take the final weight of the ending node as the time to solution for that graph. The octant with the heaviest sweep time is used as the time to solution for a given partitioning scheme. We will use a python optimization tool in order to get the best partitioning scheme possible. The cut lines will be the input parameter, and the tool will iterate on this parameter to minimize the time to solution. 
+Once each TDG is weighted appropriately with conflicts taken into account, we simply take the final weight of the ending node as the time to solution for that graph. The octant with the heaviest sweep time is used as the time to solution for a given partitioning scheme. We will use a python optimization tool in order to get the best partitioning scheme possible. The cut planes will be the input parameter, and the tool will iterate on this parameter to minimize the time to solution. 
 
 \section{Goals and Proposed Plan}
 
 \begin{itemize}
 \item Devise and implement a load balancing by dimension algorithm in PDT (Section \ref{lbd_section}).
-\item Devise and implement a time-to-solution estimator that returns the maximum time to solution for a given partitioning scheme (Section \ref{TOS}).
+\item Devise and implement a time-to-solution estimator, with angle-set and cell-set aggregation capabilities, that returns the maximum time to solution for a given partitioning scheme (Section \ref{TOS}).
 \item Verify time-to-solution estimator matches PDT's sweep time with equivalent aggregation parameters and scheduling.
 \item Use time-to-solution estimator to optimize cut plane locations by using it as a cost function in a Python optimization library (scipy.minimize, scipy.optimize, etc.). 
 \item Build test problems, in 2D and 3D, that balance approximately perfectly via both load balancing algorithms.
-\item Using these test problems, show that optimizing partitions with the proposed approach yields a better runtime.
-\item Implement these tests in PDT and show that the optimized partitions yield a better runtime than perfectly load balanced problems.
+\item Using these test problems, show results obtained by optimizing partitions with the proposed approach.
 \end{itemize}
 
 
