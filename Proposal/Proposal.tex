@@ -81,7 +81,7 @@
 \section{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically cartesian grids. However, structured meshes are somewhat limiting when  simulating more complex problems and experiments, requiring the use of unstructured meshes in transport sweeps. While unstructured meshes provide the ability to simulate realistic problems, they introduce some challenges like unbalanced partitions, which can increase the time to solution. To combat this, PDT, Texas A\&M University's massively parallel deterministic transport code, introduced two load balancing algorithms that rely on moving the spatial partition boundaries, or cut planes (cut lines in 2D), throughout the mesh in order to obtain a roughly equivalent amount of cells (and therefore work) per processor. However, this sacrifices the optimal partitioning scheme\cite{mpadams2013} in favor of balance. We propose a method that weighs ideal load balancing with the consequences to the transport sweep in order to achieve the best possible time to solution.
+Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids. However, structured meshes are somewhat limiting when  simulating more complex problems and experiments, requiring the use of unstructured meshes in transport sweeps. While unstructured meshes provide the ability to simulate realistic problems, they introduce some challenges like unbalanced partitions, which can increase the time to solution. To combat this, PDT, Texas A\&M University's massively parallel deterministic transport code, introduced two load balancing algorithms that rely on moving the spatial partition boundaries, or cut planes (cut lines in 2D), throughout the mesh in order to obtain a roughly equivalent amount of cells (and therefore work) per processor. However, this sacrifices the optimal partitioning scheme\cite{mpadams2013} in favor of balance. We propose a method that weighs ideal load balancing against the consequences to the transport sweep in order to achieve the best possible time to solution.
 
 \subsection{Review of Neutron Transport and the Transport Sweep}
 
@@ -94,7 +94,7 @@ The steady-state neutron transport equation describes the behavior of neutrons i
 \end{equation}
 where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption, outscatter, and within group scattering). These represent the loss terms of the neutron transport equation. The right hand side of Eq.~\eqref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into $dE$ about energy $E$ and $d\Omega$ about direction $\vo$.
 
-Without loss of generality for the problem at hand, we assume isotropic scattering for simplicity. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, has its angular dependence present in the integral, and it is divided by $4\pi$ to reflect isotropic behavior. This yields:
+Without loss of generality for the problem at hand, we assume isotropic scattering for simplicity. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, has its angular dependence present in the integral, and is divided by $4\pi$ to reflect isotropic behavior. This yields:
 \begin{align}
 \label{isotropic}
 \vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  
@@ -106,7 +106,7 @@ where we have introduced the scalar flux as the integral of the angular flux:
 \label{def_scalar_flux}
 \phi(\vr,E') = \int_{4\pi}d\Omega' \psi(\vr,E',\vo').
 \end{equation}
-The next step to solving the transport equation is to discretize in energy, yielding Eq.~\eqref{multigroup} the multigroup transport equation:
+The next step to solving the transport equation is to discretize in energy, yielding Eq.~\eqref{multigroup}, the multigroup transport equation:
 \begin{equation}
 \vo \cdot \vec \nabla \psi_g(\vr,\vo) +\Sigma_{t,g}(\vr) \psi_g(\vr,\vo) = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g}(\vr,\vo), \quad \text{for } 1 \le g \le G
 \label{multigroup}
@@ -125,7 +125,7 @@ $\psi_m$ to numerically perform the angular integration:
 \phi_g(\vr) \approx \sum_{m=1}^{m=M} w_m \psi_{g,m}(\vr).
 \end{equation}
 
-At this point, it is clear that we are solving a sequence of transport equations, solving for one group and direction at a time. Therefore, all transport equations are of the following form:
+At this point, it is clear that we are solving a sequence of transport equations for one group and direction at a time. Therefore, all transport equations take the following form:
 \begin{equation}
 \vo_m \cdot \vec \nabla \psi_{m}(\vr) +\Sigma_{t}(\vr) \psi_{m}(\vr)  = \frac{1}{4\pi}\Sigma_{s}(\vr)\phi(\vr) + q^{ext+inscat}_m(\vr) = q_m(\vr),
 \end{equation}
@@ -149,7 +149,7 @@ After the angular and energy dependence have been accounted for, Eq.~\eqref{iter
 \end{minipage}
 \smallskip
 
-The number in each cell represents the order in which the cells are solved. All cells must receive the solution downwind from them before solving for their own solution. This dependency can be represented and stored as a task dependence graph, shown in Fig. \ref{tdg}.
+The number in each cell represents the order in which the cells are solved. All cells must receive the solution downwind from them before they can begin solving. This process can be represented and stored as a task dependence graph, shown in Fig. \ref{tdg}.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
@@ -159,14 +159,14 @@ The number in each cell represents the order in which the cells are solved. All 
 \end{minipage}
 \smallskip
 
-The concepts presented in this introduction are used by PDT, Texas A\&M University's massively parallel deterministic transport code. It is capable of multi-group simulations and employs discrete ordinates for angular discretization. PDT features steady-state, time-dependent, criticality, and depletion simulations, and solves the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation. PDT has been shown to scale on logically Cartesian grids out to \tcr{750,000} cores. Logically Cartesian grids contain regular convex grid units that allow for vertex motion inside them, in order to conform to curved shapes. Much of the work completed and proposed in this document uses PDT or was developed in PDT. 
+The concepts presented in this introduction are used by PDT, Texas A\&M University's massively parallel deterministic transport code, capable of multi-group simulations and employing discrete ordinates for angular discretization. PDT features steady-state, time-dependent, criticality, and depletion simulations, and solves the transport equation for neutron, thermal, gamma, coupled neutron-gamma, electron, and coupled electron-photon radiation. PDT has been shown to scale on logically Cartesian grids out to \tcr{750,000} cores. Logically Cartesian grids contain regular convex grid units that allow for vertex motion inside them, in order to conform to curved shapes. Much of the work completed and proposed in this document uses PDT or was developed in PDT. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Review of Parallel Transport Sweeps}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-As mentioned in the previous section, a transport sweep is set up by overlaying a domain with a finite element mesh. The sweep then solves the transport equation cell by cell using a discontinuous finite element approach. A task dependence graph gives the order in which cells are solved, as shown in Fig. \ref{tdg}. The transport sweep can be solved in parallel in order to obtain the solution faster, as well as distribute the problem across many processors for memory intensive cases. 
+As mentioned in the previous section, a transport sweep is set up by overlaying a domain with a finite element mesh and solving the transport equation cell by cell using a discontinuous finite element approach. A task dependence graph gives the order in which cells are solved, as shown in Fig. \ref{tdg}. The transport sweep can be solved in parallel in order to obtain the solution faster, as well as distribute the problem across many processors for memory intensive cases. 
 
 
 In PDT, a transport sweep can be performed on a structured Cartesian or arbitrary polyhedral mesh. Sweeping on an unstructured mesh presents two big challenges: maintaining sweep efficiency on a massively parallel scale and keeping non-concave sub-domains to avoid cycles. PDT has already proven the ability to perform massively parallel transport sweeps on structured meshes. As part of previous efforts in PDT, researchers have outlined three important properties for parallel sweeps. 
@@ -184,8 +184,8 @@ In a regular grid, we have the  number of cells in each Cartesian direction: $N_
 
 Fine grain work units are aggregated into coarser-grained units called \textit{tasks}. A few terms are defined that describe how each variable is aggregated.
 \begin{itemize}
-\item $A_x = \frac{N_x}{P_x}$, where $N_x$ is the number of cells in $x$ and $P_x$ is the number of processors in $x$
-\item $A_y = \frac{N_y}{P_y}$, where $N_y$ is the number of cells in $y$ and $P_y$ is the number of processors in $y$
+\item $A_x = \frac{N_x}{P_x}$, where $N_x$ is the number of cells in $x$ and $P_x$ is the number of processors in $x$.
+\item $A_y = \frac{N_y}{P_y}$, where $N_y$ is the number of cells in $y$ and $P_y$ is the number of processors in $y$.
 \item $A_z$ = a selectable number of z-planes of $A_x A_y$ cells.
 \item $N_g = \frac{G}{A_g}$
 \item $N_m = \frac{M}{A_m}$
@@ -201,10 +201,10 @@ Equation ~\eqref{paralleleff} approximately defines parallel sweep efficiency:
 \begin{equation}\label{paralleleff}
 \begin{split}
 \epsilon &\approx \frac{T_{\text{task}} N_{\text{tasks}}}{[N_{\text{stages}}] [T_{\text{task}} + T_{\text{comm}}]} \\
-            &\approx\frac{1}{[1+\frac{N_{\text{idle}}}{N_{\text{tasks}}}][1 + \frac{T_{\text{comm}}}{T_{\text{task}}}]}.
+            &\approx\frac{1}{[1+\frac{N_{\text{idle}}}{N_{\text{tasks}}}][1 + \frac{T_{\text{comm}}}{T_{\text{task}}}]},
 \end{split}
 \end{equation}
-
+where $N_\text{idle}$ is the number of idle stages for each processor, $N_\text{tasks}$ is the number of tasks each processor performs, $T_\text{comm}$ is the time to communicate after completion of a task, and $T_\text{task}$ is the time it takes to compute one task.
 Equations ~\eqref{Tcomm} and ~\eqref{Ttask} show how $T_{\text{comm}}$ and $T_{\text{task}}$ are calculated:
 \begin{equation}
 T_{\text{comm}} = M_L T_{\text{latency}} + T_{\text{byte}} N_{\text{bytes}}
@@ -214,15 +214,15 @@ T_{\text{comm}} = M_L T_{\text{latency}} + T_{\text{byte}} N_{\text{bytes}}
 T_{\text{task}} = cA_x A_y A_z A_m A_g T_{\text{grind}},
 \label{Ttask}
 \end{equation}
-where $c$ is an overhead constant, $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. If a high value of $M_L$ is necessary for the model to match computational results, improvements should be made in code implementation.
+where $c$ is an overhead constant, $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency.
 
-Before expanding on the proposed method of partitioning and scheduling for parallel transport sweeps, a quick review of transport sweep algorithms is necessary. Our method will expand on PDT's sweep algorithm\cite{mpadams2013}, which is an extension of the popular KBA algorithm\cite{KBA}.
+Before expanding on the proposed method of partitioning and scheduling for parallel transport sweeps, a quick review of some transport sweep algorithms is necessary. Our method will expand on PDT's sweep algorithm\cite{mpadams2013}, which is an extension of the popular KBA algorithm\cite{KBA}.
 
 \subsection{The KBA Algorithm}
 
 Several parallel transport sweep codes use KBA partitioning in their sweeping, such as Denovo \cite{denovo} and PARTISN \cite{partisn}. The KBA partitioning scheme and algorithm was developed by Koch, Baker, and Alcouffe \cite{KBA}.
 
-The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. This partitions the domain into longer, thin columns. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. KBA uses a "pipelining" or assembly line approach where new work is started before old work is fully completed. Figure \ref{pipeline_example} shows an example of pipelining the angular work of a quadrant.
+The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. This partitions the domain into longer, thin columns. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. KBA uses a ``pipelining" or assembly line approach where new work is started before old work is fully completed. Figure \ref{pipeline_example} shows an example of pipelining the angular work of a quadrant.
 
 \begin{figure}[H]
 \centering
@@ -231,9 +231,9 @@ The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_
 \label{pipeline_example}
 \end{figure}
 
-In Fig. \ref{pipeline_example}, we see that as soon as soon as a processor is free to solve the next angle with the same sweep ordering, it begins immediately. KBA introduced pipelining in order to combat the inherent inefficiencies of waiting for all processors to complete a sweep in a direction before starting the next angle. 
+In Fig. \ref{pipeline_example}, we see that as soon as a processor is free to solve the next angle with the same sweep ordering, it begins immediately. KBA introduced pipelining in order to combat the inherent inefficiencies of waiting for all processors to complete a sweep in a direction before starting the next angle. 
 
-There are two variants to the KBA algorithm, ``successive in angle, successive in quadrant", and ``simultaneous in angle, successive in quadrant".  With "successive in angle, successive in quadrant", an octant pipelines it's angular work, and once all directions are complete the opposing octant pipelines them back. This is then done for the remaining octant pairs. With "simultaneous in angle, successive in quadrant", all angles from one octant are simultaneously solved, and upon completion the opposing octant solves them. This is then done for the remaining octant pairs. The KBA parallel efficiency\cite{mpadams2013} is:
+There are two variants to the KBA algorithm, ``successive in angle, successive in quadrant", and ``simultaneous in angle, successive in quadrant".  With ``successive in angle, successive in quadrant", an octant pipelines its angular work, and once all directions are complete the opposing octant pipelines them back. This is then done for the remaining octant pairs. With ``simultaneous in angle, successive in quadrant", all angles from one octant are simultaneously solved, and upon completion the opposing octant solves them. This is then done for the remaining octant pairs. The KBA parallel efficiency\cite{mpadams2013} for ``successive in angle, successive in quadrant" is:
 \begin{equation}
   \epsilon_{KBA} \approx \frac{1}{[1 + \frac{4(P_x+P_y-2)}{8MN_k}][1 + \frac{T_{\text{comm}}}{T_{\text{{task}}}}]}.
 \end{equation}
@@ -253,32 +253,30 @@ If two or more tasks reach a processor at the same time, PDT employs a tie break
 
 The PDT optimal parallel efficiency\cite{mpadams2013} is:
 \begin{equation}
-	\epsilon \approx \frac{1}{ [1 + \frac{P_x + P_y - 4 + N_k(P_z -2}{8MGN_k/(A_m A_G} ]  [ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}} ]}
+	\epsilon \approx \frac{1}{ [1 + \frac{P_x + P_y - 4 + N_k(P_z -2}{8MGN_k/(A_m A_G)} ]  [ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}} ]}
 \end{equation}
 
-PDT's partitioning and scheduling algorithm has been studied for balanced (equivalent amount of work per processor), regular hexahedral meshes. When PDT introduced support for unstructured meshes, it came at the cost of load-balanced grids. Before discussing how the transport sweep is scheduled on such grids, we'll focus on the generation, partitioning, and load balancing of unstructured meshing in PDT.
+PDT's partitioning and scheduling algorithm has been studied for balanced (equivalent amount of work per processor), regular hexahedral meshes. When PDT introduced support for unstructured meshes, it came at the cost of load-balanced grids. Before discussing how we propose to schedule the transport sweep on such grids, we'll focus on the generation, partitioning, and load balancing of unstructured meshing in PDT.
 
 \section{Review of Partitioning Unstructured Meshes in PDT}
 
-The capability for PDT to generate and run on an unstructured mesh gained importance as the need to simulate irregular problems arose. However, there was a desire to keep logically Cartesian partitions in order to preserve as much as the existing sweep mechanics in the code as possible. Each logically Cartesian partition is called a subset, which are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator. 
+The capability for PDT to generate and run on an unstructured mesh gained importance as the need to simulate irregular problems arose. However, there was a desire to keep logically Cartesian partitions in order to preserve as much as the existing sweep mechanics in the code as possible. Each logically Cartesian partition is called a subset, which are obtained using cut planes in 3D and cut lines in 2D. Figure \ref{grid} demonstrates this functionality, with the first two subsets meshed using the Triangle Mesh Generator\cite{triangle}, a 2D mesh generator. PDT employs two approaches to support unstructured meshing, a 2D mesh extruded in the third dimension, and a fully unstructured 3D mesh.
 
 \noindent\begin{minipage}{\textwidth}
 \centering
 \includegraphics[scale = 0.5]{../figures/lattice.png}
 \includegraphics[scale = 0.5]{../figures/subsetlattice.png}
-\captionof{figure}{A PSLG describing a fuel lattice, and with a orthogonal ``subset" grid imposed on on the PSLG.}
+\captionof{figure}{A Planar Straight Line Graph (PSLG) describing a fuel lattice, and with a orthogonal ``subset" partition imposed on on the PSLG.}
 \label{grid}
 \end{minipage}
 
-Discontinuities along the boundary are fixed by ``stitching'' hanging nodes, creating degenerate polygons. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, degenerate polygons cause no issues in computing the solution. PDT employs two approaches to support unstructured meshing, a 2D mesh extruded in the third dimension, and a fully unstructured 3D mesh.
-
 \subsection{2D Extruded Meshes in PDT}
 
-When using the 2D extruded unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). After superimposing the orthogonal partition, a PSLG is created for each subset, and meshed.  Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. This method works quite well for symmetric problems, but can cause some issues when meshing spheres, cylinders, and non-symmetric features. As a result, PDT required support for truly 3D unstructured meshes.
+When using the 2D extruded unstructured meshing capability in PDT, the input geometry is described by a Planar Straight Line Graph (PSLG). After superimposing the orthogonal partition, a PSLG is created for each subset, and meshed. Mesh discontinuities along partition boundaries are fixed by ``stitching'' hanging nodes, creating degenerate polygons. Because PDT's spatial discretization employs Piece-Wise Linear Discontinuous (PWLD) finite element basis functions, degenerate polygons cause no issues in computing the solution.  Because the input's and each subset's PSLG must be described and meshed in 2D, the mesh can be extruded in the $z$ dimension in order to give us the capability to run on 3D problems. This method works quite well for symmetric problems, but can cause some issues when meshing spheres, cylinders, and non-symmetric features. As a result, PDT required support for truly 3D unstructured meshes.
 
 \subsection{3D Unstructured Meshes in PDT}
 
-The ability to read in meshes stored in the OpenFOAM format was developed recently in PDT. The OpenFOAM format was chosen for two reasons. First, OpenFOAM has many utilities to convert existing meshes in a variety of formats (such as Fluent) into the OpenFOAM format, which allows PDT to support users with pre-generated meshes. Second, as part of his PhD work, Rick Vega (a Texas A\&M graduate under Marvin Adams) wrote a code that takes the OpenFOAM-formatted mesh, partitions it with cut planes (preserving the logically Cartesian partitioning scheme), load balances it, and dumps the partitioned, balanced mesh for PDT to read in. 
+The ability to read in 3D meshes stored in the OpenFOAM format was developed recently in PDT. The OpenFOAM format was chosen for two reasons. First, OpenFOAM has many utilities to convert existing meshes in a variety of formats (such as Fluent) into the OpenFOAM format, which allows PDT to support users with pre-generated meshes. Second, as part of his PhD work, Rick Vega (a Texas A\&M graduate under Marvin Adams) wrote a code that takes the OpenFOAM-formatted mesh, partitions it with cut planes (preserving the logically Cartesian partitioning scheme), load balances it, and dumps the partitioned, balanced mesh for PDT to read in. 
 
 Figures \ref{comparison}, \ref{comparison_slice}, and \ref{comparison_slice_zoom} show the differences in the mesh between the 2D extruded and 3D approaches for the IM1C experiment run at Texas A\&M University.
 
@@ -306,18 +304,18 @@ Figures \ref{comparison}, \ref{comparison_slice}, and \ref{comparison_slice_zoom
   \label{comparison_slice_zoom}
 \end{figure}
 
-As shown in Fig. \ref{comparison_slice_zoom}, the other advantage of the OpenFOAM meshes is the ability to maintain good mesh quality with a relatively smaller number of cells. Due to the extrusion process in the prismatic meshes, any spherical or cylindrical shapes are stair-stepped in 2D, and need a lot more cells to maintain a good mesh quality.
+As shown in Fig. \ref{comparison_slice_zoom}, the other advantage of the OpenFOAM meshes is the ability to maintain good mesh quality with a smaller number of cells. Due to the extrusion process in PDT's prismatic meshes, any spherical or cylindrical shapes are stair-stepped in 2D, and need a lot more cells to maintain a good mesh quality.
 
-However, the 3D meshes do pose a challenge. When aggregating angles during the sweep, cycles occur. This prevents PDT from sweeping on these meshes unless using single angle aggregation, and most sweeps on large problems take far too long to run. A sweep structure that detects and addresses cycles is currently being implemented by the PDT development team, making 3D meshes practical for most problems.
+However, the 3D meshes do pose a challenge. When aggregating angles for the sweep, cycles occur. This prevents PDT from sweeping on these meshes unless using single angle aggregation, and most sweeps on large problems take far too long to run. A sweep structure that detects and addresses cycles is currently being implemented by the PDT development team, making 3D meshes practical for most problems.
 
-While both unstructured meshing approaches allowed PDT to run problems it was more difficult to run on before, it introduced the issue of unbalanced partitions. When creating the subsets with cut planes or cut lines, there is no guarantee that each subset will have an equivalent amount of cells. Over the last few years, two load balancing algorithms were introduced to combat this issue.
+While both unstructured meshing approaches allowed PDT to run problems previously more difficult to run, it introduced the issue of unbalanced partitions. When creating subsets with cut planes or cut lines, there is no guarantee that each subset will have an equivalent amount of cells. Over the last few years, two load balancing algorithms were introduced to combat this issue.
 
 \section{Approaches to Load Balancing Unstructured Meshes}
 
-When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor, and is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to balance the number of cells. Ideally, each processor will be responsible for an equal number of cells. Two approaches to load balancing were explored in PDT, which we refer to as "load balancing" and "load balancing by dimension". 
+When discussing the parallel scaling of transport sweeps, a load balanced problem is of great importance. A load balanced problem has an equal number of degrees of freedom per processor, and is important in order to minimize idle time for all processors by equally distributing (as much as possible) the work each processor has to do.  For the purposes of unstructured meshes in PDT, we are looking to balance the number of cells. Two approaches to load balancing were explored in PDT, which we refer to as ``load balancing" and ``load balancing by dimension". 
 Both load balancing algorithms rely on the movement of cut planes in order to redistribute high mesh-density areas to multiple processors.
 
-Before describing either load balancing algorithm, we define metric describing how imbalanced our problem is:
+Before describing either load balancing algorithm, we define a metric describing how imbalanced our problem is:
 
 \begin{equation}
 f =\frac{\underset{ijk}{\text{max}}(N_{ijk})}{\frac{N_{tot}}{I\cdot J\cdot K}},
@@ -333,7 +331,7 @@ $f_{D}$ is calculated by taking the maximum number of cells per row, column, or 
 
 \subsection{Load Balancing}
 
-The initial approach to load balancing was implemented on 2D extruded meshes. This means the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. Algorithm \ref{initial_algorithm} summarizes the initial approach to load balancing meshes in PDT.
+The initial approach to load balancing was implemented on 2D extruded meshes, meaning the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. Algorithm \ref{initial_algorithm} summarizes the initial approach to load balancing meshes in PDT.
 
 \begin{algorithm}[H]
 \caption{The initial load balancing algorithm.}
@@ -365,7 +363,7 @@ The image on the left side of Fig. \ref{redistribute} shows the CDF of the trian
 
 \subsection{Load Balancing by Dimension} \label{lbd_section}
 
-An improved load balancing algorithm was implemented that significantly improved our metric. Rather than load balancing all dimensions within an iteration, one dimension is balanced first for all iterations, and then the cut planes that yielded the best metric for that dimension are chosen. Then the next dimension is balanced within the first dimension. For example, if the $x$ cut planes are balanced first, the $y$ cut planes would be balanced \textit{within} each column. When full 3D load balancing by dimension (shown in Fig. \ref{lbd}) is used via Rick Vega's code, excellent metrics (shown in Table \ref{lbd_f}) within 6\% of unity are consistently obtained.
+An improved load balancing algorithm was implemented that improved our metric. Rather than load balancing all dimensions within an iteration, one dimension is balanced first for all iterations, and then the cut planes that yielded the best metric for that dimension are chosen. Then the next dimension is balanced within the first dimension. For example, if the $x$ cut planes are balanced first, the $y$ cut planes would be balanced \textit{within} each column. When full 3D load balancing by dimension (shown in Fig. \ref{lbd}) is used via Rick Vega's code, excellent metrics (shown in Table \ref{lbd_f}) within 6\% of unity are consistently obtained.
 
 \begin{table}[H]
 \centering
@@ -390,7 +388,7 @@ An improved load balancing algorithm was implemented that significantly improved
 \label{lbd}
 \end{figure}
 
-Even with excellent load balancing metrics with the load balancing by dimension algorithm, concern arose that the transport sweep would be impacted by not sweeping across regular partitions (cut planes going all the way across the domain rather than being split by dimension). 
+Even with excellent metrics with the load balancing by dimension algorithm, concerns arose that the transport sweep would be impacted by not sweeping across regular partitions (cut planes going all the way across the domain rather than being split by dimension). 
 
 \section{Issues of Load Balancing Unstructured Meshes for Transport Sweeps}
 
@@ -457,7 +455,7 @@ Figure \ref{worst_partition} shows a worse theoretical sweep partitioning, where
   \label{worst_partition}
 \end{figure}
 
-Two things become immediately clear as a result of this study: ideal balance does not always yield the best parallel efficiency, and the stage count of a sweep is no longer as important. The importance of the stage decreases, because a stage relies on the assumption of perfect load balance. Once the time to compute a task changes throughout the problem domain, we must instead rely on the total time to solution as the most important metric, not the stage and the previously stated definition of parallel efficiency (Eq. \ref{paralleleff}). 
+Two things become immediately clear as a result of this study: ideal balance does not always yield the best parallel efficiency, and the stage count of a sweep loses importance. This is because the stage relies on the assumption of perfect balance. Once the time to compute a task changes throughout the problem domain, we must instead rely on the total time to solution as the most important metric, not the stage and the previously stated definition of parallel efficiency (Eq. \ref{paralleleff}). 
 
 \section{Time-to-Solution Estimation} \label{TOS}
 
@@ -479,11 +477,11 @@ In order to optimize the location of the cut planes based on balance and sweep e
 
 \subsection{Weighting the Task Dependence Graph}\label{weighting_graphs}
 
-The time to solution relies on weighting the graph correctly to determine the traversal time for each octant. In order to correctly estimate the time to solution, two pieces of information are initially required: the number of cells per subset, and the number of boundary cells per subset. In order to obtain this information, a very fine grid is superimposed upon the domain partitioning, with each grid unit containing $g$ cells. Equation \eqref{num_mini_sub} gives the total number of fine grid units $n_s$, and Eqns. \eqref{boundaries_begin} - \eqref{boundaries} give $a,b, \text{and }  c$, the global domain boundaries in each dimension. 
+The time to solution relies on weighting the graph correctly to determine the traversal time for each octant. In order to correctly estimate the time to solution, two pieces of information are initially required: the number of cells per subset, and the number of boundary cells per subset. In order to obtain this information, a very fine grid is superimposed upon the domain partitioning, with each fine grid unit containing $g$ cells. Equation \eqref{num_mini_sub} gives the total number of fine grid units $n_s$, and Eqns. \eqref{boundaries_begin} - \eqref{boundaries} give $a,b, \text{and }  c$, the global domain boundaries in each dimension. 
 %Equations.
 \begin{align}
 \label{num_mini_sub}
-n_s &= \frac{\text{number of cells}}{g} \\
+n_s &= \frac{\text{number of cells across the entire domain}}{g} \\
 \label{boundaries_begin}
 a &= x_{\text{max}} - x_{\text{min}} \\
 b &= y_{\text{max}} - y_{\text{min}} \\
@@ -556,14 +554,14 @@ The conflict detection process is best explained as a ``marching" process. We be
 \end{algorithmic}
 \end{algorithm}
 %%%%%
-Due to the potentially imbalanced nature of problems, each subset could take a different amount of time to solve and communicate it's information.  Conflicts are resolved by one of two methods, first-come-first-serve and depth-of-graph remaining. If a conflict arises between two or more TDGs, the following process is followed:
+Due to the potentially imbalanced nature of problems, each subset could take a different amount of time to solve and communicate its information.  Conflicts are resolved by one of two methods, first-come-first-serve and depth-of-graph remaining. If a conflict arises between two or more TDGs, the following process is followed:
 \begin{enumerate}
 	\item Whichever TDG reaches the conflicted node first, wins.
 	\item If two or more TDGs reach the conflicted node at the same time, the TDG with the greater depth-of-graph remaining wins.
 	\item If two or more TDGs have the same depth-of-graph remaining, the graph with the priority octant wins (the same as PDT's priority octant system described in Section \ref{pdt_extension}).
 \end{enumerate}
 
-Once all TDGs have had their weights modified to address conflicts, it is extremely simple to estimation the time-to-solution. The maximum value of the final weight (for example, the weight from node 8 to node -1 in Fig. \ref{TDG}) across all TDGs is the time-to-solution. 
+Once all TDGs have had their weights modified to address conflicts, it is extremely simple to estimate the time-to-solution. The maximum value of the final weight (for example, the weight from node 8 to node -1 in Fig. \ref{digraph}) across all TDGs is the time-to-solution. 
 
 \subsection{Optimizing the Time to Solution}\label{optimize}
 
