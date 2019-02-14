@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 import time
 plt.close("all")
 
-numrow = 11
-numcol = 11
+numrow = 8
+numcol = 8
 
-adjacency_matrix = np.genfromtxt('matrices_10.csv',delimiter=",")
+adjacency_matrix = np.genfromtxt('matrices_7.csv',delimiter=",")
 
 
 graphs = build_graphs(adjacency_matrix,numrow,numcol)
@@ -28,47 +28,49 @@ graphs = make_edges_universal(graphs)
 end = time.time()
 print(end - start)
 
-#plt.figure("G")
+#plt.figure("G universal")
 #edge_labels_1 = nx.get_edge_attributes(G,'weight')
 #nx.draw(G,nx.spectral_layout(G),with_labels = True)
 #nx.draw_networkx_edge_labels(G,nx.spectral_layout(G),edge_labels=edge_labels_1)
 #
-#plt.figure("G1")
+#plt.figure("G1 universal")
 #edge_labels_1 = nx.get_edge_attributes(G1,'weight')
 #nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
 #nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
 #
-#plt.figure("G2")
+#plt.figure("G2 universal")
 #edge_labels_1 = nx.get_edge_attributes(G2,'weight')
 #nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
 #nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
 #
-#plt.figure("G3")
+#plt.figure("G3 universal")
 #edge_labels_1 = nx.get_edge_attributes(G3,'weight')
 #nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
 #nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
 
+
+
 #A list that stores the time to solve each node.
-#time_to_solve = [1]*numrow*numcol
-#
-#graphs = add_conflict_weights(graphs,time_to_solve)
-#
-#plt.figure("G")
-#edge_labels_1 = nx.get_edge_attributes(G,'weight')
-#nx.draw(G,nx.spectral_layout(G),with_labels = True)
-#nx.draw_networkx_edge_labels(G,nx.spectral_layout(G),edge_labels=edge_labels_1)
-#
-#plt.figure("G1")
-#edge_labels_1 = nx.get_edge_attributes(G1,'weight')
-#nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
-#nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
-#
-#plt.figure("G2")
-#edge_labels_1 = nx.get_edge_attributes(G2,'weight')
-#nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
-#nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
-#
-#plt.figure("G3")
-#edge_labels_1 = nx.get_edge_attributes(G3,'weight')
-#nx.draw(G3,nx.spectral_layout(G3),with_labels = True)
-#nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3),edge_labels=edge_labels_1)
+time_to_solve = [1]*numrow*numcol
+
+graphs = add_conflict_weights(graphs,time_to_solve)
+
+plt.figure("G")
+edge_labels_1 = nx.get_edge_attributes(G,'weight')
+nx.draw(G,nx.spectral_layout(G),with_labels = True)
+nx.draw_networkx_edge_labels(G,nx.spectral_layout(G),edge_labels=edge_labels_1)
+
+plt.figure("G1")
+edge_labels_1 = nx.get_edge_attributes(G1,'weight')
+nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
+nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
+
+plt.figure("G2")
+edge_labels_1 = nx.get_edge_attributes(G2,'weight')
+nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
+nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
+
+plt.figure("G3")
+edge_labels_1 = nx.get_edge_attributes(G3,'weight')
+nx.draw(G3,nx.spectral_layout(G3),with_labels = True)
+nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3),edge_labels=edge_labels_1)
