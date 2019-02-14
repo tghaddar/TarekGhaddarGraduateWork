@@ -10,6 +10,7 @@ from math import isclose
 from matplotlib.pyplot import imshow,pause
 import time
 import operator
+from copy import deepcopy
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 #This function computes the solve time for a sweep for each octant. 
@@ -187,13 +188,13 @@ def make_edges_universal(graphs):
       if (start_node == n):
         continue
       #Getting all simple paths to the node.
-      start = time.time()
-      simple_paths = nx.all_simple_paths(graph,start_node,n)
-      end = time.time()
-      print(n,end - start)
+      #start = time.time()
+      #simple_paths = nx.all_simple_paths(graph,start_node,n)
+      #end = time.time()
+      #print(n,end - start)
       #The heaviest path and the length of the heaviest path.
       start = time.time()
-      heaviest_path,heaviest_path_length = get_heaviest_path_faster(graph,simple_paths)
+      heaviest_path,heaviest_path_length = get_heaviest_path_faster(graph,start_node,n)
       end = time.time()
       print(n,end-start)
 
@@ -236,9 +237,9 @@ def make_edges_univeral_faster(graphs):
     #Looping over nodes to get the longest path to each node.
     for n in range(0,num_nodes):
       #Getting all simple paths to the node.
-      simple_paths = nx.all_simple_paths(graph,start_node,n)
+      #simple_paths = nx.all_simple_paths(graph,start_node,n)
       #The heaviest path and the length of the heaviest path.
-      heaviest_path,heaviest_path_length = get_heaviest_path_faster(graph,simple_paths)
+      heaviest_path,heaviest_path_length = get_heaviest_path_faster(graph,start_node,n)
       #Storing this value in heavy_path_lengths.
       heavy_path_lengths[n] = heaviest_path_length
       
@@ -306,7 +307,6 @@ def nodes_being_solved(G,weight_limit,time_to_solve):
   return nodes_being_solved
   
 def sum_weights_of_path(graph,path):
-  start_func = time.time()
   weight_sum = 0.0
   path_length = len(path) - 1
   for n in range(0,path_length):
@@ -315,8 +315,6 @@ def sum_weights_of_path(graph,path):
     weight = graph[node1][node2]['weight']
     weight_sum += weight
 
-  end_func = time.time()
-  print("within func: " , end_func-start_func)
   return weight_sum
 
 #Takes all simple paths in a graph and returns the heaviest one.
@@ -334,24 +332,20 @@ def get_heaviest_path(graph,paths):
     
   return heaviest_path,heaviest_path_weight
 
-def get_heaviest_path_faster(graph,paths):
-  heaviest_path = 0
+def get_heaviest_path_faster(graph,start_node,target_node):
+  start_heavy = time.time()
   heaviest_path_weight = 0.0 
-  #Storing all the path weights.
-  path_weights = []
-  start1 = time.time()
-#  for path in paths:
-#    start_append = time.time()
-#    path_weights.append(sum_weights_of_path(graph,path))
-#    end_append = time.time()
-#    print("append: ", end_append - start_append)
-  path_weights = [sum_weights_of_path(graph,path) for path in paths]
-  end1 = time.time()
-  print(path_weights)
-  print("sum_of_weights time: ", end1-start1)
-  #Getting the max weight and index of max weight.
-  heaviest_path_weight = max(path_weights)
-  heaviest_path = np.argmax(path_weights)
+  #A graph with the weights inverted. We use this to calculate the longest path.
+  inverse_graph = deepcopy(graph)
+  inverse_graph = invert_weights(inverse_graph)
+  
+  #The heaviest (or longest path) is the shortest path on the inverse graph.
+  heaviest_path = nx.shortest_path(inverse_graph,start_node,target_node)
+  
+  heaviest_path_weight = sum_weights_of_path(graph,heaviest_path)
+  end_heavy = time.time()
+  print("heaviest_path_time: ", end_heavy-start_heavy)
+  
   
   return heaviest_path,heaviest_path_weight
   
