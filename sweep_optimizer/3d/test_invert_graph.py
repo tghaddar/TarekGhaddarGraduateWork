@@ -30,6 +30,10 @@ nx.draw(G,nx.spectral_layout(G),with_labels = True)
 nx.draw_networkx_edge_labels(G,nx.spectral_layout(G),edge_labels=edge_labels_1)
 
 graph_copy = invert_weights(graph_copy)
+
+#Getting the shortest path of the copy (longest path of the original graph).
+longest_path = nx.shortest_path(G,0,3)
+
 plt.figure("G_invert")
 edge_labels_1 = nx.get_edge_attributes(graph_copy,'weight')
 nx.draw(graph_copy,nx.spectral_layout(graph_copy),with_labels = True)
