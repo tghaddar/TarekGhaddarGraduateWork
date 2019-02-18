@@ -504,8 +504,7 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
   #Copying the graphs frozen at time t.
   frozen_graphs = deepcopy(graphs)
   num_graphs = len(graphs)
-  #Storing modified edges per graph at time t. Initializing with a dummy edge.
-  modified_edges = {k: [] for k in range(num_graphs)}
+  
   #We loop over all nodes ready to solve at time t.
   for node in nodes:
     print("Node in conflict: ", node)
@@ -515,6 +514,8 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
     conflicting_graphs = conflicting_nodes[node]
     num_conflicting_graphs = len(conflicting_graphs)
     for outer in range(0,num_conflicting_graphs-1):
+      #Storing modified edges per graph at time t. Initializing with a dummy edge.
+      modified_edges = {k: [] for k in range(num_graphs)}
       #The fastest graph to the node.
       first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node)
       print("First graph to the node: ", first_graph)
@@ -717,7 +718,7 @@ def add_conflict_weights(graphs,time_to_solve):
   #Keep iterating until all graphs have finished.
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if (t == 4):
+    if (t == 3):
       print("debug")
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
