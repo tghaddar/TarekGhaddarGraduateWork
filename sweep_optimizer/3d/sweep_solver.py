@@ -504,7 +504,10 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
   #Copying the graphs frozen at time t.
   frozen_graphs = deepcopy(graphs)
   num_graphs = len(graphs)
-  
+  num_nodes = len(nodes)
+  #Storing modified edges per graph over all nodes per time t.
+  modified_edges_over_nodes = [{k: [] for k in range(num_graphs)} for i in range(num_nodes+1)]
+  node_ind = 1
   #We loop over all nodes ready to solve at time t.
   for node in nodes:
     print("Node in conflict: ", node)
@@ -513,9 +516,10 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
     #We get the graphs in conflict at this node.
     conflicting_graphs = conflicting_nodes[node]
     num_conflicting_graphs = len(conflicting_graphs)
+   
     for outer in range(0,num_conflicting_graphs-1):
-      #Storing modified edges per graph at time t. Initializing with a dummy edge.
-      modified_edges = {k: [] for k in range(num_graphs)}
+      #Storing modified edges per graph at time t.
+      modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
       #The fastest graph to the node.
       first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node)
       print("First graph to the node: ", first_graph)
@@ -551,15 +555,17 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
               #Adding this edge to the modified edges.
               modified_edges[second_graph].append(edge)
             elif(edge not in modified_edges[second_graph]):
-                #Adding the delay. 
-                secondary_graph[node1][node2]['weight'] += delay
-                #Adding this edge to the modified edges.
-                modified_edges[second_graph].append(edge)
+              #Adding the delay. 
+              secondary_graph[node1][node2]['weight'] += delay
+              #Adding this edge to the modified edges.
+              modified_edges[second_graph].append(edge)
 
 
       
       graphs[second_graph] = secondary_graph
     
+    modified_edges_over_nodes[node_ind] = modified_edges
+    node_ind += 1
     
     
     
@@ -718,7 +724,7 @@ def add_conflict_weights(graphs,time_to_solve):
   #Keep iterating until all graphs have finished.
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if (t == 3):
+    if t == 3.0:
       print("debug")
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
@@ -762,30 +768,30 @@ def add_conflict_weights(graphs,time_to_solve):
         #if (num_conflicting_nodes == 1):
         t = find_next_interaction(graphs,t,time_to_solve)
     
-    plt.close("all")
-    G,G1,G2,G3 = graphs
-    plt.figure("G")
-    edge_labels_1 = nx.get_edge_attributes(G,'weight')
-    nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
-    
-    plt.figure("G1")
-    edge_labels_1 = nx.get_edge_attributes(G1,'weight')
-    nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
-    
-    plt.figure("G2")
-    edge_labels_1 = nx.get_edge_attributes(G2,'weight')
-    nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
-    
-    plt.figure("G3")
-    edge_labels_1 = nx.get_edge_attributes(G3,'weight')
-    nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
-    nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
-    
-    pause(1)
-    print("here")
+#    plt.close("all")
+#    G,G1,G2,G3 = graphs
+#    plt.figure("G")
+#    edge_labels_1 = nx.get_edge_attributes(G,'weight')
+#    nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
+#    
+#    plt.figure("G1")
+#    edge_labels_1 = nx.get_edge_attributes(G1,'weight')
+#    nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
+#    
+#    plt.figure("G2")
+#    edge_labels_1 = nx.get_edge_attributes(G2,'weight')
+#    nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
+#    
+#    plt.figure("G3")
+#    edge_labels_1 = nx.get_edge_attributes(G3,'weight')
+#    nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
+#    nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
+#    
+#    pause(1)
+#    print("here")
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
       if finished_graphs[g]:
