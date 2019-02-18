@@ -227,8 +227,8 @@ def nodes_being_solved(G,weight_limit,time_to_solve):
   #The simple paths of this graph.
   simple_paths = nx.all_simple_paths(G,start_node,end_node)
   
+  start_path_loop = time.time()
   for path in simple_paths:
-    
     #Number of nodes in this path
     num_nodes_path = len(path)
     for n in range(1,num_nodes_path):
@@ -251,6 +251,9 @@ def nodes_being_solved(G,weight_limit,time_to_solve):
           nodes_being_solved.append(node1)
           break
 
+
+  end_path_loop = time.time()
+  print("path_loop: ", end_path_loop - start_path_loop)
   #Making the list unique.
   nodes_being_solved = list(set(nodes_being_solved))
   nodes_being_solved = sorted(nodes_being_solved)
@@ -510,7 +513,6 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
   node_ind = 1
   #We loop over all nodes ready to solve at time t.
   for node in nodes:
-    print("Node in conflict: ", node)
     #The time to solve this node.
     time_to_solve_node = time_to_solve[node]
     #We get the graphs in conflict at this node.
@@ -522,7 +524,6 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
       modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
       #The fastest graph to the node.
       first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node)
-      print("First graph to the node: ", first_graph)
       #Removed from conflicting graphs.
       conflicting_graphs.remove(first_graph) 
       #Loop over the secondary graphs.
@@ -609,8 +610,8 @@ def modify_secondary_graphs(graphs,conflicting_graphs,node,time_to_solve_node):
   for outer in range(0,num_conflicting_graphs-1):
     #The fastest graph to the node.
     first_graph = find_first_graph(conflicting_graphs,graphs,node)
-    print("Conflicted Node: ", node)
-    print("First graph: ", first_graph)
+#    print("Conflicted Node: ", node)
+#    print("First graph: ", first_graph)
     #Removed from conflicting graphs.
     conflicting_graphs.remove(first_graph)
     #Loop over the secondary graphs.
@@ -724,23 +725,27 @@ def add_conflict_weights(graphs,time_to_solve):
   #Keep iterating until all graphs have finished.
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if t == 3.0:
-      print("debug")
+    start_nodes_being_solved = time.time()
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
       graph = graphs[g]
       all_nodes_being_solved[g] = nodes_being_solved(graph,t,time_to_solve)
-    
-    print("Nodes being solved in each graph")
-    print(all_nodes_being_solved)
+      
+    end_nodes_being_solved = time.time()
+    print("nodes_being_solved: ", end_nodes_being_solved - start_nodes_being_solved)
+#    print("Nodes being solved in each graph")
+#    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
+    start_find_conflicts = time.time()
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
+    end_find_conflicts = time.time()
+    print("find_conflicts: ",end_find_conflicts - start_find_conflicts)
     num_conflicting_nodes = len(conflicting_nodes)
     
-    print("The graphs in conflict for each node")
-    print(conflicting_nodes)
-    print("here")
+#    print("The graphs in conflict for each node")
+#    print(conflicting_nodes)
+#    print("here")
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
       t = find_next_interaction(graphs,t,time_to_solve)
@@ -748,7 +753,7 @@ def add_conflict_weights(graphs,time_to_solve):
     else:
       #Find nodes ready to solve at time t that are in conflict.
       first_nodes = find_first_conflict(conflicting_nodes,graphs)
-      print(first_nodes)
+#      print(first_nodes)
       num_nodes_ready_to_solve = len(first_nodes)
       if (num_nodes_ready_to_solve == 1):
         first_node = first_nodes[0]
@@ -767,31 +772,7 @@ def add_conflict_weights(graphs,time_to_solve):
         #To update our march through, we need to update t here, with a find_next_interaction.
         #if (num_conflicting_nodes == 1):
         t = find_next_interaction(graphs,t,time_to_solve)
-    
-#    plt.close("all")
-#    G,G1,G2,G3 = graphs
-#    plt.figure("G")
-#    edge_labels_1 = nx.get_edge_attributes(G,'weight')
-#    nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
-#    nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
-#    
-#    plt.figure("G1")
-#    edge_labels_1 = nx.get_edge_attributes(G1,'weight')
-#    nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
-#    nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
-#    
-#    plt.figure("G2")
-#    edge_labels_1 = nx.get_edge_attributes(G2,'weight')
-#    nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
-#    nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
-#    
-#    plt.figure("G3")
-#    edge_labels_1 = nx.get_edge_attributes(G3,'weight')
-#    nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
-#    nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
-#    
-#    pause(1)
-#    print("here")
+
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
       if finished_graphs[g]:
@@ -807,6 +788,7 @@ def add_conflict_weights(graphs,time_to_solve):
     print(finished_graphs)
     
     num_finished_graphs = len([x for x in finished_graphs if finished_graphs[x] == True])
+
     
   return graphs
 

@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 import time
 plt.close("all")
 
-numrow = 9
-numcol = 9
+numrow = 11
+numcol = 11
 
-adjacency_matrix = np.genfromtxt('matrices_8.csv',delimiter=",")
+adjacency_matrix = np.genfromtxt('matrices_10.csv',delimiter=",")
 
 
 graphs = build_graphs(adjacency_matrix,numrow,numcol)
