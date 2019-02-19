@@ -52,19 +52,20 @@ def _all_simple_paths_graph_modified(G, source, target, time_to_solve, cutoff=No
         children = stack[-1]
         child = next(children, None)
         start_time = list(G.in_edges(child,'weight'))[0][2]
-        if (cutoff == 0.0):
-          yield source
-        if (cutoff > start_time_source and cutoff < start_time):
-          yield source
         if child is None:
             stack.pop()
             visited.pop()
+        elif (cutoff == 0.0):
+            yield source
+        elif (cutoff >= start_time_source and cutoff < start_time):
+            yield source
         elif start_time > cutoff:
             stack.pop()
             visited.pop()
         elif start_time <= cutoff:
             if child == target:
-                yield child
+              stack.pop()
+              visited.pop()
             elif start_time + time_to_solve[child] > cutoff:
                 yield child
             elif child not in visited:
@@ -72,8 +73,6 @@ def _all_simple_paths_graph_modified(G, source, target, time_to_solve, cutoff=No
                 stack.append(iter(G[child]))
             
         else:  # len(visited) == cutoff:
-            if child == target or target in children:
-                yield target
             stack.pop()
             visited.pop()
 
@@ -279,7 +278,7 @@ def nodes_being_solved_simple(G,prev_nodes,weight_limit,time_to_solve):
     
     node_generator = all_simple_paths_modified(G,prev_node,end_node,time_to_solve,cutoff=weight_limit)
     nodes_being_solved += list(node_generator)
-          
+
   #Making the list unique.
   nodes_being_solved = list(set(nodes_being_solved))
   nodes_being_solved = sorted(nodes_being_solved)
@@ -634,34 +633,7 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
     
     modified_edges_over_nodes[node_ind] = modified_edges
     node_ind += 1
-    
-    
-    
-#    plt.close("all")
-#    G,G1,G2,G3 = graphs
-#    plt.figure("G")
-#    edge_labels_1 = nx.get_edge_attributes(G,'weight')
-#    nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
-#    nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
-#    
-#    plt.figure("G1")
-#    edge_labels_1 = nx.get_edge_attributes(G1,'weight')
-#    nx.draw(G1,nx.spectral_layout(G1,weight = None),with_labels = True)
-#    nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1,weight = None),edge_labels=edge_labels_1)
-#    
-#    plt.figure("G2")
-#    edge_labels_1 = nx.get_edge_attributes(G2,'weight')
-#    nx.draw(G2,nx.spectral_layout(G2,weight = None),with_labels = True)
-#    nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2,weight = None),edge_labels=edge_labels_1)
-#    
-#    plt.figure("G3")
-#    edge_labels_1 = nx.get_edge_attributes(G3,'weight')
-#    nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
-#    nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
-#    
-#    pause(1)
-#    print("here")
-  
+      
   #Make sure all incoming edges to all nodes match up. We do this later in the multi-node case because this all occurs within one time iteration.
   for g in range(0,num_graphs):
     graphs[g] = match_delay_weights(graphs[g])
@@ -801,6 +773,8 @@ def add_conflict_weights(graphs,time_to_solve):
     all_nodes_being_solved_test =[None]*num_graphs
     for g in range(0,num_graphs):
       graph = graphs[g]
+      if (t == 2.0 and g == 1):
+        print("debug")
       all_nodes_being_solved[g] = nodes_being_solved_faster(graph,prev_nodes[g],t,time_to_solve)
       all_nodes_being_solved_test[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve)
       
