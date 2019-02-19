@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import time
 plt.close("all")
 
+start_tos = time.time()
+
 numrow = 11
 numcol = 11
 
@@ -23,10 +25,8 @@ for g in range(0,num_graphs):
 
 G,G1,G2,G3 = graphs
 
-start = time.time()
 graphs = make_edges_universal(graphs)
-end = time.time()
-print(end - start)
+
 
 #plt.figure("G universal")
 #edge_labels_1 = nx.get_edge_attributes(G,'weight')
@@ -54,6 +54,9 @@ print(end - start)
 time_to_solve = [1]*numrow*numcol
 
 graphs = add_conflict_weights(graphs,time_to_solve)
+
+end_tos = time.time()
+print("Total Run Time: ", end_tos - start_tos)
 
 plt.figure("G")
 edge_labels_1 = nx.get_edge_attributes(G,'weight')

@@ -214,7 +214,6 @@ def make_edges_universal(graphs):
     graphs[g] = graph
   return graphs
 
-
 #A weight based traversal of a graph G. In the context of our problem, this returns all nodes solving at time t = weight_limit.
 def nodes_being_solved(G,weight_limit,time_to_solve):
   #starting_node
@@ -226,6 +225,7 @@ def nodes_being_solved(G,weight_limit,time_to_solve):
   nodes_being_solved = []
   #The simple paths of this graph.
   simple_paths = nx.all_simple_paths(G,start_node,end_node)
+  
   
   start_path_loop = time.time()
   for path in simple_paths:
@@ -269,6 +269,47 @@ def sum_weights_of_path(graph,path):
     weight_sum += weight
 
   return weight_sum
+
+#An attempt to speep up nodes_being_solved (def on line 218).
+
+def nodes_being_solved_faster(G,prev_nodes,weight_limit,time_to_solve):
+  #The ending node of the graph is always -1. 
+  end_node =  -1
+  
+  #The nodes being solved.
+  nodes_being_solved = []
+  #Looping over the previous nodes and getting the simple paths to the ending node.
+  for prev_node in prev_nodes:
+    
+    simple_paths = nx.all_simple_paths(G,prev_node,end_node)
+    #Looping over the simple paths from the previous node to the ending node.
+    for path in simple_paths:
+      #Number of nodes in this path
+      num_nodes_path = len(path)
+      for n in range(1,num_nodes_path):
+        node1 = path[n-1]
+        node2 = path[n]
+        current_weight = G[node1][node2]['weight']
+        #Checking if the node is solving by the weight limit.
+        if ( current_weight >= weight_limit):
+          #The time this node starts solving at.
+          try:
+            start_time = list(G.in_edges(node1,'weight'))[0][2]
+          except:
+            start_time = 0.0
+          #If the start time of the node has already passed t, we break out of the loop.
+          if (start_time > weight_limit):
+            break
+          #Is this node is actually being solved? Or just waiting to communicate?
+          elif (start_time+time_to_solve[node1] > weight_limit):
+            #The node is actually being solved.
+            nodes_being_solved.append(node1)
+            break
+          
+  #Making the list unique.
+  nodes_being_solved = list(set(nodes_being_solved))
+  nodes_being_solved = sorted(nodes_being_solved)
+  return nodes_being_solved
 
 #Returns the heaviest path to a node.
 def get_heaviest_path_faster(graph,start_node,target_node):
@@ -322,7 +363,7 @@ def print_simple_paths(path_gen):
     print(p)
 
 #Finds the next time where a node is ready to solve. This is the time where we solve for conflicts.
-def find_next_interaction(graphs,start_time,time_to_solve):
+def find_next_interaction(graphs,prev_nodes,start_time,time_to_solve):
   
   num_graphs = len(graphs)
   
@@ -331,8 +372,8 @@ def find_next_interaction(graphs,start_time,time_to_solve):
     
     graph = graphs[g]
     #Getting the nodes being solved at the start time.
-    start_nodes = nodes_being_solved(graph,start_time,time_to_solve)
-    end_node = [x for x in graph.nodes() if graph.out_degree(x) == 0][0]
+    start_nodes = nodes_being_solved_faster(graph,prev_nodes[g],start_time,time_to_solve)
+    end_node = -1
     
     for node in start_nodes:
       #Getting all the paths froward from this node till the end.
@@ -712,9 +753,11 @@ def add_conflict_weights(graphs,time_to_solve):
   
   #Storing the ending nodes of all graphs.
   end_nodes = {}
+  prev_nodes = []
   for g in range(0,num_graphs):
     graph = graphs[g]
     end_nodes[g] = list(graph.predecessors(-1))[0]
+    prev_nodes.append([x for x in graph.nodes() if graph.in_degree(x) == 0])
   
   #The number of graphs that have finished.
   num_finished_graphs = 0
@@ -722,6 +765,7 @@ def add_conflict_weights(graphs,time_to_solve):
   finished_graphs = [False]*num_graphs
   #The current time (starts at 0.0 s)
   t = 0.0
+  
   #Keep iterating until all graphs have finished.
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
@@ -730,10 +774,11 @@ def add_conflict_weights(graphs,time_to_solve):
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
       graph = graphs[g]
-      all_nodes_being_solved[g] = nodes_being_solved(graph,t,time_to_solve)
+      all_nodes_being_solved[g] = nodes_being_solved_faster(graph,prev_nodes[g],t,time_to_solve)
       
     end_nodes_being_solved = time.time()
     print("nodes_being_solved: ", end_nodes_being_solved - start_nodes_being_solved)
+    prev_nodes = all_nodes_being_solved
 #    print("Nodes being solved in each graph")
 #    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
@@ -748,7 +793,7 @@ def add_conflict_weights(graphs,time_to_solve):
 #    print("here")
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
-      t = find_next_interaction(graphs,t,time_to_solve)
+      t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
     #Otherwise, we address the conflicts between nodes across all graphs.
     else:
       #Find nodes ready to solve at time t that are in conflict.
@@ -763,7 +808,7 @@ def add_conflict_weights(graphs,time_to_solve):
         graphs = modify_secondary_graphs(graphs,conflicting_graphs,first_node,time_to_solve[first_node])
         #To update our march through, we need to update t here, with a find_next_interaction.
         if (num_conflicting_nodes == 1):
-          t = find_next_interaction(graphs,t,time_to_solve)
+          t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
       
       else:
         #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
@@ -771,7 +816,7 @@ def add_conflict_weights(graphs,time_to_solve):
         
         #To update our march through, we need to update t here, with a find_next_interaction.
         #if (num_conflicting_nodes == 1):
-        t = find_next_interaction(graphs,t,time_to_solve)
+        t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
 
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
