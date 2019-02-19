@@ -372,7 +372,8 @@ def find_next_interaction(graphs,prev_nodes,start_time,time_to_solve):
     
     graph = graphs[g]
     #Getting the nodes being solved at the start time.
-    start_nodes = nodes_being_solved_faster(graph,prev_nodes[g],start_time,time_to_solve)
+    start_nodes = prev_nodes[g]
+    print(start_nodes)
     end_node = -1
     
     for node in start_nodes:
@@ -779,6 +780,7 @@ def add_conflict_weights(graphs,time_to_solve):
     end_nodes_being_solved = time.time()
     print("nodes_being_solved: ", end_nodes_being_solved - start_nodes_being_solved)
     prev_nodes = all_nodes_being_solved
+    print(prev_nodes)
 #    print("Nodes being solved in each graph")
 #    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
