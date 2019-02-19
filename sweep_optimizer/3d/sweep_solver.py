@@ -25,6 +25,50 @@ m_l = 1
 T_m = 35.0
 T_g = 60.0
 
+#A modified version of networkx simple paths algorithm.
+def all_simple_paths_modified(G, source, target, time_to_solve, cutoff=None):
+
+    if source not in G:
+        raise nx.NodeNotFound('source node %s not in graph' % source)
+    if target not in G:
+        raise nx.NodeNotFound('target node %s not in graph' % target)
+    if source == target:
+        return []
+    if cutoff is None:
+        cutoff = len(G) - 1
+    return _all_simple_paths_graph_modified(G, source, target,time_to_solve, cutoff=cutoff)
+
+
+def _all_simple_paths_graph_modified(G, source, target, time_to_solve, cutoff=None):
+
+    visited = [source]
+    stack = [iter(G[source])]
+    while stack:
+        children = stack[-1]
+        child = next(children, None)
+        start_time = list(G.in_edges(child,'weight'))[0][2]
+        if child is None:
+            stack.pop()
+            visited.pop()
+        elif start_time > cutoff:
+            stack.pop()
+            visited.pop()
+        elif start_time <= cutoff:
+            if child == target:
+                yield child
+            elif start_time + time_to_solve[child] > cutoff:
+                yield child
+            elif child not in visited:
+                visited.append(child)
+                stack.append(iter(G[child]))
+            
+        else:  # len(visited) == cutoff:
+            if child == target or target in children:
+                yield target
+            stack.pop()
+            visited.pop()
+
+
 def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   
   #Approximately two cells per mini subset.
@@ -224,7 +268,7 @@ def nodes_being_solved(G,weight_limit,time_to_solve):
   #A list to store the nodes that are being solved at time t = weight_limit.
   nodes_being_solved = []
   #The simple paths of this graph.
-  simple_paths = nx.all_simple_paths(G,start_node,end_node)
+  simple_paths = modified_simple_paths(G,start_node,end_node)
   
   
   start_path_loop = time.time()
