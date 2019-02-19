@@ -42,11 +42,20 @@ def all_simple_paths_modified(G, source, target, time_to_solve, cutoff=None):
 def _all_simple_paths_graph_modified(G, source, target, time_to_solve, cutoff=None):
 
     visited = [source]
+    start_time_source = 0.0
+    try:
+      start_time_source = list(G.in_edges(source,'weight'))[0][2]
+    except:
+      start_time_source = 0.0
     stack = [iter(G[source])]
     while stack:
         children = stack[-1]
         child = next(children, None)
         start_time = list(G.in_edges(child,'weight'))[0][2]
+        if (cutoff == 0.0):
+          yield source
+        if (cutoff > start_time_source and cutoff < start_time):
+          yield source
         if child is None:
             stack.pop()
             visited.pop()
@@ -259,45 +268,18 @@ def make_edges_universal(graphs):
   return graphs
 
 #A weight based traversal of a graph G. In the context of our problem, this returns all nodes solving at time t = weight_limit.
-def nodes_being_solved(G,weight_limit,time_to_solve):
-  #starting_node
-  start_node = [x for x in G.nodes() if G.in_degree(x) == 0][0]
-  #ending_node 
-  end_node =  [x for x in G.nodes() if G.out_degree(x) == 0][0]
-
-  #A list to store the nodes that are being solved at time t = weight_limit.
+def nodes_being_solved_simple(G,prev_nodes,weight_limit,time_to_solve):
+  #The ending node of the graph is always -1. 
+  end_node =  -1
+  
+  #The nodes being solved.
   nodes_being_solved = []
-  #The simple paths of this graph.
-  simple_paths = modified_simple_paths(G,start_node,end_node)
-  
-  
-  start_path_loop = time.time()
-  for path in simple_paths:
-    #Number of nodes in this path
-    num_nodes_path = len(path)
-    for n in range(1,num_nodes_path):
-      node1 = path[n-1]
-      node2 = path[n]
-      current_weight = G[node1][node2]['weight']
-      #Checking if the node is solving by the weight limit.
-      if ( current_weight >= weight_limit):
-        #The time this node starts solving at.
-        try:
-          start_time = list(G.in_edges(node1,'weight'))[0][2]
-        except:
-          start_time = 0.0
-        #If the start time of the node has already passed t, we break out of the loop.
-        if (start_time > weight_limit):
-          break
-        #Is this node is actually being solved? Or just waiting to communicate?
-        elif (start_time+time_to_solve[node1] > weight_limit):
-          #The node is actually being solved.
-          nodes_being_solved.append(node1)
-          break
-
-
-  end_path_loop = time.time()
-  print("path_loop: ", end_path_loop - start_path_loop)
+  #Looping over the previous nodes and getting the simple paths to the ending node.
+  for prev_node in prev_nodes:
+    
+    node_generator = all_simple_paths_modified(G,prev_node,end_node,time_to_solve,cutoff=weight_limit)
+    nodes_being_solved += list(node_generator)
+          
   #Making the list unique.
   nodes_being_solved = list(set(nodes_being_solved))
   nodes_being_solved = sorted(nodes_being_solved)
@@ -816,14 +798,17 @@ def add_conflict_weights(graphs,time_to_solve):
     start_nodes_being_solved = time.time()
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
+    all_nodes_being_solved_test =[None]*num_graphs
     for g in range(0,num_graphs):
       graph = graphs[g]
       all_nodes_being_solved[g] = nodes_being_solved_faster(graph,prev_nodes[g],t,time_to_solve)
+      all_nodes_being_solved_test[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve)
       
     end_nodes_being_solved = time.time()
     print("nodes_being_solved: ", end_nodes_being_solved - start_nodes_being_solved)
     prev_nodes = all_nodes_being_solved
-
+    print(all_nodes_being_solved)
+    print(all_nodes_being_solved_test)
 #    print("Nodes being solved in each graph")
 #    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
