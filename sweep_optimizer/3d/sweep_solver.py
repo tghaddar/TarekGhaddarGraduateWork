@@ -48,34 +48,24 @@ def _all_simple_paths_graph_modified(G, source, target, time_to_solve, cutoff=No
     except:
       start_time_source = 0.0
     stack = [iter(G[source])]
+    if cutoff == start_time_source:
+      yield source
     while stack:
         children = stack[-1]
         child = next(children, None)
         start_time = list(G.in_edges(child,'weight'))[0][2]
         if child is None:
-            stack.pop()
-            visited.pop()
-        elif (cutoff == 0.0):
-            yield source
-        elif (cutoff >= start_time_source and cutoff < start_time):
-            yield source
-        elif start_time > cutoff:
-            stack.pop()
-            visited.pop()
-        elif start_time <= cutoff:
-            if child == target:
-              stack.pop()
-              visited.pop()
-            elif start_time + time_to_solve[child] > cutoff:
-                yield child
-            elif child not in visited:
-                visited.append(child)
-                stack.append(iter(G[child]))
-            
-        else:  # len(visited) == cutoff:
-            stack.pop()
-            visited.pop()
-
+          stack.pop()
+          visited.pop()
+        elif child == target:
+          stack.pop()
+          visited.pop()
+        elif start_time == cutoff:
+          yield child
+        elif start_time < cutoff:
+          #Making sure that it's actually solving and not just waiting to communicate.
+          if start_time + time_to_solve[child] > cutoff:
+            yield child
 
 def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   
@@ -773,8 +763,6 @@ def add_conflict_weights(graphs,time_to_solve):
     all_nodes_being_solved_test =[None]*num_graphs
     for g in range(0,num_graphs):
       graph = graphs[g]
-      if (t == 2.0 and g == 1):
-        print("debug")
       all_nodes_being_solved[g] = nodes_being_solved_faster(graph,prev_nodes[g],t,time_to_solve)
       all_nodes_being_solved_test[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve)
       
