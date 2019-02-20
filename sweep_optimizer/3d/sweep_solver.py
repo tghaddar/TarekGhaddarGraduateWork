@@ -760,17 +760,14 @@ def add_conflict_weights(graphs,time_to_solve):
     start_nodes_being_solved = time.time()
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
-    all_nodes_being_solved_test =[None]*num_graphs
     for g in range(0,num_graphs):
       graph = graphs[g]
-      all_nodes_being_solved[g] = nodes_being_solved_faster(graph,prev_nodes[g],t,time_to_solve)
-      all_nodes_being_solved_test[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve)
+      #all_nodes_being_solved[g] = nodes_being_solved_faster(graph,prev_nodes[g],t,time_to_solve)
+      all_nodes_being_solved[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve)
       
     end_nodes_being_solved = time.time()
     print("nodes_being_solved: ", end_nodes_being_solved - start_nodes_being_solved)
     prev_nodes = all_nodes_being_solved
-    print(all_nodes_being_solved)
-    print(all_nodes_being_solved_test)
 #    print("Nodes being solved in each graph")
 #    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
