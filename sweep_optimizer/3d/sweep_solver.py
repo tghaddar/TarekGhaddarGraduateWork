@@ -643,12 +643,7 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
           node1,node2 = edges[e]
           secondary_graph[node1][node2]['weight'] += delay
         
-        #All paths from the node in conflict until the end of the graph reflect the delay.
-        start_loop = time.time()
         secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
-        end_loop = time.time()
-        print("loop: ", end_loop - start_loop)
-
 
       
         graphs[second_graph] = secondary_graph
