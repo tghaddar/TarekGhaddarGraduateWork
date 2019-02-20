@@ -403,6 +403,28 @@ def find_next_interaction(graphs,prev_nodes,start_time,time_to_solve):
       
   return next_time
 
+def find_next_interaction_simple(graphs,prev_nodes,start_time,time_to_solve):
+  
+  num_graphs = len(graphs)
+  
+  next_time = float("inf")
+  for g in range(0,num_graphs):
+    
+    graph = graphs[g]
+    #Getting the nodes being solved at the start time.
+    start_nodes = prev_nodes[g]
+    
+    for node in start_nodes:
+        #The successors to this node.
+        successors = list(graph.successors(node))
+        for s in successors:
+          #Getting the time the next node is ready to solve.
+          next_node_solve = graph[node][s]['weight']
+          if next_node_solve < next_time:
+            next_time = next_node_solve
+      
+  return next_time
+
 #Checks if there are conflicts.
 def find_conflicts(nodes):
   
@@ -780,6 +802,10 @@ def add_conflict_weights(graphs,time_to_solve):
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
       t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
+      t_test = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
+      print("nxt interaction check :", t,t_test)
+      if (t != t_test):
+        raise Exception("find_next_interaction_methods are not matching up")
     #Otherwise, we address the conflicts between nodes across all graphs.
     else:
       #Find nodes ready to solve at time t that are in conflict.
@@ -795,6 +821,10 @@ def add_conflict_weights(graphs,time_to_solve):
         #To update our march through, we need to update t here, with a find_next_interaction.
         if (num_conflicting_nodes == 1):
           t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
+          t_test = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
+          print("nxt interaction check :", t,t_test)
+          if (t != t_test):
+            raise Exception("find_next_interaction_methods are not matching up")
       
       else:
         #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
@@ -803,6 +833,10 @@ def add_conflict_weights(graphs,time_to_solve):
         #To update our march through, we need to update t here, with a find_next_interaction.
         #if (num_conflicting_nodes == 1):
         t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
+        t_test = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
+        print("nxt interaction check :", t,t_test)
+        if (t != t_test):
+            raise Exception("find_next_interaction_methods are not matching up")
 
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
