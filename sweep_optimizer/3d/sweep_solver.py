@@ -643,35 +643,37 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
           node1,node2 = edges[e]
           secondary_graph[node1][node2]['weight'] += delay
         
-        #All paths from the node in conflict until the end of the graph.
-        secondary_paths = nx.all_simple_paths(secondary_graph,node,-1)
-        #Looping over all of downstream secondary paths.
+        #All paths from the node in conflict until the end of the graph reflect the delay.
         start_loop = time.time()
-        for path in secondary_paths:
-          len_path = len(path)-1
-          for n in range(0,len_path):
-            node1 = path[n]
-            node2 = path[n+1]
-            #The edge.
-            edge = (node1,node2)
-            #Checking if this edge has already been modified. If it has, we DO NOT need to modify it again.
-            if not modified_edges[second_graph]:
-              #Adding the delay. 
-              secondary_graph[node1][node2]['weight'] += delay
-              #Adding this edge to the modified edges.
-              modified_edges[second_graph].append(edge)
-            elif(edge not in modified_edges[second_graph]):
-              #Adding the delay. 
-              secondary_graph[node1][node2]['weight'] += delay
-              #Adding this edge to the modified edges.
-              modified_edges[second_graph].append(edge)
+        secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
+#        secondary_paths = nx.all_simple_paths(secondary_graph,node,-1)
+#        #Looping over all of downstream secondary paths.
+#        
+#        for path in secondary_paths:
+#          len_path = len(path)-1
+#          for n in range(0,len_path):
+#            node1 = path[n]
+#            node2 = path[n+1]
+#            #The edge.
+#            edge = (node1,node2)
+#            #Checking if this edge has already been modified. If it has, we DO NOT need to modify it again.
+#            if not modified_edges[second_graph]:
+#              #Adding the delay. 
+#              secondary_graph[node1][node2]['weight'] += delay
+#              #Adding this edge to the modified edges.
+#              modified_edges[second_graph].append(edge)
+#            elif(edge not in modified_edges[second_graph]):
+#              #Adding the delay. 
+#              secondary_graph[node1][node2]['weight'] += delay
+#              #Adding this edge to the modified edges.
+#              modified_edges[second_graph].append(edge)
         
         end_loop = time.time()
         print("loop: ", end_loop - start_loop)
 
 
       
-      graphs[second_graph] = secondary_graph
+        graphs[second_graph] = secondary_graph
     
     modified_edges_over_nodes[node_ind] = modified_edges
     node_ind += 1
