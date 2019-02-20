@@ -25,7 +25,7 @@ m_l = 1
 T_m = 35.0
 T_g = 60.0
 
-#A modified version of networkx simple paths algorithm.
+#A modified version of networkx simple paths algorithm. This behaves as a weight based depth traversal algorithm.
 def all_simple_paths_modified(G, source, target, time_to_solve, cutoff=None):
 
     if source not in G:
@@ -66,6 +66,32 @@ def _all_simple_paths_graph_modified(G, source, target, time_to_solve, cutoff=No
           #Making sure that it's actually solving and not just waiting to communicate.
           if start_time + time_to_solve[child] > cutoff:
             yield child
+
+def modify_downstream_edges(G,source,target,modified_edges,delay):
+  
+  visited = [source]
+  stack = [iter(G[source])]
+
+  while stack:
+    children = stack[-1]
+    child = next(children,None)
+    if child is None:
+      stack.pop()
+      visited.pop()
+    else:
+      prev_node = visited[-1]
+      edge = (prev_node,child)
+      if not modified_edges:
+        G[prev_node][child]['weight'] += delay
+        modified_edges.append(edge)
+      elif (edge not in modified_edges):
+        G[prev_node][child]['weight'] += delay
+        modified_edges.append(edge)
+      if child not in visited:
+        visited.append(child)
+        stack.append(iter(G[child]))
+      
+  return G
 
 def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   
@@ -620,6 +646,7 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
         #All paths from the node in conflict until the end of the graph.
         secondary_paths = nx.all_simple_paths(secondary_graph,node,-1)
         #Looping over all of downstream secondary paths.
+        start_loop = time.time()
         for path in secondary_paths:
           len_path = len(path)-1
           for n in range(0,len_path):
@@ -638,6 +665,9 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
               secondary_graph[node1][node2]['weight'] += delay
               #Adding this edge to the modified edges.
               modified_edges[second_graph].append(edge)
+        
+        end_loop = time.time()
+        print("loop: ", end_loop - start_loop)
 
 
       
