@@ -374,12 +374,13 @@ def nodes_being_solved_faster(G,prev_nodes,weight_limit,time_to_solve):
 def get_heaviest_path_faster(graph,start_node,target_node):
   
   #A graph with the weights inverted. We use this to calculate the longest path.
-  inverse_graph = deepcopy(graph)
-  inverse_graph = invert_weights(inverse_graph)
+  #inverse_graph = deepcopy(graph)
+  inverse_graph = invert_weights(graph)
   
   #The heaviest (or longest path) is the shortest path on the inverse graph.
   heaviest_path = nx.shortest_path(inverse_graph,start_node,target_node)
-  
+  #Returning the weights to normal.
+  graph = invert_weights(graph)
   #Getting the path length of the heaviest path.  
   heaviest_path_weight = sum_weights_of_path(graph,heaviest_path)  
   
