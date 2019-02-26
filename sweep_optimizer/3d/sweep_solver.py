@@ -93,6 +93,24 @@ def modify_downstream_edges(G,source,target,modified_edges,delay):
       
   return G
 
+def modify_downstream_edges_faster(G,source,modified_edges,delay):
+  
+  downstream_nodes = nx.descendants(G,source)
+  for node in downstream_nodes:
+  
+    #Getting incoming edges to this node.
+    in_edges = G.in_edges(node)
+    
+    for u,v in in_edges:
+      if not modified_edges:
+        G[u][v]['weight'] += delay
+        modified_edges.append((u,v))
+      elif (u,v) not in modified_edges:
+        G[u][v]['weight'] += delay
+        modified_edges.append((u,v))
+  
+  return G
+
 def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   
   #Approximately two cells per mini subset.
@@ -643,7 +661,8 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
           node1,node2 = edges[e]
           secondary_graph[node1][node2]['weight'] += delay
         
-        secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
+        #secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
+        secondary_graph = modify_downstream_edges_faster(secondary_graph,node,modified_edges[second_graph],delay)
 
       
         graphs[second_graph] = secondary_graph
