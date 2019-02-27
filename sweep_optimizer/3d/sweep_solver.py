@@ -873,7 +873,10 @@ def compute_solve_time(graphs):
   
   num_graphs = len(graphs)
   solve_times = [None]*num_graphs
+  for g in range(0,num_graphs):
+    graph = graphs[g]
+    solve_times[g] = list(graph.in_edges(-1,'weight'))[0][2]
 
-  time = np.average(all_graph_time)
-  return all_graph_time,time,heaviest_paths
+  max_time = max(solve_times)
+  return solve_times,max_time
     
