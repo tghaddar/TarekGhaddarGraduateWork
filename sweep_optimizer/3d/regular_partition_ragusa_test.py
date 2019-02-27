@@ -25,7 +25,6 @@ for g in range(0,num_graphs):
 
 G,G1,G2,G3 = graphs
 
-<<<<<<< HEAD
 start_before_universal = time.time()
 graphs = make_edges_universal(graphs)
 
@@ -49,7 +48,7 @@ plt.figure("G3 universal")
 edge_labels_1 = nx.get_edge_attributes(G3,'weight')
 nx.draw(G3,nx.spectral_layout(G3,weight = None),with_labels = True)
 nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3,weight = None),edge_labels=edge_labels_1)
-=======
+
 graphs = make_edges_universal(graphs)
 
 start_after_universal = time.time()

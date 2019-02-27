@@ -249,7 +249,7 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,
 def invert_weights(graph):
   
   for u,v,d in graph.edges(data=True):
-    d['weight'] = pow(d['weight'],-1)
+    d['weight'] = -1.0*d['weight']
   
   return graph
 
@@ -274,9 +274,8 @@ def make_edges_universal(graphs):
       if (start_node == n):
         continue
       
-      #Gets the heaviest path and its weight. 
-      heaviest_path,heaviest_path_length = get_heaviest_path_faster(graph,start_node,n)
-
+      #Gets the heaviest path length and its weight. 
+      heaviest_path_length = get_heaviest_path_faster(graph,start_node,n)
       #Storing this value in heavy_path_lengths.
       heavy_path_lengths[n] = heaviest_path_length
       
@@ -421,43 +420,17 @@ def get_heaviest_path_faster(graph,start_node,target_node):
   
   #A graph with the weights inverted. We use this to calculate the longest path.
   #inverse_graph = deepcopy(graph)
-  inverse_graph = invert_weights(graph)
+  graph = invert_weights(graph)
   
-  #The heaviest (or longest path) is the shortest path on the inverse graph.
-  heaviest_path = nx.shortest_path(inverse_graph,start_node,target_node)
+  heaviest_path = nx.bellman_ford_path(graph,start_node,target_node,weight='weight')
   #Returning the weights to normal.
   graph = invert_weights(graph)
   #Getting the path length of the heaviest path.  
-  heaviest_path_weight = sum_weights_of_path(graph,heaviest_path)  
+  heaviest_path_weight = sum_weights_of_path(graph,heaviest_path)
   
-  return heaviest_path,heaviest_path_weight
+  return heaviest_path_weight
   
-def get_heaviest_path_simple(G,start_node,target_node):
-  
-  #The path length.
-  path_length = 0.0
-  #Keeping track of who we visited.
-  visited = [start_node]
-  stack = [iter(G[start_node])]
-  while stack:
-    children = stack[-1]
-    child = next(children,None)
-    if child is None:
-      stack.pop()
-      visited.pop()
-      path_length -= 1.0
-    elif child != target_node:
-      if child not in visited and child != -1:
-        prev_node = visited[-1]
-        path_length += G[prev_node][child]['weight']
-        visited.append(child)
-        stack.append(iter(G[child])) 
-    else:
-      prev_node = visited[-1]
-      path_length += G[prev_node][child]['weight']
-      yield path_length
-      path_length = 0.0
-     
+      
 #Returns the depth of graph remaining.
 def get_DOG_remaining(graph):
 
