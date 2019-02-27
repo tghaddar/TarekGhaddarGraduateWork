@@ -249,7 +249,7 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,
 def invert_weights(graph):
   
   for u,v,d in graph.edges(data=True):
-      d['weight'] = pow(d['weight'],-1)
+    d['weight'] = pow(d['weight'],-1)
   
   return graph
 
@@ -875,6 +875,7 @@ def add_conflict_weights(graphs,time_to_solve):
   #Keep iterating until all graphs have finished.
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
+    start_nodes_being_solved = time.time()
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -884,6 +885,11 @@ def add_conflict_weights(graphs,time_to_solve):
       
     prev_nodes = all_nodes_being_solved
     print(prev_nodes)
+    end_nodes_being_solved = time.time()
+    print("nodes_being_solved: ", end_nodes_being_solved - start_nodes_being_solved)
+    prev_nodes = all_nodes_being_solved
+#    print("Nodes being solved in each graph")
+#    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
     num_conflicting_nodes = len(conflicting_nodes)
@@ -947,4 +953,6 @@ def compute_solve_time(graphs):
   num_graphs = len(graphs)
   solve_times = [None]*num_graphs
 
+  time = np.average(all_graph_time)
+  return all_graph_time,time,heaviest_paths
     

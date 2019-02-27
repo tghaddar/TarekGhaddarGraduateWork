@@ -49,3 +49,9 @@ start_func = time.time()
 G = modify_downstream_edges(G,0,-1,modified_edges,delay)
 end_func = time.time()
 print("function: ",end_func - start_func)
+
+#    
+#plt.figure("G")
+#edge_labels_1 = nx.get_edge_attributes(G,'weight')
+#nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
+#nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
