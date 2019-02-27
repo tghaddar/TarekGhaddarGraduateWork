@@ -249,7 +249,7 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,
 def invert_weights(graph):
   
   for u,v,d in graph.edges(data=True):
-    d['weight'] = pow(d['weight'],-1)
+      d['weight'] = pow(d['weight'],-1)
   
   return graph
 
@@ -276,6 +276,52 @@ def make_edges_universal(graphs):
       
       #Gets the heaviest path and its weight. 
       heaviest_path,heaviest_path_length = get_heaviest_path_faster(graph,start_node,n)
+
+      #Storing this value in heavy_path_lengths.
+      heavy_path_lengths[n] = heaviest_path_length
+      
+    #Storing the heavy path lengths as the weight value to all preceding edges.
+    for n in range(0,num_nodes):
+      
+      #The starting node has no preceding edges so we skip it.
+      if (n != start_node):
+        #Getting the weight we want for preceding edges.
+        new_weight = heavy_path_lengths[n]
+        #Getting the incoming edges to this node.
+        incoming_edges = list(graph.in_edges(n,'weight'))
+        for edge in incoming_edges:
+          graph[edge[0]][edge[1]]['weight'] = new_weight
+
+    #Adding the value of the last edge (end_node to the dummy -1 node).
+    true_end_node = list(graph.predecessors(-1))[0]
+    pred_end_node = list(graph.predecessors(true_end_node))[0]
+    graph[true_end_node][-1]['weight'] += graph[pred_end_node][true_end_node]['weight']
+    
+    graphs[g] = graph
+  return graphs
+
+def make_edges_universal_new(graphs):
+  
+  num_nodes = graphs[0].number_of_nodes()-1
+  num_graphs = len(graphs)
+  
+  #Looping over all graphs.
+  for g in range(0,num_graphs):
+    #The current_graph which we will alter.
+    graph = graphs[g]
+    
+    #Getting the starting node of this graph.
+    start_node = [x for x in graph.nodes() if graph.in_degree(x) == 0][0]
+    #A list storing the heaviest path length to each node.
+    heavy_path_lengths = [0.0]*num_nodes
+    #Looping over nodes to get the longest path to each node.
+    for n in range(0,num_nodes):
+      #If the starting node is the target node we know that path length is zero.
+      if (start_node == n):
+        continue
+      
+      #Gets the heaviest path and its weight. 
+      heaviest_path_length = max(list(get_heaviest_path_simple(graph,start_node,n)))
 
       #Storing this value in heavy_path_lengths.
       heavy_path_lengths[n] = heaviest_path_length
@@ -386,7 +432,32 @@ def get_heaviest_path_faster(graph,start_node,target_node):
   
   return heaviest_path,heaviest_path_weight
   
-      
+def get_heaviest_path_simple(G,start_node,target_node):
+  
+  #The path length.
+  path_length = 0.0
+  #Keeping track of who we visited.
+  visited = [start_node]
+  stack = [iter(G[start_node])]
+  while stack:
+    children = stack[-1]
+    child = next(children,None)
+    if child is None:
+      stack.pop()
+      visited.pop()
+      path_length -= 1.0
+    elif child != target_node:
+      if child not in visited and child != -1:
+        prev_node = visited[-1]
+        path_length += G[prev_node][child]['weight']
+        visited.append(child)
+        stack.append(iter(G[child])) 
+    else:
+      prev_node = visited[-1]
+      path_length += G[prev_node][child]['weight']
+      yield path_length
+      path_length = 0.0
+     
 #Returns the depth of graph remaining.
 def get_DOG_remaining(graph):
 

@@ -12,7 +12,7 @@ start_tos = time.time()
 numrow = 2
 numcol = 2 
 
-adjacency_matrix = np.genfromtxt('matrices_2_random.csv',delimiter=",")
+adjacency_matrix = np.genfromtxt('matrices_1_random.csv',delimiter=",")
 
 
 graphs = build_graphs(adjacency_matrix,numrow,numcol)
