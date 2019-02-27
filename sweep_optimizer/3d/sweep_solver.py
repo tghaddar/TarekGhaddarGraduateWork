@@ -804,7 +804,6 @@ def add_conflict_weights(graphs,time_to_solve):
   #Keep iterating until all graphs have finished.
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    start_nodes_being_solved = time.time()
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -812,11 +811,8 @@ def add_conflict_weights(graphs,time_to_solve):
       #all_nodes_being_solved[g] = nodes_being_solved_faster(graph,prev_nodes[g],t,time_to_solve)
       all_nodes_being_solved[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve)
       
-    end_nodes_being_solved = time.time()
-    print("nodes_being_solved: ", end_nodes_being_solved - start_nodes_being_solved)
     prev_nodes = all_nodes_being_solved
-#    print("Nodes being solved in each graph")
-#    print(all_nodes_being_solved)
+    print(prev_nodes)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
     num_conflicting_nodes = len(conflicting_nodes)
@@ -875,25 +871,9 @@ def add_conflict_weights(graphs,time_to_solve):
   return graphs
 
 
-def compute_solve_time(graphs,cells_per_subset,t_u,upc,global_subset_boundaries,num_row,num_col,num_plane):
-  time = 0
-  all_graph_time = np.zeros(len(graphs))
-  heaviest_paths = []
-  #Looping over the graphs.
-  for ig in range(0,len(graphs)):
-    time_graph = 0
-    graph = graphs[ig]
-    copy_graph = copy(graph)
-    start_node = [x for x in copy_graph.nodes() if copy_graph.in_degree(x) == 0][0]
-    end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
-    
-    paths = nx.all_simple_paths(graph,start_node,end_node)
-
-    heaviest_path,path_weight = get_heaviest_path(graph,paths)
-    heaviest_paths.append(heaviest_path)
-    time_graph = path_weight #+ t_u*upc*cells_per_subset[end_node]
-    all_graph_time[ig] = time_graph 
+def compute_solve_time(graphs):
   
-  time = np.average(all_graph_time)
-  return all_graph_time,time,heaviest_paths
+  num_graphs = len(graphs)
+  solve_times = [None]*num_graphs
+
     
