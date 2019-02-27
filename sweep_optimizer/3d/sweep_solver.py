@@ -299,52 +299,6 @@ def make_edges_universal(graphs):
     graphs[g] = graph
   return graphs
 
-def make_edges_universal_new(graphs):
-  
-  num_nodes = graphs[0].number_of_nodes()-1
-  num_graphs = len(graphs)
-  
-  #Looping over all graphs.
-  for g in range(0,num_graphs):
-    #The current_graph which we will alter.
-    graph = graphs[g]
-    
-    #Getting the starting node of this graph.
-    start_node = [x for x in graph.nodes() if graph.in_degree(x) == 0][0]
-    #A list storing the heaviest path length to each node.
-    heavy_path_lengths = [0.0]*num_nodes
-    #Looping over nodes to get the longest path to each node.
-    for n in range(0,num_nodes):
-      #If the starting node is the target node we know that path length is zero.
-      if (start_node == n):
-        continue
-      
-      #Gets the heaviest path and its weight. 
-      heaviest_path_length = max(list(get_heaviest_path_simple(graph,start_node,n)))
-
-      #Storing this value in heavy_path_lengths.
-      heavy_path_lengths[n] = heaviest_path_length
-      
-    #Storing the heavy path lengths as the weight value to all preceding edges.
-    for n in range(0,num_nodes):
-      
-      #The starting node has no preceding edges so we skip it.
-      if (n != start_node):
-        #Getting the weight we want for preceding edges.
-        new_weight = heavy_path_lengths[n]
-        #Getting the incoming edges to this node.
-        incoming_edges = list(graph.in_edges(n,'weight'))
-        for edge in incoming_edges:
-          graph[edge[0]][edge[1]]['weight'] = new_weight
-
-    #Adding the value of the last edge (end_node to the dummy -1 node).
-    true_end_node = list(graph.predecessors(-1))[0]
-    pred_end_node = list(graph.predecessors(true_end_node))[0]
-    graph[true_end_node][-1]['weight'] += graph[pred_end_node][true_end_node]['weight']
-    
-    graphs[g] = graph
-  return graphs
-
 #A weight based traversal of a graph G. In the context of our problem, this returns all nodes solving at time t = weight_limit.
 def nodes_being_solved_simple(G,prev_nodes,weight_limit,time_to_solve):
   #The ending node of the graph is always -1. 
@@ -848,7 +802,6 @@ def add_conflict_weights(graphs,time_to_solve):
   #Keep iterating until all graphs have finished.
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    start_nodes_being_solved = time.time()
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -857,19 +810,14 @@ def add_conflict_weights(graphs,time_to_solve):
       all_nodes_being_solved[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve)
       
     prev_nodes = all_nodes_being_solved
-    print(prev_nodes)
-    end_nodes_being_solved = time.time()
-    print("nodes_being_solved: ", end_nodes_being_solved - start_nodes_being_solved)
-    prev_nodes = all_nodes_being_solved
 #    print("Nodes being solved in each graph")
 #    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
     num_conflicting_nodes = len(conflicting_nodes)
     
-#    print("The graphs in conflict for each node")
-#    print(conflicting_nodes)
-#    print("here")
+    print("The graphs in conflict for each node")
+    print(conflicting_nodes)
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
       #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
