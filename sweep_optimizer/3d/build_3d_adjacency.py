@@ -173,78 +173,82 @@ def build_graphs(adjacency_matrix_3d,num_row,num_col,num_plane):
   adjacency_matrix_0 = np.triu(adjacency_matrix_3d)
   #Time to build the graph for octant 0
   G = nx.DiGraph(adjacency_matrix_0)
-  plt.figure(2)
-  nx.draw(G,nx.shell_layout(G),with_labels = True)
-  plt.savefig('digraph.pdf')
-  
+  #Adding the -1 node.
+  end_node = [x for x in G.nodes() if G.out_degree(x) == 0][0]
+  G.add_node(-1)
+  G.add_edge(end_node,-1)
   
   #Lower triangular matrix.
   adjacency_matrix_7 = np.tril(adjacency_matrix_3d)
   #Building graph for octant 7
   G_7 = nx.DiGraph(adjacency_matrix_7)
-  plt.figure(3)
-  nx.draw(G_7,nx.shell_layout(G_7),with_labels = True)
-  plt.savefig('digraph7.pdf')
+  #Adding the -1 node.
+  end_node = [x for x in G_7.nodes() if G_7.out_degree(x) == 0][0]
+  G_7.add_node(-1)
+  G_7.add_edge(end_node,-1)
+
   
   #Reordering for octant 1.
   adjacency_flip,id_map = flip_adjacency.flip_adjacency_1(adjacency_matrix_3d,num_row,num_col,num_plane)
   adjacency_matrix_1 = np.triu(adjacency_flip)
   G_1 = nx.DiGraph(adjacency_matrix_1)
   G_1 = nx.relabel_nodes(G_1,id_map,copy=True)
-  plt.figure(4)
-  nx.draw(G_1,nx.shell_layout(G_1),with_labels=True)
-  plt.savefig('digraph1.pdf')
+  #Adding the -1 node.
+  end_node = [x for x in G_1.nodes() if G_1.out_degree(x) == 0][0]
+  G_1.add_node(-1)
+  G_1.add_edge(end_node,-1)
+  
   
   adjacency_matrix_6 = np.tril(adjacency_flip)
   G_6 = nx.DiGraph(adjacency_matrix_6)
   G_6 = nx.relabel_nodes(G_6,id_map,copy=True)
-  plt.figure(5)
-  nx.draw(G_6,nx.shell_layout(G_6),with_labels=True)
-  plt.savefig('digraph6.pdf')
+  #Adding the -1 node.
+  end_node = [x for x in G_6.nodes() if G_6.out_degree(x) == 0][0]
+  G_6.add_node(-1)
+  G_6.add_edge(end_node,-1)
+
   
   adjacency_flip,id_map = flip_adjacency.flip_adjacency_2(adjacency_matrix_3d,num_row,num_col,num_plane)
   adjacency_matrix_2 = np.triu(adjacency_flip)
   G_2 = nx.DiGraph(adjacency_matrix_2)
   G_2 = nx.relabel_nodes(G_2,id_map,copy=True)
-  plt.figure(6)
-  nx.draw(G_2,nx.shell_layout(G_2),with_labels=True)
-  plt.savefig('digraph2.pdf')
+  #Adding the -1 node.
+  end_node = [x for x in G_2.nodes() if G_2.out_degree(x) == 0][0]
+  G_2.add_node(-1)
+  G_2.add_edge(end_node,-1)
+
   
   adjacency_matrix_5 = np.tril(adjacency_flip)
   G_5 = nx.DiGraph(adjacency_matrix_5)
   G_5 = nx.relabel_nodes(G_5,id_map,copy=True)
-  plt.figure(7)
-  nx.draw(G_5,nx.shell_layout(G_5),with_labels=True)
-  plt.savefig('digraph5.pdf')
+  #Adding the -1 node.
+  end_node = [x for x in G_5.nodes() if G_5.out_degree(x) == 0][0]
+  G_5.add_node(-1)
+  G_5.add_edge(end_node,-1)
+
   
   adjacency_flip,id_map = flip_adjacency.flip_adjacency_3(adjacency_matrix_3d,num_row,num_col,num_plane)
   adjacency_matrix_3 = np.triu(adjacency_flip)
   G_3 = nx.DiGraph(adjacency_matrix_3)
   G_3 = nx.relabel_nodes(G_3,id_map,copy=True)
-  plt.figure(8)
-  nx.draw(G_3,nx.shell_layout(G_3),with_labels=True)
-  plt.savefig('digraph3.pdf')
-  
+  #Adding the -1 node.
+  end_node = [x for x in G_3.nodes() if G_3.out_degree(x) == 0][0]
+  G_3.add_node(-1)
+  G_3.add_edge(end_node,-1)
+
   adjacency_matrix_4 = np.tril(adjacency_flip)
   G_4 = nx.DiGraph(adjacency_matrix_4)
   G_4 = nx.relabel_nodes(G_4,id_map,copy=True)
-  plt.figure(9)
-  nx.draw(G_4,nx.shell_layout(G_4),with_labels=True)
-  plt.savefig('digraph4.pdf')
+  #Adding the -1 node.
+  end_node = [x for x in G_4.nodes() if G_4.out_degree(x) == 0][0]
+  G_4.add_node(-1)
+  G_4.add_edge(end_node,-1)
 
   #Storing all the graphs in a list.
   graphs = [G,G_1,G_2,G_3,G_4,G_5,G_6,G_7]
   
-  #Storing all simple paths for each graph.
-  paths = []
-  for graph in graphs:
-    copy_graph = copy(graph)
-    start_node = [x for x in copy_graph.nodes() if copy_graph.in_degree(x) == 0][0]
-    end_node = [x for x in copy_graph.nodes() if copy_graph.out_degree(x) == 0][0]
-    simple_paths = nx.all_simple_paths(graph,start_node,end_node)
-    paths.append(simple_paths)
   
-  return graphs,paths
+  return graphs
 
 
 
