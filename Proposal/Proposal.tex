@@ -37,7 +37,7 @@
 \usepackage{fixltx2e}
 %Title Page
 \newcommand{\titles}{\LARGE \textbf{Partitioning Optimization for Massively Parallel Transport Sweeps on Unstructured Grids}}
-\newcommand{\authors}{\normalsize Tarek Ghaddar \\ Chair: Dr. Jean Ragusa \\ Committee: Dr. Jim Morel, Dr. Marvin Adams, Dr. Nancy Amato}
+\newcommand{\authors}{\normalsize Tarek Ghaddar \\ Chair: Dr. Jean Ragusa \\ Committee: Dr. Marvin Adams, Dr. Nancy Amato, Dr. Jim Morel}
 \newcommand{\department}{\normalsize Nuclear Engineering Department}
 \newcommand{\university}{\normalsize Texas A\&M University}
 \newcommand{\locations}{\normalsize College Station, TX, 77843-3133}
@@ -251,9 +251,24 @@ If two or more tasks reach a processor at the same time, PDT employs a tie break
 	\item If multiple tasks have $\Omega_y > 0$, then the task with $\Omega_z > 0$ wins.
 \end{enumerate}
 
-The PDT optimal parallel efficiency\cite{mpadams2013} is:
+Given these conflict resolution techniques, the minimum possible number of stages for given partitioning parameters $P_i$ and $A_j$ is $2N_{\text{fill}} + N_{\text{tasks}}$. $N_{\text{fill}}$ is both the minimum number of stages before a sweepfront can reach the center-most processors and the number needed to finish a direction's sweep after the center-most processors have finished. Equations \ref{nfill}, \ref{nidle}, and \ref{ntasks} define $N_{\text{fill}}, N_{\text{idle}}$, and $N_{\text{tasks}}$:
+
 \begin{equation}
-	\epsilon \approx \frac{1}{ [1 + \frac{P_x + P_y - 4 + N_k(P_z -2}{8MGN_k/(A_m A_G)} ]  [ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}} ]}
+N_\text{fill} = \frac{P_x}{2} - 1 + \frac{P_y}{2} - 1 + N_k (\frac{P_z}{2} - 1)
+\label{nfill}
+\end{equation}
+\begin{equation}
+N_\text{idle} = 2N_{\text{fill}}
+\label{nidle}
+\end{equation}
+\begin{equation}
+N_\text{tasks} = 8N_mN_gN_k
+\label{ntasks}
+\end{equation}
+
+Plugging these definitions into Eq. \ref{paralleleff}, the PDT optimal parallel efficiency\cite{mpadams2013} is:
+\begin{equation}
+	\epsilon \approx \frac{1}{ [1 + \frac{P_x + P_y - 4 + N_k(P_z -2)}{8MGN_k/(A_m A_G)} ]  [ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}} ]}
 \end{equation}
 
 PDT's partitioning and scheduling algorithm has been studied for balanced (equivalent amount of work per processor), regular hexahedral meshes. When PDT introduced support for unstructured meshes, it came at the cost of load-balanced grids. Before discussing how we propose to schedule the transport sweep on such grids, we'll focus on the generation, partitioning, and load balancing of unstructured meshing in PDT.
