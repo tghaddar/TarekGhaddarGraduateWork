@@ -7,8 +7,7 @@ Created on Sun Mar 10 18:03:31 2019
 
 from sweep_solver import get_heaviest_path_faster
 import multiprocessing as mp
-from numba import autojit,prange
-from joblib import Parallel, delayed,parallel_backend
+#from numba import autojit,prange
 import numpy as np
 from build_adjacency_matrix import build_graphs
 import time
@@ -65,10 +64,10 @@ def make_edges_universal(graphs):
   return graphs
 
 
-numrow = 20
-numcol = 20
+numrow = 50
+numcol = 50
 
-adjacency_matrix = np.genfromtxt('matrices_19.csv',delimiter=",")
+adjacency_matrix = np.genfromtxt('matrices_49.csv',delimiter=",")
 
 
 graphs = build_graphs(adjacency_matrix,numrow,numcol)
@@ -101,10 +100,12 @@ def inner_loop(n):
 
 heavy_path_lengths_par = []
 start_par = time.time() 
-if __name__ == 'main':
-  with futures.ThreadPoolExecutor(max_workers=2) as executor:
-    for heavy_path_length in executor.map(inner_loop,range(0,num_nodes)):
-      heavy_path_lengths_par.append(heavy_path_length)
+all_nodes = range(0,num_nodes)
+
+print("Num cores: ", mp.cpu_count())
+
+with mp.Pool(4) as p:
+  heavy_path_lengths_par = p.map(inner_loop,all_nodes)
 end_par = time.time()
 
 
@@ -124,14 +125,12 @@ for n in range(0,num_nodes):
 
 end_serial = time.time()
 
-if [abs(x) for x in heavy_path_lengths_par]  == heavy_path_lengths:
+if heavy_path_lengths_par  == heavy_path_lengths:
   print("Success")
 else:
   print("Failure")
 
 print("Parallel Time: ", end_par - start_par)
 print("Serial Time: ", end_serial - start_serial)
-print(heavy_path_lengths_par)
-print(heavy_path_lengths)
 
 
