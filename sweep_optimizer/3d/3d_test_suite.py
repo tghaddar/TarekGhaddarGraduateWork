@@ -10,6 +10,7 @@ from build_3d_adjacency import build_graphs
 from sweep_solver import make_edges_universal
 from sweep_solver import add_conflict_weights
 from sweep_solver import compute_solve_time
+from mesh_processor import create_3d_cuts
 #from sweep_solver import 
 import warnings
 import networkx as nx
@@ -45,12 +46,7 @@ step_z = float((global_z_max - global_z_min)/(N_z+1))
 step_y = float((global_y_max - global_y_min)/(N_y+1))
 step_x = float((global_x_max - global_x_min)/(N_x+1))
 
-z_cuts = [global_z_min,5,global_z_max]
-  
-#X_cuts per plane.
-x_cuts = [[global_x_min,5,global_x_max],[global_x_min,5,global_x_max]]
-#y_cuts per column per plane.
-y_cuts = [[[global_y_min,5,global_y_max],[global_y_min,5,global_y_max]], [[global_y_min,5,global_y_max],[global_y_min,5,global_y_max]]]
+z_cuts,x_cuts,y_cuts = create_3d_cuts(global_x_min,global_x_max,num_col,global_y_min,global_y_max,num_row,global_z_min,global_z_max,num_plane)
 
 global_subset_boundaries = build_3d_global_subset_boundaries(N_x,N_y,N_z,x_cuts,y_cuts,z_cuts)
 
