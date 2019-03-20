@@ -11,18 +11,20 @@ from sweep_solver import make_edges_universal
 from sweep_solver import add_conflict_weights
 from sweep_solver import compute_solve_time
 from mesh_processor import create_3d_cuts
-#from sweep_solver import 
+import matplotlib.pyplot as plt 
 import warnings
 import networkx as nx
 warnings.filterwarnings("ignore")
 
+plt.close("all")
+
 
 #Number of cuts in the x direction.
-N_x = 2
+N_x = 1
 #Number of cuts in the y direction.
-N_y = 2
+N_y = 1
 #Number of cuts in the z direction.
-N_z = 2
+N_z = 1
 #Total number of subsets
 num_subsets = (N_x+1)*(N_y+1)*(N_z+1)
 num_subsets_2d = (N_x+1)*(N_y+1)
@@ -62,6 +64,18 @@ for g in range(0,num_graphs):
 
 
 graphs = make_edges_universal(graphs)
+
+for g in range(0,num_graphs):
+  plt.figure(str(g))
+  edge_labels_1 = nx.get_edge_attributes(graphs[g],'weight')
+  if g < 3:
+    nx.draw(graphs[g],nx.spectral_layout(graphs[g]),with_labels = True)
+    nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g]),edge_labels=edge_labels_1)
+  else:
+    nx.draw(graphs[g],nx.spectral_layout(graphs[g],weight=100),with_labels = True)
+    nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight=100),edge_labels=edge_labels_1)
+  plt.savefig("graph_"+str(g)+".pdf")
+  plt.close()
 
 #A list that stores the time to solve each node.
 time_to_solve = [1]*num_subsets

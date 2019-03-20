@@ -810,8 +810,8 @@ def add_conflict_weights(graphs,time_to_solve):
       all_nodes_being_solved[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve)
       
     prev_nodes = all_nodes_being_solved
-#    print("Nodes being solved in each graph")
-#    print(all_nodes_being_solved)
+    print("Nodes being solved in each graph")
+    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
     num_conflicting_nodes = len(conflicting_nodes)
@@ -827,7 +827,7 @@ def add_conflict_weights(graphs,time_to_solve):
     else:
       #Find nodes ready to solve at time t that are in conflict.
       first_nodes = find_first_conflict(conflicting_nodes,graphs)
-#      print(first_nodes)
+      print(first_nodes)
       num_nodes_ready_to_solve = len(first_nodes)
       if (num_nodes_ready_to_solve == 1):
         first_node = first_nodes[0]
