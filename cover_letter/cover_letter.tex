@@ -1,0 +1,101 @@
+%% start of file `template.tex'.
+%% Copyright 2006-2013 Xavier Danaux (xdanaux@gmail.com).
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License version 1.3c,
+% available at http://www.latex-project.org/lppl/.
+
+
+\documentclass[11pt,letterpaper,roman]{moderncv}        % possible options include font size ('10pt', '11pt' and '12pt'), paper size ('a4paper', 'letterpaper', 'a5paper', 'legalpaper', 'executivepaper' and 'landscape') and font family ('sans' and 'roman')
+
+% moderncv themes
+\moderncvstyle{classic}                            % style options are 'casual' (default), 'classic', 'oldstyle' and 'banking'
+\moderncvcolor{green}                              % color options 'blue' (default), 'orange', 'green', 'red', 'purple', 'grey' and 'black'
+%\renewcommand{\familydefault}{\sfdefault}         % to set the default font; use '\sfdefault' for the default sans serif font, '\rmdefault' for the default roman one, or any tex font name
+%\nopagenumbers{}                                  % uncomment to suppress automatic page numbering for CVs longer than one page
+
+% character encoding
+\usepackage[utf8]{inputenc}                       % if you are not using xelatex ou lualatex, replace by the encoding you are using
+%\usepackage{CJKutf8}                              % if you need to use CJK to typeset your resume in Chinese, Japanese or Korean
+
+% adjust the page margins
+\usepackage[left=1in,right=1in,top=1in,bottom=0.5in]{geometry}								% scale=0.75
+%\setlength{\hintscolumnwidth}{3cm}                % if you want to change the width of the column with the dates
+%\setlength{\makecvtitlenamewidth}{10cm}           % for the 'classic' style, if you want to force the width allocated to your name and avoid line breaks. be careful though, the length is normally calculated to avoid any overlap with your personal info; use this at your own typographical risks...
+
+% personal data
+\name{Tarek}{Ghaddar}
+%\title{Resumé title}                               % optional, remove / comment the line if not wanted
+\address{1000 Spring Loop, Apt 1504}{College Station, TX 77840}%{USA}
+%\address{423 Spence St., MS 3133}{77843 College Station, TX}{USA}% optional, remove / comment the line if not wanted; the "postcode city" and and "country" arguments can be omitted or provided empty
+\phone[mobile]{+1~(956)~778~5923}                   % optional, remove / comment the line if not wanted
+%\phone[dept]{+1~(979)~845~4161}                    % optional, remove / comment the line if not wanted
+%\phone[fax]{+1~(979)~848~6443}                      % optional, remove / comment the line if not wanted
+%\email{masonchilds@tamu.edu}                               % optional, remove / comment the line if not wanted
+\email{tghaddar@tamu.edu}                               % optional, remove / comment the line if not wanted
+%\homepage{www.johndoe.com}                         % optional, remove / comment the line if not wanted
+%\extrainfo{additional information}                 % optional, remove / comment the line if not wanted
+%\photo[64pt][0.4pt]{picture}                       % optional, remove / comment the line if not wanted; '64pt' is the height the picture must be resized to, 0.4pt is the thickness of the frame around it (put it to 0pt for no frame) and 'picture' is the name of the picture file
+\quote{Some quote}                                 % optional, remove / comment the line if not wanted
+
+% include signature
+\makeatletter
+\renewcommand*{\makeletterclosing}{
+	\@closing\\[0em]%
+	{\includegraphics[width=4cm]{signature_childs}
+		\par
+		\bfseries \@firstname~\@lastname}%
+		\\
+	\ifthenelse{\isundefined{\@enclosure}}{}{%
+%		\\%
+		\vfill%
+		{\color{color2}\itshape\enclname: \@enclosure}}}
+\makeatother
+
+% to show numerical labels in the bibliography (default is to show no labels); only useful if you make citations in your resume
+%\makeatletter
+%\renewcommand*{\bibliographyitemlabel}{\@biblabel{\arabic{enumiv}}}
+%\makeatother
+%\renewcommand*{\bibliographyitemlabel}{[\arabic{enumiv}]}% CONSIDER REPLACING THE ABOVE BY THIS
+
+% bibliography with mutiple entries
+%\usepackage{multibib}
+%\newcites{book,misc}{{Books},{Others}}
+%----------------------------------------------------------------------------------
+%            content
+%----------------------------------------------------------------------------------
+\begin{document}
+%-----       letter       ---------------------------------------------------------
+% recipient data
+\recipient{Hiring Staff}{Oak Ridge National Laboratory}
+\date{\today}
+\opening{To Whom it May Concern,}
+\closing{Sincerely,}
+
+\makelettertitle
+
+I am writing to apply for the position of Assistant R\&D Staff Member - High Performance Computing (HPC) Nuclear Engineer (Requisition ID 813) in the Reactor Physics Group in RNSD at Oak Ridge National Laboratory. I will be receiving my PhD in Nuclear Engineering from Texas A\&M University in August of 2019. My advisor is Prof. Jean Ragusa, %and my areas of interest and experience include non-intrusive optical fluid velocity measurements, along with experimental facility construction and instrumentation. I have also thrived in computational analysis and presentation of big data which is commonly produced from large scale experimentation, and numerical simulation.
+
+My graduate work has focused on optimizing radiation transport sweeps in Texas A\&M's flagship massively parallel deterministic finite element radiation transport code, PDT. For my MS project, . While completing my MS, I learned the application and nuances of fluid velocity measurement via particle image velocimetry (PIV). Using this knowledge, and a study of the current state of the art in matched refractive index combinations, I determined a new combination of materials for test section construction to be used in PIV measurements for improved uncertainty quantification, especially in experimental error estimation. This is highlighted in my most recent publication in \emph{Experimental Thermal and Fluid Science}. 
+
+%while assisting on the joint DOE TerraPower project ``Toward a Longer Life Core:..Experimental Investigation of Deformed Fuel Assemblies'' (Project~\#DE-NE0008321).
+%This is being expanded in further work on prototypical, as well as new PWR spacer grids, which is set for publication later this year.
+
+%The bulk of my PhD work has been completed without external sponsorship, as a side project my advisor has enabled and encouraged me to accomplish at low cost, and for future expansion of the work to additional test sections and fuel bundle geometries. Hailing from the Salt Lake Valley, and having previously worked at INL, as well as
+
+I also served an internship at Idaho National Laboratory (INL) during my graduate studies. While there, I worked on external coupling of the approved regulatory fuel performance code, FRAPCON, with the thermal-hydraulic system code RELAP. This experience provided me an understanding of the required detail and justification that must be implemented in system simulations that are used in the regulatory approval of commercial plants.
+
+I personally believe that the NuScale UAMPS project at the INL site is this nation's current best path forward in next-generation reactor technology. The opportunity to work on a project of that importance in any capacity is an engineer's dream.
+
+Having worked extensively on light water reactor fuel bundle technologies in support of current plant operations and sustainability, I would be keen to work on energy advancement projects that I believe shape this country’s future in a positive manner. I hope to bring my combined experience of computational analysis and experimental understanding to NuScale and contribute to industry-leading innovation in the energy production sector.
+
+%I understand this position, as an Associate level, is considered beyond what a recent PhD graduate would start at. I was unable to find any postings in the Assistant, or even Postdoc, level that aligned with my strengths, however. I am willing to be reassigned a more appropriate position level, if desired.
+%Please let me know if there are any other materials or information that will assist you in processing my application.
+
+Thank you for your consideration. I look forward to hearing from you.
+
+\makeletterclosing
+
+\end{document}
+
+%% end of file `template.tex'.
