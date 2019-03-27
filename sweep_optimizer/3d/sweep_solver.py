@@ -25,6 +25,25 @@ m_l = 1
 T_m = 35.0
 T_g = 60.0
 
+#Plots graphs at a specific time. Will help with debugging.
+def plot_graphs(graphs,t):
+  
+  num_graphs = len(graphs)
+  grange = range(0,num_graphs)
+  for g in grange:
+    plt.figure(str(g)+str(t))
+    plt.title("Time " + str(t) + " Graph " + str(g))
+    edge_labels_1 = nx.get_edge_attributes(graphs[g],'weight')
+    if g < 3:
+      nx.draw(graphs[g],nx.spectral_layout(graphs[g],weight=None),with_labels = True)
+      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight=None),edge_labels=edge_labels_1)
+    else:
+      nx.draw(graphs[g],nx.spectral_layout(graphs[g],weight=None),with_labels = True)
+      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight=None),edge_labels=edge_labels_1)
+    plt.savefig("debug_graph_plots/graph_"+str(t)+"_"+str(g)+".pdf")
+    plt.close()
+    
+
 #A modified version of networkx simple paths algorithm. This behaves as a weight based depth traversal algorithm.
 def all_simple_paths_modified(G, source, target, time_to_solve, cutoff=None):
 
@@ -94,7 +113,6 @@ def modify_downstream_edges(G,source,target,modified_edges,delay):
   return G
 
 def modify_downstream_edges_faster(G,source,modified_edges,delay):
-  
   downstream_nodes = nx.descendants(G,source)
   for node in downstream_nodes:
   
@@ -102,12 +120,13 @@ def modify_downstream_edges_faster(G,source,modified_edges,delay):
     in_edges = G.in_edges(node)
     
     for u,v in in_edges:
-      if not modified_edges:
-        G[u][v]['weight'] += delay
-        modified_edges.append((u,v))
-      elif (u,v) not in modified_edges:
-        G[u][v]['weight'] += delay
-        modified_edges.append((u,v))
+      if (u == source or u in downstream_nodes):
+        if not modified_edges:
+          G[u][v]['weight'] += delay
+          modified_edges.append((u,v))
+        elif (u,v) not in modified_edges:
+          G[u][v]['weight'] += delay
+          modified_edges.append((u,v))
   
   return G
 
@@ -641,6 +660,7 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
     num_conflicting_graphs = len(conflicting_graphs)
    
     for outer in range(0,num_conflicting_graphs-1):
+      print(node,conflicting_graphs)
       #Storing modified edges per graph at time t.
       modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
       #The fastest graph to the node.
@@ -660,9 +680,12 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
           node1,node2 = edges[e]
           secondary_graph[node1][node2]['weight'] += delay
         
+        if (second_graph == 6):
+          print("debug stop")
         #secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
         secondary_graph = modify_downstream_edges_faster(secondary_graph,node,modified_edges[second_graph],delay)
-
+        if (second_graph == 6):
+          print("debug stop")
       
         graphs[second_graph] = secondary_graph
     
@@ -849,6 +872,8 @@ def add_conflict_weights(graphs,time_to_solve):
         #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
+    #plot_graphs(graphs,t)
+    print("here")
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
       if finished_graphs[g]:
