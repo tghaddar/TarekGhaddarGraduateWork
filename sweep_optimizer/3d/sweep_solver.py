@@ -118,6 +118,10 @@ def modify_downstream_edges_faster(G,source,modified_edges,delay):
   
     #Getting incoming edges to this node.
     in_edges = G.in_edges(node)
+    #Get the weights of  in_edges.
+    weights = [z for x,y,z in in_edges]
+    #The maximum weight.
+    max_weight = copy(max(weights))
     
     for u,v in in_edges:
       if (u == source or u in downstream_nodes):
@@ -658,7 +662,7 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
     #We get the graphs in conflict at this node.
     conflicting_graphs = conflicting_nodes[node]
     num_conflicting_graphs = len(conflicting_graphs)
-   
+    #modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
     for outer in range(0,num_conflicting_graphs-1):
       print(node,conflicting_graphs)
       #Storing modified edges per graph at time t.
