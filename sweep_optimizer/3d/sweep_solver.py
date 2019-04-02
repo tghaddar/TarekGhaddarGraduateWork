@@ -112,7 +112,7 @@ def modify_downstream_edges(G,source,target,modified_edges,delay):
       
   return G
 
-def modify_downstream_edges_faster(G,source,modified_edges,time_to_solve):
+def modify_downstream_edges_faster(G,source,modified_edges,time_to_solve,og_delay):
 #  downstream_nodes = nx.descendants(G,source)
 #  for node in downstream_nodes:
 #  
@@ -132,26 +132,38 @@ def modify_downstream_edges_faster(G,source,modified_edges,time_to_solve):
 #          G[u][v]['weight'] += delay
 #          modified_edges.append((u,v))
   
-  downstream_nodes = nx.descendants(G,source)  
-  for node in downstream_nodes:
-
-    #Getting incoming edges to this node.
-    in_edges = list(G.in_edges(node,'weight'))
-    #Get the weights of  in_edges.
+  downstream_nodes = list(nx.descendants(G,source))
+  num_downstream_nodes = len(downstream_nodes)
+  #We get when each downstream node is ready to solve.
+  ready_to_solve_all = [None]*num_downstream_nodes
+  for n in range(0,num_downstream_nodes):
+    current_node = downstream_nodes[n]
+    #Get incoming edges to this node.
+    in_edges = list(G.in_edges(current_node,'weight'))
+    #Get the weights for all 
     weights = [z for x,y,z in in_edges]
-    #The maximum weight (which is when this downstream node is ready to solve)
-    ready_to_solve = copy(max(weights))
-    
+    ready_to_solve_all[n] = (current_node,max(weights))
+  
+  
+  #Sorting the downstream nodes in order of when they solve.
+  ready_to_solve_all.sort(key=lambda tup:tup[1])
+  
+  
+  for node_data in ready_to_solve_all:
+    #The current node.
+    node = node_data[0]
+    #When the current node is ready to solve.
+    ready_to_solve = node_data[1]
     #Get outgoing edges of this node.
     out_edges = G.out_edges(node)
     for u,v in out_edges:
       if (v in downstream_nodes):
         if not modified_edges:
-          delay = time_to_solve[node] + ready_to_solve - G[u][v]['weight']
+          delay = time_to_solve[node] + og_delay + ready_to_solve - G[u][v]['weight']
           if delay > 0.0:
             G[u][v]['weight'] += delay
         elif (u,v) not in modified_edges:
-          delay = time_to_solve[node] + ready_to_solve - G[u][v]['weight']
+          delay = time_to_solve[node] + og_delay + ready_to_solve - G[u][v]['weight']
           if delay > 0.0:
             G[u][v]['weight'] += delay
   
@@ -710,7 +722,7 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
         if (second_graph == 6):
           print("debug stop")
         #secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
-        secondary_graph = modify_downstream_edges_faster(secondary_graph,node,modified_edges[second_graph],time_to_solve)
+        secondary_graph = modify_downstream_edges_faster(secondary_graph,node,modified_edges[second_graph],time_to_solve,delay)
         if (second_graph == 6):
           print("debug stop")
       
