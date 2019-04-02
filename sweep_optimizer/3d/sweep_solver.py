@@ -132,42 +132,53 @@ def modify_downstream_edges_faster(G,source,modified_edges,time_to_solve,og_dela
 #          G[u][v]['weight'] += delay
 #          modified_edges.append((u,v))
   
+  
   downstream_nodes = list(nx.descendants(G,source))
+  #Add the source node to the downstream nodes.
+  downstream_nodes = [source] + downstream_nodes
   num_downstream_nodes = len(downstream_nodes)
   #We get when each downstream node is ready to solve.
-  ready_to_solve_all = [None]*num_downstream_nodes
+  ready_to_solve_all = {}
   for n in range(0,num_downstream_nodes):
     current_node = downstream_nodes[n]
-    #Get incoming edges to this node.
-    in_edges = list(G.in_edges(current_node,'weight'))
-    #Get the weights for all 
-    weights = [z for x,y,z in in_edges]
-    ready_to_solve_all[n] = (current_node,max(weights))
+    #Get incoming edge with the maximum weight to this node.
+    ready_to_solve_all[current_node] = get_max_incoming_weight(G,current_node)
   
   
   #Sorting the downstream nodes in order of when they solve.
-  ready_to_solve_all.sort(key=lambda tup:tup[1])
+  ready_to_solve_all = dict(sorted(ready_to_solve_all.items(),key=lambda x:x[1]))
   
   
-  for node_data in ready_to_solve_all:
+  for k,val in ready_to_solve_all.items():
     #The current node.
-    node = node_data[0]
+    node = k
     #When the current node is ready to solve.
-    ready_to_solve = node_data[1]
+    ready_to_solve = val
     #Get outgoing edges of this node.
     out_edges = G.out_edges(node)
     for u,v in out_edges:
       if (v in downstream_nodes):
         if not modified_edges:
-          delay = time_to_solve[node] + og_delay + ready_to_solve - G[u][v]['weight']
+          delay = time_to_solve[node] + ready_to_solve - G[u][v]['weight']
           if delay > 0.0:
             G[u][v]['weight'] += delay
+            ready_to_solve_all[v] = get_max_incoming_weight(G,v)
+            #modified_edges.append((u,v))
         elif (u,v) not in modified_edges:
-          delay = time_to_solve[node] + og_delay + ready_to_solve - G[u][v]['weight']
+          delay = time_to_solve[node] + ready_to_solve - G[u][v]['weight']
           if delay > 0.0:
             G[u][v]['weight'] += delay
+            ready_to_solve_all[v] = get_max_incoming_weight(G,v)
+            #modified_edges.append((u,v))
   
   return G
+
+def get_max_incoming_weight(G,node):
+  
+  in_edges = list(G.in_edges(node,'weight'))
+  weights = [z for x,y,z in in_edges]
+  
+  return max(weights)
 
 def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   
@@ -911,8 +922,8 @@ def add_conflict_weights(graphs,time_to_solve):
         #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
-    plot_graphs(graphs,t)
-    print("here")
+    #plot_graphs(graphs,t)
+    #print("here")
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
       if finished_graphs[g]:
