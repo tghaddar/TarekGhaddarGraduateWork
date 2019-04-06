@@ -667,9 +667,23 @@ def find_first_graph(conflicting_graphs,graphs,node):
           if dogs_remaining[d] == max_dog_remaining:
             max_dogs.append(dogs_graph_indices[d])
         
-        #Once we have the graph indices of the tied graphs (according to DOG remaining), the priority octant wins.
-        max_dogs = sort_priority(max_dogs)
-        first_graph = max_dogs[0]
+        
+        #Once we have the graph indices of the tied graphs (according to DOG remaining), the we check to see if they have a different lengths of shortest paths.
+        max_dogs_same_length = []
+        for d in range(0,len(max_dogs)):
+          graph_index = max_dogs[d]
+          shortest_length = len(list(nx.shortest_path(graphs[graph_index],node,-1)))
+          max_dogs_same_length.append(shortest_length)
+        
+        #If all shortest path lengths are the same, we sort based on priority.
+        if len(max_dogs_same_length) != len(set(dogs_remaining)):
+          max_dogs = sort_priority(max_dogs)
+          first_graph = max_dogs[0]
+        #Otherwise we choose the one with the "longest" shortest path.
+        else:
+          short_path_index = max_dogs_same_length.index(max(max_dogs_same_length))
+          first_graph = max_dogs[short_path_index]
+          
       
       #We only need to look at the graph with the max DOG remaining. It is the first graph that should start solving.
       else:
@@ -979,8 +993,8 @@ def add_conflict_weights(graphs,time_to_solve):
         #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
-    #plot_graphs(graphs,t)
-    print("here")
+    plot_graphs(graphs,t)
+    #print("here")
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
       if finished_graphs[g]:
