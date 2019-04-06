@@ -517,6 +517,9 @@ def find_next_interaction(graphs,prev_nodes,start_time,time_to_solve):
 
 def find_next_interaction_simple(graphs,prev_nodes,start_time,time_to_solve):
   
+  if start_time == 3:
+    print("debug stop")
+  
   num_graphs = len(graphs)
   
   next_time = float("inf")
@@ -527,13 +530,12 @@ def find_next_interaction_simple(graphs,prev_nodes,start_time,time_to_solve):
     start_nodes = prev_nodes[g]
     
     for node in start_nodes:
-        #The successors to this node.
-        successors = list(graph.successors(node))
-        for s in successors:
-          #Getting the time the next node is ready to solve.
-          next_node_solve = graph[node][s]['weight']
-          if next_node_solve < next_time:
-            next_time = next_node_solve
+      successors = list(graph.successors(node))
+      for s in successors:
+        #Getting the time the next node is ready to solve.
+        next_node_solve = graph[node][s]['weight']
+        if next_node_solve < next_time:
+          next_time = next_node_solve
   
   return next_time
 
@@ -730,12 +732,12 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
           node1,node2 = edges[e]
           secondary_graph[node1][node2]['weight'] += delay
         
-        if (second_graph == 6):
-          print("debug stop")
+        #if (second_graph == 6):
+          #print("debug stop")
         #secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
         secondary_graph = modify_downstream_edges_faster(secondary_graph,node,modified_edges[second_graph],time_to_solve,delay)
-        if (second_graph == 6):
-          print("debug stop")
+        #if (second_graph == 6):
+          #print("debug stop")
       
         graphs[second_graph] = secondary_graph
     
@@ -859,11 +861,15 @@ def add_conflict_weights(graphs,time_to_solve):
   
   #Storing the ending nodes of all graphs.
   end_nodes = {}
+  starting_nodes = []
   prev_nodes = []
   for g in range(0,num_graphs):
     graph = graphs[g]
     end_nodes[g] = list(graph.predecessors(-1))[0]
     prev_nodes.append([x for x in graph.nodes() if graph.in_degree(x) == 0])
+    starting_nodes.append(prev_nodes[g])
+  
+  
   
   #The number of graphs that have finished.
   num_finished_graphs = 0
@@ -879,6 +885,8 @@ def add_conflict_weights(graphs,time_to_solve):
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
       graph = graphs[g]
+      if not prev_nodes[g]:
+        prev_nodes[g] = starting_nodes[g]
       #all_nodes_being_solved[g] = nodes_being_solved_faster(graph,prev_nodes[g],t,time_to_solve)
       all_nodes_being_solved[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve)
       
@@ -936,7 +944,7 @@ def add_conflict_weights(graphs,time_to_solve):
       if t >= time_to_finish:
         finished_graphs[g] = True
     
-    print(finished_graphs)
+    #print(finished_graphs)
     
     num_finished_graphs = len([x for x in finished_graphs if finished_graphs[x] == True])
 

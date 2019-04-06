@@ -10,10 +10,10 @@ plt.close("all")
 
 start_tos = time.time()
 
-numrow = 50
-numcol = 50 
+numrow = 4
+numcol = 4
 
-adjacency_matrix = np.genfromtxt('matrices_49.csv',delimiter=",")
+adjacency_matrix = np.genfromtxt('matrices_3.csv',delimiter=",")
 
 
 graphs = build_graphs(adjacency_matrix,numrow,numcol)
