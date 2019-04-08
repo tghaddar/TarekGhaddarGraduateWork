@@ -676,7 +676,7 @@ def find_first_graph(conflicting_graphs,graphs,node):
           max_dogs_same_length.append(shortest_length)
         
         #If all shortest path lengths are the same, we sort based on priority.
-        if len(max_dogs_same_length) != len(set(dogs_remaining)):
+        if len(max_dogs_same_length) != len(set(max_dogs_same_length)):
           max_dogs = sort_priority(max_dogs)
           first_graph = max_dogs[0]
         #Otherwise we choose the one with the "longest" shortest path.
@@ -772,8 +772,6 @@ def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,ti
   node_ind = 1
   #We loop over all nodes ready to solve at time t.
   for node in nodes:
-    if node == 7:
-      print("debug stop")
     #The time to solve this node.
     time_to_solve_node = time_to_solve[node]
     #We get the graphs in conflict at this node.
@@ -781,6 +779,8 @@ def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,ti
     print(node,conflicting_graphs)
     #Storing modified edges per graph at time t.
     modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
+    if node == 1:
+      print("debug stop")
     #The fastest graph to the node.
     first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node)
     #Removed from conflicting graphs.
@@ -942,7 +942,7 @@ def add_conflict_weights(graphs,time_to_solve):
   #Keep iterating until all graphs have finished.
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if t == 3:
+    if t == 2:
       print("debug stop")
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
@@ -993,7 +993,7 @@ def add_conflict_weights(graphs,time_to_solve):
         #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
-    plot_graphs(graphs,t)
+    #plot_graphs(graphs,t)
     #print("here")
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
