@@ -48,7 +48,9 @@
 %
 % Define title...
 %
-\title{APPROACHES TO LOAD BALANCING \\MASSIVELY PARALLEL TRANSPORT SWEEPS\\ON UNSTRUCTURED GRIDS}
+\title{APPROACHES TO LOAD BALANCING \\
+MASSIVELY PARALLEL TRANSPORT SWEEPS\\
+ON UNSTRUCTURED GRIDS}
 %
 % ...and authors
 %
@@ -110,15 +112,25 @@ where the gain terms terms have been combined into one general source term, $q_m
 
 After the angular and energy dependence have been accounted for, Eq. (\ref{source iteration}) must be discretized in space as well. This is done by meshing the domain and utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}, allowing one cell at a time to be solved. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. 
 
-PDT, Texas A\&M's massively parallel deterministic transport code, employs the transport sweep by with the process described above, using a finite element mesh and solving the discrete ordinates form of the transport equation using a discontinuous finite element approach and source iteration\cite{mpadams15, mpadams13}. Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions, causing runtimes of problems to become unmanageable.
+PDT, Texas A\&M's massively parallel deterministic transport code, employs the transport sweep with the process described above, using a finite element mesh and solving the discrete ordinates form of the transport equation using a discontinuous finite element approach and source iteration\cite{mpadams15, mpadams13}. Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions, causing runtimes of problems to become unmanageable.
+
+To combat imbalanced partitions, two load balancing algorithms were implemented, referred to in this paper as the original load balancing algorithm and the load balancing by dimension algorithm.
 
 
-\section{SECOND OR SUBSEQUENT MAJOR HEADING} 
+\section{LOAD BALANCING UNSTRUCTURED MESHES IN PDT} 
 \label{sec:first}
 
-This is Section~\ref{sec:first}. It is followed by a subsection, that is, 
-\ref{sec:second}. The style for subsection titles and all text in this template is defined 
-in the \emph{mandc2019.cls} file.  Make sure to avoid widow/orphan lines.
+Before detailing the two load balancing algorithms PDT employs, a quick review of partitioning unstructured meshes in PDT is necessary.
+\vspace{-0.6cm}
+\begin{itemize}\itemsep 1pt \parskip 0pt \parsep 0pt
+\item ``Cut lines" in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
+\item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
+\item The subsets are distributed amongst the processor domain.
+\end{itemize}
+
+Figure \ref{partioning_example} shows an example of a domain partitioned into subsets.
+
+Both approaches to load balancing move these cut lines in order to redistribute cells more evenly throughout subsets, and therefore processors.
 
 \subsection{Subsection Title: First Character of Each Non-trivial Word is Uppercase} 
 \label{sec:second}
