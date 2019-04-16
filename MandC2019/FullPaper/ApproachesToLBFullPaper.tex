@@ -39,24 +39,26 @@
 \usepackage{caption}
 \captionsetup{width=1.0\textwidth,font={bf,normalsize},skip=0.3cm,within=none,justification=centering}
 
+\newcommand{\tcr}[1]{\textcolor{red}{#1}}
+\newcommand{\vr}{\vec{r}}
+\newcommand{\vo}{\vec{\Omega}}
+
 %\usepackage[justification=centering]{caption}
 
 %
 % Define title...
 %
-\title{APPROACHES TO LOAD BALANCING \\
-MASSIVELY PARALLEL TRANSPORT SWEEPS \\
- ON UNSTRUCTURED GRIDS}
+\title{APPROACHES TO LOAD BALANCING \\MASSIVELY PARALLEL TRANSPORT SWEEPS\\ON UNSTRUCTURED GRIDS}
 %
 % ...and authors
 %
 \author{%
   % FIRST AUTHORS 
   %
-  \textbf{Tarek Habib Ghaddar$^1$, Jean C. Ragusa$^1$,Jan Vermaak$^1$, Marvin L. Adams$^1$}\\%\footnote{Footnote, if necessary, in Times New Roman font and font size 10} \\
-  $^1$Dept. of Nuclear Engineering, Texas  A\&M University \\
+  \textbf{Tarek Habib Ghaddar$^1$, Jean C. Ragusa$^1$, Jan Vermaak$^1$, Marvin L. Adams$^1$} \\
+$^1$Dept. of Nuclear Engineering, Texas  A\&M University \\
   College Station, TX, 77843-3133 \\ 
-\\
+     \\
   \url{tghaddar@tamu.edu}, \url{jean.ragusa@tamu.edu}, \url{janv@tamu.edu}, \url{mladams@tamu.edu}
 }
 %
@@ -85,32 +87,31 @@ MASSIVELY PARALLEL TRANSPORT SWEEPS \\
 \keywords{list of three to five key words}
 
 \section{INTRODUCTION} 
-Paper starts here with two blank lines before first section title.  Use 
-8.5$\times$11 paper size, with 1'' margins on all sides.  Use one blank line 
-before and after each subsequent section’s title.  Most of the formatting is globally
-set by the specifications given in the \emph{mandc2019.cls} file.  
-First-level section titles must be all uppercase and centered, and must 
-be numbered in Arabic numerals as shown above.  Unlike the Word template, the body text and section titles for this \LaTeX\ template use 
-11-point font.  We have found that the 11-point font in \LaTeX\ more closely 
-matched the 12-point font in Word.  Introduce the topic of your work 
-in this section.
+The steady-state neutron transport equation describes the behavior of neutrons in a medium and is given by Eq. (\ref{continuous transport}):
+\begin{multline}
+\vo \cdot \vec \nabla \psi(\vr,E,\vo) + \Sigma_t(\vr,E) \psi(\vr,E,\vo)  = \\ 
+\int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')  + S_{ext}(\vr,E,\vo) ,
+\label{continuous transport}
+\end{multline}
+where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption, outscatter, and within group scattering). These represent the loss terms of the neutron transport equation. The right hand side of Eq.~\eqref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into $dE$ about energy $E$ and $d\Omega$ about direction $\vo$. 
 
-The first line of a paragraph is not indented; rather add one blank line between 
-paragraphs.  This is done automatically. If you are a \LaTeX\ expert you 
-can likely define the established format characteristics in a more elegant 
-manner than what is done here.  This is perfectly fine, so long as the 
-established paper format/appearance is maintained.  This template is merely 
-to assist with maintaining uniformity in paper appearance.
+Eq. (\ref{angle}) is obtained by assuming isotropic scattering, discretizing in energy, and discretizing in angle using the discrete ordinates method\cite{discrete ordinates}:
+\begin{equation}
+\vo_m \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr).
+\label{angle}
+\end{equation}
 
-There are four types of reference styles: journal paper\cite{journal}, 
-proceedings paper\cite{proc_paper}, book\cite{book}, and website\cite{website}.
-References to websites are discouraged, but acceptable if absolutely necessary. It 
-is the author’s responsibility to check links in the PDF file of your paper. 
-All references should be cited in the text in numerical order, in order of 
-appearance as [5-7].
+This allows us to solve a sequence of transport equations for one group and direction at a time. The discrete form of the transport equation is solved via source iteration, described in Eq. (\ref{source iteration}):
+\begin{equation}
+\vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
+\label{source iteration}
+\end{equation}
+where the gain terms terms have been combined into one general source term, $q_m$. The angular flux of iteration $(l+1)$ is calculated using the $(l^{th})$ value of the scalar flux. 
 
-The page limit for M\&C 2019 papers is 12 pages. It is strongly recommended that 
-the length of any final paper should not exceed 12 pages.
+After the angular and energy dependence have been accounted for, Eq. (\ref{source iteration}) must be discretized in space as well. This is done by meshing the domain and utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}, allowing one cell at a time to be solved. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. 
+
+PDT, Texas A\&M's massively parallel deterministic transport code, employs the transport sweep by with the process described above, using a finite element mesh and solving the discrete ordinates form of the transport equation using a discontinuous finite element approach and source iteration\cite{mpadams15, mpadams13}. Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions, causing runtimes of problems to become unmanageable.
+
 
 \section{SECOND OR SUBSEQUENT MAJOR HEADING} 
 \label{sec:first}
