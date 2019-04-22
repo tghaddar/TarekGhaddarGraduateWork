@@ -38,6 +38,7 @@
 \setlist[itemize]{leftmargin=*}
 \usepackage{caption}
 \captionsetup{width=1.0\textwidth,font={bf,normalsize},skip=0.3cm,within=none,justification=centering}
+\usepackage{float}
 
 \newcommand{\tcr}[1]{\textcolor{red}{#1}}
 \newcommand{\vr}{\vec{r}}
@@ -120,15 +121,22 @@ To combat imbalanced partitions, two load balancing algorithms were implemented,
 \section{LOAD BALANCING UNSTRUCTURED MESHES IN PDT} 
 \label{sec:first}
 
-Before detailing the two load balancing algorithms PDT employs, a quick review of partitioning unstructured meshes in PDT is necessary.
-\vspace{-0.6cm}
+Before detailing the two load balancing algorithms PDT employs, a quick review of partitioning unstructured meshes in PDT is necessary:
+\vspace{-2cm}
 \begin{itemize}\itemsep 1pt \parskip 0pt \parsep 0pt
 \item ``Cut lines" in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
 \item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
 \item The subsets are distributed amongst the processor domain.
 \end{itemize}
+\vspace{-2cm}
+Figure \ref{partioning_example} shows an example of an unstructured mesh partitioned into four subsets.
 
-Figure \ref{partioning_example} shows an example of a domain partitioned into subsets.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.9,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/partitioning_example.pdf}
+\caption{An unstructured mesh partitioned into four subsets with cut lines at $x,y = 10$ cm.}
+\label{partioning_example}
+\end{figure}
 
 Both approaches to load balancing move these cut lines in order to redistribute cells more evenly throughout subsets, and therefore processors.
 
