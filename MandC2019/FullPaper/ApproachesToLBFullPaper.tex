@@ -39,6 +39,12 @@
 \usepackage{caption}
 \captionsetup{width=1.0\textwidth,font={bf,normalsize},skip=0.3cm,within=none,justification=centering}
 \usepackage{float}
+%Better boldface math font.
+\usepackage{bm}
+%Algorithm
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{siunitx}
 
 \newcommand{\tcr}[1]{\textcolor{red}{#1}}
 \newcommand{\vr}{\vec{r}}
@@ -87,7 +93,7 @@ $^1$Dept. of Nuclear Engineering, Texas  A\&M University \\
   spacing. The abstract is a very brief summary highlighting main 
   accomplishments, what is new, and how it relates to the state-of-the-art.
 \end{abstract}
-\keywords{list of three to five key words}
+\keywords{transport sweep, massively parallel, load balancing}
 
 \section{INTRODUCTION} 
 The steady-state neutron transport equation describes the behavior of neutrons in a medium and is given by Eq. (\ref{continuous transport}):
@@ -103,7 +109,6 @@ Eq. (\ref{angle}) is obtained by assuming isotropic scattering, discretizing in 
 \vo_m \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr).
 \label{angle}
 \end{equation}
-
 This allows us to solve a sequence of transport equations for one group and direction at a time. The discrete form of the transport equation is solved via source iteration, described in Eq. (\ref{source iteration}):
 \begin{equation}
 \vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
@@ -113,69 +118,76 @@ where the gain terms terms have been combined into one general source term, $q_m
 
 After the angular and energy dependence have been accounted for, Eq. (\ref{source iteration}) must be discretized in space as well. This is done by meshing the domain and utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}, allowing one cell at a time to be solved. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. 
 
-PDT, Texas A\&M's massively parallel deterministic transport code, employs the transport sweep with the process described above, using a finite element mesh and solving the discrete ordinates form of the transport equation using a discontinuous finite element approach and source iteration\cite{mpadams15, mpadams13}. Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions, causing runtimes of problems to become unmanageable.
+PDT, Texas A\&M's massively parallel deterministic transport code, employs the transport sweep with the process described above, using a finite element mesh and solving the discrete ordinates form of the transport equation using a discontinuous finite element approach and source iteration\cite{mpadams15, mpadams13}. Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions, causing longer and unmanageable runtimes.
 
 To combat imbalanced partitions, two load balancing algorithms were implemented, referred to in this paper as the original load balancing algorithm and the load balancing by dimension algorithm.
-
 
 \section{LOAD BALANCING UNSTRUCTURED MESHES IN PDT} 
 \label{sec:first}
 
 Before detailing the two load balancing algorithms PDT employs, a quick review of partitioning unstructured meshes in PDT is necessary:
-\vspace{-2cm}
+\vspace{-2.5cm}
 \begin{itemize}\itemsep 1pt \parskip 0pt \parsep 0pt
 \item ``Cut lines" in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
 \item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
 \item The subsets are distributed amongst the processor domain.
 \end{itemize}
 \vspace{-2cm}
-Figure \ref{partioning_example} shows an example of an unstructured mesh partitioned into four subsets.
+Figure \ref{partitioning_example} shows an example of an unstructured mesh partitioned into four subsets in PDT. 
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.9,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/partitioning_example.pdf}
-\caption{An unstructured mesh partitioned into four subsets with cut lines at $x,y = 10$ cm.}
-\label{partioning_example}
+\caption{An unstructured mesh partitioned into four subsets with cut lines at $\bm{x,y = 10}$ cm.}
+\label{partitioning_example}
 \end{figure}
-
-Both approaches to load balancing move these cut lines in order to redistribute cells more evenly throughout subsets, and therefore processors.
-
-\subsection{Subsection Title: First Character of Each Non-trivial Word is Uppercase} 
-\label{sec:second}
-
-Double-space before and after secondary titles is automatic.  Figures and 
-tables should appear as close as possible to where they are first
-cited, e.g., Fig.~\ref{fig:amdahl}, in the text.  Figures are numbered in Arabic 
-numerals, with the caption centered below the figure, in \textbf{boldface}. For a better 
-arrangement it is strongly recommended that all the figures must be placed in the``Figures'' 
-folder. Triple-space before the figure, and after the figure caption.
-
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[scale=0.60]{./Figures/figure.pdf}
-  \caption{SCALE/TRITON-NEWT Model of BWR Assembly in Order to Show and Example of a Figure and a Multi-line Caption}   
-  \label{fig:amdahl}
-\end{figure}
-
-When importing figures or any graphical image please verify two things:
-\vspace{-0.65cm} % THE DISTANCE BETWEEN THE ":" AND THE FIRST LINE OF THE LIST MAY VARY DEPENDING ON THE TEXT LENGTH, CHANGE THIS VALUE DEPENDING ON YOUR NEEDS.
-\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
-\item Any number, text or symbol is in Times font and is not smaller than 
-  10-point after reduction to the actual window in your paper
-\item That it can be translated into PDF
-\end{itemize}
-
-Equations, such as Eq. (\ref{sample_equation}), should be centered and 
-sequentially numbered to the flush right of the formula.
-
+Both approaches to load balancing move these cut lines in order to redistribute cells more evenly throughout subsets. We define a metric describing how imbalanced our problem is:
 \begin{equation}
-  \label{sample_equation}
-  \mathrm{Speedup}=\frac{1}{\frac{f}{p}+(1-f)}
+f =\frac{\underset{ijk}{\text{max}}(N_{ijk})}{\frac{N_{tot}}{I\cdot J\cdot K}},
+\label{metric_def}
 \end{equation}
+where $f$ is the load balance metric, $N_{ijk}$ is the number of cells in subset $(i,j,k)$, $N_{tot}$ is the global number of cells in the problem, and $I$, $J$, and $K$ are the total number of subsets in the $x$, $y$, and $z$ direction, respectively. The metric is a measure of the maximum number of cells per subset divided by the average number of cells per subset. For a perfectly balanced problem, $f = 1$.
 
-The continuation of a paragraph after an equation should not be indented.  
-All paragraphs, as well as section or subsection headings, are separated by 
-just one single empty line.
+Dimensional sub-metrics are defined to assist with the movement of the partitions:
+\begin{equation}
+f_{D} = \underset{d}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D}.
+\label{f_d}
+\end{equation}
+$f_{D}$ is calculated by taking the maximum number of cells per row, column, or plane and dividing it by the average number of cells per the corresponding dimension. If this number is greater than predefined tolerances, the cut lines in the respective dimension are redistributed. 
+
+Figure \ref{redistribute} illustrates an example of redistributing the cut lines in $x$ to balance the cells per column.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{Figures/redistribute_before.pdf}
+\includegraphics[scale=0.5]{Figures/redistribute_after.pdf}
+\caption{The use of the CDF of triangles per column to redistribute the cut lines in X.}
+\label{redistribute}
+\end{figure}
+The image on the left side of Fig. \ref{redistribute} shows the CDF of the triangles per column. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut lines are redistributed to. 
+
+\subsection{Original Load Balancing Algorithm}
+\label{og_lb}
+
+The initial approach to load balancing was implemented on 2D extruded meshes, meaning the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. Algorithm \ref{initial_algorithm} summarizes the initial approach to load balancing meshes in PDT.
+
+\begin{algorithm}[H]
+\caption{The original load balancing algorithm.}
+\label{initial_algorithm}
+\begin{algorithmic}
+
+\WHILE{$f > \text{tol}_{\text{subset}}$}
+  \IF {$f_I > \text{tol}_{\text{col}}$}
+    \STATE Redistribute the X cut lines.
+  \ENDIF
+  \IF {$f_J > \text{tol}_{\text{row}}$}
+  	\STATE Redistribute the Y cut lines.
+  \ENDIF
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$ (defined by Eq. (\ref{f_d})), are balanced. If they are not, we redistribute the cut lines. 
+
+To study the behavior of the original load balancing algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area. The minimum allowable angle per triangle was kept constant at \ang{20}.
 
 \subsubsection{Sub-subsection level and lower: only first character uppercase}
 
