@@ -45,6 +45,7 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{siunitx}
+\usepackage{pgfplotstable}
 
 \newcommand{\tcr}[1]{\textcolor{red}{#1}}
 \newcommand{\vr}{\vec{r}}
@@ -188,6 +189,26 @@ The initial approach to load balancing was implemented on 2D extruded meshes, me
 While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$ (defined by Eq. (\ref{f_d})), are balanced. If they are not, we redistribute the cut lines. 
 
 To study the behavior of the original load balancing algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area. The minimum allowable angle per triangle was kept constant at \ang{20}.
+
+%\begin{table}
+%\centering
+%\pgfplotstabletypeset[%
+%   fixed zerofill,
+%   precision=3,
+%   col sep=comma,
+%   dec sep align,
+%   columns/0/.style ={column name=2},
+%   columns/1/.style ={column name=3},
+%   columns/2/.style ={column name=4},
+%   columns/3/.style ={column name=5},
+%   columns/4/.style={column name=6},
+%   columns/5/.style={column name=7},
+%   columns/6/.style={column name=8},
+%   columns/7/.style={column name=9},
+%   columns/8/.style={column name=10},
+%   rows={Coarse,1.8,1.6,1.4,1.2,1,0.8,0.6,0.4,0.2,0.1,0.08,0.06,0.05,0.04,0.03,0.02,0.01},
+%   ]{opp_side_og_q.csv}
+%\end{table}
 
 \subsubsection{Sub-subsection level and lower: only first character uppercase}
 
