@@ -38,7 +38,7 @@
 \setlist[itemize]{leftmargin=*}
 \usepackage{caption}
 \captionsetup{width=1.0\textwidth,font={bf,normalsize},skip=0.3cm,within=none,justification=centering}
-\usepackage{float}
+%\usepackage{float}
 %Better boldface math font.
 \usepackage{bm}
 %Algorithm
@@ -46,6 +46,13 @@
 \usepackage{algorithmic}
 \usepackage{siunitx}
 \usepackage[table]{xcolor}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.7}
 
 \newcommand{\tcr}[1]{\textcolor{red}{#1}}
 \newcommand{\vr}{\vec{r}}
@@ -127,16 +134,16 @@ To combat imbalanced partitions, two load balancing algorithms were implemented,
 \label{sec:first}
 
 Before detailing the two load balancing algorithms PDT employs, a quick review of partitioning unstructured meshes in PDT is necessary:
-\vspace{-2.5cm}
+%\vspace{-2.5cm}
 \begin{itemize}\itemsep 1pt \parskip 0pt \parsep 0pt
 \item ``Cut lines" in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
 \item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
 \item The subsets are distributed amongst the processor domain.
 \end{itemize}
-\vspace{-2cm}
+%\vspace{-2cm}
 Figure \ref{partitioning_example} shows an example of an unstructured mesh partitioned into four subsets in PDT. 
 
-\begin{figure}[H]
+\begin{figure}[htb]
 \centering
 \includegraphics[scale=0.9,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/partitioning_example.pdf}
 \caption{An unstructured mesh partitioned into four subsets with cut lines at $\bm{x,y = 10}$ cm.}
@@ -157,7 +164,7 @@ f_{D} = \underset{d}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D}.
 $f_{D}$ is calculated by taking the maximum number of cells per row, column, or plane and dividing it by the average number of cells per the corresponding dimension. If this number is greater than predefined tolerances, the cut lines in the respective dimension are redistributed. 
 
 Figure \ref{redistribute} illustrates an example of redistributing the cut lines in $x$ to balance the cells per column.
-\begin{figure}[H]
+\begin{figure}[htb]
 \centering
 \includegraphics[scale=0.5]{Figures/redistribute_before.pdf}
 \includegraphics[scale=0.5]{Figures/redistribute_after.pdf}
@@ -171,7 +178,7 @@ The image on the left side of Fig. \ref{redistribute} shows the CDF of the trian
 
 The initial approach to load balancing was implemented on 2D extruded meshes, meaning the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. Algorithm \ref{initial_algorithm} summarizes the initial approach to load balancing meshes in PDT.
 
-\begin{algorithm}[H]
+\begin{algorithm}[htb]
 \caption{The original load balancing algorithm.}
 \label{initial_algorithm}
 \begin{algorithmic}
@@ -187,10 +194,11 @@ The initial approach to load balancing was implemented on 2D extruded meshes, me
 \end{algorithmic}
 \end{algorithm}
 While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$ (defined by Eq. (\ref{f_d})), are balanced. If they are not, we redistribute the cut lines. 
+%\vspace{-3.5cm}
 
-To study the behavior of the original load balancing algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area. The minimum allowable angle per triangle was kept constant at \ang{20}.
-\vspace{-5cm}
-\begin{table}[H]
+To study the behavior of the original load balancing algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area, with the minimum allowable angle per triangle was kept constant at \ang{20}.
+%\vspace{-1cm}
+\begin{table}[htb]
 \centering
   \caption{\bf The results of the parametric study using the original load balancing algorithm.}
   \begin{tabular}{c|c|c|c|c|c|c|c|c} 
@@ -218,7 +226,29 @@ To study the behavior of the original load balancing algorithm, the problem show
 \end{table}
 
 \subsection{Load Balancing by Dimension Algorithm}
-\begin{table}[H]
+
+The load balancing by dimension algorithm, like the original load balancing algorithm, relies on the movement of cut planes to redistribute mesh cells in a more balanced manner. However rather than moving all cut planes in all dimensions in one iteration, one dimension is balanced first for all iterations, and then the cut planes that yield the best metric for that dimension are chosen. Then the next dimensions is balanced within the first dimension. For example, if the $x$ cut planes are balanced first, the $y$ cut planes are balanced \textit{within} each column.
+We slightly alter the definition for our dimensional sub-metrics (Eq. (\ref{f_d})) accordingly:
+\begin{align}
+f_{D1} &= \underset{d1}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D1}, \\
+f_{D2,1} &= \Big(\underset{d2}{\text{max}}[\sum_{d3} N_{ijk,d1}]/\frac{N_{d1}}{D2}\Big), \\
+f_{D3,2,1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}{D3} \Big) .
+\end{align}
+
+%Algorithm \ref{lbd} describes the load balancing by dimension algorithm. 
+%
+%\begin{algorithm}[htb]
+%\caption{The load balancing by dimension algorithm.}
+%\label{lbd}
+%\begin{algorithmic}
+%
+%\WHILE{$f > \text{tol}_{\text{subset}}$}
+%\
+%\ENDWHILE
+%\end{algorithmic}
+%\end{algorithm}
+
+\begin{table}[htb]
 \centering
   \caption{\bf The results of the parametric study using the load balancing by dimension algorithm.}
   \begin{tabular}{c|c|c|c|c|c|c|c|c} 
@@ -245,7 +275,7 @@ To study the behavior of the original load balancing algorithm, the problem show
   \end{tabular}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[htb]
 \centering
   \caption{\bf The percent decrese in $f$ from the original load balancing algorithm when using the load balancing by dimension algorithm.}
   \begin{tabular}{c|c|c|c|c|c|c|c|c} 
@@ -269,27 +299,6 @@ To study the behavior of the original load balancing algorithm, the problem show
 0.003 & 0.002 & 0.001 & 0.000 & 0.001 & 0.004 & 0.361 & 0.070 & 0.000 \\  \hline
 0.002 & 0.003 & 0.002 & -0.000 & 0.001 & -0.000 & 0.196 & 0.027 & -0.000 \\ \hline 
 
-  \end{tabular}
-\end{table}
-
-\subsubsection{Sub-subsection level and lower: only first character uppercase}
-
-See Table \ref{table:example} for a sample table.  The ``tabls'' package is
-recommended for improved row and column spacing.  Notice the caption appears 
-above the table by setting the \verb!\caption! command immediately 
-after the \verb!\begin{table}!. Tables are numbered in Roman 
-numerals, with the caption centered above the table, in \textbf{boldface}.  
-Triple-space before and after the table.
-
-\begin{table}[!htb]
-  \centering
-  \caption{\bf Parallel Performance for the Sample Problem}
-  \label{table:example} 
-  \begin{tabular}{|c|c|c|c|} \hline 
-   Number of & Wall-Clock & Speedup & Efficiency \\
-   Processors & Time$^{a}$ (min) & (T$_{s}$/T$_{p}$) & (\%) \\ \hline
-    \ 1 &  100.0 & \ ---    & ---  \\ \hline
-    \ 2 &   52.6 & \ 1.9    & 95.0 \\ \hline 
   \end{tabular}
 \end{table}
 
