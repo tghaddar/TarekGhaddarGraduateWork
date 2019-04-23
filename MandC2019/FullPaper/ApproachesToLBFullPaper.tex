@@ -243,18 +243,27 @@ Once the z planes are balanced according to $f_{D1}$, we balance the second dime
 
 Once the columns within each z-plane are balanced, we balance the rows $within$ the columns $within$ each plane. The row-wise sub-metrics for each plane for each column, $f_{D3,d2,d1}$, are calculated by dividing the maximum number of cells per row per column by the average number of cells per row per column in each plane.
 
-%Algorithm \ref{lbd} describes the load balancing by dimension algorithm. 
-%
-%\begin{algorithm}[htb]
-%\caption{The load balancing by dimension algorithm.}
-%\label{lbd}
-%\begin{algorithmic}
-%
-%\WHILE{$f > \text{tol}_{\text{subset}}$}
-%\
-%\ENDWHILE
-%\end{algorithmic}
-%\end{algorithm}
+Algorithm \ref{lbd} summarizes the load balancing by dimension process.
+
+\begin{algorithm}[htb]
+\caption{The load balancing by dimension algorithm.}
+\label{lbd}
+\begin{algorithmic}
+
+\WHILE{$f > \text{tol}_{\text{subset}}$}
+  \IF {$f_{D1} > \text{tol}_{\text{D1}}$}
+    \STATE Redistribute the D1 cut planes.
+  \ENDIF  
+  
+  \FOR {$d1$ in $D1$}
+    \IF {$f_{D2,d1} > \text{tol}_{\text{D2}}$}
+      \STATE Redistribute the D2 cut planes within d1. 
+    \ENDIF
+  \ENDFOR
+  
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
 
 \begin{table}[htb]
 \centering
