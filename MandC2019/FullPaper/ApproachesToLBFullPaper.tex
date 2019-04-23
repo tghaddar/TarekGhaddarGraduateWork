@@ -261,6 +261,14 @@ Algorithm \ref{lbd} summarizes the load balancing by dimension process.
     \ENDIF
   \ENDFOR
   
+  \FOR{$d1$ in $D1$}
+    \FOR{$d2$ in $D2$}
+      \IF {$f_{D3,d2,d1} > \text{tol}_{\text{D3}}$ }
+        \STATE Redistribute the D3 cut planes within d2 within d1. 
+      \ENDIF
+    \ENDFOR
+  \ENDFOR
+  
 \ENDWHILE
 \end{algorithmic}
 \end{algorithm}
