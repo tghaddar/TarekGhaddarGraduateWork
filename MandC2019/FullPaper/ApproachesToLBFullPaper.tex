@@ -29,6 +29,7 @@
 %
 %  various packages that you may wish to activate for usage 
 \usepackage{tabls}
+\usepackage{graphicx}
 \usepackage{cites}
 \usepackage{epsf}
 \usepackage{appendix}
@@ -196,11 +197,12 @@ The initial approach to load balancing was implemented on 2D extruded meshes, me
 While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$ (defined by Eq. (\ref{f_d})), are balanced. If they are not, we redistribute the cut lines. 
 %\vspace{-3.5cm}
 
-To study the behavior of the original load balancing algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area, with the minimum allowable angle per triangle was kept constant at \ang{20}.
+To study the behavior of the original load balancing algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area, with the minimum allowable angle per triangle was kept constant at \ang{20}. Table \ref{og_table} shows the results of this parametric study using the original load balancing algorithm.
 %\vspace{-1cm}
 \begin{table}[htb]
 \centering
   \caption{\bf The results of the parametric study using the original load balancing algorithm.}
+  \scalebox{0.9}{
   \begin{tabular}{c|c|c|c|c|c|c|c|c} 
    \bf  2 &  \bf 3    &  \bf  4   &  \bf  5   &  \bf  6   &  \bf  7   & \bf   8   &  \bf 9    &  \bf 10   \\ \hline \hline
 1.993 & 2.735 & 4.360 & 4.812 & 5.545 & 6.321 & 3.114 & 2.697 & 1.893 \\ \hline 
@@ -222,7 +224,8 @@ To study the behavior of the original load balancing algorithm, the problem show
 1.005 & 1.008 & 1.010 & 1.013 & 1.021 & 1.035 & 1.623 & 1.137 & 1.016 \\ \hline
 1.003 & 1.009 & 1.009 & 1.011 & 1.016 & 1.013 & 1.281 & 1.058 & 1.015 \\ \hline
 
-  \end{tabular}
+  \end{tabular}}
+  \label{og_table}
 \end{table}
 
 \subsection{Load Balancing by Dimension Algorithm}
@@ -230,10 +233,15 @@ To study the behavior of the original load balancing algorithm, the problem show
 The load balancing by dimension algorithm, like the original load balancing algorithm, relies on the movement of cut planes to redistribute mesh cells in a more balanced manner. However rather than moving all cut planes in all dimensions in one iteration, one dimension is balanced first for all iterations, and then the cut planes that yield the best metric for that dimension are chosen. Then the next dimensions is balanced within the first dimension. For example, if the $x$ cut planes are balanced first, the $y$ cut planes are balanced \textit{within} each column.
 We slightly alter the definition for our dimensional sub-metrics (Eq. (\ref{f_d})) accordingly:
 \begin{align}
-f_{D1} &= \underset{d1}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D1}, \\
-f_{D2,1} &= \Big(\underset{d2}{\text{max}}[\sum_{d3} N_{ijk,d1}]/\frac{N_{d1}}{D2}\Big), \\
-f_{D3,2,1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}{D3} \Big) .
+f_{D1} &= \underset{d1}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D1}, \label{f_d1} \\
+f_{D2,d1} &= \Big(\underset{d2}{\text{max}}[\sum_{d3} N_{ijk,d1}]/\frac{N_{d1}}{D2}\Big), \label{f_d2}\\
+f_{D3,d2,d1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}{D3} \Big) . \label{f_d3}
 \end{align}
+Equation (\ref{f_d1}) represents the sub-metric for the first dimension we load balance. In order to assist in the explanation of $f_{D2,d1}$ and $f_{D3,d2,d1}$, we'll take $D1$ to be the $z$ dimension. In Eq. ({\ref{f_d1}), $D1$ represents the number of $z$ planes, $N_{tot}$ represents the number of cells in the mesh, and $N_{ijk}$ is the number of cells in subset $(i,j,k)$. $f_{D1}$ is the maximum number of cells per plane by the average number of cells per plane. 
+
+Once the z planes are balanced according to $f_{D1}$, we balance the second dimension (in this example, the columns, or $x$ cut planes) \textit{within} each $z$ plane. $f_{D2,d1}$ represents the column-wise sub-metrics for each $z$ plane. In other words, there are $D1$ column-wise sub-metrics, one for each plane. These column-wise sub-metrics are calculated by dividing the maximum number of cells per column divided by the average number cells per column \textit{in each plane}. 
+
+Once the columns within each z-plane are balanced, we balance the rows $within$ the columns $within$ each plane. The row-wise sub-metrics for each plane for each column, $f_{D3,d2,d1}$, are calculated by dividing the maximum number of cells per row per column by the average number of cells per row per column in each plane.
 
 %Algorithm \ref{lbd} describes the load balancing by dimension algorithm. 
 %
