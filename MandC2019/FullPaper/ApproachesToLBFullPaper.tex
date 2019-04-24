@@ -47,13 +47,9 @@
 \usepackage{algorithmic}
 \usepackage{siunitx}
 \usepackage[table]{xcolor}
-\setcounter{topnumber}{2}
-\setcounter{bottomnumber}{2}
-\setcounter{totalnumber}{4}
-\renewcommand{\topfraction}{0.85}
-\renewcommand{\bottomfraction}{0.85}
-\renewcommand{\textfraction}{0.15}
-\renewcommand{\floatpagefraction}{0.7}
+\usepackage{placeins}
+
+
 
 \newcommand{\tcr}[1]{\textcolor{red}{#1}}
 \newcommand{\vr}{\vec{r}}
@@ -144,7 +140,7 @@ Before detailing the two load balancing algorithms PDT employs, a quick review o
 %\vspace{-2cm}
 Figure \ref{partitioning_example} shows an example of an unstructured mesh partitioned into four subsets in PDT. 
 
-\begin{figure}[htb]
+\begin{figure}[!htb]
 \centering
 \includegraphics[scale=0.9,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/partitioning_example.pdf}
 \caption{An unstructured mesh partitioned into four subsets with cut lines at $\bm{x,y = 10}$ cm.}
@@ -165,7 +161,7 @@ f_{D} = \underset{d}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D}.
 $f_{D}$ is calculated by taking the maximum number of cells per row, column, or plane and dividing it by the average number of cells per the corresponding dimension. If this number is greater than predefined tolerances, the cut lines in the respective dimension are redistributed. 
 
 Figure \ref{redistribute} illustrates an example of redistributing the cut lines in $x$ to balance the cells per column.
-\begin{figure}[htb]
+\begin{figure}[!htb]
 \centering
 \includegraphics[scale=0.5]{Figures/redistribute_before.pdf}
 \includegraphics[scale=0.5]{Figures/redistribute_after.pdf}
@@ -179,7 +175,7 @@ The image on the left side of Fig. \ref{redistribute} shows the CDF of the trian
 
 The initial approach to load balancing was implemented on 2D extruded meshes, meaning the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. Algorithm \ref{initial_algorithm} summarizes the initial approach to load balancing meshes in PDT.
 
-\begin{algorithm}[htb]
+\begin{algorithm}[!htb]
 \caption{The original load balancing algorithm.}
 \label{initial_algorithm}
 \begin{algorithmic}
@@ -228,7 +224,7 @@ Once the z planes are balanced according to $f_{D1}$, we balance the second dime
 
 Once the columns within each z-plane are balanced, we balance the rows $within$ the columns $within$ each plane. The row-wise sub-metrics for each plane for each column, $f_{D3,d2,d1}$, are calculated by dividing the maximum number of cells per row per column by the average number of cells per row per column in each plane. Algorithm \ref{lbd} summarizes the load balancing by dimension process described.
 
-\begin{algorithm}[htb]
+\begin{algorithm}[!htb]
 \caption{The load balancing by dimension algorithm.}
 \label{lbd}
 \begin{algorithmic}
@@ -257,9 +253,9 @@ Once the columns within each z-plane are balanced, we balance the rows $within$ 
 
 \section{RESULTS}
 
-To study the behavior of the original load balancing algorithm and the load balancing by dimension algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area, with the minimum allowable angle per triangle was kept constant at \ang{20}. We varied the number of subsets in $x$ and $y$ from 2 to 10 (with the total number of subsets varying from 4 to 100). The problem illustrated by Fig. \ref{partitioning_example} was chosen because it has two dense features in opposing corners with no features in between, lending itself to being an imbalanced mesh. Table \ref{og_table} shows the results of this parametric study using the original load balancing algorithm.
+To study the behavior of the original load balancing algorithm and the load balancing by dimension algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area, with the minimum allowable angle per triangle was kept constant at \ang{20}. We varied the number of subsets in $x$ and $y$ from 2 to 10 (with the total number of subsets varying from 4 to 100). The problem illustrated by Fig. \ref{partitioning_example} was chosen because it has two dense features in opposing corners with no features in between, lending itself to being an imbalanced mesh. Table \ref{og_table} shows the results of this parametric study using the original load balancing algorithm vs. using the load balancing by dimension algorithm. Table \ref{all_improvements} shows the percent improvements for both algorithms from no load balancing to running both load balancing algorithm, while Table \ref{method_improvement} shows the improvement of the load balancing by dimension algorithm relative to the original load balancing algorithm.
 %\vspace{-1cm}
-\begin{table}[htb]
+\begin{table}[!htb]
 \centering
   \caption{\bf The results of the parametric study using the original load balancing algorithm (left) and the load balancing by dimension algorithm (right).}
   \scalebox{0.5}{
@@ -306,13 +302,11 @@ To study the behavior of the original load balancing algorithm and the load bala
 \bf 0.02& 1.002 & 1.006 & 1.009 & 1.013 & 1.020 & 1.030 & 1.038 & 1.058 & 1.016 \\ \hline
 \bf 0.01& \cellcolor{red!25}1.001 & 1.006 & 1.007 & 1.011 & 1.015 & 1.013 & 1.030 & 1.029 & 1.015 \\ \hline
 
-  \end{tabular}
- } 
-  
+  \end{tabular}} 
   \label{og_table}
 \end{table}
 
-\begin{table}[htb]
+\begin{table}[!htb]
 \centering
 \caption{\bf The percent improvement of the original load balancing algorithm (left) and the load balancing by dimension algorithm (right).}
 \scalebox{0.5}{
@@ -364,67 +358,39 @@ To study the behavior of the original load balancing algorithm and the load bala
 \label{all_improvements}
 \end{table}
 
-\begin{table}[htb]
+%method improvement table
+\begin{table}[!htb]
 \centering
-  \caption{\bf The results of the parametric study using the load balancing by dimension algorithm.}
-  \begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
+\caption{\bf The percent improvement of the load balancing by dimension algorithm over the original load balancing algorithm.}
+\scalebox{0.75}{
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
 \bf Area, $N^{1/2}$ & \bf  2 & \bf 3    &  \bf  4   &  \bf  5   &  \bf 6    &  \bf  7   &   \bf 8   &  \bf 9    &  \bf 10   \\ \hline \hline
-\bf Coarse & 1.645 & 1.455 & 1.878 & 2.348 & 3.046 & 3.022 & 1.752 & 2.304 & 1.451 \\ \hline 
-\bf 1.8& 1.034 & 1.460 & 2.127 & 1.744 & 2.098 & 2.588 & 2.623 & 2.776 & 2.872 \\ \hline
-\bf 1.6& 1.015 & 1.396 & 1.899 & 1.877 & 2.090 & 2.857 & 2.608 & 3.582 & 2.604 \\ \hline
-\bf 1.4& 1.011 & 1.418 & 1.631 & 1.964 & 1.820 & 2.968 & 2.055 & 2.201 & 1.523 \\ \hline
-\bf 1.2& 1.019 & 1.344 & 1.483 & 1.983 & 2.122 & 3.023 & 2.356 & \cellcolor{blue!25}4.765 & 2.371 \\ \hline
-\bf 1.0& 1.007 & 1.338 & 1.641 & 2.313 & 3.097 & 2.098 & 2.563 & 2.808 & 2.637 \\ \hline
-\bf 0.8& 1.016 & 1.157 & 1.457 & 1.982 & 1.881 & 2.340 & 2.283 & 3.513 & 3.947 \\ \hline
-\bf 0.6& 1.012 & 1.111 & 1.199 & 1.598 & 1.901 & 1.791 & 2.330 & 3.005 & 3.719 \\ \hline
-\bf 0.4& 1.005 & 1.024 & 1.204 & 1.288 & 1.665 & 1.492 & 1.660 & 2.528 & 2.511 \\ \hline
-\bf 0.2& 1.007 & 1.021 & 1.025 & 1.116 & 1.175 & 1.358 & 1.478 & 1.624 & 1.837 \\ \hline
-\bf 0.1& 1.003 & 1.019 & 1.024 & 1.019 & 1.092 & 1.122 & 1.161 & 1.087 & 1.247 \\ \hline
-\bf 0.08& 1.007 & 1.010 & 1.022 & 1.035 & 1.035 & 1.077 & 1.176 & 1.135 & 1.219 \\ \hline
-\bf 0.06& 1.004 & 1.009 & 1.021 & 1.032 & 1.031 & 1.070 & 1.102 & 1.080 & 1.072 \\ \hline
-\bf 0.05& 1.002 & 1.005 & 1.019 & 1.023 & 1.038 & 1.071 & 1.096 & 1.094 & 1.101 \\ \hline
-\bf 0.04& 1.002 & 1.008 & 1.008 & 1.021 & 1.027 & 1.028 & 1.063 & 1.091 & 1.080 \\ \hline
-\bf 0.03& 1.003 & 1.008 & 1.013 & 1.014 & 1.030 & 1.044 & 1.068 & 1.074 & \cellcolor{red!25}1.001 \\ \hline
-\bf 0.02& 1.002 & 1.006 & 1.009 & 1.013 & 1.020 & 1.030 & 1.038 & 1.058 & 1.016 \\ \hline
-\bf 0.01& \cellcolor{red!25}1.001 & 1.006 & 1.007 & 1.011 & 1.015 & 1.013 & 1.030 & 1.029 & 1.015 \\ \hline
-
-  \end{tabular}
+\bf Coarse&  0.175 & 0.663 & 0.743 & 0.781 & 0.796 & 0.757 & 0.938 & 0.760 & 0.820 \\ \hline 
+\bf 1.8&  0.266 & 0.417 & 0.511 & 0.661 & 0.766 & 0.665 & 0.896 & 0.647 & 0.512 \\ \hline 
+\bf 1.6&  0.262 & 0.426 & 0.568 & 0.635 & 0.760 & 0.631 & 0.897 & 0.542 & 0.557 \\ \hline 
+\bf 1.4&  0.244 & 0.369 & 0.497 & 0.618 & 0.769 & 0.595 & 0.901 & 0.722 & 0.741 \\ \hline 
+\bf 1.2&  0.242 & 0.336 & 0.552 & 0.614 & 0.663 & 0.583 & 0.886 & 0.208 & 0.597 \\ \hline 
+\bf 1.0&  0.203 & 0.287 & 0.458 & 0.549 & 0.442 & 0.605 & 0.875 & 0.536 & 0.552 \\ \hline 
+\bf 0.8&  0.162 & 0.330 & 0.435 & 0.460 & 0.638 & 0.542 & 0.888 & 0.393 & 0.000 \\ \hline 
+\bf 0.6&  0.122 & 0.291 & 0.447 & 0.460 & 0.503 & 0.610 & 0.844 & 0.267 & 0.058 \\ \hline 
+\bf 0.4&  0.093 & 0.274 & 0.310 & 0.400 & 0.488 & 0.519 & 0.888 & 0.328 & 0.000 \\ \hline 
+\bf 0.2&  0.042 & 0.147 & 0.185 & 0.267 & 0.344 & 0.299 & 0.810 & 0.349 & 0.025 \\ \hline 
+\bf 0.1&  0.026 & 0.067 & 0.109 & 0.156 & 0.144 & 0.210 & 0.735 & 0.367 & 0.000 \\ \hline 
+\bf 0.08& 0.002 & 0.032 & 0.059 & 0.060 & 0.122 & 0.150 & 0.699 & 0.268 & 0.041 \\ \hline 
+\bf 0.06& 0.005 & 0.014 & 0.036 & 0.057 & 0.094 & 0.073 & 0.643 & 0.246 & 0.058 \\ \hline 
+\bf 0.05& 0.006 & 0.017 & 0.006 & 0.005 & 0.033 & 0.068 & 0.579 & 0.208 & 0.008 \\ \hline 
+\bf 0.04& 0.002 & 0.008 & 0.009 & 0.000 & 0.011 & 0.022 & 0.544 & 0.168 & 0.000 \\ \hline 
+\bf 0.03& 0.002 & 0.000 & 0.005 & 0.024 & 0.028 & 0.027 & 0.479 & 0.089 & 0.000 \\ \hline 
+\bf 0.02& 0.003 & 0.002 & 0.001 & 0.000 & 0.001 & 0.004 & 0.361 & 0.070 & 0.000 \\ \hline 
+\bf 0.01& 0.002 & 0.003 & 0.002 & 0.000 & 0.001 & 0.000 & 0.196 & 0.027 & 0.000 \\ \hline 
+\end{tabular}}
+\label{method_improvement}
 \end{table}
 
-\begin{table}[htb]
-\centering
-  \caption{\bf The percent decrease in $f$ from the original load balancing algorithm when using the load balancing by dimension algorithm.}
-  \begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
-& \bf 2 &  \bf 3    & \bf  4   &  \bf  5   & \bf  6    &  \bf  7   &  \bf  8   &  \bf 9  &  \bf 10   \\ \hline \hline
-\bf Coarse & 0.175 & 0.468 & 0.569 & 0.512 & 0.451 & 0.522 & 0.437 & 0.146 & 0.234 \\  \hline 
-\bf   1.8& 0.266 & 0.359 & 0.263 & 0.466 & 0.555 & 0.452 & 0.555 & 0.399 & -0.542 \\ \hline 
-\bf   1.6& 0.262 & 0.367 & 0.283 & 0.422 & 0.520 & 0.414 & 0.443 & 0.292 & -0.959 \\ \hline 
-\bf   1.4& 0.244 & 0.328 & 0.453 & 0.352 & 0.606 & 0.311 & 0.769 & 0.527 & 0.431 \\  \hline
-\bf   1.2& 0.242 & 0.331 & 0.265 & 0.415 & 0.458 & 0.392 & 0.754 & -0.049 & 0.499 \\ \hline 
-\bf   1.0& 0.203 & 0.259 & 0.318 & 0.223 & 0.153 & 0.514 & 0.589 & 0.419 & 0.466 \\  \hline
-\bf   0.8& 0.162 & 0.295 & 0.366 & 0.186 & 0.360 & 0.467 & 0.692 & 0.213 & -0.000 \\ \hline 
-\bf   0.6& 0.122 & 0.291 & 0.414 & 0.325 & 0.406 & 0.403 & 0.677 & 0.267 & -0.035 \\ \hline 
-\bf   0.4& 0.093 & 0.274 & 0.262 & 0.392 & 0.301 & 0.436 & 0.762 & 0.181 & 0.000 \\  \hline
-\bf   0.2& 0.042 & 0.147 & 0.185 & 0.267 & 0.343 & 0.269 & 0.563 & 0.260 & 0.025 \\  \hline
-\bf   0.1& 0.026 & 0.067 & 0.109 & 0.156 & 0.144 & 0.210 & 0.424 & 0.305 & -0.000 \\ \hline 
-\bf   0.08&0.002 & 0.032 & 0.059 & 0.060 & 0.122 & 0.150 & 0.445 & 0.268 & 0.041 \\  \hline
-\bf   0.06&0.005 & 0.014 & 0.036 & 0.057 & 0.094 & 0.073 & 0.396 & 0.246 & 0.058 \\  \hline
-\bf   0.05&0.006 & 0.017 & 0.006 & 0.005 & 0.033 & 0.068 & 0.342 & 0.208 & 0.008 \\  \hline
-\bf   0.04&0.002 & 0.008 & 0.009 & 0.000 & 0.011 & 0.022 & 0.301 & 0.168 & -0.000 \\ \hline 
-\bf   0.03&0.002 & -0.000 & 0.005 & 0.024 & 0.028 & 0.027 & 0.263 & 0.089 & 0.000 \\ \hline 
-\bf   0.02&0.003 & 0.002 & 0.001 & 0.000 & 0.001 & 0.004 & 0.361 & 0.070 & 0.000 \\  \hline
-\bf   0.01&0.002 & 0.003 & 0.002 & -0.000 & 0.001 & -0.000 & 0.196 & 0.027 & -0.000 \\ \hline 
-
-  \end{tabular}
-\end{table}
-
+\FloatBarrier
 \section{CONCLUSIONS AND FUTURE WORK}
 
 Present your summary and conclusions here.
-
-\section*{NOMENCLATURE}
-
-If variables are extensively used in the text, a Nomenclature section would be helpful to the readers.
 
 \section*{ACKNOWLEDGEMENTS}
 
