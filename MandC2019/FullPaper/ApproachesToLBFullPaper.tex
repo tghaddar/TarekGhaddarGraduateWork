@@ -67,11 +67,11 @@ ON UNSTRUCTURED GRIDS}
 \author{%
   % FIRST AUTHORS 
   %
-  \textbf{Tarek Habib Ghaddar$^1$, Jean C. Ragusa$^1$, Jan Vermaak$^1$, Marvin L. Adams$^1$} \\
+  \textbf{Tarek Habib Ghaddar$^1$, Jean C. Ragusa$^1$, Marvin L. Adams$^1$} \\
 $^1$Dept. of Nuclear Engineering, Texas  A\&M University \\
   College Station, TX, 77843-3133 \\ 
      \\
-  \url{tghaddar@tamu.edu}, \url{jean.ragusa@tamu.edu}, \url{janv@tamu.edu}, \url{mladams@tamu.edu}
+  \url{tghaddar@tamu.edu}, \url{jean.ragusa@tamu.edu}, \url{mladams@tamu.edu}
 }
 %
 % Insert authors' names and short version of title in lines below
@@ -140,7 +140,7 @@ Figure \ref{partitioning_example} shows an example of an unstructured mesh parti
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[scale=0.9,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/partitioning_example.pdf}
+\includegraphics[scale=0.5,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/partitioning_example.pdf}
 \caption{An unstructured mesh partitioned into four subsets with cut lines at $\bm{x,y = 10}$ cm.}
 \label{partitioning_example}
 \end{figure}
@@ -195,7 +195,7 @@ This initial approach involved placing cut lines in all dimensions all the way t
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.6]{figures/2dgeneral.png}
+\includegraphics[scale=0.4]{figures/2dgeneral.png}
 \caption{A 2D subset layout with $M$ unaligned patches of high mesh density.}
 \label{2dgeneral}
 \end{figure}
@@ -220,7 +220,7 @@ Equation (\ref{f_d1}) represents the sub-metric for the first dimension we load 
 
 Once the z planes are balanced according to $f_{D1}$, we balance the second dimension (in this example, the columns, or $x$ cut planes) \textit{within} each $z$ plane. $f_{D2,d1}$ represents the column-wise sub-metrics for each $z$ plane. In other words, there are $D1$ column-wise sub-metrics, one for each plane. These column-wise sub-metrics are calculated by dividing the maximum number of cells per column divided by the average number cells per column \textit{in each plane}. 
 
-Once the columns within each z-plane are balanced, we balance the rows $within$ the columns $within$ each plane. The row-wise sub-metrics for each plane for each column, $f_{D3,d2,d1}$, are calculated by dividing the maximum number of cells per row per column by the average number of cells per row per column in each plane. Algorithm \ref{lbd} summarizes the load balancing by dimension process described.
+Once the columns within each z-plane are balanced, we balance the rows $within$ the columns $within$ each plane. The row-wise sub-metrics for each plane for each column, $f_{D3,d2,d1}$, are calculated by dividing the maximum number of cells per row per column by the average number of cells per row per column in each plane. Algorithm \ref{lbd} summarizes the load balancing by dimension process described. 
 
 \begin{algorithm}[!htb]
 \caption{The load balancing by dimension algorithm.}
@@ -249,9 +249,21 @@ Once the columns within each z-plane are balanced, we balance the rows $within$ 
 \end{algorithmic}
 \end{algorithm}
 
+Figure \ref{alg_illustration} illustrates the behavior of both algorithms. In the left image of the figure, we see the partitions cutting across the entire domain, with the left-most $x$ cut line moved into the denser geometric feature in the bottom left corner to more evenly distribute cells. In the right image of the figure, we see the $x$ partitions cutting across the entire domain, but the $y$ partitions being redistributed by column. The $y$ partitions are moved into the respective geometric features in the appropriate columns in order to better balance the problem.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[scale=0.45,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/og_lb_example.pdf}
+\includegraphics[scale=0.45,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/lbd_example.pdf}
+\caption{The partitions of a problem after the original load balancing (left) and the load balancing by dimension (right) algorithms.}
+\label{alg_illustration}
+\end{figure}
+
+\FloatBarrier
 \section{RESULTS}
 
 To study the behavior of the original load balancing algorithm and the load balancing by dimension algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area, with the minimum allowable angle per triangle was kept constant at \ang{20}. We varied the number of subsets in $x$ and $y$ from 2 to 10 (with the total number of subsets varying from 4 to 100). The problem illustrated by Fig. \ref{partitioning_example} was chosen because it has two dense features in opposing corners with no features in between, lending itself to being an imbalanced mesh. Table \ref{og_table} shows the results of this parametric study using the original load balancing algorithm vs. using the load balancing by dimension algorithm. Table \ref{all_improvements} shows the percent improvements for both algorithms from no load balancing to running both load balancing algorithm, while Table \ref{method_improvement} shows the improvement of the load balancing by dimension algorithm relative to the original load balancing algorithm.
+
 %\vspace{-1cm}
 \begin{table}[!htb]
 \centering
@@ -356,39 +368,40 @@ To study the behavior of the original load balancing algorithm and the load bala
 \label{all_improvements}
 \end{table}
 
+The data in Tables \ref{og_table} and \ref{all_improvements} showcase an important point. As mesh refinement increases, the need for load balancing decreases. If sparse regions of the domain have a similar number of cells to the dense regions of the domain, the problem will be inherently balanced with even partitions. Table \ref{method_improvement} demonstrates that with the exception of a few outliers, the load balancing by dimension algorithm is an improvement over the original load balancing algorithms, particularly for coarser mesh refinements.
+
 %method improvement table
 \begin{table}[!htb]
 \centering
 \caption{\bf The percent improvement of the load balancing by dimension algorithm over the original load balancing algorithm.}
-\scalebox{0.75}{
+\scalebox{0.5}{
 \begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
 \bf Area, $N^{1/2}$ & \bf  2 & \bf 3    &  \bf  4   &  \bf  5   &  \bf 6    &  \bf  7   &   \bf 8   &  \bf 9    &  \bf 10   \\ \hline \hline
-\bf Coarse&  0.175 & 0.663 & 0.743 & 0.781 & 0.796 & 0.757 & 0.938 & 0.760 & 0.820 \\ \hline 
-\bf 1.8&  0.266 & 0.417 & 0.511 & 0.661 & 0.766 & 0.665 & 0.896 & 0.647 & 0.512 \\ \hline 
-\bf 1.6&  0.262 & 0.426 & 0.568 & 0.635 & 0.760 & 0.631 & 0.897 & 0.542 & 0.557 \\ \hline 
-\bf 1.4&  0.244 & 0.369 & 0.497 & 0.618 & 0.769 & 0.595 & 0.901 & 0.722 & 0.741 \\ \hline 
-\bf 1.2&  0.242 & 0.336 & 0.552 & 0.614 & 0.663 & 0.583 & 0.886 & 0.208 & 0.597 \\ \hline 
-\bf 1.0&  0.203 & 0.287 & 0.458 & 0.549 & 0.442 & 0.605 & 0.875 & 0.536 & 0.552 \\ \hline 
-\bf 0.8&  0.162 & 0.330 & 0.435 & 0.460 & 0.638 & 0.542 & 0.888 & 0.393 & 0.000 \\ \hline 
-\bf 0.6&  0.122 & 0.291 & 0.447 & 0.460 & 0.503 & 0.610 & 0.844 & 0.267 & 0.058 \\ \hline 
-\bf 0.4&  0.093 & 0.274 & 0.310 & 0.400 & 0.488 & 0.519 & 0.888 & 0.328 & 0.000 \\ \hline 
-\bf 0.2&  0.042 & 0.147 & 0.185 & 0.267 & 0.344 & 0.299 & 0.810 & 0.349 & 0.025 \\ \hline 
-\bf 0.1&  0.026 & 0.067 & 0.109 & 0.156 & 0.144 & 0.210 & 0.735 & 0.367 & 0.000 \\ \hline 
-\bf 0.08& 0.002 & 0.032 & 0.059 & 0.060 & 0.122 & 0.150 & 0.699 & 0.268 & 0.041 \\ \hline 
-\bf 0.06& 0.005 & 0.014 & 0.036 & 0.057 & 0.094 & 0.073 & 0.643 & 0.246 & 0.058 \\ \hline 
-\bf 0.05& 0.006 & 0.017 & 0.006 & 0.005 & 0.033 & 0.068 & 0.579 & 0.208 & 0.008 \\ \hline 
-\bf 0.04& 0.002 & 0.008 & 0.009 & 0.000 & 0.011 & 0.022 & 0.544 & 0.168 & 0.000 \\ \hline 
-\bf 0.03& 0.002 & 0.000 & 0.005 & 0.024 & 0.028 & 0.027 & 0.479 & 0.089 & 0.000 \\ \hline 
-\bf 0.02& 0.003 & 0.002 & 0.001 & 0.000 & 0.001 & 0.004 & 0.361 & 0.070 & 0.000 \\ \hline 
-\bf 0.01& 0.002 & 0.003 & 0.002 & 0.000 & 0.001 & 0.000 & 0.196 & 0.027 & 0.000 \\ \hline 
+Coarse & 0.175 & 0.468 & 0.569 & 0.512 & 0.451 & 0.522 & 0.437 & 0.146 & 0.234 \\ \hline 
+ \bf 1.8& 0.266 & 0.359 & 0.263 & 0.466 & 0.555 & 0.452 & 0.555 & 0.399 & -0.542 \\ \hline 
+ \bf 1.6& 0.262 & 0.367 & 0.283 & 0.422 & 0.520 & 0.414 & 0.443 & 0.292 & -0.959 \\ \hline 
+ \bf 1.4& 0.244 & 0.328 & 0.453 & 0.352 & 0.606 & 0.311 & 0.769 & 0.527 & 0.431 \\ \hline 
+ \bf 1.2& 0.242 & 0.331 & 0.265 & 0.415 & 0.458 & 0.392 & 0.754 & -0.049 & 0.499 \\ \hline 
+ \bf 1.0& 0.203 & 0.259 & 0.318 & 0.223 & 0.153 & 0.514 & 0.589 & 0.419 & 0.466 \\ \hline 
+ \bf 0.8& 0.162 & 0.295 & 0.366 & 0.186 & 0.360 & 0.467 & 0.692 & 0.213 & -0.000 \\ \hline 
+ \bf 0.6& 0.122 & 0.291 & 0.414 & 0.325 & 0.406 & 0.403 & 0.677 & 0.267 & -0.035 \\ \hline 
+ \bf 0.4& 0.093 & 0.274 & 0.262 & 0.392 & 0.301 & 0.436 & 0.762 & 0.181 & 0.000 \\ \hline 
+ \bf 0.2& 0.042 & 0.147 & 0.185 & 0.267 & 0.343 & 0.269 & 0.563 & 0.260 & 0.025 \\ \hline 
+ \bf 0.1& 0.026 & 0.067 & 0.109 & 0.156 & 0.144 & 0.210 & 0.424 & 0.305 & -0.000 \\ \hline 
+ \bf 0.08&0.002 & 0.032 & 0.059 & 0.060 & 0.122 & 0.150 & 0.445 & 0.268 & 0.041 \\ \hline 
+ \bf 0.06&0.005 & 0.014 & 0.036 & 0.057 & 0.094 & 0.073 & 0.396 & 0.246 & 0.058 \\ \hline 
+ \bf 0.05&0.006 & 0.017 & 0.006 & 0.005 & 0.033 & 0.068 & 0.342 & 0.208 & 0.008 \\ \hline 
+ \bf 0.04&0.002 & 0.008 & 0.009 & 0.000 & 0.011 & 0.022 & 0.301 & 0.168 & -0.000 \\ \hline 
+ \bf 0.03&0.002 & -0.000 & 0.005 & 0.024 & 0.028 & 0.027 & 0.263 & 0.089 & 0.000 \\ \hline 
+ \bf 0.02&0.003 & 0.002 & 0.001 & 0.000 & 0.001 & 0.004 & 0.361 & 0.070 & 0.000 \\ \hline 
+ \bf 0.01&0.002 & 0.003 & 0.002 & -0.000 & 0.001 & -0.000 & 0.196 & 0.027 & -0.000 \\ \hline 
 \end{tabular}}
 \label{method_improvement}
 \end{table}
 
 \FloatBarrier
 \section{CONCLUSIONS AND FUTURE WORK}
-
-While perfect load balance was the initial goal, we needed to know if this affected the efficiency of the parallel transport sweep. 
+The load balancing by dimension algorithm has allowed PDT to solve large scale simulations in reasonable times, decreasing the amount of idle time spent on processors with little work. However, while perfect load balance was the initial goal, we needed to know if this affected the efficiency of the parallel transport sweep. 
 Figure \ref{partitions} shows three theoretical sweep domains with $P_x = 20, P_y = 20$. In the figure, only the subset domain is shown, with the assumption that there is an equivalent number of mesh cells per subset. In the top image of Fig. \ref{partitions}, we see a regular processor grid, which will lead to a nice wavelike sweep that finishes in 40 stages. 
 \begin{figure}[!htb]
   \centering
@@ -409,6 +422,8 @@ With the improved load balancing by dimension, we are likely to see a partition 
 %\end{figure}
 
 The bottom image in Fig. \ref{partitions} shows a worse theoretical sweep partitioning, where the transport sweep takes on a snake-like behavior. This partitioning yields a stage count of 230, which is far worse than even the random partitioning stage count of 101.
+
+As a result of this theoretical study, a general sweep scheduler and optimizer is being built for PDT in order to choose the partitions that will lead to the optimal solution. This optimizer will take into account load balancing and the ideal sweep partitioning in order to choose partitions that lead to the best time-to-solution. This ongoing work can be applied outside of PDT as well for any code that utilizes the transport sweep as their method of solving the radiation transport simulations equation.
 
 %\begin{figure}[!htb]
 %  \centering
@@ -433,13 +448,5 @@ for this great support.
  \setlength{\baselineskip}{12pt}
  \bibliographystyle{mandc}
  \bibliography{mandc}
-
-\appendix
-\gdef\thesection{APPENDIX \Alph{section}}
-\section{Sample Appendix 1}
-\label{app:a}
-If necessary, include Appendices numbered in upper case alphabetical order. This is \ref{app:a}. 
-
-
 
 \end{document}
