@@ -49,8 +49,6 @@
 \usepackage[table]{xcolor}
 \usepackage{placeins}
 
-
-
 \newcommand{\tcr}[1]{\textcolor{red}{#1}}
 \newcommand{\vr}{\vec{r}}
 \newcommand{\vo}{\vec{\Omega}}
@@ -109,7 +107,7 @@ The steady-state neutron transport equation describes the behavior of neutrons i
 \end{multline}
 where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption, outscatter, and within group scattering). These represent the loss terms of the neutron transport equation. The right hand side of Eq.~\eqref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into $dE$ about energy $E$ and $d\Omega$ about direction $\vo$. 
 
-Eq. (\ref{angle}) is obtained by assuming isotropic scattering, discretizing in energy, and discretizing in angle using the discrete ordinates method\cite{discrete ordinates}:
+Eq. (\ref{angle}) is obtained by assuming isotropic scattering, discretizing in energy, and discretizing in angle using the discrete ordinates method:
 \begin{equation}
 \vo_m \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr).
 \label{angle}
@@ -123,7 +121,7 @@ where the gain terms terms have been combined into one general source term, $q_m
 
 After the angular and energy dependence have been accounted for, Eq. (\ref{source iteration}) must be discretized in space as well. This is done by meshing the domain and utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}, allowing one cell at a time to be solved. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. 
 
-PDT, Texas A\&M's massively parallel deterministic transport code, employs the transport sweep with the process described above, using a finite element mesh and solving the discrete ordinates form of the transport equation using a discontinuous finite element approach and source iteration\cite{mpadams15, mpadams13}. Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions, causing longer and unmanageable runtimes.
+PDT, Texas A\&M's massively parallel deterministic transport code, employs the transport sweep with the process described above, using a finite element mesh and solving the discrete ordinates form of the transport equation using a discontinuous finite element approach and source iteration\cite{mpadams2015},\cite{mpadams2013}. Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions, causing longer and unmanageable runtimes.
 
 To combat imbalanced partitions, two load balancing algorithms were implemented, referred to in this paper as the original load balancing algorithm and the load balancing by dimension algorithm.
 
@@ -390,8 +388,36 @@ To study the behavior of the original load balancing algorithm and the load bala
 \FloatBarrier
 \section{CONCLUSIONS AND FUTURE WORK}
 
-Present your summary and conclusions here.
+While perfect load balance was the initial goal, we needed to know if this affected the efficiency of the parallel transport sweep. 
+Figure \ref{partitions} shows three theoretical sweep domains with $P_x = 20, P_y = 20$. In the figure, only the subset domain is shown, with the assumption that there is an equivalent number of mesh cells per subset. In the top image of Fig. \ref{partitions}, we see a regular processor grid, which will lead to a nice wavelike sweep that finishes in 40 stages. 
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[scale=0.5]{Figures/regular_partition_4.png}
+   \includegraphics[scale=0.5]{Figures/random_partition_4.png}
+    \includegraphics[scale=0.5]{Figures/worst_partition_4.png}
+  \caption{Three different perfectly load balanced partitions.}
+  \label{partitions}
+\end{figure}
 
+With the improved load balancing by dimension, we are likely to see a partition similar to the partitioning shown in  the middle image of Fig. \ref{partitions} for most geometries. It can be observed that we do not have the nice wavelike transport sweep, as communication penalties take their toll. As a result, this sweep completes in 101 stages, as opposed to 40 stages for the regular partition.
+
+%\begin{figure}[!htb]
+%  \centering
+%  \includegraphics[scale=0.5]{Figures/random_partition_1.png}
+%  \caption{The transport sweep using a random partition with perfect balance.}
+%  \label{random_partition}
+%\end{figure}
+
+The bottom image in Fig. \ref{partitions} shows a worse theoretical sweep partitioning, where the transport sweep takes on a snake-like behavior. This partitioning yields a stage count of 230, which is far worse than even the random partitioning stage count of 101.
+
+%\begin{figure}[!htb]
+%  \centering
+%  \includegraphics[scale=0.5]{Figures/worst_partition_1.png}
+%  \caption{The transport sweep using the worst partition with perfect balance.}
+%  \label{worst_partition}
+%\end{figure}
+
+\FloatBarrier
 \section*{ACKNOWLEDGEMENTS}
 
 Acknowledge the help of colleagues and sources of funding, as appropriate.
@@ -404,23 +430,9 @@ for this great support.
 % You can enter a bibliography into the document using the following format, or use the 
 % bibliography style file "mandc.bst" found in the template directory.  You can use the bibliography style file
 % by replacing the current bibliography block with:
-% \setlength{\baselineskip}{12pt}
-% \bibliographystyle{mandc}
-% \bibliography{mandc}
-
-\setlength{\baselineskip}{12pt}
-\begin{thebibliography}{300}
-\bibitem{journal} B. Author(s), ``Title,'' \emph{Journal Name in Italic}, 
-  \textbf{Volume in Bold}, pp. 34-89 (19xx).
-\bibitem{proc_paper} C. D. Author(s), ``Article Title,'' \emph{Proceedings of
-  Meeting in Italic}, Location, Dates of Meeting, Vol. n, pp. 134-156 
-  (19xx).
-\bibitem{book} E. F. Author, \emph{Book Title in Italic}, Publisher, City \&
-  Country (19xx). 
-\bibitem{website} ``Spallation Neutron Source: The next-generation 
-  neutron-scattering facility in the United States,'' 
-  \url{http://www.sns.gov/documentation/sns\_brochure.pdf} (2002).
-\end{thebibliography}
+ \setlength{\baselineskip}{12pt}
+ \bibliographystyle{mandc}
+ \bibliography{mandc}
 
 \appendix
 \gdef\thesection{APPENDIX \Alph{section}}
