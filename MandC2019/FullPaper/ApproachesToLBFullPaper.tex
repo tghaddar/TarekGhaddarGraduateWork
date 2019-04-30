@@ -90,13 +90,9 @@ $^1$Dept. of Nuclear Engineering, Texas  A\&M University \\
 \justify 
 
 \begin{abstract}
-  Use 8.5$\times$11 paper size, with 1'' margins on all sides.  A required 200-250 
-  word abstract starts on this line.  Leave two blank lines before ``ABSTRACT''
-  and one after.  Use 11 point Times New Roman here and single 
-  spacing. The abstract is a very brief summary highlighting main 
-  accomplishments, what is new, and how it relates to the state-of-the-art.
+  PDT, Texas A\&M's massively parallel deterministic transport sweep code, has the capability to sweep on unstructured grids. In order to combat the inherent imbalance (inequivalent amount of work per processor) of unstructured meshes for transport sweeps, we implemented two automated load balancing algorithms: the original load balancing algorithm and the load balancing by dimension algorithm. In a parametric study, the original load balancing algorithm improved balance by a maximum of 89\% with a mean improvement of 16.9\%, while the load balancing by dimension algorithm improved balance by a maximum of 93.8\% and a mean of 32.3\%.
 \end{abstract}
-\keywords{transport sweep, massively parallel, load balancing}
+\keywords{transport sweep, massively parallel, load balancing, unstructured}
 
 \section{INTRODUCTION} 
 The steady-state neutron transport equation describes the behavior of neutrons in a medium and is given by Eq. (\ref{continuous transport}):
@@ -141,10 +137,10 @@ Figure \ref{partitioning_example} shows an example of an unstructured mesh parti
 \begin{figure}[!htb]
 \centering
 \includegraphics[scale=0.5,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/partitioning_example.pdf}
-\caption{An unstructured mesh partitioned into four subsets with cut lines at $\bm{x,y = 10}$ cm.}
+\caption{An unstructured mesh partitioned into four subsets with cut planes at $\bm{x,y = 10}$ cm.}
 \label{partitioning_example}
 \end{figure}
-Both approaches to load balancing move these cut lines in order to redistribute cells more evenly throughout subsets. We define a metric describing how imbalanced our problem is:
+Both approaches to load balancing move these cut planes in order to redistribute cells more evenly throughout subsets. We define a metric describing how imbalanced our problem is:
 \begin{equation}
 f =\frac{\underset{ijk}{\text{max}}(N_{ijk})}{\frac{N_{tot}}{I\cdot J\cdot K}},
 \label{metric_def}
@@ -156,17 +152,17 @@ Dimensional sub-metrics are defined to assist with the movement of the partition
 f_{D} = \underset{d}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D}.
 \label{f_d}
 \end{equation}
-$f_{D}$ is calculated by taking the maximum number of cells per row, column, or plane and dividing it by the average number of cells per the corresponding dimension. If this number is greater than predefined tolerances, the cut lines in the respective dimension are redistributed. 
+$f_{D}$ is calculated by taking the maximum number of cells per row, column, or plane and dividing it by the average number of cells per the corresponding dimension. If this number is greater than predefined tolerances, the cut planes in the respective dimension are redistributed. 
 
-Figure \ref{redistribute} illustrates an example of redistributing the cut lines in $x$ to balance the cells per column.
+Figure \ref{redistribute} illustrates an example of redistributing the cut planes in $x$ to balance the cells per column.
 \begin{figure}[!htb]
 \centering
 \includegraphics[scale=0.5]{Figures/redistribute_before.pdf}
 \includegraphics[scale=0.5]{Figures/redistribute_after.pdf}
-\caption{The use of the CDF of triangles per column to redistribute the cut lines in X.}
+\caption{The use of the CDF of triangles per column to redistribute the cut planes in X.}
 \label{redistribute}
 \end{figure}
-The image on the left side of Fig. \ref{redistribute} shows the CDF of the triangles per column. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut lines are redistributed to. 
+The image on the left side of Fig. \ref{redistribute} shows the CDF of the triangles per column. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut planes are redistributed to. 
 
 \subsection{Original Load Balancing Algorithm}
 \label{og_lb}
@@ -180,18 +176,18 @@ The initial approach to load balancing was implemented on 2D extruded meshes, me
 
 \WHILE{$f > \text{tol}_{\text{subset}}$}
   \IF {$f_I > \text{tol}_{\text{col}}$}
-    \STATE Redistribute the X cut lines.
+    \STATE Redistribute the X cut planes.
   \ENDIF
   \IF {$f_J > \text{tol}_{\text{row}}$}
-  	\STATE Redistribute the Y cut lines.
+  	\STATE Redistribute the Y cut planes.
   \ENDIF
 \ENDWHILE
 \end{algorithmic}
 \end{algorithm}
-While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$ (defined by Eq. (\ref{f_d})), are balanced. If they are not, we redistribute the cut lines. 
+While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$ (defined by Eq. (\ref{f_d})), are balanced. If they are not, we redistribute the corresponding cut planes.
 %\vspace{-3.5cm}
 
-This initial approach involved placing cut lines in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches of high mesh density.
+This initial approach involved placing cut planes in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches of high mesh density.
 
 \begin{figure}[H]
 \centering
@@ -262,7 +258,7 @@ Figure \ref{alg_illustration} illustrates the behavior of both algorithms. In th
 \FloatBarrier
 \section{RESULTS}
 
-To study the behavior of the original load balancing algorithm and the load balancing by dimension algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area, with the minimum allowable angle per triangle was kept constant at \ang{20}. We varied the number of subsets in $x$ and $y$ from 2 to 10 (with the total number of subsets varying from 4 to 100). The problem illustrated by Fig. \ref{partitioning_example} was chosen because it has two dense features in opposing corners with no features in between, lending itself to being an imbalanced mesh. Table \ref{og_table} shows the results of this parametric study using the original load balancing algorithm vs. using the load balancing by dimension algorithm. Table \ref{all_improvements} shows the percent improvements for both algorithms from no load balancing to running both load balancing algorithm, while Table \ref{method_improvement} shows the improvement of the load balancing by dimension algorithm relative to the original load balancing algorithm.
+To show the behavior of the original load balancing algorithm and the load balancing by dimension algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area, with the minimum allowable angle per triangle was kept constant at \ang{20}. We varied the number of subsets in $x$ and $y$ from 2 to 10 (with the total number of subsets varying from 4 to 100). The problem illustrated by Fig. \ref{partitioning_example} was chosen because it has two dense features in opposing corners with no features in between, lending itself to being an imbalanced mesh. Table \ref{og_table} shows the results of this parametric study using the original load balancing algorithm vs. using the load balancing by dimension algorithm. Table \ref{all_improvements} shows the percent improvements for both algorithms from no load balancing to running both load balancing algorithm, while Table \ref{method_improvement} shows the improvement of the load balancing by dimension algorithm relative to the original load balancing algorithm.
 
 %\vspace{-1cm}
 \begin{table}[!htb]
