@@ -1,5 +1,6 @@
 #This library contains all mesh related functions.
 import numpy as np
+import math
 from scipy import integrate
 
 
@@ -11,7 +12,43 @@ def analytical_mesh_integration_3d(f,xmin,xmax,ymin,ymax,zmin,zmax):
 
 def analytical_mesh_integration_2d(f,xmin,xmax,ymin,ymax):
   return integrate.tplquad(f,xmin,xmax,lambda x: ymin, lambda x: ymax)
+
+#Getting the cells and boundary cells per subset.
+def get_cells_per_subset_2d(f,boundaries):
   
+  #The total number of subsets.
+  num_subsets = len(boundaries)
+  
+  #Stores the number of cells per subset.
+  cells_per_subset = [None]*num_subsets
+  #Stores the number of boundary cells per subset.
+  bdy_cells_per_subset = [None]*num_subsets
+  
+  #Looping through the subsets.
+  for s in range(0,num_subsets):
+    
+    subset_bounds = boundaries[s]
+    xmin = subset_bounds[0]
+    xmax = subset_bounds[1]
+    ymin = subset_bounds[2]
+    ymax = subset_bounds[3]
+    
+    #The x length of the subset.
+    Lx = xmax - xmin
+    #The y length of the subset.
+    Ly = ymax - ymin
+    #The area of the subset.
+    subset_area = Lx*Ly
+    
+    #Getting the number of cells in the current subset.
+    N = analytical_mesh_integration_2d(f,xmin,xmax,ymin,ymax)
+    cells_per_subset[s] = N
+    
+    #Computing the boundary cells along x and y.
+    nx = math.sqrt(N/subset_area)*Lx
+    ny =  math.sqrt(N/subset_area)*Ly
+    bdy_cells_per_subset[s] = [nx,ny]
+    
 
 #Creates uniform 3d cuts given boundaries and number of subsets in each dimension.
 def create_3d_cuts(xmin,xmax,nx,ymin,ymax,ny,zmin,zmax,nz):
@@ -39,3 +76,21 @@ def create_3d_cuts(xmin,xmax,nx,ymin,ymax,ny,zmin,zmax,nz):
   
   
   return z_cuts,x_cuts,y_cuts
+
+def create_2d_cuts(xmin,xmax,nx,ymin,ymax,ny):
+  
+  #The x_cuts.
+  xstep = (xmax- xmin)/nx
+  x_range = range(0,nx+1)
+  x_cuts = [xmin+i*xstep for i in x_range]
+  
+  #The y cuts.
+  ystep = (ymax - ymin)/ny
+  y_range = range(0,ny+1)
+  y_cuts_i = [ymin+i*ystep for i in y_range]
+  final_range = range(0,nx)
+  y_cuts = [y_cuts_i for i in final_range]
+  
+  return x_cuts,y_cuts
+  
+  
