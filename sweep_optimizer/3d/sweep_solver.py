@@ -4,10 +4,14 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from copy import copy
+from build_adjacency_matrix import build_graphs
+from build_adjacency_matrix import build_adjacency
 from copy import deepcopy
 from utilities import get_ijk
+from utiltities import get_ij
 from math import isclose
 from matplotlib.pyplot import imshow,pause
+from mesh_processor import get_cells_per_subset_2d
 import time
 import operator
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -24,6 +28,8 @@ t_byte = 1e-09
 m_l = 1
 T_m = 35.0
 T_g = 60.0
+upc = 4.0
+ubpc = 2.0
 
 #Plots graphs at a specific time. Will help with debugging.
 def plot_graphs(graphs,t):
@@ -283,7 +289,7 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
     
   return bounds_check
 
-def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,upc, upbc,t_comm,latency,m_l,num_row,num_col,num_plane):
+def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,t_u,upc,upbc,t_comm,latency,m_l,num_row,num_col):
     
   num_graphs = len(graphs)
 
@@ -294,19 +300,19 @@ def add_edge_cost(graphs,num_total_cells,global_subset_boundaries,cell_dist,t_u,
       #The starting node of this edge.
       node = e[0]
       #Cells in this subset.
-      num_cells = cell_dist[node]
+      num_cells = cells_per_subset[node]
       
-      boundary_cells = pow(num_cells,2/3)
-#      #Communicating across the z plane.
-#      if (bounds_check == 'xy'):
-#        boundary_cells = bound_cell_x*bound_cell_y
-#      #Communicating across the y plane.
-#      if (bounds_check == 'xz'):
-#        boundary_cells = bound_cell_x*bound_cell_z
-#      #Communicating across the x plane.
-#      if(bounds_check == 'yz'):
-#        boundary_cells = bound_cell_y*bound_cell_z
-#      
+      #Finding out if our neighbor is on the x boundary or the y boundary.
+      neighbor = e[1]
+      i_neighbor,j_neighbor = get_ij(neighbor,num_row,num_col)
+      i_node,j_node = get_ij(node,num_row,num_col)
+      boundary_cells = 0.0
+      #Communicating across a y-boundary.
+      if i_neighbor == i_node:
+        boundary_cells = boundary_cells_per_subset[node][0]
+      #Communicating across an x-boundary.
+      else:
+        boundary_cells = boundary_cells_per_subset[node][1]
       
       #The cost of this edge. upc = uknowns per cell
       #upbc = unkowns per boundary cell
@@ -1025,4 +1031,11 @@ def compute_solve_time(graphs):
 
   max_time = max(solve_times)
   return solve_times,max_time
-    
+
+#The driving function to compute the time to solution.
+def time_to_solution(f,subset_bounds,num_col,num_row):
+  
+  #Getting mesh information.
+  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d(f,subset_bounds)
+  #Building the adjacency matrix.
+  adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1)

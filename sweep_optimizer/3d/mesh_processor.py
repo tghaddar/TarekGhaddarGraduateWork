@@ -11,13 +11,14 @@ def analytical_mesh_integration_3d(f,xmin,xmax,ymin,ymax,zmin,zmax):
   return integrate.tplquad(f,xmin,xmax,lambda x: ymin, lambda x: ymax, lambda x,y: zmin, lambda x,y: zmax)
 
 def analytical_mesh_integration_2d(f,xmin,xmax,ymin,ymax):
-  return integrate.tplquad(f,xmin,xmax,lambda x: ymin, lambda x: ymax)
+  return integrate.dblquad(f,xmin,xmax,lambda x: ymin, lambda x: ymax)
 
 #Getting the cells and boundary cells per subset.
 def get_cells_per_subset_2d(f,boundaries):
   
   #The total number of subsets.
   num_subsets = len(boundaries)
+  print(num_subsets)
   
   #Stores the number of cells per subset.
   cells_per_subset = [None]*num_subsets
@@ -41,13 +42,16 @@ def get_cells_per_subset_2d(f,boundaries):
     subset_area = Lx*Ly
     
     #Getting the number of cells in the current subset.
-    N = analytical_mesh_integration_2d(f,xmin,xmax,ymin,ymax)
+    N = analytical_mesh_integration_2d(f,xmin,xmax,ymin,ymax)[0]
     cells_per_subset[s] = N
     
     #Computing the boundary cells along x and y.
     nx = math.sqrt(N/subset_area)*Lx
     ny =  math.sqrt(N/subset_area)*Ly
     bdy_cells_per_subset[s] = [nx,ny]
+    
+
+  return cells_per_subset,bdy_cells_per_subset
     
 
 #Creates uniform 3d cuts given boundaries and number of subsets in each dimension.
