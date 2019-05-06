@@ -8,7 +8,7 @@ from build_adjacency_matrix import build_graphs
 from build_adjacency_matrix import build_adjacency
 from copy import deepcopy
 from utilities import get_ijk
-from utiltities import get_ij
+from utilities import get_ij,get_ss_id
 from math import isclose
 from matplotlib.pyplot import imshow,pause
 from mesh_processor import get_cells_per_subset_2d
@@ -22,14 +22,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 #The number of cells per subset.
 #The grind time (time to solve an unknown on a machine)
 #The communication time per byte. 
-t_byte = 1e-09
-#The number of bytes to communicate per subset.
-#The message latency time.
-m_l = 1
-T_m = 35.0
-T_g = 60.0
-upc = 4.0
-ubpc = 2.0
+
 
 #Plots graphs at a specific time. Will help with debugging.
 def plot_graphs(graphs,t):
@@ -289,10 +282,13 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
     
   return bounds_check
 
-def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,t_u,upc,upbc,t_comm,latency,m_l,num_row,num_col):
+def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col):
     
   num_graphs = len(graphs)
-
+  num_subsets = len(global_subset_boundaries)
+  #Storing the time to solve and communicate each subset.
+  time_to_solve = [None]*num_subsets
+  t_u,upc,upbc,t_comm,latency,m_l = machine_params
   
   for ig in range(0,num_graphs):
     graph = graphs[ig]
@@ -309,16 +305,17 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       boundary_cells = 0.0
       #Communicating across a y-boundary.
       if i_neighbor == i_node:
-        boundary_cells = boundary_cells_per_subset[node][0]
+        boundary_cells = bdy_cells_per_subset[node][0]
       #Communicating across an x-boundary.
       else:
-        boundary_cells = boundary_cells_per_subset[node][1]
+        boundary_cells = bdy_cells_per_subset[node][1]
       
       #The cost of this edge. upc = uknowns per cell
       #upbc = unkowns per boundary cell
       cost = num_cells*t_u*upc + (boundary_cells*upbc*t_comm + latency*m_l)
+      time_to_solve[node] = num_cells*t_u*upc
       graph[e[0]][e[1]]['weight'] = cost
-  return graphs
+  return graphs,time_to_solve
 
 #This inverts the weights of a graph in order to be able to calculate the true longest path.
 def invert_weights(graph):
@@ -1032,10 +1029,40 @@ def compute_solve_time(graphs):
   max_time = max(solve_times)
   return solve_times,max_time
 
+#Get the y_cuts from global subset boundaries.x
+def get_y_cuts(boundaries,numrow,numcol):
+  
+  y_cuts = [[None]*(numrow+1) for col in range(numcol)]
+  #Looping through columns.
+  for col in range(0,numcol):
+    for row in range(0,numrow+1):
+      if (row == numrow):
+        ss_id = get_ss_id(col,row-1,numrow)
+        y_cuts[col][row] = boundaries[ss_id][3]
+      else:
+        ss_id = get_ss_id(col,row,numrow)
+        y_cuts[col][row] = boundaries[ss_id][2]
+      
+  return y_cuts
+      
 #The driving function to compute the time to solution.
-def time_to_solution(f,subset_bounds,num_col,num_row):
+def time_to_solution(f,subset_bounds,machine_params,num_col,num_row):
   
   #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d(f,subset_bounds)
+  #Getting the y_cuts in order to build the adjacency matrix.
+  y_cuts = get_y_cuts(subset_bounds,num_row,num_col)
   #Building the adjacency matrix.
-  adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1)
+  adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
+  #Building the graphs.
+  graphs = build_graphs(adjacency_matrix,num_row,num_col)
+  #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
+  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
+  #Making the edges universal.
+  graphs = make_edges_universal(graphs)
+  #Adding delay weighting.
+  graphs = add_conflict_weights(graphs,time_to_solve)
+  
+  all_times,max_time = compute_solve_time(graphs)
+  return all_times,max_time
+  

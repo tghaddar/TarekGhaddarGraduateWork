@@ -1,5 +1,22 @@
 from mesh_processor import analytical_mesh_integration_2d,create_2d_cuts,get_cells_per_subset_2d
 from build_global_subset_boundaries import build_global_subset_boundaries
+from sweep_solver import get_y_cuts,plot_graphs,add_edge_cost
+from build_adjacency_matrix import build_graphs,build_adjacency
+
+
+#The machine parameters.
+#Communication time per double
+t_comm = 4.47e-02
+#The number of bytes to communicate per subset.
+#The message latency time.
+m_l = 1
+latency = 4110.0e-02
+#Solve time per unknown.
+t_u = 450.0e-02
+upc = 4.0
+upbc = 2.0
+
+machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
 
 #Number of rows and columns.
 numrow = 2
@@ -21,5 +38,15 @@ f = lambda x,y: 5
 
 cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d(f,subset_boundaries)
 
+ycuts = get_y_cuts(subset_boundaries,numrow,numcol)
+#Building the adjacency matrix.
+adjacency_matrix = build_adjacency(subset_boundaries,numcol-1,numrow-1,ycuts)
+#Building the graphs.
+graphs = build_graphs(adjacency_matrix,numrow,numcol)
+#Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
+graphs,time_to_solve = add_edge_cost(graphs,subset_boundaries,cells_per_subset,bdy_cells_per_subset,machine_params,numrow,numcol)
+plot_graphs(graphs,0)
+#Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
+#graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
 
 

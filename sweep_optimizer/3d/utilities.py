@@ -23,3 +23,7 @@ def get_ij(ss_id,numrow,numcol):
   j = int(ss_id % numrow)
   i = int((ss_id - j)/numrow)
   return i,j
+
+def get_ss_id(i,j,numrow):
+  return i*numrow + j
+  

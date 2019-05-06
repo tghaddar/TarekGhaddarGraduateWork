@@ -1,0 +1,93 @@
+%% start of file `template.tex'.
+%% Copyright 2006-2013 Xavier Danaux (xdanaux@gmail.com).
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License version 1.3c,
+% available at http://www.latex-project.org/lppl/.
+
+
+\documentclass[11pt,letterpaper,roman]{moderncv}        % possible options include font size ('10pt', '11pt' and '12pt'), paper size ('a4paper', 'letterpaper', 'a5paper', 'legalpaper', 'executivepaper' and 'landscape') and font family ('sans' and 'roman')
+
+% moderncv themes
+\moderncvstyle{classic}                            % style options are 'casual' (default), 'classic', 'oldstyle' and 'banking'
+\moderncvcolor{green}                              % color options 'blue' (default), 'orange', 'green', 'red', 'purple', 'grey' and 'black'
+%\renewcommand{\familydefault}{\sfdefault}         % to set the default font; use '\sfdefault' for the default sans serif font, '\rmdefault' for the default roman one, or any tex font name
+%\nopagenumbers{}                                  % uncomment to suppress automatic page numbering for CVs longer than one page
+
+% character encoding
+\usepackage[utf8]{inputenc}                       % if you are not using xelatex ou lualatex, replace by the encoding you are using
+%\usepackage{CJKutf8}                              % if you need to use CJK to typeset your resume in Chinese, Japanese or Korean
+
+% adjust the page margins
+\usepackage[left=1in,right=1in,top=1in,bottom=0.5in]{geometry}								% scale=0.75
+%\setlength{\hintscolumnwidth}{3cm}                % if you want to change the width of the column with the dates
+%\setlength{\makecvtitlenamewidth}{10cm}           % for the 'classic' style, if you want to force the width allocated to your name and avoid line breaks. be careful though, the length is normally calculated to avoid any overlap with your personal info; use this at your own typographical risks...
+
+% personal data
+\name{Tarek}{Ghaddar}
+%\title{Resumé title}                               % optional, remove / comment the line if not wanted
+\address{1000 Spring Loop, Apt 1504}{College Station, TX 77840}%{USA}
+%\address{423 Spence St., MS 3133}{77843 College Station, TX}{USA}% optional, remove / comment the line if not wanted; the "postcode city" and and "country" arguments can be omitted or provided empty
+\phone[mobile]{+1~(956)~778~5923}                   % optional, remove / comment the line if not wanted
+%\phone[dept]{+1~(979)~845~4161}                    % optional, remove / comment the line if not wanted
+%\phone[fax]{+1~(979)~848~6443}                      % optional, remove / comment the line if not wanted
+%\email{masonchilds@tamu.edu}                               % optional, remove / comment the line if not wanted
+\email{tghaddar@tamu.edu}                               % optional, remove / comment the line if not wanted
+%\homepage{www.johndoe.com}                         % optional, remove / comment the line if not wanted
+%\extrainfo{additional information}                 % optional, remove / comment the line if not wanted
+%\photo[64pt][0.4pt]{picture}                       % optional, remove / comment the line if not wanted; '64pt' is the height the picture must be resized to, 0.4pt is the thickness of the frame around it (put it to 0pt for no frame) and 'picture' is the name of the picture file
+\quote{Some quote}                                 % optional, remove / comment the line if not wanted
+
+% include signature
+\makeatletter
+\renewcommand*{\makeletterclosing}{
+	\@closing\\[0em]%
+	{\includegraphics[scale=0.1]{../signature_ghaddar.jpg}
+		\par
+		\bfseries \@firstname~\@lastname}%
+		\\
+	\ifthenelse{\isundefined{\@enclosure}}{}{%
+%		\\%
+		\vfill%
+		{\color{color2}\itshape\enclname: \@enclosure}}}
+\makeatother
+
+% to show numerical labels in the bibliography (default is to show no labels); only useful if you make citations in your resume
+%\makeatletter
+%\renewcommand*{\bibliographyitemlabel}{\@biblabel{\arabic{enumiv}}}
+%\makeatother
+%\renewcommand*{\bibliographyitemlabel}{[\arabic{enumiv}]}% CONSIDER REPLACING THE ABOVE BY THIS
+
+% bibliography with mutiple entries
+%\usepackage{multibib}
+%\newcites{book,misc}{{Books},{Others}}
+%----------------------------------------------------------------------------------
+%            content
+%----------------------------------------------------------------------------------
+\begin{document}
+%-----       letter       ---------------------------------------------------------
+% recipient data
+\recipient{Hiring Staff}{Los Alamos National Laboratory}
+\date{\today}
+\opening{To Whom it May Concern,}
+\closing{Sincerely,}
+
+\makelettertitle
+
+I am writing to apply for the position of 	Theoretical and Numerical Particle Transport Methods Scientist 2 or 3 (IRC70402) in the CCS-2 group at Los Alamos National Laboratory. I will be receiving my PhD in Nuclear Engineering from Texas A\&M University in August of 2019. My advisor is Prof. Jean Ragusa, and my areas of interest and experience include computational radiation transport, scientific computing and analysis, and parallel computing. 
+
+My graduate work has focused on optimizing radiation transport sweeps in Texas A\&M's flagship massively parallel deterministic finite element radiation transport code, PDT. For my MS project, I implemented a 2D and 2D extruded unstructured meshing capability in PDT, and I followed up by implemented a load balancing algorithm in order to combat the imbalanced partitions that were introduced by unstructured meshes. My doctoral work generalized and expanded on this by building a sweep optimization code. This implements a general sweep scheduler and time-to-solution estimator and returns the optimal partitioning scheme for a given problem. Through my graduate work, I learned or gained experience in object oriented C++, radiation transport methods, working within a collaborative production level code, scripting in bash and Python, and parallel computing with MPI, OpenMP, and other parallel libraries.
+
+I also served two internships at Los Alamos National Laboratory (LANL) and Oak Ridge National Laboratory (ORNL). While interning in the XCP-3 group at LANL, I implemented analytic single event charged particle capabilities in the Monte Carlo N-Particle (MCNP) transport code. This work provided me with significant experience studying Monte Carlo methods, charged particle transport, and the Fortran computing language. 
+
+While interning with the Consortium for Advanced Simulation of Light Water Reactors (CASL) at ORNL, I updated the MPACT reactor simulation code's Graphics Processing Unit (GPU) capabilities utilizing the Kokkos C++ library. Using Kokkos, I accelerated the fission and scattering source calculations by writing interoperable Fortran/C++ code to perform these calculations on a GPU. This work provided me with my first experience coding for GPUs, which have a significant future in scientific computing.
+
+LANL has always pushed the limits of computational nuclear engineering with a variety of codes and new computing facilities. I believe with my experience in computational radiation transport and parallel computing, I would be a great fit for the CCS-2 group and the direction it is headed. 
+
+Thank you for your consideration. I look forward to hearing from you.
+
+\makeletterclosing
+
+\end{document}
+
+%% end of file `template.tex'.
