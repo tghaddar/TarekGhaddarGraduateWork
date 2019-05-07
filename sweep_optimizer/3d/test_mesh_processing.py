@@ -34,7 +34,7 @@ x_cuts,y_cuts = create_2d_cuts(global_xmin,global_xmax,numcol,global_ymin,global
 #The subset_boundaries.
 subset_boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
 
-f = lambda x,y: 5
+f = lambda x,y: 2
 
 cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d(f,subset_boundaries)
 
@@ -43,10 +43,9 @@ ycuts = get_y_cuts(subset_boundaries,numrow,numcol)
 adjacency_matrix = build_adjacency(subset_boundaries,numcol-1,numrow-1,ycuts)
 #Building the graphs.
 graphs = build_graphs(adjacency_matrix,numrow,numcol)
+
 #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
 graphs,time_to_solve = add_edge_cost(graphs,subset_boundaries,cells_per_subset,bdy_cells_per_subset,machine_params,numrow,numcol)
 plot_graphs(graphs,0)
-#Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
-#graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
 
 

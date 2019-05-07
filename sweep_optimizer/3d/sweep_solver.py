@@ -35,10 +35,10 @@ def plot_graphs(graphs,t):
     edge_labels_1 = nx.get_edge_attributes(graphs[g],'weight')
     if g < 3:
       nx.draw(graphs[g],nx.spectral_layout(graphs[g],weight=None),with_labels = True)
-      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight=None),edge_labels=edge_labels_1)
+      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight=None),edge_labels=edge_labels_1,font_size=8)
     else:
       nx.draw(graphs[g],nx.spectral_layout(graphs[g],weight=None),with_labels = True)
-      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight=None),edge_labels=edge_labels_1)
+      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight=None),edge_labels=edge_labels_1,font_size=8)
     plt.savefig("debug_graph_plots/graph_"+str(t)+"_"+str(g)+".pdf")
     plt.close()
     
@@ -287,7 +287,7 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
   num_graphs = len(graphs)
   num_subsets = len(global_subset_boundaries)
   #Storing the time to solve and communicate each subset.
-  time_to_solve = [None]*num_subsets
+  time_to_solve = [[None]*num_subsets for g in range(num_graphs)]
   t_u,upc,upbc,t_comm,latency,m_l = machine_params
   
   for ig in range(0,num_graphs):
@@ -303,18 +303,29 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       i_neighbor,j_neighbor = get_ij(neighbor,num_row,num_col)
       i_node,j_node = get_ij(node,num_row,num_col)
       boundary_cells = 0.0
+      comm_overhead = latency*m_l
       #Communicating across a y-boundary.
       if i_neighbor == i_node:
         boundary_cells = bdy_cells_per_subset[node][0]
       #Communicating across an x-boundary.
       else:
         boundary_cells = bdy_cells_per_subset[node][1]
-      
+      if neighbor == -1:
+        boundary_cells = 0
+        comm_overhead = 0
       #The cost of this edge. upc = uknowns per cell
       #upbc = unkowns per boundary cell
-      cost = num_cells*t_u*upc + (boundary_cells*upbc*t_comm + latency*m_l)
-      time_to_solve[node] = num_cells*t_u*upc
+      cost = num_cells*t_u*upc + (boundary_cells*upbc*t_comm + comm_overhead)
       graph[e[0]][e[1]]['weight'] = cost
+    
+  for ig in range(0,num_graphs):
+    graph = graphs[ig]
+    for n in range(0,num_subsets):
+      out_edges = list(graph.out_edges(n,'weight'))
+      num_edges = len(out_edges)
+      out_edges = [out_edges[i][2] for i in range(num_edges)]
+      time_to_solve[ig][n] = max(out_edges)
+  
   return graphs,time_to_solve
 
 #This inverts the weights of a graph in order to be able to calculate the true longest path.
@@ -932,8 +943,6 @@ def add_conflict_weights(graphs,time_to_solve):
     end_nodes[g] = list(graph.predecessors(-1))[0]
     prev_nodes.append([x for x in graph.nodes() if graph.in_degree(x) == 0])
     starting_nodes.append(deepcopy(prev_nodes[g]))
-  
-  
   
   #The number of graphs that have finished.
   num_finished_graphs = 0

@@ -31,5 +31,9 @@ tghaddar@tamu.edu\\
 \hspace{10pt}
 
 \normalsize
-Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids. However, structured meshes are somewhat limiting when  simulating more complex problems and experiments, requiring the use of unstructured meshes in transport sweeps.
+Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids. However, structured meshes are somewhat limiting when  simulating more complex problems and experiments, requiring the use of unstructured meshes in transport sweeps. While unstructured meshes provide the ability to simulate realistic problems, they introduce some challenges like unbalanced partitions, which can increase the time to solution. To combat this, PDT, Texas A\&M University's massively parallel deterministic radiation transport code, introduced two load balancing algorithms that rely on moving the spatial partition boundaries throughout the mesh in order to obtain a roughly equivalent amount of cells (and therefore work) per processor.
+
+While the load balancing efforts allowed for unstructured simulations to be run in a reasonable time, theoretical studies showed that perfectly balanced partitions will not always lead to the best solution time. To address this, a method that weighs ideal load balanced partitions against the consequences they could incur to the total sweep time is being developed. A time-to-solution estimator is fed into an optimizing function, returning the partitions that result in the best sweep time. These partitions can be fed into PDT, or any other code that uses PDT's partitioning style. 
+
+In this seminar, the motivating work on unstructured meshes and load balancing will be reviewed, followed by the methodology of the time-to-solution estimator, and concluding with preliminary studies of the optimization process. 
 \end{document}
