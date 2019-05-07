@@ -1,6 +1,6 @@
 from mesh_processor import analytical_mesh_integration_2d,create_2d_cuts,get_cells_per_subset_2d
 from build_global_subset_boundaries import build_global_subset_boundaries
-from sweep_solver import get_y_cuts,plot_graphs,add_edge_cost
+from sweep_solver import time_to_solution
 from build_adjacency_matrix import build_graphs,build_adjacency
 
 
@@ -36,16 +36,19 @@ subset_boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cu
 
 f = lambda x,y: 2
 
-cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d(f,subset_boundaries)
-
-ycuts = get_y_cuts(subset_boundaries,numrow,numcol)
-#Building the adjacency matrix.
-adjacency_matrix = build_adjacency(subset_boundaries,numcol-1,numrow-1,ycuts)
-#Building the graphs.
-graphs = build_graphs(adjacency_matrix,numrow,numcol)
-
-#Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
-graphs,time_to_solve = add_edge_cost(graphs,subset_boundaries,cells_per_subset,bdy_cells_per_subset,machine_params,numrow,numcol)
-plot_graphs(graphs,0)
+#cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d(f,subset_boundaries)
+#
+#ycuts = get_y_cuts(subset_boundaries,numrow,numcol)
+##Building the adjacency matrix.
+#adjacency_matrix = build_adjacency(subset_boundaries,numcol-1,numrow-1,ycuts)
+##Building the graphs.
+#graphs = build_graphs(adjacency_matrix,numrow,numcol)
+#
+##Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
+#graphs,time_to_solve = add_edge_cost(graphs,subset_boundaries,cells_per_subset,bdy_cells_per_subset,machine_params,numrow,numcol)
+#graphs = make_edges_universal(graphs)
+#graphs = add_conflict_weights(graphs,time_to_solve)
+all_times,max_time = time_to_solution(f,subset_boundaries,machine_params,numcol,numrow)
+#plot_graphs(graphs,0)
 
 
