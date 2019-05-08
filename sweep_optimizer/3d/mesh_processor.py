@@ -97,4 +97,29 @@ def create_2d_cuts(xmin,xmax,nx,ymin,ymax,ny):
   
   return x_cuts,y_cuts
   
+
+def create_2d_cut_suite(xmin,xmax,nx,ymin,ymax,ny):
   
+  num_steps = 10
+  
+  xstep = (xmax - xmin)/num_steps
+  ystep = (ymax - ymin)/num_steps
+  
+  all_x_cuts = [None]*num_steps
+  all_y_cuts = [None]*pow(num_steps,2)
+  
+  for i in range(0,num_steps):
+    x_cuts = [xmin, xmin+i*xstep, xmax]
+    all_x_cuts[i] = x_cuts
+  
+  counter = 0
+  for i in range(0,num_steps):
+    for j in range(0,num_steps):
+      
+      y_cuts_i= [ymin, ymin+i*ystep,ymax]
+      y_cuts_j = [ymin,ymin+j*ystep,ymax]
+      all_y_cuts[counter] = [y_cuts_i,y_cuts_j]
+      counter += 1
+      
+      
+  return all_x_cuts,all_y_cuts

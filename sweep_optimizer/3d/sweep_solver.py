@@ -1069,7 +1069,7 @@ def time_to_solution(f,subset_bounds,machine_params,num_col,num_row):
   graphs = make_edges_universal(graphs)
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve)
-  plot_graphs(graphs,0)
-  all_times,max_time = compute_solve_time(graphs)
-  return all_times,max_time
+  #plot_graphs(graphs,0)
+  max_time = compute_solve_time(graphs)
+  return max_time
   
