@@ -34,17 +34,17 @@ def plot_graphs(graphs,t):
     plt.title("Time " + str(t) + " Graph " + str(g))
     edge_labels_1 = nx.get_edge_attributes(graphs[g],'weight')
     if g < 3:
-      nx.draw(graphs[g],nx.spectral_layout(graphs[g],weight=None),with_labels = True)
-      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight=None),edge_labels=edge_labels_1,font_size=8)
+      nx.draw(graphs[g],nx.spectral_layout(graphs[g],weight='weight'),with_labels = True)
+      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight='weight'),edge_labels=edge_labels_1,font_size=5)
     else:
-      nx.draw(graphs[g],nx.spectral_layout(graphs[g],weight=None),with_labels = True)
-      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight=None),edge_labels=edge_labels_1,font_size=8)
+      nx.draw(graphs[g],nx.spectral_layout(graphs[g],weight='weight'),with_labels = True)
+      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight='weight'),edge_labels=edge_labels_1,font_size=5)
     plt.savefig("debug_graph_plots/graph_"+str(t)+"_"+str(g)+".pdf")
     plt.close()
     
 
 #A modified version of networkx simple paths algorithm. This behaves as a weight based depth traversal algorithm.
-def all_simple_paths_modified(G, source, target, time_to_solve, cutoff=None):
+def all_simple_paths_modified(G, source, target, time_to_solve_graph, cutoff=None):
 
     if source not in G:
         raise nx.NodeNotFound('source node %s not in graph' % source)
@@ -54,10 +54,10 @@ def all_simple_paths_modified(G, source, target, time_to_solve, cutoff=None):
         return []
     if cutoff is None:
         cutoff = len(G) - 1
-    return _all_simple_paths_graph_modified(G, source, target,time_to_solve, cutoff=cutoff)
+    return _all_simple_paths_graph_modified(G, source, target,time_to_solve_graph, cutoff=cutoff)
 
 
-def _all_simple_paths_graph_modified(G, source, target, time_to_solve, cutoff=None):
+def _all_simple_paths_graph_modified(G, source, target, time_to_solve_graph, cutoff=None):
 
     visited = [source]
     start_time_source = 0.0
@@ -68,6 +68,8 @@ def _all_simple_paths_graph_modified(G, source, target, time_to_solve, cutoff=No
     stack = [iter(G[source])]
     if cutoff == start_time_source:
       yield source
+    elif start_time_source > cutoff:
+      return 
     while stack:
         children = stack[-1]
         child = next(children, None)
@@ -82,8 +84,12 @@ def _all_simple_paths_graph_modified(G, source, target, time_to_solve, cutoff=No
           yield child
         elif start_time < cutoff:
           #Making sure that it's actually solving and not just waiting to communicate.
-          if start_time + time_to_solve[child] > cutoff:
+          if start_time + time_to_solve_graph[child] > cutoff:
             yield child
+        elif start_time > cutoff:
+          #Checking to see the source is actually solving and not just waiting to communicate.
+          if start_time_source + time_to_solve_graph[source] > cutoff:
+            yield source
 
 def modify_downstream_edges(G,source,target,modified_edges,delay):
   
@@ -295,24 +301,41 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
     for e in graph.edges():
       #The starting node of this edge.
       node = e[0]
+      #Checking the successors.
+      node_successors = list(graph.successors(node))
+      bounds = [False, False]
+      #Determining if this subset has neighbors in both x and y.
+      for n in range(0,len(node_successors)):
+        neighbor = node_successors[n]
+        if neighbor == -1:
+          break
+        i_neighbor,j_neighbor = get_ij(neighbor,num_row,num_col)
+        i_node,j_node = get_ij(node,num_row,num_col)
+        #Checking which boundary this is on.
+        if i_neighbor == i_node:
+          bounds[1] = True
+        else:
+          bounds[0] = True
+      
+      #Determining the number of boundary cells to add to the cost.
+      boundary_cells = 0.0
+      comm_overhead = 0.0
+      #We first see how many True entries are in bounds.
+      num_true = sum(bounds)
+      if num_true == 2:
+        boundary_cells = max(bdy_cells_per_subset[node])
+        comm_overhead = latency*m_l
+      elif num_true == 1:
+        #Communicating across an x-boundary only.
+        if  bounds[0] == True:
+          boundary_cells = bdy_cells_per_subset[node][1]
+        #Communicating across a y-boundary only.
+        elif bounds[1] == True:
+          boundary_cells = bdy_cells_per_subset[node][0]
+      
       #Cells in this subset.
       num_cells = cells_per_subset[node]
       
-      #Finding out if our neighbor is on the x boundary or the y boundary.
-      neighbor = e[1]
-      i_neighbor,j_neighbor = get_ij(neighbor,num_row,num_col)
-      i_node,j_node = get_ij(node,num_row,num_col)
-      boundary_cells = 0.0
-      comm_overhead = latency*m_l
-      #Communicating across a y-boundary.
-      if i_neighbor == i_node:
-        boundary_cells = bdy_cells_per_subset[node][0]
-      #Communicating across an x-boundary.
-      else:
-        boundary_cells = bdy_cells_per_subset[node][1]
-      if neighbor == -1:
-        boundary_cells = 0
-        comm_overhead = 0
       #The cost of this edge. upc = uknowns per cell
       #upbc = unkowns per boundary cell
       cost = num_cells*t_u*upc + (boundary_cells*upbc*t_comm + comm_overhead)
@@ -803,18 +826,21 @@ def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,ti
       #The delay the second_graph will incur.
       delay = calculate_delay(first_graph,second_graph,frozen_graphs,node,time_to_solve[first_graph][node])
       secondary_graph = graphs[second_graph]
-      #We need to first add the delay to the preceding edges, in order to update the time this node is ready to solve at.
-      edges = list(secondary_graph.in_edges(node))
-      num_edges = len(edges)
-      for e in range(0,num_edges):
-        node1,node2 = edges[e]
-        secondary_graph[node1][node2]['weight'] += delay
+      if delay > 0.0:
+        #We need to first add the delay to the preceding edges, in order to update the time this node is ready to solve at.
+        edges = list(secondary_graph.in_edges(node))
+        num_edges = len(edges)
+        for e in range(0,num_edges):
+          node1,node2 = edges[e]
+          secondary_graph[node1][node2]['weight'] += delay
+        
+        #secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
+        secondary_graph = modify_downstream_edges_faster(secondary_graph,second_graph,node,modified_edges[second_graph],time_to_solve,delay)    
+        graphs[second_graph] = secondary_graph
       
-      #secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
-      secondary_graph = modify_downstream_edges_faster(secondary_graph,second_graph,node,modified_edges[second_graph],time_to_solve,delay)    
-      graphs[second_graph] = secondary_graph
-    
+    print(node_ind)
     modified_edges_over_nodes[node_ind] = modified_edges
+    
     node_ind += 1
       
   #Make sure all incoming edges to all nodes match up. We do this later in the multi-node case because this all occurs within one time iteration.
@@ -922,7 +948,7 @@ def calculate_delay(first_graph,second_graph,graphs,node,time_to_solve_node):
   #The delay is the difference in start times.
   delay = first_start_time + time_to_solve_node - second_start_time
   #If this delay value is less than zero, then the first graph has finished solving it by the time the second graph gets to it.
-  if delay < 0.0:
+  if delay < 0.0 or delay < 10e-12:
     delay = 0.0
   
   return delay
@@ -968,7 +994,7 @@ def add_conflict_weights(graphs,time_to_solve):
     print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
-    num_conflicting_nodes = len(conflicting_nodes)
+    #num_conflicting_nodes = len(conflicting_nodes)
     
     print("The graphs in conflict for each node")
     print(conflicting_nodes)
@@ -982,26 +1008,23 @@ def add_conflict_weights(graphs,time_to_solve):
       #Find nodes ready to solve at time t that are in conflict.
       first_nodes = find_first_conflict(conflicting_nodes,graphs)
       print(first_nodes)
-      num_nodes_ready_to_solve = len(first_nodes)
-      if (num_nodes_ready_to_solve == 1):
-        first_node = first_nodes[0]
-        #The conflicting grpahs at this node.
-        conflicting_graphs = conflicting_nodes[first_node]
+#      num_nodes_ready_to_solve = len(first_nodes)
+#      if (num_nodes_ready_to_solve == 1):
+#        first_node = first_nodes[0]
+#        #The conflicting grpahs at this node.
+#        conflicting_graphs = conflicting_nodes[first_node]
+#        #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
+#        graphs = modify_secondary_graphs(graphs,conflicting_graphs,first_node,time_to_solve)
+#        #To update our march through, we need to update t here, with a find_next_interaction.
+#        if (num_conflicting_nodes == 1):
+#          #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
+#          t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
+#      
+#      else:
         #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
-        graphs = modify_secondary_graphs(graphs,conflicting_graphs,first_node,time_to_solve)
-        #To update our march through, we need to update t here, with a find_next_interaction.
-        if (num_conflicting_nodes == 1):
-          #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
-          t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
-      
-      else:
-        #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
-        #graphs = modify_secondary_graphs_mult_node(graphs,conflicting_nodes,first_nodes,time_to_solve)
-        graphs = modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,first_nodes,time_to_solve)
-        #To update our march through, we need to update t here, with a find_next_interaction.
-        #if (num_conflicting_nodes == 1):
-        #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
-        t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
+      graphs = modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,first_nodes,time_to_solve)
+      #To update our march through, we need to update t here, with a find_next_interaction.
+      t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
     #plot_graphs(graphs,t)
     #print("here")
@@ -1018,7 +1041,6 @@ def add_conflict_weights(graphs,time_to_solve):
         finished_graphs[g] = True
     
     #print(finished_graphs)
-    
     num_finished_graphs = len([x for x in finished_graphs if finished_graphs[x] == True])
 
     
@@ -1067,9 +1089,10 @@ def time_to_solution(f,subset_bounds,machine_params,num_col,num_row):
   graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
+  plot_graphs(graphs,0)
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve)
   #plot_graphs(graphs,0)
-  max_time = compute_solve_time(graphs)
+  solve_times,max_time = compute_solve_time(graphs)
   return max_time
   

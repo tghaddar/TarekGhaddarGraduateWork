@@ -51,8 +51,24 @@ f = lambda x,y: x+y
 #graphs = make_edges_universal(graphs)
 #graphs = add_conflict_weights(graphs,time_to_solve)
 
+num_x_cuts = len(all_x_cuts)
+num_y_cuts = len(all_y_cuts)
+max_times = []
 
-max_time = time_to_solution(f,subset_boundaries,machine_params,numcol,numrow)
+x_cuts = all_x_cuts[0]
+y_cuts = all_y_cuts[5]
+subset_boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
+max_times = time_to_solution(f,subset_boundaries,machine_params,numcol,numrow)
+
+#for i in range(0,num_x_cuts):
+#  for j in range(0,num_y_cuts):
+#    print("LOOK AT ME GRANDMA: ", i,j)
+#    x_cuts = all_x_cuts[i]
+#    y_cuts = all_y_cuts[j]    
+#    subset_boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
+#    
+#    max_times.append(time_to_solution(f,subset_boundaries,machine_params,numcol,numrow))
+
 #plot_graphs(graphs,0)
 
 

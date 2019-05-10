@@ -102,7 +102,7 @@
 \tableofcontents
 \end{frame}
 
-\section{Introduction and Previous Work}
+\section{Introduction and Background}
 
 \begin{frame}[t]\frametitle{Introduction}
 \begin{block}{}
@@ -116,6 +116,81 @@
 \end{itemize}
 \end{block}
 \end{frame}
+
+\begin{frame}[t]\frametitle{Transport Sweeps}
+\begin{block}{}
+\begin{equation}
+\vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
+\label{iteration}
+\end{equation}
+\end{block}
+\centering
+\includegraphics[scale = 0.21]{figures/UnstructureMesh.pdf}
+\includegraphics[scale = 0.21]{figures/StructuredMesh.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{KBA}
+\begin{block}{}
+\begin{itemize}
+\item KBA introduced a "pipelining" or assembly line approach where new work is started before old work is fully completed.
+\end{itemize}
+\end{block}
+\centering
+\includegraphics[scale=0.6,trim={0cm 1cm 0cm 0cm},clip]{../figures/pipeline_example.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{KBA}
+\begin{block}{}
+\begin{itemize}
+\item KBA primarily uses "successive in angle, successive in quadrant" approach.
+\item An octant pipelines its angular work, and once all directions are complete, the opposing octant pipelines them back.
+\item This is then done for all remaining octant pairs.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Sweeps in PDT}
+\begin{block}{}
+\begin{itemize}
+\item PDT's extension of the KBA algorithm does not limit $P_z, A_m, G,$ or $A_g$.
+\item PDT also launches all 8 octants (4 quadrants in 2D) simultaneously, rather than one octant-pair at a time.
+\item Unlike KBA, PDT must schedule around conflicts that emerge between octants.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Tie Breaking in PDT}
+
+\begin{block}{If two or more tasks reach a processor at the same time, PDT employs a tie breaking strategy:}
+
+\begin{enumerate}
+	\item The task with the greater depth-of-graph remaining (simply, more work remaining) goes first.
+	\item If the depth-of-graph remaining is tied, the task with $\Omega_x > 0$ wins.
+	\item If multiple tasks have $\Omega_x > 0$, then the task with $\Omega_y > 0$ wins.
+	\item If multiple tasks have $\Omega_y > 0$, then the task with $\Omega_z > 0$ wins.
+\end{enumerate}
+\end{block}
+\end{frame}
+
+
+\section{Unstructured Meshing}
+
+\begin{frame}[t]\frametitle{Unstructured Meshing in PDT}
+\begin{block}{Partitioning for Unstructured Meshes}
+\begin{itemize}
+\item ``Cut lines" in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
+\item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
+\item The subsets are distributed amongst the processor domain.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Partitioning Example}
+\centering
+\includegraphics[scale=0.45,trim={0.95in 0.64in 0.35in 0.44in},clip]{figures/partitioning_example.pdf}
+\end{frame}
+
+\section{Load Balancing and Motivation}
 
 \begin{frame}[t]\frametitle{Load Balancing}
 \begin{block}{Load Balance Metric}
@@ -253,12 +328,10 @@ This process assumes that there are NO cycles in the TDGs. All graphs are acycli
 \label{weight}
 \text{weight} &= N_u\cdot T_u (\text{\textcolor{red}{threads}}) + N_b\cdot T_{\text{comm}} + \text{latency}\cdot M_L \\
 N_u &= \text{num cells}\cdot \text{unknowns per cell} \\
-N_b &\approx(\text{num cells})^{\frac{2}{3}}\cdot \text{unknowns per boundary cell}
+N_b &\approx(\text{num boundary cells})\cdot \text{unknowns per boundary cell}
 \end{align}
 \end{block}
 \end{frame}
-
-
 
 \begin{frame}[t]\frametitle{Determining Cells per Subset}
 	\centering
