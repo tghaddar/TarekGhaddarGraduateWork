@@ -838,7 +838,6 @@ def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,ti
         secondary_graph = modify_downstream_edges_faster(secondary_graph,second_graph,node,modified_edges[second_graph],time_to_solve,delay)    
         graphs[second_graph] = secondary_graph
       
-    print(node_ind)
     modified_edges_over_nodes[node_ind] = modified_edges
     
     node_ind += 1
@@ -978,8 +977,6 @@ def add_conflict_weights(graphs,time_to_solve):
   #Keep iterating until all graphs have finished.
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if t == 2:
-      print("debug stop")
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -994,7 +991,7 @@ def add_conflict_weights(graphs,time_to_solve):
     print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
-    #num_conflicting_nodes = len(conflicting_nodes)
+    num_conflicting_nodes = len(conflicting_nodes)
     
     print("The graphs in conflict for each node")
     print(conflicting_nodes)
@@ -1024,10 +1021,11 @@ def add_conflict_weights(graphs,time_to_solve):
         #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
       graphs = modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,first_nodes,time_to_solve)
       #To update our march through, we need to update t here, with a find_next_interaction.
-      t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
+      if (num_conflicting_nodes == len(first_nodes)):
+        t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
-    #plot_graphs(graphs,t)
-    #print("here")
+#    plot_graphs(graphs,t)
+#    print("here")
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
       if finished_graphs[g]:

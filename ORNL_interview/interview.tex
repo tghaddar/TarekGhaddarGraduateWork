@@ -175,6 +175,32 @@
 
 \section{Unstructured Meshing}
 
+\begin{frame}[t]\frametitle{Cubit vs. Triangle Meshes}
+\begin{columns}
+
+\begin{column}{.49\textwidth}
+\begin{block}{Triangle}
+  \begin{itemize}
+    \item PDT meshes on the fly and in parallel by calling Triangle library.
+    \item Stitching required.
+    \item 2D extruded mesh.
+  \end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{.49\textwidth}
+\begin{block}{Cubit}
+  \begin{itemize}
+    \item Mesh is generated, load balanced and then read into PDT.
+    \item No stitching necessary.
+    \item First instance of a truly unstructured 3D mesh in PDT.
+    \item More control over the mesh.
+  \end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
 \begin{frame}[t]\frametitle{Unstructured Meshing in PDT}
 \begin{block}{Partitioning for Unstructured Meshes}
 \begin{itemize}
