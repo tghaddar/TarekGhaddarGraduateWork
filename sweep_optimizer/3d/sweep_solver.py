@@ -977,6 +977,12 @@ def add_conflict_weights(graphs,time_to_solve):
   #Keep iterating until all graphs have finished.
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
+    print(graphs[3][2][1])
+    print(graphs[3][1][0])
+    print(graphs[3][2][0])
+    if t == 30665.804999999993:
+      print("debug here")
+      
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -1087,7 +1093,7 @@ def time_to_solution(f,subset_bounds,machine_params,num_col,num_row):
   graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
-  plot_graphs(graphs,0)
+  #plot_graphs(graphs,0)
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve)
   #plot_graphs(graphs,0)
