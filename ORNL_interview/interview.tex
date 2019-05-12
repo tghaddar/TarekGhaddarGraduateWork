@@ -136,7 +136,7 @@
 \begin{frame}[t]\frametitle{KBA}
 \begin{block}{}
 \begin{itemize}
-\item KBA introduced a "pipelining" or assembly line approach where new work is started before old work is fully completed.
+\item KBA utlilizes a "pipelining" or assembly line approach where new work is started before old work is fully completed.
 \end{itemize}
 \end{block}
 \centering
@@ -356,7 +356,7 @@ This process assumes that there are NO cycles in the TDGs. All graphs are acycli
 \begin{align}
 \text{cells per subset} &= \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz \\
 \label{weight}
-\text{weight} &= N_u\cdot T_u (\text{\textcolor{red}{threads}}) + N_b\cdot T_{\text{comm}} + \text{latency}\cdot M_L \\
+\text{weight} &= N_u\cdot T_u + N_b\cdot T_{\text{comm}} + \text{latency}\cdot M_L \\
 N_u &= \text{num cells}\cdot \text{unknowns per cell} \\
 N_b &\approx(\text{num boundary cells})\cdot \text{unknowns per boundary cell}
 \end{align}
@@ -387,9 +387,8 @@ N_b &\approx(\text{num boundary cells})\cdot \text{unknowns per boundary cell}
 \begin{block}{}
 \begin{itemize}
 	\item Once all edges in all TDGs are appropriately weighted according to Eq. \ref{weight}, we need to detect and resolve sweep conflicts between the 8 octants.
-	\item For perfectly balanced and optimally partitioned problems (structured grids) we will default to a depth-of-graph conflict resolution.
+	\item For perfectly balanced and optimally partitioned problems (structured grids) we will default to a depth-of-graph conflict resolution (same as PDT).
 	\item For unbalanced partitions, we will default to a first come first serve conflict resolution.
-    \item We check for conflicts only amongst the longest paths of each graph. This simplification takes into account the upstream dependencies of each node, without losing the accuracy of the time to sweep each graph.
 \end{itemize}
 \end{block}
 \end{frame}
