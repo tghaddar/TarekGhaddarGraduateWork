@@ -123,10 +123,14 @@
 \vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
 \label{iteration}
 \end{equation}
+\begin{itemize}
+\item The domain is meshed and discretized, allowing one cell at a time to be solved.
+\item The solution across a cell interface is connected based on an upwind approach.
+\end{itemize}
 \end{block}
 \centering
-\includegraphics[scale = 0.21]{figures/UnstructureMesh.pdf}
-\includegraphics[scale = 0.21]{figures/StructuredMesh.pdf}
+\includegraphics[scale = 0.15]{figures/UnstructureMesh.pdf}
+\includegraphics[scale = 0.15]{figures/StructuredMesh.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{KBA}
