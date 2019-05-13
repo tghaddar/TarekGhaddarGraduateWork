@@ -112,7 +112,7 @@
 	\item Unstructured meshes allow us to simulate realistic problems, but introduce unbalanced partitions. 
 	\item PDT (Texas A\&M's massively parallel transport code) introduced two load balancing algorithms that repartition the mesh in order to obtain a roughly equivalent amount of cells per processor. 
 	\item However, this can sacrifice the optimal sweep partitioning (cut lines all the way through the domain) in favor of balance. 
-	\item The work proposed will balance perfect load balancing and optimal sweep partitioning in order to achieve the best possible time to solution.
+	\item The method described will balance perfect load balancing and optimal sweep partitioning in order to achieve the best possible time to solution.
 \end{itemize}
 \end{block}
 \end{frame}
@@ -133,6 +133,17 @@
 \includegraphics[scale = 0.15]{figures/StructuredMesh.pdf}
 \end{frame}
 
+\begin{frame}[t]\frametitle{Parallel Transport Sweeps}
+
+\begin{block}{A parallel sweep algorithm is defined by three properties:}
+\begin{itemize}
+\item partitioning: dividing the domain among available processors,
+\item aggregation: grouping cells, directions, and energy groups into tasks,
+\item scheduling: choosing which task to execute if more than one is available.
+\end{itemize}
+\end{block}
+\end{frame}
+
 \begin{frame}[t]\frametitle{KBA}
 \begin{block}{}
 \begin{itemize}
@@ -146,7 +157,8 @@
 \begin{frame}[t]\frametitle{KBA}
 \begin{block}{}
 \begin{itemize}
-\item KBA primarily uses "successive in angle, successive in quadrant" approach.
+\item KBA limits the number of processors in $z$ to one, solves one group at a time, and does not aggregate in angle or group.
+\item KBA primarily uses a "successive in angle, successive in quadrant" approach.
 \item An octant pipelines its angular work, and once all directions are complete, the opposing octant pipelines them back.
 \item This is then done for all remaining octant pairs.
 \end{itemize}

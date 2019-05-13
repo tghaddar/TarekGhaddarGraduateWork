@@ -90,7 +90,7 @@ $^1$Dept. of Nuclear Engineering, Texas  A\&M University \\
 \justify 
 
 \begin{abstract}
-  PDT, Texas A\&M's massively parallel deterministic transport sweep code, has the capability to sweep on unstructured grids. In order to combat the inherent imbalance (inequivalent amount of work per processor) of unstructured meshes for transport sweeps, we implemented two automated load balancing algorithms: the original load balancing algorithm and the load balancing by dimension algorithm. In a parametric study, the original load balancing algorithm improved balance by a maximum of 89\% with a mean improvement of 16.9\%, while the load balancing by dimension algorithm improved balance by a maximum of 93.8\% and a mean of 32.3\%.
+  PDT, Texas A\&M's massively parallel deterministic transport sweep code, has the capability to sweep on unstructured grids. In order to combat the inherent imbalance (inequivalent amount of work per processor) of unstructured meshes for transport sweeps, we implemented two automated load balancing algorithms: the original load balancing algorithm and the load balancing by dimension algorithm. In a parametric study, the original load balancing algorithm improved balance by a maximum of 89\% with a mean improvement of 16.9\%, while the load balancing by dimension algorithm improved balance by a maximum of 93.8\% with a mean improvement of 32.3\%.
 \end{abstract}
 \keywords{transport sweep, massively parallel, load balancing, unstructured}
 
@@ -136,7 +136,7 @@ Figure \ref{partitioning_example} shows an example of an unstructured mesh parti
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[scale=0.5,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/partitioning_example.pdf}
+\includegraphics[scale=0.4,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/partitioning_example.pdf}
 \caption{An unstructured mesh partitioned into four subsets with cut planes at $\bm{x,y = 10}$ cm.}
 \label{partitioning_example}
 \end{figure}
@@ -157,15 +157,14 @@ $f_{D}$ is calculated by taking the maximum number of cells per row, column, or 
 Figure \ref{redistribute} illustrates an example of redistributing the cut planes in $x$ to balance the cells per column.
 \begin{figure}[!htb]
 \centering
-\includegraphics[scale=0.5]{Figures/redistribute_before.pdf}
-\includegraphics[scale=0.5]{Figures/redistribute_after.pdf}
+\includegraphics[scale=0.4]{Figures/redistribute_before.pdf}
+\includegraphics[scale=0.4]{Figures/redistribute_after.pdf}
 \caption{The use of the CDF of triangles per column to redistribute the cut planes in X.}
 \label{redistribute}
 \end{figure}
 The image on the left side of Fig. \ref{redistribute} shows the CDF of the triangles per column. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut planes are redistributed to. 
-
+\FloatBarrier 
 \subsection{Original Load Balancing Algorithm}
-\label{og_lb}
 
 The initial approach to load balancing was implemented on 2D extruded meshes, meaning the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. Algorithm \ref{initial_algorithm} summarizes the initial approach to load balancing meshes in PDT.
 
@@ -187,11 +186,11 @@ The initial approach to load balancing was implemented on 2D extruded meshes, me
 While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$ (defined by Eq. (\ref{f_d})), are balanced. If they are not, we redistribute the corresponding cut planes.
 %\vspace{-3.5cm}
 
-This initial approach involved placing cut planes in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches of high mesh density.
+The original load balancing algorithm placed cut planes in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches of high mesh density.
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
-\includegraphics[scale=0.4]{figures/2dgeneral.png}
+\includegraphics[scale=0.4]{Figures/2dgeneral.png}
 \caption{A 2D subset layout with $M$ unaligned patches of high mesh density.}
 \label{2dgeneral}
 \end{figure}
@@ -364,7 +363,7 @@ To show the behavior of the original load balancing algorithm and the load balan
 \label{all_improvements}
 \end{table}
 
-The data in Tables \ref{og_table} and \ref{all_improvements} showcase an important point. As mesh refinement increases, the need for load balancing decreases. If sparse regions of the domain have a similar number of cells to the dense regions of the domain, the problem will be inherently balanced with even partitions. Table \ref{method_improvement} demonstrates that with the exception of a few outliers, the load balancing by dimension algorithm is an improvement over the original load balancing algorithms, particularly for coarser mesh refinements.
+The data in Tables \ref{og_table} and \ref{all_improvements} showcase an important point. As mesh refinement increases, the need for load balancing decreases. If sparse regions of the domain have a similar number of cells to the dense regions of the domain, the problem will be inherently balanced with even partitions. Table \ref{method_improvement} demonstrates that with the exception of a few outliers, the load balancing by dimension algorithm is an improvement over the original load balancing algorithms, particularly for coarser mesh refinements. The metric improves by a max of 76.9\% and a mean of 21.7\%  with the load balancing by dimensions algorithm over the original load balancing algorithm.
 
 %method improvement table
 \begin{table}[!htb]
@@ -398,12 +397,12 @@ Coarse & 0.175 & 0.468 & 0.569 & 0.512 & 0.451 & 0.522 & 0.437 & 0.146 & 0.234 \
 \FloatBarrier
 \section{CONCLUSIONS AND FUTURE WORK}
 The load balancing by dimension algorithm has allowed PDT to solve large scale simulations in reasonable times, decreasing the amount of idle time spent on processors with little work. However, while perfect load balance was the initial goal, we needed to know if this affected the efficiency of the parallel transport sweep. 
-Figure \ref{partitions} shows three theoretical sweep domains with $P_x = 20, P_y = 20$. In the figure, only the subset domain is shown, with the assumption that there is an equivalent number of mesh cells per subset. In the top image of Fig. \ref{partitions}, we see a regular processor grid, which will lead to a nice wavelike sweep that finishes in 40 stages. 
+Figure \ref{partitions} shows three theoretical sweep domains with 20 subsets in $x$ and $y$. In the figure, only the subset domain is shown, with the assumption that there is an equivalent number of mesh cells per subset. In the top image of Fig. \ref{partitions}, we see a regular processor grid, which will lead to a nice wavelike sweep that finishes in 40 stages. 
 \begin{figure}[!htb]
   \centering
-  \includegraphics[scale=0.5]{Figures/regular_partition_4.png}
-   \includegraphics[scale=0.5]{Figures/random_partition_4.png}
-    \includegraphics[scale=0.5]{Figures/worst_partition_4.png}
+  \includegraphics[scale=0.4]{Figures/regular_partition_4.png}
+   \includegraphics[scale=0.4]{Figures/random_partition_4.png}
+    \includegraphics[scale=0.4]{Figures/worst_partition_4.png}
   \caption{Three different perfectly load balanced partitions.}
   \label{partitions}
 \end{figure}
@@ -431,12 +430,7 @@ As a result of this theoretical study, a general sweep scheduler and optimizer i
 \FloatBarrier
 \section*{ACKNOWLEDGEMENTS}
 
-Acknowledge the help of colleagues and sources of funding, as appropriate.
-
-\textbf{As an example:} The format for this template was adapted from the \LaTeX template for the PHYSOR-2018 conference posted and available on the Internet and 
-most of the \LaTeX\ format definitions contained in this were already defined. The 
-M\&C 2019 organizing committee deeply thank the PHYSOR-2018 technical committee 
-for this great support.
+This material is based upon work supported by the Department of Energy, National Nuclear Security Administration, under Award Number(s) DE-NA0002376.
 
 % You can enter a bibliography into the document using the following format, or use the 
 % bibliography style file "mandc.bst" found in the template directory.  You can use the bibliography style file
