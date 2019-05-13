@@ -285,6 +285,22 @@
 \end{frame}
 
 \begin{frame}[t]\frametitle{Load Balancing Study}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.25,trim={0.95in 0.64in 0.35in 0.44in},clip]{figures/og_lb_example.pdf}
+\includegraphics[scale=0.25,trim={0.95in 0.64in 0.35in 0.44in},clip]{figures/lbd_example.pdf}
+\label{alg_illustration}
+\end{figure}
+  \begin{block}{Parametric Study Parameters}
+    \begin{itemize}
+      \item Number of subsets ranging from 2 to 10 each in $x$ and $y$.
+      \item Maximum triangle area ranging from coarsest possible to 0.01 cm\textsuperscript{2}.
+      \item Minimum triangle angle kept constant at $20^{\circ}$.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Load Balancing Study}
 \begin{table}[H]
 \centering
 \caption{\bf The percent improvement of the original load balancing algorithm (left) and the load balancing by dimension algorithm (right).}
@@ -475,6 +491,12 @@ N_b &\approx(\text{num boundary cells})\cdot \text{unknowns per boundary cell}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Ongoing and Future Work}
+  \begin{block}{}
+    \begin{itemize}
+      \item The time to solution estimator has been verified for 2D cases, with ongoing efforts for 3D verification.
+      \item Preliminary optimization efforts are promising using the SciPy optimize library.  
+    \end{itemize}
+  \end{block}
 \end{frame}
 
 \end{document}
