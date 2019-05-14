@@ -569,23 +569,19 @@ N_b &\approx(\text{num boundary cells})\cdot \text{boundary unkowns per cell}
 
 \begin{frame}[t]\frametitle{Pre Universal Weighting}
   \centering
-  \includegraphics{figures/G_pre_universal.pdf}
+  \includegraphics[scale=0.65]{figures/G_pre_universal.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Post Universal Weighting}
   \centering
-  \includegraphics{figures/G_universal.pdf}
+  \includegraphics[scale=0.65]{figures/G_universal.pdf}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Universal Edge Weighting}
-\centering
-\includegraphics[scale=0.5]{figures/printgraph.pdf}
-\end{frame}
 
 \begin{frame}[t]\frametitle{Conflict Detection and Resolution}
 \begin{block}{}
 \begin{itemize}
-	\item Once all edges in all TDGs univerally weighted, we need to detect and resolve sweep conflicts between the 8 octants.
+	\item Once all edges in all TDGs are universaly weighted, we need to detect and resolve sweep conflicts between the 8 octants.
 	\item For perfectly balanced and optimally partitioned problems (structured grids) we will default to a depth-of-graph conflict resolution (same as PDT).
 	\item For unbalanced partitions, we will default to a first come first serve conflict resolution.
 \end{itemize}
@@ -607,11 +603,34 @@ N_b &\approx(\text{num boundary cells})\cdot \text{boundary unkowns per cell}
 \end{block}
 \end{frame}
 
+\begin{frame}[t]\frametitle{Conflict Resolution Algorithm}
+  \begin{block}{}
+    \begin{itemize}
+      \item Best summarized as a ``marching" process. 
+      \item Starting at time $t=0$, find the first interaction (recalling that the incoming weight to a node reflects the time it is ready to solve).
+      \item If at time $t$, multiple TDGs are solving the same node, this means there is a conflict. 
+      \item  ``Losing" TDGs modify their downstream weights according to how long they are delayed.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Sweeping the Graph}
+\begin{block}{}
+\begin{itemize}
+	\item Now that all TDGs are weighted based on solve time, communication time, and delays, we can easily calculate the time it takes each octant to sweep across the graph. 
+	\item The maximum final edge weight across all TDGs is the maximum sweep time.
+\end{itemize}
+\end{block}
+\end{frame}
+
 \begin{frame}[t]\frametitle{Ongoing and Future Work}
   \begin{block}{}
     \begin{itemize}
       \item The time to solution estimator has been verified for 2D cases, with ongoing efforts for 3D verification.
       \item Preliminary optimization efforts are promising using the SciPy optimize library.  
+      \item Numerical studies using comparing load balanced partitions vs. optimized partitions in PDT ongoing.
+      \item Adding in support for multiple angles per octant. 
+      \item Adding in support for angular and subset aggregation.
     \end{itemize}
   \end{block}
 \end{frame}

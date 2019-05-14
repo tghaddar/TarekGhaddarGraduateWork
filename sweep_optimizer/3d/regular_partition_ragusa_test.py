@@ -70,7 +70,7 @@ plt.savefig("G_universal.pdf")
 #A list that stores the time to solve each node.
 time_to_solve = [1]*numrow*numcol
 
-#graphs = add_conflict_weights(graphs,time_to_solve)
+graphs = add_conflict_weights(graphs,time_to_solve)
 #
 #end_tos = time.time()
 #print("Universal Edges: ", start_after_universal - start_before_universal)
@@ -80,23 +80,23 @@ time_to_solve = [1]*numrow*numcol
 #all_times,max_time = compute_solve_time(graphs)
 #print("Final Solve Time: ",max_time)
 
-#plt.figure("G")
-#edge_labels_1 = nx.get_edge_attributes(G,'weight')
-#nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
-#nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
-#
-#
-#plt.figure("G1 universal")
-#edge_labels_1 = nx.get_edge_attributes(G1,'weight')
-#nx.draw(G1,nx.spectral_layout(G1),with_labels = True)
-#nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1),edge_labels=edge_labels_1)
-#
-#plt.figure("G2 universal")
-#edge_labels_1 = nx.get_edge_attributes(G2,'weight')
-#nx.draw(G2,nx.spectral_layout(G2),with_labels = True)
-#nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2),edge_labels=edge_labels_1)
-#
-#plt.figure("G3")
-#edge_labels_1 = nx.get_edge_attributes(G3,'weight')
-#nx.draw(G3,nx.spectral_layout(G3),with_labels = True)
-#nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3),edge_labels=edge_labels_1)
+plt.figure("G")
+edge_labels_1 = nx.get_edge_attributes(G,'weight')
+nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
+nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
+
+
+plt.figure("G1 universal")
+edge_labels_1 = nx.get_edge_attributes(G1,'weight')
+nx.draw(G1,nx.spectral_layout(G1),with_labels = True)
+nx.draw_networkx_edge_labels(G1,nx.spectral_layout(G1),edge_labels=edge_labels_1)
+
+plt.figure("G2 universal")
+edge_labels_1 = nx.get_edge_attributes(G2,'weight')
+nx.draw(G2,nx.spectral_layout(G2),with_labels = True)
+nx.draw_networkx_edge_labels(G2,nx.spectral_layout(G2),edge_labels=edge_labels_1)
+
+plt.figure("G3")
+edge_labels_1 = nx.get_edge_attributes(G3,'weight')
+nx.draw(G3,nx.spectral_layout(G3),with_labels = True)
+nx.draw_networkx_edge_labels(G3,nx.spectral_layout(G3),edge_labels=edge_labels_1)
