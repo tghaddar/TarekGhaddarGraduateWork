@@ -67,8 +67,8 @@
 
 \title[Partitioning Optimization]{Partitioning Optimization for Massively Parallel Transport Sweeps on Unstructured Grids}
 \author[Ghaddar]{Tarek Ghaddar}
-\institute[TAMU]{Tarek Ghaddar \\ Chair: Jean Ragusa \\ Committee: Jim Morel, Marvin Adams, Nancy Amato}
-\date[December 12, 2018]
+\institute[TAMU]{Tarek Ghaddar \\ Texas A\&M University \\ ORNL Interview Seminar}
+\date[May 14, 2018]
 
 {
 \setbeamertemplate{headline}{}
@@ -144,17 +144,8 @@
 \end{block}
 \end{frame}
 
-\begin{frame}[t]\frametitle{KBA}
-\begin{block}{}
-\begin{itemize}
-\item KBA utlilizes a "pipelining" or assembly line approach where new work is started before old work is fully completed.
-\end{itemize}
-\end{block}
-\centering
-\includegraphics[scale=0.6,trim={0cm 1cm 0cm 0cm},clip]{../figures/pipeline_example.pdf}
-\end{frame}
 
-\begin{frame}[t]\frametitle{KBA}
+\begin{frame}[t]\frametitle{KBA Algorithm}
 \begin{block}{}
 \begin{itemize}
 \item KBA limits the number of processors in $z$ to one, solves one group at a time, and does not aggregate in angle or group.
@@ -163,6 +154,16 @@
 \item This is then done for all remaining octant pairs.
 \end{itemize}
 \end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{KBA Algorithm}
+\begin{block}{}
+\begin{itemize}
+\item KBA utlilizes a "pipelining" or assembly line approach where new work is started before old work is fully completed.
+\end{itemize}
+\end{block}
+\centering
+\includegraphics[scale=0.6,trim={0cm 1cm 0cm 0cm},clip]{../figures/pipeline_example.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Sweeps in PDT}
@@ -188,33 +189,20 @@
 \end{block}
 \end{frame}
 
-
 \section{Unstructured Meshing}
 
-\begin{frame}[t]\frametitle{Cubit vs. Triangle Meshes}
-\begin{columns}
-
-\begin{column}{.49\textwidth}
-\begin{block}{Triangle}
-  \begin{itemize}
-    \item PDT meshes on the fly and in parallel by calling Triangle library.
-    \item Stitching required.
-    \item 2D extruded mesh.
-  \end{itemize}
-\end{block}
-\end{column}
-
-\begin{column}{.49\textwidth}
-\begin{block}{Cubit}
-  \begin{itemize}
-    \item Mesh is generated, load balanced and then read into PDT.
-    \item No stitching necessary.
-    \item First instance of a truly unstructured 3D mesh in PDT.
-    \item More control over the mesh.
-  \end{itemize}
-\end{block}
-\end{column}
-\end{columns}
+\begin{frame}[t]\frametitle{Unstructured Meshing in PDT}
+  \begin{block}{}
+    \begin{itemize}
+      \item PDT using unstructured meshes has been a priority since early 2014. 
+      \item Unstructured meshes allow for simulation of a wider and more general variety of problems.
+      \item Two unstructured mesh types are supported in PDT:
+        \begin{itemize}
+          \item Triangle (2D and 2D extruded triangular/prismatic meshes).
+          \item Cubit/OpenFOAM (fully unstructured 2D/3D meshes).
+        \end{itemize}
+    \end{itemize}
+  \end{block}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Unstructured Meshing in PDT}
@@ -232,7 +220,39 @@
 \includegraphics[scale=0.45,trim={0.95in 0.64in 0.35in 0.44in},clip]{figures/partitioning_example.pdf}
 \end{frame}
 
-\section{Load Balancing and Motivation}
+\begin{frame}[t]\frametitle{Cubit vs. Triangle Meshes}
+\begin{columns}
+
+\begin{column}{.49\textwidth}
+\begin{block}{Triangle}
+  \begin{itemize}
+    \item PDT meshes on the fly and in parallel by calling Triangle library.
+    \item Stitching of ``hanging nodes" required.
+    \item 2D extruded mesh.
+  \end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{.49\textwidth}
+\begin{block}{Cubit}
+  \begin{itemize}
+    \item Mesh is generated, load balanced and then read into PDT (collaborative code with Rick Vega).
+    \item No stitching necessary.
+    \item First instance of a truly unstructured 3D mesh in PDT.
+    \item More control over the mesh.
+  \end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Comparison of the two meshing approaches}
+\centering
+\includegraphics[scale=0.17]{../figures/im1_228.png}
+\includegraphics[scale=0.17]{../figures/im1c_prism.png}
+\end{frame}
+
+\section{Load Balancing Algorithms}
 
 \begin{frame}[t]\frametitle{Load Balancing}
 \begin{block}{Load Balance Metric}
@@ -250,18 +270,36 @@
   Subsequent improvement in algorithm: once dimension 1 has been balanced, balance dimension 2, then balance dimension 3 (\tcr{load balancing by dimension})
 \end{block}
 \end{frame}
-
-\begin{frame}[t]\frametitle{No Load Balancing, f = 41.82}
-\centering
-\includegraphics[scale=0.25]{figures/im12d_nolb.png}
+\begin{frame}[t]\frametitle{Load Balancing Metrics}
+\begin{equation}
+f =\frac{\underset{ijk}{\text{max}}(N_{ijk})}{\frac{N_{tot}}{I\cdot J\cdot K}},
+\label{metric_def}
+\end{equation}
+\begin{align}
+f_{D1} &= \underset{d1}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D1}, \label{f_d1} \\
+f_{D2,d1} &= \Big(\underset{d2}{\text{max}}[\sum_{d3} N_{ijk,d1}]/\frac{N_{d1}}{D2}\Big), \label{f_d2}\\
+f_{D3,d2,d1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}{D3} \Big) . \label{f_d3}
+\end{align}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Load Balancing, f = 2.97}
-\centering
-\includegraphics[trim={1cm 0cm 0cm 3cm},clip,scale=0.25]{figures/im12d_oldlb.png}
+\begin{frame}[t]\frametitle{Original Load Balancing Algorithm}
+\begin{algorithm}[H]
+\label{initial_algorithm}
+\begin{algorithmic}
+
+\WHILE{$f > \text{tol}_{\text{subset}}$}
+  \IF {$f_I > \text{tol}_{\text{col}}$}
+    \STATE Redistribute the X cut planes.
+  \ENDIF
+  \IF {$f_J > \text{tol}_{\text{row}}$}
+  	\STATE Redistribute the Y cut planes.
+  \ENDIF
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Theoretical Motivation for LBD \\ (Courtesy of Dr. Adams)}
+\begin{frame}[t]\frametitle{Theoretical Motivation for LBD}
   \begin{block}{}
   \begin{itemize}
     \item Consider simple 2D layout with $M$ unaligned patches of high mesh density
@@ -273,6 +311,56 @@
     \includegraphics[width=5cm ]{figures/2dgeneral.png}
   \end{center}
 \end{frame}
+
+\begin{frame}[t]\frametitle{Load Balancing By Dimension Algorithm}
+\begin{algorithm}[H]
+\label{lbd}
+\begin{algorithmic}
+
+  \WHILE {$f_{D1} > \text{tol}_{\text{D1}}$}
+    \STATE Redistribute the D1 cut planes.
+  \ENDWHILE  
+  
+  \FOR {$d1$ in $D1$}
+    \WHILE {$f_{D2,d1} > \text{tol}_{\text{D2}}$}
+      \STATE Redistribute the D2 cut planes within d1. 
+    \ENDWHILE
+  \ENDFOR
+  
+  \FOR{$d1$ in $D1$}
+    \FOR{$d2$ in $D2$}
+      \WHILE {$f_{D3,d2,d1} > \text{tol}_{\text{D3}}$ }
+        \STATE Redistribute the D3 cut planes within d2 within d1. 
+      \ENDWHILE
+    \ENDFOR
+  \ENDFOR
+  
+  \STATE Calculate $f$.
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Redistribution}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{figures/redistribute_before.pdf}
+\includegraphics[scale=0.3]{figures/redistribute_after.pdf}
+\caption{The use of the CDF of triangles per column to redistribute the cut planes in X.}
+\label{redistribute}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[t]\frametitle{No Load Balancing, f = 41.82}
+\centering
+\includegraphics[scale=0.25]{figures/im12d_nolb.png}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Load Balancing, f = 2.97}
+\centering
+\includegraphics[trim={1cm 0cm 0cm 3cm},clip,scale=0.25]{figures/im12d_oldlb.png}
+\end{frame}
+
 
 \begin{frame}[t]\frametitle{Load Balancing By Dimension, f = 2.02}
 \centering
@@ -354,6 +442,16 @@
 \end{table}
 \end{frame}
 
+\begin{frame}[t]\frametitle{Paramtric Study Conclusions}
+  \begin{block}{}
+  \begin{itemize}
+    \item The more uniformly refined your mesh, the more inherently balanced it is.
+    \item With the exception of a few outliers, the load balancing by dimension algorithm was an improvement over the original load balancing algorithm.
+    \item The metric improved by a max of 76.9\% and a mean of 21.7\% with the load balancing by dimension algorithm over the original load balancing algorithm. 
+  \end{itemize}
+  \end{block}
+\end{frame}
+
 \begin{frame}[t]\frametitle{Consequences of Load Balancing By Dimension}
   \begin{block}{}
   \begin{itemize}
@@ -398,7 +496,6 @@
 \begin{itemize}
   \item For a given partition, this tool will build subset-level (not cell level) directed task dependence graphs for each octant, and weight the edges of that graph based on a set of criteria.
   \item The estimator returns the maximum time to sweep across one of the graphs.
-  \item The maximum sweep time corresponds to the graph that has the maximum longest weighted path. 
 \end{itemize}
 \end{block}
 \begin{block}{}
@@ -420,9 +517,8 @@ This process assumes that there are NO cycles in the TDGs. All graphs are acycli
 	\begin{itemize}
 		\item Solve and communication time of each subset to its neighbors.
 		\item Conflicts that arise between DAGs due to the sweep.
-		\item This final edge weight reflects the amount of time it takes to solve the base node.
 	\end{itemize}
-	\item Compute solve time by getting the maximum edge-weighted sum of the longest paths for all DAGs.
+	\item Compute solve time by getting the maximum final edge weight across all DAGs.
 \end{enumerate}
 \end{block}
 \end{frame}
@@ -440,7 +536,7 @@ This process assumes that there are NO cycles in the TDGs. All graphs are acycli
 \label{weight}
 \text{weight} &= N_u\cdot T_u + N_b\cdot T_{\text{comm}} + \text{latency}\cdot M_L \\
 N_u &= \text{num cells}\cdot \text{unknowns per cell} \\
-N_b &\approx(\text{num boundary cells})\cdot \text{unknowns per boundary cell}
+N_b &\approx(\text{num boundary cells})\cdot \text{boundary unkowns per cell}
 \end{align}
 \end{block}
 \end{frame}
@@ -455,9 +551,27 @@ N_b &\approx(\text{num boundary cells})\cdot \text{unknowns per boundary cell}
 	\includegraphics[scale=0.65]{figures/mesh_subsets.pdf}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Determining Cells per Subset}
-	\centering
-	\includegraphics[scale=0.65]{figures/full_mesh_density.pdf}
+\begin{frame}[t]\frametitle{Universal Edge Weighting}
+  \begin{block}{}
+    \begin{itemize}
+      \item Once the outgoing edges of each node are independently weighted, the next step is to have our graphs weighted on a universal time scale. 
+      \item To do this, we calculate the sum of the longest weighted path to each node, and set all incoming edges to each node to this value.
+      \item To find the longest weighted path, the graph weights are inverted, and the shortest weighted path is found. The original edge weights are used to calculate the value of the longest weighted path.
+      \item The resulting graph is weighted so that the incoming edge to each node represents the time that node is ready to solve.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Weighting Example}
+Put 3x3 picture with time to solve and communicate = to 1. Make sure there are subset labels.
+\end{frame}
+
+\begin{frame}[t]\frametitle{Pre Universal Weighting}
+
+\end{frame}
+
+\begin{frame}[t]\frametitle{Post Universal Weighting}
+
 \end{frame}
 
 \begin{frame}[t]\frametitle{Universal Edge Weighting}
@@ -468,7 +582,7 @@ N_b &\approx(\text{num boundary cells})\cdot \text{unknowns per boundary cell}
 \begin{frame}[t]\frametitle{Conflict Detection and Resolution}
 \begin{block}{}
 \begin{itemize}
-	\item Once all edges in all TDGs are appropriately weighted according to Eq. \ref{weight}, we need to detect and resolve sweep conflicts between the 8 octants.
+	\item Once all edges in all TDGs univerally weighted, we need to detect and resolve sweep conflicts between the 8 octants.
 	\item For perfectly balanced and optimally partitioned problems (structured grids) we will default to a depth-of-graph conflict resolution (same as PDT).
 	\item For unbalanced partitions, we will default to a first come first serve conflict resolution.
 \end{itemize}
@@ -480,7 +594,7 @@ N_b &\approx(\text{num boundary cells})\cdot \text{unknowns per boundary cell}
 \begin{itemize}
 	\item The first octant to arrive to a node will begin solving it, and the remaining octants will incur a delay (if applicable).
 	\item The delay is reflected in each remaining TDG by adding the corresponding delay as a weight to the applicable edge.
-	\item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant wins the tie.
+  \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant (same as PDT) wins the tie.
 \end{itemize}
 \end{block}
 \begin{block}{Potential Future Work: hybrid depth-of-graph/first come first serve conflict resolution}

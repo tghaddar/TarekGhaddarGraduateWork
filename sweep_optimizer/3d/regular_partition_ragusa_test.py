@@ -10,10 +10,10 @@ plt.close("all")
 
 start_tos = time.time()
 
-numrow = 10
-numcol = 10
+numrow = 3
+numcol = 3
 
-adjacency_matrix = np.genfromtxt('matrices_9.csv',delimiter=",")
+adjacency_matrix = np.genfromtxt('matrices_2.csv',delimiter=",")
 
 
 graphs = build_graphs(adjacency_matrix,numrow,numcol)
@@ -31,10 +31,10 @@ start_before_universal = time.time()
 graphs = make_edges_universal(graphs)
 
 start_after_universal = time.time()
-#plt.figure("G universal")
-#edge_labels_1 = nx.get_edge_attributes(G,'weight')
-#nx.draw(G,nx.spectral_layout(G),with_labels = True)
-#nx.draw_networkx_edge_labels(G,nx.spectral_layout(G),edge_labels=edge_labels_1)
+plt.figure("G universal")
+edge_labels_1 = nx.get_edge_attributes(G,'weight')
+nx.draw(G,nx.spectral_layout(G),with_labels = True)
+nx.draw_networkx_edge_labels(G,nx.spectral_layout(G),edge_labels=edge_labels_1)
 #
 #plt.figure("G1 universal")
 #edge_labels_1 = nx.get_edge_attributes(G1,'weight')
@@ -56,15 +56,15 @@ start_after_universal = time.time()
 #A list that stores the time to solve each node.
 time_to_solve = [1]*numrow*numcol
 
-graphs = add_conflict_weights(graphs,time_to_solve)
-
-end_tos = time.time()
-print("Universal Edges: ", start_after_universal - start_before_universal)
-print("Post Universal Edges: ", end_tos - start_after_universal)
-print("Total Run Time: ", end_tos - start_tos)
-
-all_times,max_time = compute_solve_time(graphs)
-print("Final Solve Time: ",max_time)
+#graphs = add_conflict_weights(graphs,time_to_solve)
+#
+#end_tos = time.time()
+#print("Universal Edges: ", start_after_universal - start_before_universal)
+#print("Post Universal Edges: ", end_tos - start_after_universal)
+#print("Total Run Time: ", end_tos - start_tos)
+#
+#all_times,max_time = compute_solve_time(graphs)
+#print("Final Solve Time: ",max_time)
 
 #plt.figure("G")
 #edge_labels_1 = nx.get_edge_attributes(G,'weight')
