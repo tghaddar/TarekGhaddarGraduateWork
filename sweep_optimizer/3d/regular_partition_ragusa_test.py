@@ -4,6 +4,9 @@ from build_adjacency_matrix import build_graphs
 from sweep_solver import make_edges_universal
 from sweep_solver import add_conflict_weights
 from sweep_solver import compute_solve_time
+from mesh_processor import create_2d_cuts
+from sweep_solver import plot_subset_boundaries_2d
+from build_global_subset_boundaries import build_global_subset_boundaries
 import matplotlib.pyplot as plt
 import time
 plt.close("all")
@@ -14,6 +17,10 @@ numrow = 3
 numcol = 3
 
 adjacency_matrix = np.genfromtxt('matrices_2.csv',delimiter=",")
+
+x_cuts,y_cuts = create_2d_cuts(0.0,10.0,3,0.0,10.0,3)
+boundaries = build_global_subset_boundaries(2,2,x_cuts,y_cuts)
+plot_subset_boundaries_2d(boundaries,9)
 
 
 graphs = build_graphs(adjacency_matrix,numrow,numcol)
@@ -26,6 +33,12 @@ for g in range(0,num_graphs):
 
 G,G1,G2,G3 = graphs
 
+plt.figure("G pre universal")
+edge_labels_1 = nx.get_edge_attributes(G,'weight')
+nx.draw(G,nx.spectral_layout(G,weight = None),with_labels = True)
+nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
+plt.savefig("G_pre_universal.pdf")
+
 start_before_universal = time.time()
 
 graphs = make_edges_universal(graphs)
@@ -33,8 +46,9 @@ graphs = make_edges_universal(graphs)
 start_after_universal = time.time()
 plt.figure("G universal")
 edge_labels_1 = nx.get_edge_attributes(G,'weight')
-nx.draw(G,nx.spectral_layout(G),with_labels = True)
-nx.draw_networkx_edge_labels(G,nx.spectral_layout(G),edge_labels=edge_labels_1)
+nx.draw(G,nx.spectral_layout(G,weight=None),with_labels = True)
+nx.draw_networkx_edge_labels(G,nx.spectral_layout(G,weight = None),edge_labels=edge_labels_1)
+plt.savefig("G_universal.pdf")
 #
 #plt.figure("G1 universal")
 #edge_labels_1 = nx.get_edge_attributes(G1,'weight')
