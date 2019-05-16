@@ -27,18 +27,48 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 #Plots graphs at a specific time. Will help with debugging.
 def plot_graphs(graphs,t):
   
+  #A dictionary for node positions for quadrant 0.
+  Q0 = {}
+  Q0[0] = [0,0]
+  Q0[1] = [2,1]
+  Q0[2] = [2,-1]
+  Q0[3] = [4, 0]
+  Q0[-1] = [6,0]
+  
+  #A dictionary for node positions for quadrant 1.
+  Q1 = {}
+  Q1[1] = [0,0]
+  Q1[0] = [2,-1]
+  Q1[3] = [2,1]
+  Q1[2] = [4,0]
+  Q1[-1] = [6,0]
+  
+  #A dictionary for node positions for quadrant 2.
+  Q2 = {}
+  Q2[2] = [0,0]
+  Q2[0] = [2,-1]
+  Q2[3] = [2,1]
+  Q2[1] = [4,0]
+  Q2[-1] = [6,0]
+  
+  #A dictionary for node positions for quadrant 3.
+  Q3 = {}
+  Q3[3] = [0,0]
+  Q3[1] = [2,1]
+  Q3[2] = [2,-1]
+  Q3[0] = [4, 0]
+  Q3[-1] = [6,0]
+  
+  Q = [Q0,Q1,Q2,Q3]
+  
   num_graphs = len(graphs)
   grange = range(0,num_graphs)
   for g in grange:
     plt.figure(str(g)+str(t))
     plt.title("Time " + str(t) + " Graph " + str(g))
     edge_labels_1 = nx.get_edge_attributes(graphs[g],'weight')
-    if g < 3:
-      nx.draw(graphs[g],nx.spectral_layout(graphs[g],weight='weight'),with_labels = True)
-      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight='weight'),edge_labels=edge_labels_1,font_size=5)
-    else:
-      nx.draw(graphs[g],nx.spectral_layout(graphs[g],weight='weight'),with_labels = True)
-      nx.draw_networkx_edge_labels(graphs[g],nx.spectral_layout(graphs[g],weight='weight'),edge_labels=edge_labels_1,font_size=5)
+    nx.draw(graphs[g],Q[g],with_labels = True)
+    nx.draw_networkx_edge_labels(graphs[g],Q[g],edge_labels=edge_labels_1,font_size=6)
     plt.savefig("debug_graph_plots/graph_"+str(t)+"_"+str(g)+".pdf")
     plt.close()
     
@@ -1118,10 +1148,11 @@ def time_to_solution(f,subset_bounds,machine_params,num_col,num_row):
   graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
-  #plot_graphs(graphs,0)
+  
+  plot_graphs(graphs,0)
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve)
+  #graphs = add_conflict_weights(graphs,time_to_solve)
   #plot_graphs(graphs,0)
   solve_times,max_time = compute_solve_time(graphs)
-  return max_time
+  return max_time,graphs
   

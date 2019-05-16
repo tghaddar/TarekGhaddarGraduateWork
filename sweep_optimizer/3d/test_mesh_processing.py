@@ -2,7 +2,9 @@ from mesh_processor import analytical_mesh_integration_2d,create_2d_cuts,get_cel
 from build_global_subset_boundaries import build_global_subset_boundaries
 from sweep_solver import time_to_solution,add_edge_cost,make_edges_universal,add_conflict_weights,get_y_cuts
 from build_adjacency_matrix import build_graphs,build_adjacency
-
+import matplotlib.pyplot as plt
+import networkx as nx
+plt.close("all")
 
 #The machine parameters.
 #Communication time per double
@@ -57,8 +59,15 @@ max_times = []
 
 x_cuts = all_x_cuts[0]
 y_cuts = all_y_cuts[6]
+
 subset_boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
-max_times = time_to_solution(f,subset_boundaries,machine_params,numcol,numrow)
+max_times,graphs = time_to_solution(f,subset_boundaries,machine_params,numcol,numrow)
+
+#G = graphs[0]
+#plt.figure("Graph Test")
+#edge_labels_1 = nx.get_edge_attributes(G,'weight')
+#nx.draw(G,pos=Q0,with_labels = True)
+#nx.draw_networkx_edge_labels(G,pos=Q0,edge_labels=edge_labels_1,font_size=8)
 
 #for i in range(0,num_x_cuts):
 #  for j in range(0,num_y_cuts): 
