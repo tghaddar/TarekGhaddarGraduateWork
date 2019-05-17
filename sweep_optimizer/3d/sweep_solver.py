@@ -25,7 +25,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 #Plots graphs at a specific time. Will help with debugging.
-def plot_graphs(graphs,t):
+def plot_graphs(graphs,t,counter):
   
   #A dictionary for node positions for quadrant 0.
   Q0 = {}
@@ -64,12 +64,12 @@ def plot_graphs(graphs,t):
   num_graphs = len(graphs)
   grange = range(0,num_graphs)
   for g in grange:
-    plt.figure(str(g)+str(t))
+    plt.figure(str(g)+str(t) + str(counter))
     plt.title("Time " + str(t) + " Graph " + str(g))
     edge_labels_1 = nx.get_edge_attributes(graphs[g],'weight')
     nx.draw(graphs[g],Q[g],with_labels = True)
     nx.draw_networkx_edge_labels(graphs[g],Q[g],edge_labels=edge_labels_1,font_size=6)
-    plt.savefig("debug_graph_plots/graph_"+str(t)+"_"+str(g)+".pdf")
+    plt.savefig("debug_graph_plots/graph_"+str(t)+ "_" + str(counter)+"_"+str(g)+".pdf")
     plt.close()
     
 
@@ -1030,14 +1030,11 @@ def add_conflict_weights(graphs,time_to_solve):
   t = 0.0
   
   #Keep iterating until all graphs have finished.
+  counter = 0
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    print(graphs[3][2][1])
-    print(graphs[3][1][0])
-    print(graphs[3][2][0])
     if t == 30665.804999999993:
-      print("debug here")
-      
+      break       
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -1085,7 +1082,8 @@ def add_conflict_weights(graphs,time_to_solve):
       if (num_conflicting_nodes == len(first_nodes)):
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
-#    plot_graphs(graphs,t)
+    plot_graphs(graphs,t,counter)
+    counter += 1
 #    print("here")
     #Checking if any of the graphs have finished.
     for g in range(0,num_graphs):
@@ -1149,9 +1147,8 @@ def time_to_solution(f,subset_bounds,machine_params,num_col,num_row):
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
   
-  plot_graphs(graphs,0)
   #Adding delay weighting.
-  #graphs = add_conflict_weights(graphs,time_to_solve)
+  graphs = add_conflict_weights(graphs,time_to_solve)
   #plot_graphs(graphs,0)
   solve_times,max_time = compute_solve_time(graphs)
   return max_time,graphs
