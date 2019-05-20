@@ -19,143 +19,82 @@
 \setcounter{page}{1}
 
 
-\chapter{\uppercase {Introduction and Literature Review}}
+\chapter{\uppercase {Introduction}}
 
-\section{Author's Message to the Student Using This Template For Their Thesis or Dissertation}
+The steady-state neutron transport equation describes the behavior of neutrons in a medium and is given by Eq.~\eqref{continuous transport}:
+\begin{equation}
+\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  =
+\int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo') 
++ S_{ext}(\vr,E,\vo) ,
+\label{continuous transport}
+\end{equation}
+where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption, outscatter, and within group scattering). These represent the loss terms of the neutron transport equation. The right hand side of Eq.~\eqref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into $dE$ about energy $E$ and $d\Omega$ about direction $\vo$.
 
-Howdy! This is the template for theses and dissertations written using \LaTeX for submission at Texas A\&M University. The Office of Graduate and Professional Studies (OGAPS) is here to guide you in submitting your thesis or dissertation. This template shows the many features of \LaTeX, with many more available to the user.
+Without loss of generality for the problem at hand, we assume isotropic scattering for simplicity. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, has its angular dependence present in the integral, and is divided by $4\pi$ to reflect isotropic behavior. This yields:
+\begin{align}
+\label{isotropic}
+\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  
+& = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \int_{4\pi}d\Omega' \psi(\vr,E',\vo')  + S_{ext}(\vr,E,\vo) \nonumber \\
+& = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \phi(\vr,E')  + S_{ext}(\vr,E,\vo) ,
+\end{align}
+where we have introduced the scalar flux as the integral of the angular flux:
+\begin{equation}
+\label{def_scalar_flux}
+\phi(\vr,E') = \int_{4\pi}d\Omega' \psi(\vr,E',\vo').
+\end{equation}
+The next step to solving the transport equation is to discretize in energy, yielding Eq.~\eqref{multigroup}, the multigroup transport equation:
+\begin{equation}
+\vo \cdot \vec \nabla \psi_g(\vr,\vo) +\Sigma_{t,g}(\vr) \psi_g(\vr,\vo) = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g}(\vr,\vo), \quad \text{for } 1 \le g \le G
+\label{multigroup}
+\end{equation}
+where the multigroup transport equations now form a system of coupled equations. 
 
-There are numerous guides, references, and tutorials available on the Internet to help you. If you are stuck, don't be afraid to conduct a Google search for your issue, or you can contact me at szroberson@exchange.tamu.edu or ogaps-latex@tamu.edu.
+Next, we discretize in angle using the discrete ordinates method\cite{denovo}, whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of directions $\vo_m$:
+\begin{equation}
+\vo_m \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr),
+\label{angle}
+\end{equation}
+where the subscript $m$ is introduced to describe the angular flux in direction $m$. The subscript is not added to our inscatter term because of the isotropic scattering assumption and because the scalar flux does not depend on angle. However, in order to evaluate the scalar flux, we employ the angular weights $w_m$ and the angular flux solutions
+$\psi_m$ to numerically perform the angular integration:
+\begin{equation}
+\label{def_scalar_flux_2}
+\phi_g(\vr) \approx \sum_{m=1}^{m=M} w_m \psi_{g,m}(\vr).
+\end{equation}
 
+At this point, it is clear that we are solving a sequence of transport equations for one group and direction at a time. Therefore, all transport equations take the following form:
+\begin{equation}
+\vo_m \cdot \vec \nabla \psi_{m}(\vr) +\Sigma_{t}(\vr) \psi_{m}(\vr)  = \frac{1}{4\pi}\Sigma_{s}(\vr)\phi(\vr) + q^{ext+inscat}_m(\vr) = q_m(\vr),
+\end{equation}
+where the group index is omitted for brevity.
 
-\subsection{Brief Usage of the Template}
+In order to obtain the solution for this discrete form of the transport equation, an iterative process, source iteration, is introduced. This is shown by a simplified transport equation Eq. ~\eqref{iteration}:
+\begin{equation}
+\vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
+\label{iteration}
+\end{equation}
+where the right hand side terms of Eq.~\eqref{angle} have been combined into one general source term, $q_m$. The angular flux of iteration $(l+1)$ is calculated using the $(l^{th})$ value of the scalar flux.
 
-This template is intended for use by STEM\footnote{Science, Technology, Engineering, and Mathematics. This is an example of a footnote. You can see that it is numbered and appended at the end of the page. Also, you can see the effect of having a multiline footnote.} students. If you are not a STEM student, this template is likely not for you.
+After the angular and energy dependence have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. This is done by meshing the domain and utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}, allowing one cell at a time to be solved. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Figure \ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
 
-The advantage of using this template over the Microsoft Word templates are numerous. First, there is a lot of control granted to the user in how the document looks. Of course, you are expected to still follow the guidelines set forth in the TAMU Thesis Manual. This template takes care of the margins, heading requirements, and front matter ordering for you.
-
-
-\subsection*{Software to Install}
-
-\textbf{MikTeX} or \textbf{ProTeXt} is the free software recommended for Windows PC users to
-compile your \LaTeX ~ document. To compile for this document, XeLaTeX compiling engine
-is used. There is currently an issue in which the package xetex-def does not install; see the file README.txt for a solution. Another software called \textbf{JabRef} is also recommended for bibliography/reference management; its usage is similar with EndNote.
-
-\subsection*{Procedure to Compile \LaTeX ~ Document}
-
-This template (and consequently, your document) will be compiled using XeLaTeX. To compile your document, do the following\footnote{Notice here that I also show off the itemize environment for unordered lists. Ordered lists use the enumerate environment.}:
-
-\begin{itemize}
-	\item In TeXstudio, go to the Tools menu, then select Commands, and click XeLaTeX.
-	
-	\item In Texmaker, go to the Tools menu and select XeLaTeX.
-	
-	\item For other editors, consult the help files included with the editor.
-\end{itemize}
-
-To view the output after the program is done compiling, press F7 in TeXstudio and TeXmaker or the appropriate hotkey for other editors. Be sure that the document is not open in another PDF reader, for your editor will not display it.
-
-\subsection{How to Fill This Document}
-The document structure is organized in the main .tex file, TAMUTemplate.tex,
-which has the same name as the output PDF file. Content in each section is in the data folder. You can open the .tex files under the data folder to modify. Four sections
-are added initially. To add in more sections into the \LaTeX document, open the
-TAMUTemplate.tex file and go to \textbf{line 130} you can just delete the content in the data folder and fill your documents and then compile under TAMUTemplate.tex.)
-
-\subsection{Reference Usage and Example}
-
-This subsection tests the usage of references. The book\cite{REALCAR} 
-is referred in this way. Actually, the option is available for you to change the default way how reference appears. The default and most commonly used option \cite{einstein} is displayed here \cite{Barn-JORVQ}.
-
-Unrelated citations are referred here for the test of reference section only\cite{TAMU}. If you
-find that the reference \cite{GIGEM} has more items than you need \cite{WAGFJ}, question marks will show up in place of a reference handle, like these \cite{Over9000}.
-
-\subsection{Equations, Formulas, and Other Really Cool Math Things That \LaTeX ~ Can Do}
-
-Equations can be written in \LaTeX ~ in one of two ways. First, you can have material displayed inline by enclosing the desired statement in dollar signs. For example, $e^{i\pi}+1=0$ is an inline math expression. Some longer expressions, especially those including sums, integrals, or large operators and objects can be displayed centered on their own line. In this \textbf{math mode}, you enclose the desired material in square brackets. For example,
-
-\[ \sum_{j = 1} ^n \int f_j \ dx = \int \sum_{j = 1} ^n f_j \ dx \]
-is a math mode expression. We can also have a series of expressions aligned at a symbol. This is particularly useful when you are showing details in solving an equation or evaluating an integral. The next block shows off the \textit{align*} environment. We use it here to show a distributive property of set intersections over unions. Observe how each line is aligned to the biconditional symbol. This makes reading steps easier, since a reader can go line by line and determine why each step is justified.
-
-\begin{align*}
-x \in A \cap \bigcup_{j} B_j &\iff x \in A \ \wedge \ x \in \bigcup_{j} B_j \\
-&\iff x \in A \ \wedge \ x \in B_k \ \text{ for some k} \\
-&\iff x \in \bigcup_{j} A \cap B_j
-\end{align*}
-
-There are many more commands and features available, but this document is too small to contain them.\footnote{Yes, I pulled a Fermat. But really, a Google search will likely help you find what you need to do.} Many guides are available on the Internet for your use.
-
-%Have some material about the align environments. Include also the eqn environment.
-
-\subsection{A Test Section}
-
-This is just a test. Below is a figure displaying some Haskell code in a compiler.
-
-\begin{figure}[!ht]
+\noindent\begin{minipage}{\textwidth}
 \centering
-	\includegraphics[scale=0.26]{Haskell1.jpg}
-	\caption{Some Haskell code in a compiler.}
-\end{figure}
+\includegraphics[scale = 0.27]{../figures/UnstructureMesh.pdf}
+\includegraphics[scale = 0.27]{../figures/StructuredMesh.pdf}
+\captionof{figure}{A demonstration of a sweep on a structured and unstructured mesh. }
+\label{sweeps}
+\end{minipage}
+\smallskip
 
-This template has been designed for use in modern systems, but can perhaps be adapted to work on older systems, such as Windows 95. Below is a screenshot of a DOSBox console, an MS-DOS emulator designed to work on several platforms. Windows 95 can be installed into DOSBox, but it is not suggested.
+The number in each cell represents the order in which the cells are solved. All cells must receive the solution downwind from them before they can begin solving. This process can be represented and stored as a task dependence graph, shown in Fig. \ref{tdg}.
 
-\begin{figure}[ht!]
+\noindent\begin{minipage}{\textwidth}
 \centering
-	\includegraphics[scale=0.55]{DOSBox1.jpg}
-	\caption{The DOSBox console running in Windows 7. The contents of the mounted directory C: are displayed, with the active subdirectory DUKE3D.}
-\end{figure}
+\includegraphics[scale = 0.35]{../figures/tdg.pdf}
+\captionof{figure}{A task dependence graph of the unstructured mesh example in Fig. \ref{sweeps}.}
+\label{tdg}
+\end{minipage}
 
-\section{Specifications in This TAMU \LaTeX ~ Template}
 
-All requirements for theses can be found in the most recent version of the Thesis Manual, available at the OGAPS website. The Thesis Office will be happy to assist you if you have questions about formatting. Questions specific to \LaTeX\ should be directed to \texttt{ogaps-latex@tamu.edu}.
+Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids. However, structured meshes are somewhat limiting when  simulating more complex problems and experiments, requiring the use of unstructured meshes in transport sweeps. While unstructured meshes provide the ability to simulate realistic problems, they introduce some challenges like unbalanced partitions, which can increase the time to solution. To combat this, PDT, Texas A\&M University's massively parallel deterministic transport code, introduced two load balancing algorithms that rely on moving the spatial partition boundaries, or cut planes (cut lines in 2D), throughout the mesh in order to obtain a roughly equivalent amount of cells (and therefore work) per processor. However, this sacrifices the optimal partitioning scheme\cite{mpadams2013} in favor of balance. We propose a method that weighs ideal load balancing against the consequences to the transport sweep in order to achieve the best possible time to solution.
 
-A common question students ask is the placement of a copyright statement at the beginning of a section with reprinted material from a previously printed source. The screenshot below describes how to achieve this. Check the instruction files for more details.
-
-\begin{figure}[ht!]
-\centering
-	\includegraphics[scale=0.65]{Footnote.png}
-	\caption{The inclusion of a copyright statement as a footnote. The lines in yellow help to change to footnote marking scheme.}
-\end{figure}
-
-\subsection{Another Test Section}
-There should be things here.
-
-%\begin{algorithm}
-%Stuff.
-%\end{algorithm}
-
-\subsubsection{Test}
-Hello, is it me you're looking for?
-
-\subsubsection{Test 2}
-There are more things to do.
-
-\subsection{Yet Another One}
-She called me late last night to say she loved me so. We insert a slew of figures in the remainder of the document to test the look of the List of Figures.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=4.25in]{Mint_XFCE.png}
-	\caption{Linux Mint 13 with the XFCE desktop environment.}
-\end{figure}
-
-Another figure follows below.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[scale=0.45]{TOC2.png}
-	\singlespace
-	\caption{The ``Table of Contents" dialog box in Microsoft Word. This must be accessed to properly generate the Table of Contents when using the Recommended Template.}
-\end{figure}
-
-Yet another figure follows - the last for this section.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=3.75in]{Rachl3.png}
-	\singlespace
-	\caption{Linear regression on three (top) and four (bottom) independent variables in base R.}
-\end{figure}
- 
- \subsection{No Surprises Here}
- Insert another song lyric here.
 

@@ -20,11 +20,11 @@ plt.close("all")
 
 
 #Number of cuts in the x direction.
-N_x = 1
+N_x = 8
 #Number of cuts in the y direction.
-N_y = 1
+N_y = 8
 #Number of cuts in the z direction.
-N_z = 1
+N_z = 8
 #Total number of subsets
 num_subsets = (N_x+1)*(N_y+1)*(N_z+1)
 num_subsets_2d = (N_x+1)*(N_y+1)
@@ -55,8 +55,6 @@ global_subset_boundaries = build_3d_global_subset_boundaries(N_x,N_y,N_z,x_cuts,
 adjacency_matrix = build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane)
 
 graphs = build_graphs(adjacency_matrix,num_row,num_col,num_plane)
-plt.figure()
-nx.draw(graphs[0],nx.spectral_layout(graphs[0]),with_labels=True)
 
 num_graphs = len(graphs)
 
@@ -66,20 +64,8 @@ for g in range(0,num_graphs):
   graph.add_weighted_edges_from((u,v,1) for u,v in graph.edges())
 
 
-plt.figure("graph_pre")
-edge_labels_1 = nx.get_edge_attributes(graphs[0],'weight') 
-nx.draw(graphs[0],nx.spectral_layout(graphs[0]),with_labels = True)
-nx.draw_networkx_edge_labels(graphs[0],nx.spectral_layout(graphs[0]),edge_labels=edge_labels_1)
-plt.savefig("graph_non_universal.pdf")
-
 graphs = make_edges_universal(graphs)
 
-plt.figure("graph")
-edge_labels_1 = nx.get_edge_attributes(graphs[0],'weight') 
-nx.draw(graphs[0],nx.spectral_layout(graphs[0],weight='weight',with_labels = True)
-nx.draw_networkx_edge_labels(graphs[0],nx.spectral_layout(graphs[0],weight='weight'),edge_labels=edge_labels_1)
-plt.savefig("graph_universal.pdf")
-plt.close()
 
 #for g in range(0,num_graphs):
 #  plt.figure(str(g))
@@ -94,8 +80,8 @@ plt.close()
 #  plt.close()
 
 #A list that stores the time to solve each node.
-#time_to_solve = [1]*num_subsets
-#
-#graphs = add_conflict_weights(graphs,time_to_solve)
-#
-#print(compute_solve_time(graphs))
+time_to_solve = [[1]*num_subsets for g in range(0,num_graphs)]
+
+graphs = add_conflict_weights(graphs,time_to_solve)
+
+print(compute_solve_time(graphs))
