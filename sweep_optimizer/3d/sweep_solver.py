@@ -214,7 +214,10 @@ def get_max_incoming_weight(G,node):
   in_edges = list(G.in_edges(node,'weight'))
   weights = [z for x,y,z in in_edges]
   
-  return max(weights)
+  if (in_edges):
+    return max(weights)
+  else:
+    return 0.0
 
 def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   
@@ -478,6 +481,25 @@ def nodes_being_solved_simple(G,prev_nodes,weight_limit,time_to_solve):
   nodes_being_solved = list(set(nodes_being_solved))
   nodes_being_solved = sorted(nodes_being_solved)
   return nodes_being_solved
+
+
+def nodes_being_solved_general(G,weight_limit,time_to_solve):
+  
+  nodes_being_solved = []
+  nodes = list(G.nodes())
+  
+  for n in nodes:
+    
+    ready_to_solve = get_max_incoming_weight(G,n)
+    if ready_to_solve > weight_limit:
+      continue
+    elif ready_to_solve == weight_limit:
+      nodes_being_solved.append(n)
+    elif ready_to_solve + time_to_solve[n] > weight_limit:
+      nodes_being_solved.append(n)
+  
+  return sorted(nodes_being_solved)
+  
   
 def sum_weights_of_path(graph,path):
   weight_sum = 0.0
@@ -1034,7 +1056,7 @@ def add_conflict_weights(graphs,time_to_solve):
   counter = 0
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if t == 10249.513799999999:
+    if t == 13655.121075066796:
       print("debug stop")       
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
@@ -1043,8 +1065,8 @@ def add_conflict_weights(graphs,time_to_solve):
       if not prev_nodes[g]:
         prev_nodes[g] = starting_nodes[g]
       #all_nodes_being_solved[g] = nodes_being_solved_faster(graph,prev_nodes[g],t,time_to_solve)
-      all_nodes_being_solved[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve[g])
-      
+      #all_nodes_being_solved[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve[g])
+      all_nodes_being_solved[g] = nodes_being_solved_general(graph,t,time_to_solve[g])
     prev_nodes = all_nodes_being_solved
     print("Nodes being solved in each graph")
     print(all_nodes_being_solved)
