@@ -105,7 +105,7 @@ def create_2d_cut_suite(xmin,xmax,nx,ymin,ymax,ny):
   xstep = (xmax - xmin)/num_steps
   ystep = (ymax - ymin)/num_steps
   
-  all_x_cuts = [None]*num_steps
+  all_x_cuts = [None]*(num_steps-1)
   all_y_cuts = [None]*pow(num_steps-1,2)
   
   for i in range(0,num_steps-1):

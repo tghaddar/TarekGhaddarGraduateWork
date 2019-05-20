@@ -1061,9 +1061,8 @@ def add_conflict_weights(graphs,time_to_solve):
   #Keep iterating until all graphs have finished.
   counter = 0
   while num_finished_graphs < num_graphs:
-    print('Time t = ', t)
-    if t == 15974.033377819662:
-      print("debug stop")
+    #print('Time t = ', t)
+
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -1074,14 +1073,14 @@ def add_conflict_weights(graphs,time_to_solve):
       #all_nodes_being_solved[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve[g])
       all_nodes_being_solved[g] = nodes_being_solved_general(graph,t,time_to_solve[g])
     prev_nodes = all_nodes_being_solved
-    print("Nodes being solved in each graph")
-    print(all_nodes_being_solved)
+#    print("Nodes being solved in each graph")
+#    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
     num_conflicting_nodes = len(conflicting_nodes)
     
-    print("The graphs in conflict for each node")
-    print(conflicting_nodes)
+#    print("The graphs in conflict for each node")
+#    print(conflicting_nodes)
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
       #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
@@ -1091,7 +1090,7 @@ def add_conflict_weights(graphs,time_to_solve):
     else:
       #Find nodes ready to solve at time t that are in conflict.
       first_nodes = find_first_conflict(conflicting_nodes,graphs)
-      print(first_nodes)
+      #print(first_nodes)
 #      num_nodes_ready_to_solve = len(first_nodes)
 #      if (num_nodes_ready_to_solve == 1):
 #        first_node = first_nodes[0]
@@ -1111,7 +1110,7 @@ def add_conflict_weights(graphs,time_to_solve):
       if (num_conflicting_nodes == len(first_nodes)):
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
-    plot_graphs(graphs,t,counter)
+#    plot_graphs(graphs,t,counter)
     counter += 1
 #    print("here")
     #Checking if any of the graphs have finished.
@@ -1180,5 +1179,5 @@ def time_to_solution(f,subset_bounds,machine_params,num_col,num_row):
   graphs = add_conflict_weights(graphs,time_to_solve)
   #plot_graphs(graphs,0)
   solve_times,max_time = compute_solve_time(graphs)
-  return max_time,graphs
+  return max_time
   
