@@ -428,19 +428,27 @@ def make_edges_universal(graphs):
   for g in range(0,num_graphs):
     #The current_graph which we will alter.
     graph = graphs[g]
-    
+
     #Getting the starting node of this graph.
     start_node = [x for x in graph.nodes() if graph.in_degree(x) == 0][0]
     #A list storing the heaviest path length to each node.
     heavy_path_lengths = [0.0]*num_nodes
+    #Inverting the weights of the graph.
+    graph = invert_weights(graph)
+    #Getting all shortest paths.
+    shortest_paths = nx.johnson(graph,weight='weight')
+    #Inverting the weights back.
+    graph = invert_weights(graph)
     #Looping over nodes to get the longest path to each node.
     for n in range(0,num_nodes):
       #If the starting node is the target node we know that path length is zero.
       if (start_node == n):
         continue
       
-      #Gets the heaviest path length and its weight. 
-      heaviest_path_length = get_heaviest_path_faster(graph,start_node,n)
+      heaviest_path = shortest_paths[start_node][n]
+      #Gets the heaviest path length.
+      heaviest_path_length = sum_weights_of_path(graph,heaviest_path)
+      #heaviest_path_length = get_heaviest_path_faster(graph,start_node,n)
       #Storing this value in heavy_path_lengths.
       heavy_path_lengths[n] = heaviest_path_length
       
@@ -837,7 +845,7 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
     num_conflicting_graphs = len(conflicting_graphs)
     #modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
     for outer in range(0,num_conflicting_graphs-1):
-      print(node,conflicting_graphs)
+      #print(node,conflicting_graphs)
       #Storing modified edges per graph at time t.
       modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
       #The fastest graph to the node.
@@ -889,11 +897,9 @@ def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,ti
   for node in nodes:
     #We get the graphs in conflict at this node.
     conflicting_graphs = conflicting_nodes[node]
-    print(node,conflicting_graphs)
+    #print(node,conflicting_graphs)
     #Storing modified edges per graph at time t.
     modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
-    if node == 1:
-      print("debug stop")
     #The fastest graph to the node.
     first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node)
     #Removed from conflicting graphs.
@@ -1056,8 +1062,8 @@ def add_conflict_weights(graphs,time_to_solve):
   counter = 0
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if t == 13655.121075066796:
-      print("debug stop")       
+    if t == 15974.033377819662:
+      print("debug stop")
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -1105,7 +1111,7 @@ def add_conflict_weights(graphs,time_to_solve):
       if (num_conflicting_nodes == len(first_nodes)):
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
-    #plot_graphs(graphs,t,counter)
+    plot_graphs(graphs,t,counter)
     counter += 1
 #    print("here")
     #Checking if any of the graphs have finished.
