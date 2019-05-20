@@ -166,22 +166,23 @@ def modify_downstream_edges_faster(G,graph_index,source,modified_edges,time_to_s
 #        elif (u,v) not in modified_edges:
 #          G[u][v]['weight'] += delay
 #          modified_edges.append((u,v))
-  
+  source_ready_to_solve = get_max_incoming_weight(G,source)
+  ready_to_solve_all = {source:source_ready_to_solve}
   
   downstream_nodes = list(nx.descendants(G,source))
-  #Add the source node to the downstream nodes.
-  downstream_nodes = [source] + downstream_nodes
   num_downstream_nodes = len(downstream_nodes)
   #We get when each downstream node is ready to solve.
-  ready_to_solve_all = {}
+  other_ready_to_solve_all = {}
   for n in range(0,num_downstream_nodes):
     current_node = downstream_nodes[n]
     #Get incoming edge with the maximum weight to this node.
-    ready_to_solve_all[current_node] = get_max_incoming_weight(G,current_node)
+    other_ready_to_solve_all[current_node] = get_max_incoming_weight(G,current_node)
   
   
   #Sorting the downstream nodes in order of when they solve.
-  ready_to_solve_all = dict(sorted(ready_to_solve_all.items(),key=lambda x:x[1]))
+  other_ready_to_solve_all = dict(sorted(other_ready_to_solve_all.items(),key=lambda x:x[1]))
+  #Adding this to the source dict.
+  ready_to_solve_all.update(other_ready_to_solve_all)
   
   
   for k,val in ready_to_solve_all.items():
@@ -1033,8 +1034,8 @@ def add_conflict_weights(graphs,time_to_solve):
   counter = 0
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if t == 30665.804999999993:
-      break       
+    if t == 10249.513799999999:
+      print("debug stop")       
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -1082,7 +1083,7 @@ def add_conflict_weights(graphs,time_to_solve):
       if (num_conflicting_nodes == len(first_nodes)):
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
-    plot_graphs(graphs,t,counter)
+    #plot_graphs(graphs,t,counter)
     counter += 1
 #    print("here")
     #Checking if any of the graphs have finished.
