@@ -5,170 +5,81 @@ Created on Thu Sep 27 14:52:23 2018
 This is the driver file for the sweep optimizer.
 @author: tghaddar
 """
-from build_global_subset_boundaries import build_global_subset_boundaries
-from build_adjacency_matrix import build_adjacency
-from utilities import get_ijk
+from mesh_processor import analytical_mesh_integration_2d,create_2d_cuts,get_cells_per_subset_2d,create_2d_cut_suite
+from sweep_solver import unpack_parameters,optimized_tts
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-import build_3d_adjacency as b3a
-import numpy as np
-import sweep_solver
-import networkx as nx
 import warnings
 from scipy.optimize import minimize
 warnings.filterwarnings("ignore")
 
 plt.close("all")
 
-num_total_cells = 12000
-#Time to solve a cell (ns)
-solve_cell = 3600.0
-#Time to communicate cell boundary info (ns)
-t_comm = 4.47
-#Latency
-latency = 4110.0
-#latency multiplier
-m_l = 1.0
+def create_parameter_space(x_cuts,y_cuts,numrow,numcol):
 
-#Number of cuts in the x direction.
-N_x = 1
-#Number of cuts in the y direction.
-N_y = 1
-#Number of cuts in the z direction.
-N_z = 1
-#Total number of subsets
-num_subsets = (N_x+1)*(N_y+1)*(N_z+1)
-num_subsets_2d = (N_x+1)*(N_y+1)
+  interior_cuts = [x_cuts[i] for i in range(1,numcol)]
 
-#Global bounds.
-global_x_min = 0.0
-global_x_max = 10.0
+  for col in range(0,numcol):
+    interior_y_cuts = [y_cuts[col][i] for i in range(1,numrow)]
+    interior_cuts += interior_y_cuts
+    
+  return interior_cuts
 
-global_y_min = 0.0
-global_y_max = 10.0
-
-global_z_min = 0.0
-global_z_max = 10.0
-
-num_row = N_y + 1
-num_col = N_x + 1
-num_plane = N_z + 1
-
-
-def con(t):
+def create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numcol):
   
-  return all(i > 0.0 for i in t) and all(i < 10.0 for i in t)
+  x_tol = 0.05*(global_xmax - global_xmin)
+  y_tol = 0.05*(global_ymax - global_ymin)
+  nx = numcol - 1
+  cut_id = 0
+  bounds = [()for i in range(0,num_params)]
+  for i in range(0,num_params):
+    if cut_id < nx:
+      bounds[i] += (global_xmin+x_tol,global_xmax-x_tol)
+    else:
+      bounds[i] += (global_ymin+y_tol,global_ymax-y_tol)
+    
+    cut_id += 1
+  return bounds
 
-param_list = []
-cell_dist_list = []
-iter = 0
+#The machine parameters.
+#Communication time per double
+t_comm = 4.47e-02
+#The number of bytes to communicate per subset.
+#The message latency time.
+m_l = 1
+latency = 4110.0e-02
+#Solve time per unknown.
+t_u = 450.0e-02
+upc = 4.0
+upbc = 2.0
 
-def time_solver(param):
-  
-  x_cuts_i = list(param[0:num_plane*N_x])
-  y_cuts_i = list(param[num_plane*N_x:num_plane*N_x + num_plane*num_col*N_y])
-  z_cuts_i = list(param[num_plane*N_x + num_plane*num_col*N_y:])
-  
-  #Adding global z boundaries.
-  z_cuts = [global_z_min] + z_cuts_i + [global_z_max]
-  z_cuts.sort()
-  
-  #Adding x global boundaries
-  x_cuts = []
-  for p in range(0,num_plane):
-    p_x_cuts = list(x_cuts_i[p*N_z:N_z*(p+1)])
-    p_x_cuts = [global_x_min] + p_x_cuts + [global_x_max]
-    p_x_cuts.sort()
-    x_cuts.append(p_x_cuts)
-  
-  y_cuts = []
-  for p in range(0,num_plane):
-    p_y_cuts = list(y_cuts_i[p*num_col*N_y:(p+1)*num_col*N_y])
-    plane_cuts = []
-    for c in range(0,num_col):
-      pc_y_cuts = p_y_cuts[c*N_y:(c+1):N_y]
-      pc_y_cuts = [global_y_min] + pc_y_cuts + [global_y_max]
-      pc_y_cuts.sort()
-      plane_cuts.append(pc_y_cuts)
-      
-    y_cuts.append(plane_cuts)
-      
+machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
 
-  #Building the global subset boundaries.
-  global_3d_subset_boundaries = b3a.build_3d_global_subset_boundaries(N_x,N_y,N_z,x_cuts,y_cuts,z_cuts)
-  
-  cell_dist = sweep_solver.get_subset_cell_dist(num_total_cells,global_3d_subset_boundaries)
-  cell_dist_list.append(cell_dist)
-  
-  adjacency_matrix = b3a.build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane)
-  
-  graphs = b3a.build_graphs(adjacency_matrix,num_row,num_col,num_plane)
-  
-  #We need to acquire a cost distribution (cell solve time + comm time for each node in each graph)
-  graphs = sweep_solver.add_edge_cost(graphs,num_total_cells,global_3d_subset_boundaries,cell_dist,solve_cell,t_comm,latency,m_l,num_row,num_col,num_plane)
-  
-  #Solving for the amount of time.
-  all_graph_time,time,heaviest_paths = sweep_solver.compute_solve_time(graphs,solve_cell,cell_dist,num_total_cells,global_3d_subset_boundaries,num_row,num_col,num_plane)
-  #time = time*10e-9
-  
-  #Removing the global bounds.
-  z_cuts.pop(0)
-  z_cuts.pop()
-  
-  for i in range(0,len(x_cuts)):
-    #x_cuts for this plane
-    p_x_cuts = x_cuts[i]
-    p_x_cuts.pop(0)
-    p_x_cuts.pop()
-    x_cuts[i] = p_x_cuts
-  
-  for j in range(0,len(y_cuts)):
-    for jp in range(0,len(y_cuts[j])):
-      p_y_cuts = y_cuts[j][jp]
-      p_y_cuts.pop(0)
-      p_y_cuts.pop()
-      y_cuts[j][jp] = p_y_cuts
-      
-   #Flattening out the cuts again.
-  b = [item for sublist in x_cuts for item in sublist]
-  c = [item for sublist in y_cuts for item in sublist]
-  c = [item for sublist in c for item in sublist]
-  param = b+c+z_cuts
-  param = tuple(param)
-  
-  param_list.append(param)
-  
-  return time,heaviest_paths
+#Number of rows and columns.
+numrow = 3
+numcol = 3
 
-#Assuming the order of cutting is z,x,y.
-z_cuts = [5]
-#X_cuts per plane.
-x_cuts = [[3],[5]]
-b = [item for sublist in x_cuts for item in sublist]
-#y_cuts per column per plane.
-y_cuts = [[[3],[5]], [[4],[7]]]
-c = [item for sublist in y_cuts for item in sublist]
-c = [item for sublist in c for item in sublist]
-#param0 = np.array([x_cuts,y_cuts,z_cuts])
-param0 = b + c + z_cuts
-param0 = tuple(param0)
+#Global boundaries.
+global_xmin = -5.0
+global_xmax = 5.0
+global_ymin = -5.0
+global_ymax = 5.0
 
-bds = ()
-for i in range(0,len(b)):
-  bds += ((global_x_min*0.9,global_x_max*0.9),)
+#The subset boundaries.
+x_cuts,y_cuts = create_2d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow)
 
-for j in range(0,len(c)):
-  bds += ((global_y_min*0.9,global_y_max*0.9),)
+interior_cuts = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+num_params = len(interior_cuts)
+bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numcol)
 
-for k in range(0,len(z_cuts)):
-  bds += ((global_z_min*0.9,global_z_max*0.9),)
-  
-print(bds)
+test_x_cuts,test_y_cuts = unpack_parameters(interior_cuts,global_xmin,global_xmax,global_ymin,global_ymax,numcol,numrow)
 
-print(con(param0))
-time,heaviest_paths = time_solver(param0)
-#sol = minimize(time_solver,param0,bounds=bds)
+#The mesh density function.
+f = lambda x,y: pow(x,2) + pow(y,2)
+
+args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l)
+
+max_time = minimize(optimized_tts,interior_cuts,args = args,bounds = bounds,options={'maxiter':10,'maxfun':10,'disp':False})
 
 
-#print(minimize(time_solver,param).x)
 

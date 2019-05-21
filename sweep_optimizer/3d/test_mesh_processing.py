@@ -75,11 +75,10 @@ for i in range(0,num_x_cuts):
     print(i,j)
     x_cuts = all_x_cuts[i]
     y_cuts = all_y_cuts[j]    
-    subset_boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
     x_cut = x_cuts[1]
     y_cut_0 = y_cuts[0][1]
     y_cut_1 = y_cuts[1][1]
-    max_time = time_to_solution(f,subset_boundaries,machine_params,numcol,numrow)
+    max_time = time_to_solution(f,x_cuts,y_cuts,machine_params,numcol,numrow)
     max_times.append([x_cut,y_cut_0,y_cut_1,max_time])
     print(i,j)
     print("here")
