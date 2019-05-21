@@ -20,11 +20,11 @@ plt.close("all")
 
 
 #Number of cuts in the x direction.
-N_x = 8
+N_x = 3
 #Number of cuts in the y direction.
-N_y = 8
+N_y = 3
 #Number of cuts in the z direction.
-N_z = 8
+N_z = 3
 #Total number of subsets
 num_subsets = (N_x+1)*(N_y+1)*(N_z+1)
 num_subsets_2d = (N_x+1)*(N_y+1)
