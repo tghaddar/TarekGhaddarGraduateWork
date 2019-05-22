@@ -43,43 +43,43 @@ def create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,num
 
 #The machine parameters.
 #Communication time per double
-t_comm = 4.47e-02
-#The number of bytes to communicate per subset.
-#The message latency time.
-m_l = 1
-latency = 4110.0e-02
-#Solve time per unknown.
-t_u = 450.0e-02
-upc = 4.0
-upbc = 2.0
-
-machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
-
-#Number of rows and columns.
-numrow = 3
-numcol = 3
-
-#Global boundaries.
-global_xmin = -5.0
-global_xmax = 5.0
-global_ymin = -5.0
-global_ymax = 5.0
-
-#The subset boundaries.
-x_cuts,y_cuts = create_2d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow)
-
-interior_cuts = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-num_params = len(interior_cuts)
-bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numcol)
-
-test_x_cuts,test_y_cuts = unpack_parameters(interior_cuts,global_xmin,global_xmax,global_ymin,global_ymax,numcol,numrow)
-
-#The mesh density function.
-f = lambda x,y: pow(x,2) + pow(y,2)
-
-args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l)
-
-max_time = minimize(optimized_tts,interior_cuts,args = args,bounds = bounds,options={'maxiter':10,'maxfun':10,'disp':False})
+#t_comm = 4.47e-02
+##The number of bytes to communicate per subset.
+##The message latency time.
+#m_l = 1
+#latency = 4110.0e-02
+##Solve time per unknown.
+#t_u = 450.0e-02
+#upc = 4.0
+#upbc = 2.0
+#
+#machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
+#
+##Number of rows and columns.
+#numrow = 3
+#numcol = 3
+#
+##Global boundaries.
+#global_xmin = 0.0
+#global_xmax = 10.0
+#global_ymin = 0.0
+#global_ymax = 10.0
+#
+##The subset boundaries.
+#x_cuts,y_cuts = create_2d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow)
+#
+#interior_cuts = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+#num_params = len(interior_cuts)
+#bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numcol)
+#
+#test_x_cuts,test_y_cuts = unpack_parameters(interior_cuts,global_xmin,global_xmax,global_ymin,global_ymax,numcol,numrow)
+#
+##The mesh density function.
+#f = lambda x,y: x + y
+#
+#args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l)
+#
+#max_time = minimize(optimized_tts,interior_cuts,args = args,bounds = bounds,options={'maxiter':10,'maxfun':10,'disp':False})
 
 
 

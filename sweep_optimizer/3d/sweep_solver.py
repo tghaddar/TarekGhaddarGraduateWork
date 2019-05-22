@@ -12,7 +12,7 @@ from utilities import get_ijk
 from utilities import get_ij,get_ss_id
 from math import isclose
 from matplotlib.pyplot import imshow,pause
-from mesh_processor import get_cells_per_subset_2d
+from mesh_processor import get_cells_per_subset_2d,get_cells_per_subset_2d_numerical
 import time
 import operator
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -1184,6 +1184,34 @@ def unpack_parameters(params,global_x_min,global_x_max,global_y_min,global_y_max
   x_cuts.append(global_x_max)
   for col in range(0,numcol):
     y_cuts[col].append(global_y_max)
+    
+  
+  return x_cuts,y_cuts
+
+def tweak_parameters(x_cuts,y_cuts,global_x_min,global_x_max,global_y_min,global_y_max,numcol,numrow):
+  
+  tweak_x = 0.05*(global_x_max - global_x_min)
+  tweak_y = 0.05*(global_y_max - global_y_min)
+  
+  #Quickly sorting the cut lines.
+  x_cuts = sorted(x_cuts)
+  for col in range(0,numcol):
+    y_cuts[col] = sorted(y_cuts[col])
+  
+  #Tweaking the xcuts if necessary
+  for cut in range(2,numcol):
+    if x_cuts[cut] == x_cuts[cut-1]:
+      x_cuts[cut] += tweak_x
+  
+  #Tweaking the ycuts if necessary
+  for col in range(0,numcol):
+    y_cuts_col = y_cuts[col]
+    for cut in range(2,numrow):
+      if y_cuts_col[cut] == y_cuts_col[cut-1]:
+        y_cuts_col[cut] += tweak_y
+    
+    y_cuts[col] = y_cuts_col
+  
   return x_cuts,y_cuts
 
 #The driving function to compute the time to solution.
@@ -1207,17 +1235,66 @@ def time_to_solution(f,x_cuts,y_cuts,machine_params,num_col,num_row):
   solve_times,max_time = compute_solve_time(graphs)
   return max_time
 
+#The driving function to compute the time to solution.
+def time_to_solution_numerical(points,x_cuts,y_cuts,machine_params,num_col,num_row):
+  #Building subset boundaries.
+  subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
+  #Getting mesh information.
+  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_numerical(points,subset_bounds)  
+  #Building the adjacency matrix.
+  adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
+  #Building the graphs.
+  graphs = build_graphs(adjacency_matrix,num_row,num_col)
+  #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
+  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
+  #Making the edges universal.
+  graphs = make_edges_universal(graphs)
+  
+  #Adding delay weighting.
+  graphs = add_conflict_weights(graphs,time_to_solve)
+  #plot_graphs(graphs,0)
+  solve_times,max_time = compute_solve_time(graphs)
+  return max_time
+
+
 #The time to solution function that is fed into the optimizer.
 def optimized_tts(params, f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l):
   #f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l = args
   machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
+  x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   print(x_cuts,y_cuts)
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d(f,subset_bounds)  
+  #Building the adjacency matrix.
+  adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
+  #Building the graphs.
+  graphs = build_graphs(adjacency_matrix,num_row,num_col)
+  #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
+  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
+  #Making the edges universal.
+  graphs = make_edges_universal(graphs)
+  
+  #Adding delay weighting.
+  graphs = add_conflict_weights(graphs,time_to_solve)
+  solve_times,max_time = compute_solve_time(graphs)
+  return max_time
+
+#The time to solution function that is fed into the optimizer.
+def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l):
+  #f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l = args
+  machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
+  
+  x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
+  x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
+  print(x_cuts,y_cuts)
+  #Building subset boundaries.
+  subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
+  #Getting mesh information.
+  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_numerical(points,subset_bounds)  
   #Building the adjacency matrix.
   adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
   #Building the graphs.

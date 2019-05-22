@@ -3,7 +3,50 @@ import numpy as np
 import math
 from scipy import integrate
 
-
+#Getting the cells in a subset.
+def get_cells_per_subset_2d_numerical(points,boundaries):
+  num_points = len(points[0])
+  #Number of subsets.
+  num_subsets = len(boundaries)
+  #Stores the number of cells per subset.
+  cells_per_subset = [0]*num_subsets
+  #Stores the number of boundary cells per subset.
+  bdy_cells_per_subset = [0.0]*num_subsets  
+  
+  #Looping through the subsets.
+  for s in range(0,num_subsets):
+    
+    subset_bounds = boundaries[s]
+    xmin = subset_bounds[0]
+    xmax = subset_bounds[1]
+    ymin = subset_bounds[2]
+    ymax = subset_bounds[3]
+    
+    #The x length of the subset.
+    Lx = xmax - xmin
+    #The y length of the subset.
+    Ly = ymax - ymin
+    #The area of the subset.
+    subset_area = Lx*Ly
+    
+    for p in range(0,num_points):
+      xpoint = points[0][p]
+      ypoint = points[1][p]
+      
+      if xpoint >= xmin and xpoint <= xmax:
+        if ypoint >= ymin and ypoint <=ymax:
+          cells_per_subset[s] += 1
+    if cells_per_subset[s] == 0:
+      cells_per_subset[s] = 1
+      
+    N = cells_per_subset[s]
+    #Computing the boundary cells along x and y.
+    nx = math.sqrt(N/subset_area)*Lx
+    ny =  math.sqrt(N/subset_area)*Ly
+    bdy_cells_per_subset[s] = [nx,ny]
+    
+  return cells_per_subset,bdy_cells_per_subset
+  
 #Integrating an analytical mesh density function.
 #f = the analytical description of the mesh density function.
 def analytical_mesh_integration_3d(f,xmin,xmax,ymin,ymax,zmin,zmax):
@@ -17,9 +60,7 @@ def analytical_mesh_integration_2d(f,xmin,xmax,ymin,ymax):
 def get_cells_per_subset_2d(f,boundaries):
   
   #The total number of subsets.
-  num_subsets = len(boundaries)
-  print(num_subsets)
-  
+  num_subsets = len(boundaries)  
   #Stores the number of cells per subset.
   cells_per_subset = [None]*num_subsets
   #Stores the number of boundary cells per subset.

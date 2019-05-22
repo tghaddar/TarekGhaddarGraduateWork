@@ -13,8 +13,9 @@ def build_global_subset_boundaries(N_x, N_y,x_cuts,y_cuts):
     ss_id = i
     
     current_column,current_row = get_ij(ss_id,numrow,numcol)
-  
-  
+    print(ss_id)
+    print(x_cuts,y_cuts)
+    print(current_column,current_row)
     #Getting x_min, x_max, y_min, y_max of current subset
     x_min = x_cuts[current_column]
     x_max = x_cuts[current_column+1]
