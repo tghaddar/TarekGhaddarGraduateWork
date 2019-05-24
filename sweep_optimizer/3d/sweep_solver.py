@@ -8,6 +8,7 @@ from build_adjacency_matrix import build_graphs
 from build_adjacency_matrix import build_adjacency
 from build_global_subset_boundaries import build_global_subset_boundaries
 from copy import deepcopy
+from copy import copy
 from utilities import get_ijk
 from utilities import get_ij,get_ss_id
 from math import isclose
@@ -26,7 +27,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 #Plots graphs at a specific time. Will help with debugging.
-def plot_graphs(graphs,t,counter):
+def plot_graphs(graphs,t,counter,num_angle):
   
   #A dictionary for node positions for quadrant 0.
   Q0 = {}
@@ -61,6 +62,11 @@ def plot_graphs(graphs,t,counter):
   Q3[-1] = [6,0]
   
   Q = [Q0,Q1,Q2,Q3]
+  for angle in range(0,num_angle-1):
+    Q.append(copy(Q0))
+    Q.append(copy(Q1))
+    Q.append(copy(Q2))
+    Q.append(copy(Q3))
   
   num_graphs = len(graphs)
   grange = range(0,num_graphs)
@@ -348,8 +354,9 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
     
   return bounds_check
 
-def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col):
-    
+def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col,test):
+  
+  
   num_graphs = len(graphs)
   num_subsets = len(global_subset_boundaries)
   #Storing the time to solve and communicate each subset.
@@ -396,9 +403,13 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       #Cells in this subset.
       num_cells = cells_per_subset[node]
       
-      #The cost of this edge. upc = uknowns per cell
-      #upbc = unkowns per boundary cell
-      cost = num_cells*t_u*upc + (boundary_cells*upbc*t_comm + comm_overhead)
+
+      #If this is a testing run, our cost is 1.
+      cost = 0.0
+      if test:
+        cost = 1.0
+      else:
+        cost = (num_cells*t_u*upc + (boundary_cells*upbc*t_comm + comm_overhead))
       graph[e[0]][e[1]]['weight'] = cost
     
   for ig in range(0,num_graphs):
@@ -411,6 +422,33 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
   
   return graphs,time_to_solve
 
+#Offsets edge weighting for initial nodes for angular pipelining.
+def pipeline_offset(graphs,num_angles,time_to_solve):
+  
+  num_graphs = len(graphs)
+  graphs_per_angle = int(num_graphs/num_angles)
+  #Getting the starting nodes for all the graphs.
+  starting_nodes = [None]*num_graphs
+  for ig in range(0,num_graphs):
+    starting_nodes[ig] = [x for x in graphs[ig].nodes() if graphs[ig].in_degree(x) == 0][0]
+  
+  #Only modifying graphs after angle 0.
+  for ig in range(graphs_per_angle,num_graphs):
+    graph = graphs[ig]
+    #Which angle.
+    angle = int(ig/graphs_per_angle)
+    starting_node = starting_nodes[ig]
+    #The pipeline cost (how much we are going to add to the initial edges).
+    pipeline_cost = angle*time_to_solve[ig][starting_node]
+    
+    starting_successors = deepcopy(list(graph.successors(starting_node)))
+    for s in starting_successors:
+      graph[starting_node][s]['weight'] += pipeline_cost
+    
+    graphs[ig] = graph
+    
+  return graphs
+    
 #This inverts the weights of a graph in order to be able to calculate the true longest path.
 def invert_weights(graph):
   
@@ -1264,7 +1302,6 @@ def optimized_tts(params, f,global_xmin,global_xmax,global_ymin,global_ymax,num_
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
-  print(x_cuts,y_cuts)
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Getting mesh information.
