@@ -631,23 +631,28 @@ def get_DOG_remaining(graph):
   return final_sweep_time
 
 #Sorts path indices based on priority octants.
-def sort_priority(graph_indices):
+def sort_priority(graph_indices,graphs_per_angle):
   #The true octant priorities.
   true_priorities = [0,4,1,5,2,6,3,7]
   original_graph_indices = copy(graph_indices)
   test_indices = []
+  true_indices = {}
   for p in range(0,len(graph_indices)):
     graph_index = graph_indices[p]
-    test_indices.append(true_priorities.index(graph_index))
+    octant_index = graph_index%graphs_per_angle
+    true_indices[octant_index] = graph_index
+    test_indices.append(true_priorities.index(octant_index))
+    #test_indices.append(true_priorities.index(graph_index))
     
     
   test_indices = sorted(test_indices)
-  index_map = {}
+  print(test_indices)
+  print(true_indices)
   for i in range(0,len(test_indices)):
-    graph_index = test_indices[i]
-    graph_indices[i] = true_priorities[graph_index]
-    old_index = original_graph_indices.index(graph_indices[i])
-    index_map[i] = old_index
+    octant = true_priorities[test_indices[i]]
+    #octant_index = graph_index%graphs_per_angle
+    graph_indices[i] = true_indices[octant]
+    #graph_indices[i] = true_priorities[graph_index]
     
   return graph_indices
 
@@ -780,8 +785,11 @@ def find_first_conflict(conflicting_nodes,graphs):
   return first_nodes
 
 #Finds the first graph to get to a conflicted node. In case they arrive at the same time, we return the graph that has a greater depth of graph remaining. In case of a tie with the DOG remaining, we return the graph that has the priority octant.
-def find_first_graph(conflicting_graphs,graphs,node):
-  
+def find_first_graph(conflicting_graphs,graphs,node,num_angles):
+  #Total number of graphs.
+  num_graphs = len(graphs)
+  #The graphs per angle.
+  graphs_per_angle = int(num_graphs/num_angles)
   num_conflicting_graphs = len(conflicting_graphs)
   #Stores the amount of time it takes each conflicting graph to arrive at the node.
   graph_times = [None]*num_conflicting_graphs
@@ -845,7 +853,7 @@ def find_first_graph(conflicting_graphs,graphs,node):
         
         #If all shortest path lengths are the same, we sort based on priority.
         if len(max_dogs_same_length) != len(set(max_dogs_same_length)):
-          max_dogs = sort_priority(max_dogs)
+          max_dogs = sort_priority(max_dogs,graphs_per_angle)
           first_graph = max_dogs[0]
         #Otherwise we choose the one with the "longest" shortest path.
         else:
@@ -929,7 +937,7 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
   return graphs
 
 #This function does the same thing as modify_secondary_graphs but in the case that multiple nodes are ready to solve at time t.
-def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,time_to_solve):
+def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,time_to_solve,num_angles):
   
   #Copying the graphs frozen at time t.
   frozen_graphs = deepcopy(graphs)
@@ -946,7 +954,7 @@ def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,ti
     #Storing modified edges per graph at time t.
     modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
     #The fastest graph to the node.
-    first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node)
+    first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node,num_angles)
     #Removed from conflicting graphs.
     conflicting_graphs.remove(first_graph) 
     #Loop over the secondary graphs.
@@ -1150,7 +1158,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles):
 #      
 #      else:
         #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
-      graphs = modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,first_nodes,time_to_solve)
+      graphs = modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,first_nodes,time_to_solve,num_angles)
       #To update our march through, we need to update t here, with a find_next_interaction.
       if (num_conflicting_nodes == len(first_nodes)):
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
