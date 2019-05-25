@@ -31,6 +31,7 @@ def plot_graphs(graphs,t,counter,num_angle):
   
   #A dictionary for node positions for quadrant 0.
   Q0 = {}
+  Q0[-2] = [-2,0]
   Q0[0] = [0,0]
   Q0[1] = [2,1]
   Q0[2] = [2,-1]
@@ -39,6 +40,7 @@ def plot_graphs(graphs,t,counter,num_angle):
   
   #A dictionary for node positions for quadrant 1.
   Q1 = {}
+  Q1[-2] = [-2,0]
   Q1[1] = [0,0]
   Q1[0] = [2,-1]
   Q1[3] = [2,1]
@@ -47,6 +49,7 @@ def plot_graphs(graphs,t,counter,num_angle):
   
   #A dictionary for node positions for quadrant 2.
   Q2 = {}
+  Q2[-2] = [-2,0]
   Q2[2] = [0,0]
   Q2[0] = [2,-1]
   Q2[3] = [2,1]
@@ -55,6 +58,7 @@ def plot_graphs(graphs,t,counter,num_angle):
   
   #A dictionary for node positions for quadrant 3.
   Q3 = {}
+  Q3[-2] = [-2,0]
   Q3[3] = [0,0]
   Q3[1] = [2,1]
   Q3[2] = [2,-1]
@@ -419,7 +423,7 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       num_edges = len(out_edges)
       out_edges = [out_edges[i][2] for i in range(num_edges)]
       time_to_solve[ig][n] = max(out_edges)
-  
+      
   return graphs,time_to_solve
 
 #Offsets edge weighting for initial nodes for angular pipelining.
@@ -431,6 +435,8 @@ def pipeline_offset(graphs,num_angles,time_to_solve):
   starting_nodes = [None]*num_graphs
   for ig in range(0,num_graphs):
     starting_nodes[ig] = [x for x in graphs[ig].nodes() if graphs[ig].in_degree(x) == 0][0]
+    graphs[ig].add_node(-2)
+    graphs[ig].add_edge(-2,starting_nodes[ig],weight=0.0)
   
   #Only modifying graphs after angle 0.
   for ig in range(graphs_per_angle,num_graphs):
@@ -441,9 +447,8 @@ def pipeline_offset(graphs,num_angles,time_to_solve):
     #The pipeline cost (how much we are going to add to the initial edges).
     pipeline_cost = angle*time_to_solve[ig][starting_node]
     
-    starting_successors = deepcopy(list(graph.successors(starting_node)))
-    for s in starting_successors:
-      graph[starting_node][s]['weight'] += pipeline_cost
+
+    graph[-2][starting_node]['weight'] += pipeline_cost
     
     graphs[ig] = graph
     
@@ -479,7 +484,7 @@ def make_edges_universal(graphs):
     #Inverting the weights back.
     graph = invert_weights(graph)
     #Looping over nodes to get the longest path to each node.
-    for n in range(0,num_nodes):
+    for n in range(0,num_nodes-1):
       #If the starting node is the target node we know that path length is zero.
       if (start_node == n):
         continue
@@ -492,7 +497,7 @@ def make_edges_universal(graphs):
       heavy_path_lengths[n] = heaviest_path_length
       
     #Storing the heavy path lengths as the weight value to all preceding edges.
-    for n in range(0,num_nodes):
+    for n in range(0,num_nodes-1):
       
       #The starting node has no preceding edges so we skip it.
       if (n != start_node):
@@ -534,6 +539,7 @@ def nodes_being_solved_general(G,weight_limit,time_to_solve):
   
   nodes_being_solved = []
   nodes = list(G.nodes())
+  nodes.remove(-2)
   
   for n in nodes:
     
@@ -1075,7 +1081,7 @@ def calculate_delay(first_graph,second_graph,graphs,node,time_to_solve_node):
   
   return delay
     
-def add_conflict_weights(graphs,time_to_solve):
+def add_conflict_weights(graphs,time_to_solve,num_angles):
   
   #The number of graphs.
   num_graphs = len(graphs)
@@ -1083,12 +1089,12 @@ def add_conflict_weights(graphs,time_to_solve):
   #Storing the ending nodes of all graphs.
   end_nodes = {}
   starting_nodes = []
-  prev_nodes = []
+  prev_nodes = [[] for g in range(0,num_graphs)]
   for g in range(0,num_graphs):
     graph = graphs[g]
     end_nodes[g] = list(graph.predecessors(-1))[0]
-    prev_nodes.append([x for x in graph.nodes() if graph.in_degree(x) == 0])
-    starting_nodes.append(deepcopy(prev_nodes[g]))
+    true_starting_node = list(graph.successors(-2))
+    starting_nodes.append(deepcopy(true_starting_node))
   
   #The number of graphs that have finished.
   num_finished_graphs = 0

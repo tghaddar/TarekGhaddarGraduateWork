@@ -1,7 +1,8 @@
 from build_global_subset_boundaries import build_global_subset_boundaries
 from build_adjacency_matrix import build_graphs,build_adjacency
 from mesh_processor import create_2d_cuts
-from sweep_solver import add_edge_cost,pipeline_offset,make_edges_universal
+from sweep_solver import add_edge_cost,pipeline_offset,make_edges_universal,plot_graphs
+from sweep_solver import add_conflict_weights
 
 #The machine parameters.
 #Communication time per double
@@ -45,9 +46,8 @@ num_graphs = len(graphs)
 #for g in range(0,num_graphs):
 #  graph = graphs[g]
 #  graph.add_weighted_edges_from((u,v,1) for u,v in graph.edges())
-  
-#The time to solve each subset for each graph.
-time_to_solve = [[1]*num_subsets for g in range(0,num_graphs)]
+ 
+#Dummy values for the purpose of this test case. 
 cells_per_subset = [1 for n in range(0,num_subsets)]
 bdy_cells_per_subset = [[1,1] for n in range(0,num_subsets)]
 
@@ -57,5 +57,9 @@ graphs,time_to_solve = add_edge_cost(graphs,subset_boundaries,cells_per_subset,b
 graphs = pipeline_offset(graphs,num_angles,time_to_solve)
 
 graphs = make_edges_universal(graphs)
+
+#plot_graphs(graphs,0,0,num_angles)
+
+graphs = add_conflict_weights(graphs,time_to_solve,num_angles)
 
 
