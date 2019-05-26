@@ -58,10 +58,8 @@ graphs = pipeline_offset(graphs,num_angles,time_to_solve)
 
 graphs = make_edges_universal(graphs)
 
-#plot_graphs(graphs,0,0,num_angles)
-
 graphs = add_conflict_weights(graphs,time_to_solve,num_angles)
 
-print(compute_solve_time(graphs))
+print(compute_solve_time(graphs)[1])
 
 
