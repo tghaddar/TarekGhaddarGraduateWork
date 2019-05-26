@@ -19,8 +19,8 @@ upbc = 2.0
 machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
 
 #Number of rows and columns.
-numrow = 2
-numcol = 2
+numrow = 3
+numcol = 3
 num_subsets = numrow*numcol
 
 #Global boundaries.
@@ -37,7 +37,7 @@ subset_boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cu
 adjacency_matrix = build_adjacency(subset_boundaries,numcol-1,numrow-1,y_cuts)
 
 #The angles per quadrant.
-num_angles = 2
+num_angles = 5
 
 graphs = build_graphs(adjacency_matrix,numrow,numcol,num_angles)
 num_graphs = len(graphs)
