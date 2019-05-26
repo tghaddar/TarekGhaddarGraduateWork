@@ -547,9 +547,11 @@ def nodes_being_solved_general(G,weight_limit,time_to_solve):
     if ready_to_solve > weight_limit:
       continue
     elif ready_to_solve == weight_limit:
-      nodes_being_solved.append(n)
+      if n != -1:
+        nodes_being_solved.append(n)
     elif ready_to_solve + time_to_solve[n] > weight_limit:
-      nodes_being_solved.append(n)
+      if n != -1:
+        nodes_being_solved.append(n)
   
   return sorted(nodes_being_solved)
   
@@ -652,8 +654,8 @@ def sort_priority(graph_indices,graphs_per_angle):
   
   test_indices = sorted(test_indices)
   test_indices = list(set(test_indices))
-  print(test_indices)
-  print(true_indices)
+#  print(test_indices)
+#  print(true_indices)
   new_graph_indices = []
   for i in range(0,len(test_indices)):
     octant = true_priorities[test_indices[i]]
@@ -1122,7 +1124,6 @@ def add_conflict_weights(graphs,time_to_solve,num_angles):
   counter = 0
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -1165,6 +1166,9 @@ def add_conflict_weights(graphs,time_to_solve,num_angles):
 #      
 #      else:
         #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
+      if (t == 9):
+        print("debug stop")
+        
       graphs = modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,first_nodes,time_to_solve,num_angles)
       #To update our march through, we need to update t here, with a find_next_interaction.
       if (num_conflicting_nodes == len(first_nodes)):
@@ -1185,8 +1189,9 @@ def add_conflict_weights(graphs,time_to_solve,num_angles):
       if t >= time_to_finish:
         finished_graphs[g] = True
     
-    #print(finished_graphs)
-    num_finished_graphs = len([x for x in finished_graphs if finished_graphs[x] == True])
+    print(finished_graphs)
+    num_finished_graphs = sum(finished_graphs)
+    print(num_finished_graphs)
 
     
   return graphs

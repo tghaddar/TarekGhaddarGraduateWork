@@ -19,8 +19,8 @@ upbc = 2.0
 machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
 
 #Number of rows and columns.
-numrow = 4
-numcol = 4
+numrow = 2
+numcol = 2
 num_subsets = numrow*numcol
 
 #Global boundaries.
