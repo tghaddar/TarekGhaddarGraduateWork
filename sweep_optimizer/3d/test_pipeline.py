@@ -2,7 +2,7 @@ from build_global_subset_boundaries import build_global_subset_boundaries
 from build_adjacency_matrix import build_graphs,build_adjacency
 from mesh_processor import create_2d_cuts
 from sweep_solver import add_edge_cost,pipeline_offset,make_edges_universal,plot_graphs
-from sweep_solver import add_conflict_weights
+from sweep_solver import add_conflict_weights, compute_solve_time
 
 #The machine parameters.
 #Communication time per double
@@ -19,8 +19,8 @@ upbc = 2.0
 machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
 
 #Number of rows and columns.
-numrow = 2
-numcol = 2
+numrow = 4
+numcol = 4
 num_subsets = numrow*numcol
 
 #Global boundaries.
@@ -61,5 +61,7 @@ graphs = make_edges_universal(graphs)
 #plot_graphs(graphs,0,0,num_angles)
 
 graphs = add_conflict_weights(graphs,time_to_solve,num_angles)
+
+print(compute_solve_time(graphs))
 
 

@@ -634,27 +634,34 @@ def get_DOG_remaining(graph):
 def sort_priority(graph_indices,graphs_per_angle):
   #The true octant priorities.
   true_priorities = [0,4,1,5,2,6,3,7]
-  original_graph_indices = copy(graph_indices)
   test_indices = []
   true_indices = {}
   for p in range(0,len(graph_indices)):
     graph_index = graph_indices[p]
     octant_index = graph_index%graphs_per_angle
-    true_indices[octant_index] = graph_index
+    try:
+      true_indices[octant_index] += [graph_index]
+    except:
+      true_indices[octant_index] = [graph_index]
     test_indices.append(true_priorities.index(octant_index))
     #test_indices.append(true_priorities.index(graph_index))
-    
-    
+  
+  #Sorting the true indices.
+  for key in true_indices:
+    true_indices[key] = sorted(true_indices[key])
+  
   test_indices = sorted(test_indices)
+  test_indices = list(set(test_indices))
   print(test_indices)
   print(true_indices)
+  new_graph_indices = []
   for i in range(0,len(test_indices)):
     octant = true_priorities[test_indices[i]]
-    #octant_index = graph_index%graphs_per_angle
-    graph_indices[i] = true_indices[octant]
+    new_graph_indices += true_indices[octant]
+    #graph_indices[i] = true_indices[octant]
     #graph_indices[i] = true_priorities[graph_index]
     
-  return graph_indices
+  return new_graph_indices
 
 
 #Takes simple paths for a graph and dumps them out.
@@ -1039,7 +1046,7 @@ def modify_secondary_graphs(graphs,conflicting_graphs,node,time_to_solve):
 
 def match_delay_weights(graph):
   
-  num_nodes = graph.number_of_nodes()-1
+  num_nodes = graph.number_of_nodes()-2
   
   for n in range(0,num_nodes):
     
@@ -1114,7 +1121,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles):
   #Keep iterating until all graphs have finished.
   counter = 0
   while num_finished_graphs < num_graphs:
-    #print('Time t = ', t)
+    print('Time t = ', t)
 
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
@@ -1126,14 +1133,14 @@ def add_conflict_weights(graphs,time_to_solve,num_angles):
       #all_nodes_being_solved[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve[g])
       all_nodes_being_solved[g] = nodes_being_solved_general(graph,t,time_to_solve[g])
     prev_nodes = all_nodes_being_solved
-#    print("Nodes being solved in each graph")
-#    print(all_nodes_being_solved)
+    print("Nodes being solved in each graph")
+    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
     num_conflicting_nodes = len(conflicting_nodes)
     
-#    print("The graphs in conflict for each node")
-#    print(conflicting_nodes)
+    print("The graphs in conflict for each node")
+    print(conflicting_nodes)
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
       #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
