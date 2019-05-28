@@ -3,7 +3,8 @@ import warnings
 import matplotlib.pyplot as plt
 from mesh_processor import create_2d_cuts,get_cells_per_subset_2d,create_2d_cut_suite
 from optimizer import create_parameter_space,create_bounds
-from sweep_solver import optimized_tts_numerical,time_to_solution_numerical
+from sweep_solver import optimized_tts_numerical,time_to_solution_numerical,optimized_tts
+from sweep_solver import time_to_solution
 from scipy.optimize import minimize
 warnings.filterwarnings("ignore")
 
@@ -15,7 +16,7 @@ cov = [[0.01,0],[0,0.01]]
 x,y = np.random.multivariate_normal(mean,cov,100).T
 points = [x,y]
 
-
+f = lambda x,y: x + y
 
 #The machine parameters.
 #Communication time per double
@@ -32,14 +33,15 @@ upbc = 2.0
 machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
 
 #Number of rows and columns.
-numrow = 3
-numcol = 3
+numrow = 2
+numcol = 2
+num_angles = 1
 
 #Global boundaries.
 global_xmin = 0.0
-global_xmax = 1.0
+global_xmax = 10.0
 global_ymin = 0.0
-global_ymax = 1.0
+global_ymax = 10.0
 
 x_cuts,y_cuts = create_2d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow)
 all_x_cuts,all_y_cuts = create_2d_cut_suite(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow)
@@ -50,13 +52,15 @@ max_times = []
 
 
 
-#interior_cuts = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-#num_params = len(interior_cuts)
-#bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numcol)
-#args = (points,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l)
-#max_time = minimize(optimized_tts_numerical,interior_cuts,args = args,bounds = bounds,options={'maxiter':10,'maxfun':10,'disp':False})
+interior_cuts = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+num_params = len(interior_cuts)
+bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol)
+args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles)
+max_time = minimize(optimized_tts,interior_cuts,args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':False})
 
-
+#x_cuts = [0.0, 6.145603174757288, 10.0] 
+#y_cuts = [[0.0, 5.0, 10.0], [0.0, 6.145603174757288, 10.0]]
+#max_time = time_to_solution(f,x_cuts,y_cuts,machine_params,numcol,numrow,num_angles)
 #max_time = time_to_solution_numerical(points,all_x_cuts[0],all_y_cuts[0],machine_params,numcol,numrow)
 #for i in range(0,num_x_cuts):
 #  for j in range(0,num_y_cuts): 

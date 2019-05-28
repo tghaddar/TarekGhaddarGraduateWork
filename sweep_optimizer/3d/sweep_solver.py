@@ -36,7 +36,7 @@ def plot_graphs(graphs,t,counter,num_angle):
   Q0[1] = [2,1]
   Q0[2] = [2,-1]
   Q0[3] = [4, 0]
-  Q0[-1] = [6,0]
+  Q0[-1] = [8,0]
   
   #A dictionary for node positions for quadrant 1.
   Q1 = {}
@@ -45,7 +45,7 @@ def plot_graphs(graphs,t,counter,num_angle):
   Q1[0] = [2,-1]
   Q1[3] = [2,1]
   Q1[2] = [4,0]
-  Q1[-1] = [6,0]
+  Q1[-1] = [8,0]
   
   #A dictionary for node positions for quadrant 2.
   Q2 = {}
@@ -54,7 +54,7 @@ def plot_graphs(graphs,t,counter,num_angle):
   Q2[0] = [2,-1]
   Q2[3] = [2,1]
   Q2[1] = [4,0]
-  Q2[-1] = [6,0]
+  Q2[-1] = [8,0]
   
   #A dictionary for node positions for quadrant 3.
   Q3 = {}
@@ -63,7 +63,7 @@ def plot_graphs(graphs,t,counter,num_angle):
   Q3[1] = [2,1]
   Q3[2] = [2,-1]
   Q3[0] = [4, 0]
-  Q3[-1] = [6,0]
+  Q3[-1] = [8,0]
   
   Q = [Q0,Q1,Q2,Q3]
   for angle in range(0,num_angle-1):
@@ -1123,7 +1123,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles):
   #Keep iterating until all graphs have finished.
   counter = 0
   while num_finished_graphs < num_graphs:
-    #print('Time t = ', t)
+#    print('Time t = ', t)
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -1134,7 +1134,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles):
       #all_nodes_being_solved[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve[g])
       all_nodes_being_solved[g] = nodes_being_solved_general(graph,t,time_to_solve[g])
     prev_nodes = all_nodes_being_solved
-    #print("Nodes being solved in each graph")
+#    print("Nodes being solved in each graph")
 #    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
@@ -1274,7 +1274,7 @@ def tweak_parameters(x_cuts,y_cuts,global_x_min,global_x_max,global_y_min,global
   return x_cuts,y_cuts
 
 #The driving function to compute the time to solution.
-def time_to_solution(f,x_cuts,y_cuts,machine_params,num_col,num_row):
+def time_to_solution(f,x_cuts,y_cuts,machine_params,num_col,num_row,num_angles):
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Getting mesh information.
@@ -1282,20 +1282,22 @@ def time_to_solution(f,x_cuts,y_cuts,machine_params,num_col,num_row):
   #Building the adjacency matrix.
   adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
   #Building the graphs.
-  graphs = build_graphs(adjacency_matrix,num_row,num_col)
+  graphs = build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
-  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
+  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,False)
+  graphs = pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
   
+  plot_graphs(graphs,0,0,num_angles)
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve)
+  graphs = add_conflict_weights(graphs,time_to_solve,num_angles)
   #plot_graphs(graphs,0)
   solve_times,max_time = compute_solve_time(graphs)
   return max_time
 
 #The driving function to compute the time to solution.
-def time_to_solution_numerical(points,x_cuts,y_cuts,machine_params,num_col,num_row):
+def time_to_solution_numerical(points,x_cuts,y_cuts,machine_params,num_col,num_row,num_angles):
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Getting mesh information.
@@ -1306,9 +1308,11 @@ def time_to_solution_numerical(points,x_cuts,y_cuts,machine_params,num_col,num_r
   graphs = build_graphs(adjacency_matrix,num_row,num_col)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
   graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
+  graphs = pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
   
+
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve)
   #plot_graphs(graphs,0)
@@ -1317,12 +1321,13 @@ def time_to_solution_numerical(points,x_cuts,y_cuts,machine_params,num_col,num_r
 
 
 #The time to solution function that is fed into the optimizer.
-def optimized_tts(params, f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l):
+def optimized_tts(params, f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles):
   #f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l = args
   machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
+  print(x_cuts,y_cuts)
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Getting mesh information.
@@ -1330,19 +1335,20 @@ def optimized_tts(params, f,global_xmin,global_xmax,global_ymin,global_ymax,num_
   #Building the adjacency matrix.
   adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
   #Building the graphs.
-  graphs = build_graphs(adjacency_matrix,num_row,num_col)
+  graphs = build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
-  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
+  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,False)
+  graphs = pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
   
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve)
+  graphs = add_conflict_weights(graphs,time_to_solve,num_angles)
   solve_times,max_time = compute_solve_time(graphs)
   return max_time
 
 #The time to solution function that is fed into the optimizer.
-def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l):
+def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles):
   #f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l = args
   machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
   
@@ -1356,13 +1362,15 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   #Building the adjacency matrix.
   adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
   #Building the graphs.
-  graphs = build_graphs(adjacency_matrix,num_row,num_col)
+  graphs = build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
-  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
+  
+  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,False)
+  graphs= pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
   
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve)
+  graphs = add_conflict_weights(graphs,time_to_solve,num_angles)
   solve_times,max_time = compute_solve_time(graphs)
   return max_time

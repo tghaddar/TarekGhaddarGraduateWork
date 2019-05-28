@@ -25,10 +25,10 @@ def create_parameter_space(x_cuts,y_cuts,numrow,numcol):
     
   return interior_cuts
 
-def create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numcol):
+def create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol):
   
-  x_tol = 0.05*(global_xmax - global_xmin)
-  y_tol = 0.05*(global_ymax - global_ymin)
+  x_tol = 0.05*(global_xmax - global_xmin)/numcol
+  y_tol = 0.05*(global_ymax - global_ymin)/numrow
   nx = numcol - 1
   cut_id = 0
   bounds = [()for i in range(0,num_params)]
