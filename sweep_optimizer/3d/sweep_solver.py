@@ -4,8 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from copy import copy
-from build_adjacency_matrix import build_graphs
-from build_adjacency_matrix import build_adjacency
+import build_adjacency_matrix as bam
 from build_global_subset_boundaries import build_global_subset_boundaries
 from copy import deepcopy
 from copy import copy
@@ -24,7 +23,6 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 #The number of cells per subset.
 #The grind time (time to solve an unknown on a machine)
 #The communication time per byte. 
-
 
 #Plots graphs at a specific time. Will help with debugging.
 def plot_graphs(graphs,t,counter,num_angle):
@@ -78,8 +76,8 @@ def plot_graphs(graphs,t,counter,num_angle):
     plt.figure(str(g)+str(t) + str(counter))
     plt.title("Time " + str(t) + " Graph " + str(g))
     edge_labels_1 = nx.get_edge_attributes(graphs[g],'weight')
-    nx.draw(graphs[g],Q[g],with_labels = True)
-    nx.draw_networkx_edge_labels(graphs[g],Q[g],edge_labels=edge_labels_1,font_size=6)
+    nx.draw(graphs[g],nx.random_layout(graphs[g]),with_labels = True)
+    nx.draw_networkx_edge_labels(graphs[g],nx.random_layout(graphs[g]),edge_labels=edge_labels_1,font_size=6)
     plt.savefig("debug_graph_plots/graph_"+str(t)+ "_" + str(counter)+"_"+str(g)+".pdf")
     plt.close()
     
@@ -317,7 +315,6 @@ def plot_subset_boundaries(global_3d_subset_boundaries,num_subsets):
 def plot_subset_boundaries_2d(global_3d_subset_boundaries,num_subsets):
   plt.figure(1)
   subset_centers = []
-  layer_colors = ['b','r']
   for i in range(0,num_subsets):
   
     subset_boundary = global_3d_subset_boundaries[i]
@@ -1274,17 +1271,17 @@ def tweak_parameters(x_cuts,y_cuts,global_x_min,global_x_max,global_y_min,global
   return x_cuts,y_cuts
 
 #The driving function to compute the time to solution.
-def time_to_solution(f,x_cuts,y_cuts,machine_params,num_col,num_row,num_angles):
+def time_to_solution(f,x_cuts,y_cuts,machine_params,num_col,num_row,num_angles,test):
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d(f,subset_bounds)  
   #Building the adjacency matrix.
-  adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
+  adjacency_matrix = bam.build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
   #Building the graphs.
-  graphs = build_graphs(adjacency_matrix,num_row,num_col,num_angles)
+  graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
-  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,False)
+  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,test)
   graphs = pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
@@ -1303,9 +1300,9 @@ def time_to_solution_numerical(points,x_cuts,y_cuts,machine_params,num_col,num_r
   #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_numerical(points,subset_bounds)  
   #Building the adjacency matrix.
-  adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
+  adjacency_matrix = bam.build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
   #Building the graphs.
-  graphs = build_graphs(adjacency_matrix,num_row,num_col)
+  graphs = bam.build_graphs(adjacency_matrix,num_row,num_col)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
   graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col)
   graphs = pipeline_offset(graphs,num_angles,time_to_solve)
@@ -1333,9 +1330,9 @@ def optimized_tts(params, f,global_xmin,global_xmax,global_ymin,global_ymax,num_
   #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d(f,subset_bounds)  
   #Building the adjacency matrix.
-  adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
+  adjacency_matrix = bam.build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
   #Building the graphs.
-  graphs = build_graphs(adjacency_matrix,num_row,num_col,num_angles)
+  graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
   graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,False)
   graphs = pipeline_offset(graphs,num_angles,time_to_solve)
@@ -1360,9 +1357,9 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_numerical(points,subset_bounds)  
   #Building the adjacency matrix.
-  adjacency_matrix = build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
+  adjacency_matrix = bam.build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
   #Building the graphs.
-  graphs = build_graphs(adjacency_matrix,num_row,num_col,num_angles)
+  graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
   
   graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,False)

@@ -1,6 +1,5 @@
 import numpy as np
 import networkx as nx
-import matplotlib.pyplot as plt
 import warnings
 from copy import deepcopy
 from flip_adjacency_2d import flip_adjacency
@@ -83,6 +82,7 @@ def build_adjacency(global_bounds,n_x, n_y, ycuts):
       adjacency_matrix[i][neighbors[j]] = 1
   
   return adjacency_matrix
+
 
 def build_graphs(adjacency_matrix,num_row,num_col,num_angle):
 
