@@ -6,6 +6,7 @@ from optimizer import create_parameter_space,create_bounds
 from sweep_solver import optimized_tts_numerical,time_to_solution_numerical,optimized_tts
 from sweep_solver import time_to_solution
 from scipy.optimize import minimize
+import time
 warnings.filterwarnings("ignore")
 
 plt.close("all")
@@ -56,7 +57,10 @@ interior_cuts = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
 num_params = len(interior_cuts)
 bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol)
 args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles)
-max_time = minimize(optimized_tts,interior_cuts,args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':False})
+start = time.time()
+max_time = minimize(optimized_tts,interior_cuts,method='Nelder-Mead',args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':False},tol=1e-08)
+end = time.time()
+print(end - start)
 
 #x_cuts = [0.0, 6.145603174757288, 10.0] 
 #y_cuts = [[0.0, 5.0, 10.0], [0.0, 6.145603174757288, 10.0]]
