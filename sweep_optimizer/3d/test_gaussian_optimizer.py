@@ -58,7 +58,7 @@ num_params = len(interior_cuts)
 bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol)
 args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles)
 start = time.time()
-max_time = minimize(optimized_tts,interior_cuts,method='Nelder-Mead',args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':False},tol=1e-08)
+max_time = minimize(optimized_tts,interior_cuts,method='SLSQP',args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':False},tol=1e-08)
 end = time.time()
 print(end - start)
 
