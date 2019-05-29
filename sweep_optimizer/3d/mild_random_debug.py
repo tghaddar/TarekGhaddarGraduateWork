@@ -4,6 +4,7 @@ import build_adjacency_matrix as bam
 from sweep_solver import add_edge_cost,pipeline_offset,make_edges_universal,add_conflict_weights,compute_solve_time
 from sweep_solver import plot_subset_boundaries_2d, plot_graphs
 from build_global_subset_boundaries import build_global_subset_boundaries
+from copy import deepcopy
 plt.close("all")
 
 x_cuts = np.genfromtxt("x_cuts_3.csv",delimiter=',')
@@ -45,6 +46,7 @@ graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_c
 graphs = pipeline_offset(graphs,num_angles,time_to_solve)
 #Making the edges universal.
 graphs = make_edges_universal(graphs)
+check_graphs = deepcopy(graphs)
 plot_graphs(graphs,0,0,num_angles)
 #Adding delay weighting.
 graphs = add_conflict_weights(graphs,time_to_solve,num_angles)

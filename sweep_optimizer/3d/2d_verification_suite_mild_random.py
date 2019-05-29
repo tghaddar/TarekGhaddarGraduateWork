@@ -92,3 +92,36 @@ for angle in range(0,num_angular_test):
   time_to_soln = compute_solve_time(graphs)[1]
   print(time_to_soln)
   computation_time_2[angle] = time_to_soln
+  
+print("4x4 Case")
+x_cuts = list(np.genfromtxt("x_cuts_4.csv",delimiter=","))
+y_cuts = np.genfromtxt("y_cuts_4.csv",delimiter=",")
+for angle in range(0,num_angular_test):
+  num_angles = int(angles_per_quadrant[angle])
+  num_space = 4
+  numrow = num_space
+  numcol = num_space
+  num_subsets = numrow*numcol
+  
+  #The subset_boundaries.
+  subset_boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
+  #Building the adjacency matrix.
+  adjacency_matrix = build_adjacency(subset_boundaries,numcol-1,numrow-1,y_cuts)
+  #Building the graphs
+  graphs = build_graphs(adjacency_matrix,numrow,numcol,num_angles)
+  num_graphs = len(graphs)
+  #Dummy values for the purpose of this test case. 
+  cells_per_subset = [1 for n in range(0,num_subsets)]
+  bdy_cells_per_subset = [[1,1] for n in range(0,num_subsets)]
+  
+  #Adding the universal cost.
+  graphs,time_to_solve = add_edge_cost(graphs,subset_boundaries,cells_per_subset,bdy_cells_per_subset,machine_params,numrow,numcol,True)
+  
+  graphs = pipeline_offset(graphs,num_angles,time_to_solve)
+  
+  graphs = make_edges_universal(graphs)
+  
+  graphs = add_conflict_weights(graphs,time_to_solve,num_angles)
+  time_to_soln = compute_solve_time(graphs)[1]
+  print(time_to_soln)
+  computation_time_2[angle] = time_to_soln
