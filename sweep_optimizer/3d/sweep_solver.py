@@ -1289,7 +1289,7 @@ def time_to_solution(f,x_cuts,y_cuts,machine_params,num_col,num_row,num_angles):
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
   
-  plot_graphs(graphs,0,0,num_angles)
+  #plot_graphs(graphs,0,0,num_angles)
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles)
   #plot_graphs(graphs,0)
