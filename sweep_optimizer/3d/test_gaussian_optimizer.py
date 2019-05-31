@@ -5,20 +5,32 @@ from mesh_processor import create_2d_cuts,get_cells_per_subset_2d,create_2d_cut_
 from optimizer import create_parameter_space,create_bounds
 from sweep_solver import optimized_tts_numerical,time_to_solution_numerical,optimized_tts
 from sweep_solver import time_to_solution
+from copy import copy
 from scipy.optimize import minimize
 import time
 warnings.filterwarnings("ignore")
 
 plt.close("all")
 
-mean = [0.5,0.5]
-cov = [[0.01,0],[0,0.01]]
 
-x,y = np.random.multivariate_normal(mean,cov,100).T
-points = [x,y]
+def jacobian(cuts,f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles):
+  num_cuts = len(cuts)
+  eps = 0.01
+  alphas = np.empty(num_cuts)
+  
+  for cut in range(0,num_cuts):
+    test_cuts = copy(cuts)
+    test_cuts[cut] += eps
+    print("jac cuts: ", test_cuts)
+    perturbed_soln = optimized_tts(test_cuts,f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles)
+    soln = optimized_tts(cuts,f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles)
+    print(perturbed_soln,soln)
+    alphas[cut] = (perturbed_soln - soln)/eps
+  
+  return alphas
+
 
 f = lambda x,y: x + y
-
 #The machine parameters.
 #Communication time per double
 t_comm = 4.47e-02
@@ -45,6 +57,26 @@ global_ymin = 0.0
 global_ymax = 10.0
 
 x_cuts,y_cuts = create_2d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow)
+interior_cuts = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+num_params = len(interior_cuts)
+
+bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol)
+args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles)
+
+
+
+
+
+mean = [0.5,0.5]
+cov = [[0.01,0],[0,0.01]]
+
+x,y = np.random.multivariate_normal(mean,cov,100).T
+points = [x,y]
+
+
+
+
+
 all_x_cuts,all_y_cuts = create_2d_cut_suite(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow)
 
 num_x_cuts = len(all_x_cuts)
@@ -53,12 +85,11 @@ max_times = []
 
 
 
-interior_cuts = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-num_params = len(interior_cuts)
-bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol)
-args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles)
+
+
 start = time.time()
-max_time = minimize(optimized_tts,interior_cuts,method='SLSQP',args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':False},tol=1e-08)
+#max_time = minimize(optimized_tts,interior_cuts,method='SLSQP',args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':False},tol=1e-08)
+max_time = minimize(optimized_tts,interior_cuts,method='Newton-CG',jac = jacobian,args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':True},tol=1e-08)
 end = time.time()
 print(end - start)
 

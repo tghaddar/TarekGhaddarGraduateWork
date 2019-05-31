@@ -1,0 +1,8 @@
+Sweep direction: (0.57735, 0.57735, 0.57735) vertex id: 11 priority: 2
+Sweep direction: (-0.57735, 0.57735, 0.57735) vertex id: 11 priority: 4
+Sweep direction: (-0.57735, -0.57735, 0.57735) vertex id: 11 priority: 7
+Sweep direction: (0.57735, -0.57735, 0.57735) vertex id: 11 priority: 6
+Sweep direction: (0.57735, 0.57735, -0.57735) vertex id: 11 priority: 0
+Sweep direction: (-0.57735, 0.57735, -0.57735) vertex id: 11 priority: 1
+Sweep direction: (-0.57735, -0.57735, -0.57735) vertex id: 11 priority: 5
+Sweep direction: (0.57735, -0.57735, -0.57735) vertex id: 11 priority: 3

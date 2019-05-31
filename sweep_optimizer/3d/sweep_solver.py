@@ -1241,7 +1241,6 @@ def unpack_parameters(params,global_x_min,global_x_max,global_y_min,global_y_max
   for col in range(0,numcol):
     y_cuts[col].append(global_y_max)
     
-  
   return x_cuts,y_cuts
 
 def tweak_parameters(x_cuts,y_cuts,global_x_min,global_x_max,global_y_min,global_y_max,numcol,numrow):
@@ -1318,11 +1317,12 @@ def time_to_solution_numerical(points,x_cuts,y_cuts,machine_params,num_col,num_r
 
 
 #The time to solution function that is fed into the optimizer.
-def optimized_tts(params, f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles):
+def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles):
   #f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l = args
   machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
+  print("pre-tweak: ",x_cuts,y_cuts)
   x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   print(x_cuts,y_cuts)
   #Building subset boundaries.
