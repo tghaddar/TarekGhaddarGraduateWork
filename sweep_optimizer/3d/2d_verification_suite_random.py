@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Jun  1 13:01:29 2019
+
+@author: tghaddar
+"""
+
 #This script generates data for 2D verification on the mild random layout.
 from build_global_subset_boundaries import build_global_subset_boundaries
 from build_adjacency_matrix import build_graphs,build_adjacency
