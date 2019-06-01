@@ -76,8 +76,8 @@ def plot_graphs(graphs,t,counter,num_angle):
     plt.figure(str(g)+str(t) + str(counter))
     plt.title("Time " + str(t) + " Graph " + str(g))
     edge_labels_1 = nx.get_edge_attributes(graphs[g],'weight')
-    nx.draw(graphs[g],nx.random_layout(graphs[g]),with_labels = True)
-    nx.draw_networkx_edge_labels(graphs[g],nx.random_layout(graphs[g]),edge_labels=edge_labels_1,font_size=6)
+    nx.draw(graphs[g],Q[g],with_labels = True)
+    nx.draw_networkx_edge_labels(graphs[g],Q[g],edge_labels=edge_labels_1,font_size=6)
     plt.savefig("debug_graph_plots/graph_"+str(t)+ "_" + str(counter)+"_"+str(g)+".pdf")
     plt.close()
     
@@ -619,8 +619,15 @@ def get_heaviest_path_faster(graph,start_node,target_node):
   heaviest_path_weight = sum_weights_of_path(graph,heaviest_path)
   
   return heaviest_path_weight
+
+#Returns the unweighted depth of graph remaining.
+def get_DOG_remaining_unweighted(graph,source):
   
-      
+  dog_remaining = nx.shortest_path_length(graph,source,-1)
+  #edges = nx.bfs_edges(graph,source)
+  #dog_remaining = len(list(edges))
+  return dog_remaining
+
 #Returns the depth of graph remaining.
 def get_DOG_remaining(graph):
 
@@ -790,8 +797,8 @@ def find_first_conflict(conflicting_nodes,graphs):
   
   return first_nodes
 
-#Finds the first graph to get to a conflicted node. In case they arrive at the same time, we return the graph that has a greater depth of graph remaining. In case of a tie with the DOG remaining, we return the graph that has the priority octant.
-def find_first_graph(conflicting_graphs,graphs,node,num_angles):
+#Finds the first graph to get to a conflicted node. In case they arrive at the same time, we return the graph that has a greater depth of graph remaining. In case of a tie with the DOG remaining, we return the graph that has the priority octant. The boolean value unweighted is True if we want to use the unweighted depth of graph remaining algorithm.
+def find_first_graph(conflicting_graphs,graphs,node,num_angles,unweighted):
   #Total number of graphs.
   num_graphs = len(graphs)
   #The graphs per angle.
@@ -836,7 +843,10 @@ def find_first_graph(conflicting_graphs,graphs,node,num_angles):
         graph_index = min_times[i]
         graph = graphs[graph_index]
         #The depth of graph remaining in this graph. This is equivalent to the time it takes to sweep the graph.
-        dog_remaining = get_DOG_remaining(graph)
+        if unweighted:
+          dog_remaining = get_DOG_remaining_unweighted(graph,node)
+        else:
+          dog_remaining = get_DOG_remaining(graph)
         dogs_remaining.append(dog_remaining)
         dogs_graph_indices.append(graph_index)
       
@@ -886,7 +896,7 @@ def find_first_graph(conflicting_graphs,graphs,node,num_angles):
   return first_graph
 
 #This function does the same thing as modify_secondary_graphs but in the case that multiple nodes are ready to solve at time t.
-def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_solve):
+def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_solve,unweighted):
   
   #Copying the graphs frozen at time t.
   frozen_graphs = deepcopy(graphs)
@@ -908,7 +918,7 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
       #Storing modified edges per graph at time t.
       modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
       #The fastest graph to the node.
-      first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node)
+      first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node,unweighted)
       #Removed from conflicting graphs.
       conflicting_graphs.remove(first_graph) 
       #Loop over the secondary graphs.
@@ -943,7 +953,7 @@ def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_sol
   return graphs
 
 #This function does the same thing as modify_secondary_graphs but in the case that multiple nodes are ready to solve at time t.
-def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,time_to_solve,num_angles):
+def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,time_to_solve,num_angles,unweighted):
   
   #Copying the graphs frozen at time t.
   frozen_graphs = deepcopy(graphs)
@@ -960,7 +970,8 @@ def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,ti
     #Storing modified edges per graph at time t.
     modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
     #The fastest graph to the node.
-    first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node,num_angles)
+    first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node,num_angles,unweighted)
+    #print("FIRST GRAPH: ", first_graph)
     #Removed from conflicting graphs.
     conflicting_graphs.remove(first_graph) 
     #Loop over the secondary graphs.
@@ -1095,7 +1106,7 @@ def calculate_delay(first_graph,second_graph,graphs,node,time_to_solve_node):
   
   return delay
     
-def add_conflict_weights(graphs,time_to_solve,num_angles):
+def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
   
   #The number of graphs.
   num_graphs = len(graphs)
@@ -1120,7 +1131,8 @@ def add_conflict_weights(graphs,time_to_solve,num_angles):
   #Keep iterating until all graphs have finished.
   counter = 0
   while num_finished_graphs < num_graphs:
-#    print('Time t = ', t)
+    #print('Time t = ', t)
+
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
     for g in range(0,num_graphs):
@@ -1163,7 +1175,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles):
 #      
 #      else:
         #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.        
-      graphs = modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,first_nodes,time_to_solve,num_angles)
+      graphs = modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,first_nodes,time_to_solve,num_angles,unweighted)
       #To update our march through, we need to update t here, with a find_next_interaction.
       if (num_conflicting_nodes == len(first_nodes)):
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
@@ -1270,7 +1282,7 @@ def tweak_parameters(x_cuts,y_cuts,global_x_min,global_x_max,global_y_min,global
   return x_cuts,y_cuts
 
 #The driving function to compute the time to solution.
-def time_to_solution(f,x_cuts,y_cuts,machine_params,num_col,num_row,num_angles,test):
+def time_to_solution(f,x_cuts,y_cuts,machine_params,num_col,num_row,num_angles,test,unweighted):
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Getting mesh information.
@@ -1287,7 +1299,7 @@ def time_to_solution(f,x_cuts,y_cuts,machine_params,num_col,num_row,num_angles,t
   
   #plot_graphs(graphs,0,0,num_angles)
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve,num_angles)
+  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   #plot_graphs(graphs,0)
   solve_times,max_time = compute_solve_time(graphs)
   return max_time
@@ -1317,7 +1329,7 @@ def time_to_solution_numerical(points,x_cuts,y_cuts,machine_params,num_col,num_r
 
 
 #The time to solution function that is fed into the optimizer.
-def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles):
+def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted):
   #f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l = args
   machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
   
@@ -1340,12 +1352,12 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   graphs = make_edges_universal(graphs)
   
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve,num_angles)
+  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
   return max_time
 
 #The time to solution function that is fed into the optimizer.
-def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles):
+def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted):
   #f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l = args
   machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
   
@@ -1368,6 +1380,6 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   graphs = make_edges_universal(graphs)
   
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve,num_angles)
+  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
   return max_time
