@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 
 subsets = [2,3,4,5,6,7,8,9,10]
 partition_types = ['regular','mild_random','random','worst']
-
+partition_titles = ['Regular', 'Mildly Random', 'Random', '"Worst"']
+counter = 0
 for partition_type in partition_types:
   for s in subsets:
     print(s)
@@ -20,6 +21,9 @@ for partition_type in partition_types:
     
     plot_name = str(s) + " " + partition_type
     plt.figure(plot_name)
+    plt.title(str(s) + "x" + str(s) + " Subsets with " + partition_titles[counter] + " Partitions")
+    plt.xlabel("x (cm)")
+    plt.ylabel("y (cm)")
     
     subset_boundaries = build_global_subset_boundaries(s-1,s-1,x_cuts,y_cuts)
     
@@ -38,3 +42,4 @@ for partition_type in partition_types:
     
     plt.savefig(str(s)+"_"+partition_type+".pdf")
     plt.close()
+  counter += 1
