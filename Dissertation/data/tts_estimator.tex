@@ -16,7 +16,10 @@
 
 \chapter{TIME-TO-SOLUTION ESTIMATOR \label{cha:tts}}
 
-This chapter is for the time to solution estimator description.
+Before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme. The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This chapter will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies. 
+
+The time to solution estimator is written in Python 3. Python was chosen as the language because of it's powerful graph library, networkx. 
+This library gives us a wide variety of graph mathematics that is optimized and easy to use. 
 
 \section{Method}
 The time-to-solution estimator determines the time to sweep across a domain by:
@@ -30,6 +33,36 @@ The time-to-solution estimator determines the time to sweep across a domain by:
 	\item Adjust the weights of each graph to reflect sweep conflicts between octants. 
 	\item Calculate the time to solution.
 \end{enumerate}
+
+\subsection{Building the adjacency matrices}
+
+Before building the graph for each quadrant/octant, an adjacency matrix must be built for the given partitioning scheme. 
+The adjacency building process relies on a major assumption: The z dimension has partitions all the way across the domain, then the x dimension has partitions per plane, then the y dimension has partitions per plane per column. 
+In future work, these three dimensions will be interchangeable, but for now, this ordering must be preserved. The adjacency building algorithm differs slightly for 2D and 3D cases. Both are detailed in the following subsection. 
+
+\subsubsection{2D adjacency matrices}
+
+To build the adjacency matrices in 2 dimensions, we only need the partitioning scheme.
+
+\subsubsection{3D adjacency matrices}
+
+\subsection{Building the directed acyclic graphs (DAGs)}
+
+The adjacency matrices give us crucial connectivity information in order to build our graphs. This process also slightly from 2D to 3D.
+
+\subsubsection{2D graph building}
+In two dimensions, we build four graphs corresponding to four quadrants. 
+We define the quadrants in the following manner:
+\begin{itemize}
+  \item Quadrant 0: $\Omega_x > 0$, $\Omega_y > 0$
+  \item Quadrant 1: $\Omega_x > 0$, $\Omega_y < 0$
+  \item Quadrant 2: $\Omega_x < 0$, $\Omega_y > 0$
+  \item Quadrant 3: $\Omega_x < 0$, $\Omega_y < 0$
+\end{itemize}
+
+
+\subsubsection{3D graph building}
+
 
 \section{2D Verification}
 
