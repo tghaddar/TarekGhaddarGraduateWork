@@ -59,6 +59,7 @@ Figure \ref{redistribute} illustrates an example of redistributing the cut plane
 The image on the left side of Fig. \ref{redistribute} shows the CDF of the triangles per column. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut planes are redistributed to. 
  
 \section{Original Load Balancing Algorithm}
+\label{sec:og_lb}
 
 The initial approach to load balancing was implemented on 2D extruded meshes, meaning the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. Algorithm \ref{initial_algorithm} summarizes the initial approach to load balancing meshes in PDT.
 
@@ -97,6 +98,7 @@ f= \frac{\left( M(N+1)+1 \right)^2}{MN^2} \xrightarrow{N\to \infty} \frac{M^2N^2
 Due to this theoretical limit, the load balancing by dimension algorithm was developed.
 
 \section{Load Balancing by Dimension Algorithm}
+\label{sec:lbd}
 
 The load balancing by dimension algorithm, like the original load balancing algorithm, relies on the movement of cut planes to redistribute mesh cells in a more balanced manner. However rather than moving all cut planes in all dimensions in one iteration, one dimension is balanced first for all iterations, and then the cut planes that yield the best metric for that dimension are chosen. Then the next dimensions is balanced within the first dimension. For example, if the $x$ cut planes are balanced first, the $y$ cut planes are balanced \textit{within} each column.
 We slightly alter the definition for our dimensional sub-metrics (Eq. (\ref{f_d})) accordingly:

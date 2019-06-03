@@ -23,7 +23,7 @@ The detailed method description will go here.
 
 \section{2D Verification}
 
-A verification study in 2D was run to verify the time-to-solution estimator for 2D partitioning schemes with perfectly balanced partitions. The test problems were verified against a code written by Jean Ragusa that mimics PDT's scheduler in two dimensions. For consistency, the time-to-solution estimator utilized an unweighted depth-of-graph algorithm during the verification study to match PDT's scheduling. The verification study consisted of the following problems:
+A verification study in 2D was run to verify the time-to-solution estimator for 2D partitioning schemes with perfectly balanced partitions. The test problems were verified against a code written by Jean Ragusa that mimics PDT's scheduler in two dimensions. For consistency, the time-to-solution estimator utilized an unweighted depth-of-graph algorithm during the verification study to match PDT's scheduling. The verification study consists of the following problems:
 \begin{enumerate}
 	\item 2x2 to 10x10 subsets in x and y with regular partitions and 1 to 6 angles per quadrant.
 	\item 2x2 to 10x10 subsets in x and y with mildly random partitions and 1 to 6 angles per quadrant.
@@ -31,9 +31,13 @@ A verification study in 2D was run to verify the time-to-solution estimator for 
 	\item  2x2 to 10x10 subsets in x and y with probable worst-case partitions and 1 to 6 angles per quadrant.
 \end{enumerate}
 
-"Mildly random" partitions keep the cut lines uniformly distributed in x, while the y cut lines vary slightly around the uniformly distributed cut lines of the regular partitions. Figure \ref{mild_random_partitions} shows an example of this. "Random" partitions possesses no such limitations on either set of cut lines, as shown by Fig. \ref{random_partitions}.
+"Mildly random" partitions keep the cut lines uniformly distributed in x, while the y cut lines vary slightly around the uniformly distributed cut lines of the regular partitions. Figure \ref{mild_random_partitions} shows examples of this partitioning style. "Random" partitions possesses no such limitations on either set of cut lines, as shown by Fig. \ref{random_partitions}. 
+
+Figures \ref{regular_partitions}, \ref{mild_random_partitions}, \ref{random_partitions}, \ref{worst_partitions} show the four partitioning schemes and Figs. \ref{regular_verification}, \ref{mild_random_verification}, \ref{random_verification}, \ref{worst_verification} show the results of the verification study for each partitioning scheme. In the results, a stage is defined as the time it takes to solve all cells in a subset for an angle.  
 
 \subsection{Regular Partitions}
+
+Figure \ref{regular_partitions} shows four examples of the regular partitioning scheme used for the first part of the verification study. Cut lines in both dimensions go all the way across the domain. This reflects the partitioning scheme after the original load balancing algorithm described in Section \ref{sec:og_lb} is used.
 
 %Regular partitions
 \begin{figure}[H]
@@ -63,6 +67,8 @@ A verification study in 2D was run to verify the time-to-solution estimator for 
 \label{regular_partitions}
 \end{figure}
 
+Using regular partitions as shown in Fig. \ref{regular_partitions}, the first portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{regular_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator verifies perfectly on regular partitions with multiple angles per quadrant. 
+
 %Verification plots.
 \begin{figure}[H]
 \centering
@@ -72,6 +78,8 @@ A verification study in 2D was run to verify the time-to-solution estimator for 
 \end{figure}
 
 \subsection{Mildly Random Partitions}
+Figure \ref{mild_random_partitions} shows four examples of the mildly random partitioning scheme used for the second part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
+
 %Mild random partitions
 \begin{figure}[H]
 \centering
@@ -100,6 +108,8 @@ A verification study in 2D was run to verify the time-to-solution estimator for 
 \label{mild_random_partitions}
 \end{figure}
 
+Using mildly random partitions as shown in Fig. \ref{mild_random_partitions}, the second portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{mild_random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator verifies perfectly on mildly random partitions with multiple angles per quadrant. 
+
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{../figures/mild_random_verification.pdf}
@@ -109,6 +119,7 @@ A verification study in 2D was run to verify the time-to-solution estimator for 
 
 \subsection{Random Partitions}
 %Random partitions
+Figure \ref{random_partitions} shows four examples of the random partitioning scheme used for the third part of the verification study. Cut lines in the x dimension go all the way across the domain, but are not necessarily uniformly distributed. The cut lines in y are randomly distributed in each column.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.45\textwidth}
@@ -136,6 +147,8 @@ A verification study in 2D was run to verify the time-to-solution estimator for 
 \label{random_partitions}
 \end{figure}
 
+Using random partitions as shown in Fig. \ref{random_partitions}, the third portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator verifies perfectly on random partitions with multiple angles per quadrant. 
+
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{../figures/random_verification.pdf}
@@ -144,6 +157,7 @@ A verification study in 2D was run to verify the time-to-solution estimator for 
 \end{figure}
 
 \subsection{Probable Worst-Case Partitions}
+Figure \ref{worst_partitions} shows four examples of the probable worst-case partitioning scheme used for the final part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. The cut lines in y are distributed on opposing ends of alternating columns.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.45\textwidth}
@@ -170,7 +184,7 @@ A verification study in 2D was run to verify the time-to-solution estimator for 
 \caption{Examples of probable worst-case partitioning.}
 \label{worst_partitions}
 \end{figure}
-
+Using probable worst-case partitions as shown in Fig. \ref{random_partitions}, the final portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{worst_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator verifies perfectly on probable worst-case partitions with multiple angles per quadrant. 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{../figures/worst_verification.pdf}
