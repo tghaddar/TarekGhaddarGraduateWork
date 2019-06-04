@@ -17,7 +17,7 @@ import numpy as np
 import networkx as nx
 import flip_adjacency
 import warnings
-from copy import copy
+from copy import deepcopy
 warnings.filterwarnings("ignore") 
 
 plt.close("all")
@@ -167,7 +167,7 @@ def build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane):
   return adjacency_matrix_3d
 
 #Creating the graphs.
-def build_graphs(adjacency_matrix_3d,num_row,num_col,num_plane):
+def build_graphs(adjacency_matrix_3d,num_row,num_col,num_plane,num_angle):
 
   #Getting the upper triangular portion of the adjacency_matrix
   adjacency_matrix_0 = np.triu(adjacency_matrix_3d)
@@ -246,6 +246,16 @@ def build_graphs(adjacency_matrix_3d,num_row,num_col,num_plane):
 
   #Storing all the graphs in a list.
   graphs = [G,G_1,G_2,G_3,G_4,G_5,G_6,G_7]
+  
+  for angle in range(0,num_angle-1):
+    graphs.append(deepcopy(G))
+    graphs.append(deepcopy(G_1))
+    graphs.append(deepcopy(G_2))
+    graphs.append(deepcopy(G_3))
+    graphs.append(deepcopy(G_4))
+    graphs.append(deepcopy(G_5))
+    graphs.append(deepcopy(G_6))
+    graphs.append(deepcopy(G_7))
   
   
   return graphs
