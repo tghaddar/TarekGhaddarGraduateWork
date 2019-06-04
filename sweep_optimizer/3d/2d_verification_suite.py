@@ -18,6 +18,7 @@ t_u = 450.0e-02
 upc = 4.0
 upbc = 2.0
 
+
 machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
 
 #Number of rows and columns.
