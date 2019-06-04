@@ -21,11 +21,11 @@ plt.close("all")
 
 
 #Number of cuts in the x direction.
-N_x = 2
+N_x = 9
 #Number of cuts in the y direction.
-N_y = 2
+N_y = 9
 #Number of cuts in the z direction.
-N_z = 2
+N_z = 9
 #Total number of subsets
 num_subsets = (N_x+1)*(N_y+1)*(N_z+1)
 num_subsets_2d = (N_x+1)*(N_y+1)
@@ -51,7 +51,7 @@ step_x = float((global_x_max - global_x_min)/(N_x+1))
 
 
 num_angles = 1
-unweighted = False
+unweighted = True
 
 z_cuts,x_cuts,y_cuts = create_3d_cuts(global_x_min,global_x_max,num_col,global_y_min,global_y_max,num_row,global_z_min,global_z_max,num_plane)
 
@@ -68,12 +68,13 @@ for g in range(0,num_graphs):
   graph = graphs[g]
   graph.add_weighted_edges_from((u,v,1) for u,v in graph.edges())
 
+#A list that stores the time to solve each node.
+time_to_solve = [[1]*num_subsets for g in range(0,num_graphs)]
 
 graphs = pipeline_offset(graphs,num_angles,time_to_solve)
 graphs = make_edges_universal(graphs)
 
-#A list that stores the time to solve each node.
-time_to_solve = [[1]*num_subsets for g in range(0,num_graphs)]
+
 
 graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
 
