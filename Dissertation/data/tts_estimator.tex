@@ -48,9 +48,9 @@ To build the adjacency matrices in 2 dimensions, we only need the partitioning s
 
 \subsection{Building the directed acyclic graphs (DAGs)}
 
-The adjacency matrices give us crucial connectivity information in order to build our graphs. This process also slightly from 2D to 3D.
+The adjacency matrices give us crucial connectivity information in order to build our graphs. This process also slightly from 2D to 3D. Both processes rely on networkx's DiGraph function to build the DAGs.
 
-\subsubsection{2D graph building}
+\subsubsection{Building the 2d graphs}
 In two dimensions, we build four graphs corresponding to four quadrants. 
 We define the quadrants in the following manner:
 \begin{itemize}
@@ -66,10 +66,12 @@ Figure \ref{quadrant_layout} illustrates this numbering.
 \caption{The quadrant layout for 2D problems.}
 \label{quadrant_layout}
 \end{figure}
+The initial adjacency matrix we obtain can be immediately used to build the graphs for quadrants 0 and 3 by using networkx's DiGraph function.
+We feed the upper triangular portion of the adjacency matrix to DiGraph to get the quadrant 0 graph, and the lower triangular portion to get the quadrant 3 graph.
 
+In order to obtain the graphs for quadrants 1 and 2, a flipped version of the adjacency matrix is necessary.
 
-
-\subsubsection{3D graph building}
+\subsubsection{Building the 3d graphs}
 
 
 \section{2D Verification}
