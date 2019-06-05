@@ -1255,6 +1255,54 @@ def unpack_parameters(params,global_x_min,global_x_max,global_y_min,global_y_max
     
   return x_cuts,y_cuts
 
+def unpack_parameters_3d(params,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,numcol,numrow,numplane):
+  
+  z_cuts = [global_z_min]
+  x_cuts = [[global_x_min] for plane in range(0,numplane)]
+  y_cuts = [[[global_y_min] for col in range(0,numcol)] for plane in range(0,numplane)]
+  
+  nx = numcol-1
+  ny = numrow-1
+  nz = numplane-1
+  
+  cut_id = 0
+  x_cut_id = 0
+
+  
+  for cut in params:
+    
+    if cut_id < nz:
+      z_cuts.append(cut)
+    elif cut_id >= nz:
+      if cut_id < nz+numplane*nx:
+        current_plane = int(x_cut_id/nx)
+        x_cuts[current_plane].append(cut)
+        x_cut_id += 1
+      else:
+        break
+    
+    cut_id += 1
+    
+  for plane in range(0,numplane):
+    for col in range(0,numcol):
+      for row in range(0,ny):
+        y_cuts[plane][col].append(params[cut_id])
+        cut_id += 1
+    
+  
+  z_cuts.append(global_x_max)
+  
+  for plane in range(0,numplane):
+    x_cuts[plane].append(global_x_max)
+  
+  for plane in range(0,numplane):
+    for col in range(0,numcol):
+      y_cuts[plane][col].append(global_y_max)
+  
+  return x_cuts,y_cuts,z_cuts
+  
+  
+
 def tweak_parameters(x_cuts,y_cuts,global_x_min,global_x_max,global_y_min,global_y_max,numcol,numrow):
   
   tweak_x = 0.05*(global_x_max - global_x_min)

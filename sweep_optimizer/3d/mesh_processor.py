@@ -56,6 +56,44 @@ def analytical_mesh_integration_3d(f,xmin,xmax,ymin,ymax,zmin,zmax):
 def analytical_mesh_integration_2d(f,xmin,xmax,ymin,ymax):
   return integrate.dblquad(f,xmin,xmax,lambda x: ymin, lambda x: ymax)
 
+def get_cells_per_subset_3d(f,boundaries):
+  #The total number of subsets.
+  num_subsets = len(boundaries)  
+  #Stores the number of cells per subset.
+  cells_per_subset = [None]*num_subsets
+  #Stores the number of boundary cells per subset.
+  bdy_cells_per_subset = [None]*num_subsets
+  
+  #Looping through the subsets.
+  for s in range(0,num_subsets):
+    
+    #The boundaries of this subset.
+    subset_bounds = boundaries[s]
+    xmin = subset_bounds[0]
+    xmax = subset_bounds[1]
+    ymin = subset_bounds[2]
+    ymax = subset_bounds[3]
+    zmin = subset_bounds[4]
+    zmax = subset_bounds[5]
+    
+    #The x,y, and z lengths of the subset.
+    Lx = xmax - xmin
+    Ly = ymax - ymin
+    Lz = zmax - zmin
+    #Subset volume.
+    subset_vol = Lx*Ly*Lz
+    
+    N = analytical_mesh_integration_3d(f,xmin,xmax,ymin,ymax,zmin,zmax)
+    cells_per_subset[s] = N
+    
+    #Computing boundary cells along xy, xz, and yz faces.
+    n_xy = pow((N/subset_vol),2.0/3.0)*Lx*Ly
+    n_xz = pow((N/subset_vol),2.0/3.0)*Lx*Lz
+    n_yz = pow((N/subset_vol),2.0/3.0)*Ly*Lz
+    bdy_cells_per_subset[s] = [n_xy,n_xz,n_yz]
+  
+  return cells_per_subset,bdy_cells_per_subset
+
 #Getting the cells and boundary cells per subset.
 def get_cells_per_subset_2d(f,boundaries):
   

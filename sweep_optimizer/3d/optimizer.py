@@ -25,6 +25,21 @@ def create_parameter_space(x_cuts,y_cuts,numrow,numcol):
     
   return interior_cuts
 
+def create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane):
+  
+  interior_cuts = [z_cuts[i] for i in range(1,numplane)]
+  
+  for plane in range(0,numplane):
+    interior_x_cuts = [x_cuts[plane][i] for i in range(1,numplane)]
+    interior_cuts += interior_x_cuts
+    
+  for plane in range(0,numplane):
+    for col in range(0,numcol):
+      interior_y_cuts = [y_cuts[plane][col][i] for i in range(1,numrow)]
+      interior_cuts += interior_y_cuts
+  
+  return interior_cuts
+  
 def create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol):
   
   x_tol = 0.05*(global_xmax - global_xmin)/numcol
