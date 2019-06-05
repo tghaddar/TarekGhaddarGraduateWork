@@ -357,7 +357,6 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
 
 def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col,test):
   
-  
   num_graphs = len(graphs)
   num_subsets = len(global_subset_boundaries)
   #Storing the time to solve and communicate each subset.
@@ -403,8 +402,6 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       
       #Cells in this subset.
       num_cells = cells_per_subset[node]
-      
-
       #If this is a testing run, our cost is 1.
       cost = 0.0
       if test:
@@ -422,6 +419,73 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       time_to_solve[ig][n] = max(out_edges)
       
   return graphs,time_to_solve
+
+def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,test):
+  num_graphs = len(graphs)
+  num_subsets = len(global_subset_boundaries)
+  #Storing the time to solve and communicate each subset.
+  time_to_solve = [[None]*num_subsets for g in range(num_graphs)]
+  t_u,upc,upbc,t_comm,latency,m_l = machine_params
+  #Looping over graphs.
+  for ig in range(0,num_graphs):
+    graph = graphs[ig]
+    for e in graph.edges():
+      #The starting node of this edge.
+      node = e[0]
+      #Checking the successors.
+      node_successors = list(graph.successors(node))
+      #Stores whether the neighboring boundaries are xy, xz, or yz.
+      bounds = [False, False,False]
+      #Checking where the neighbors are located.
+      for n in range(0,len(node_successors)):
+        neighbor = node_successors[n]
+        if neighbor == -1:
+          break
+        i_n,j_n,k_n = get_ijk(neighbor, num_row,num_col,num_plane)
+        i,j,k = get_ijk(node,num_row,num_col,num_plane)
+        if k_n != k:
+          bounds[0] = True
+        else:
+          if i_n == i:
+            bounds[1] = True
+          else:
+            bounds[2] = True
+      
+      num_true = sum(bounds)
+      boundary_cells = 0.0
+      comm_overhead = 0.0
+      if num_true == 3:
+        boundary_cells = max(bdy_cells_per_subset[node])
+        comm_overhead = latency*m_l
+      else:
+        if bounds[0] == True:
+          boundary_cells = bdy_cells_per_subset[node][0]
+        if bounds[1] == True:
+          boundary_cells = bdy_cells_per_subset[node][1]
+        if bounds[2] == True:
+          boundary_cells = bdy_cells_per_subset[node][2]
+      
+      #Cells in this subset.
+      num_cells = cells_per_subset[node]
+      #If this is a testing run, our cost is 1.
+      cost = 0.0
+      if test:
+        cost = 1.0
+      else:
+        cost = (num_cells*t_u*upc + (boundary_cells*upbc*t_comm + comm_overhead))
+      graph[e[0]][e[1]]['weight'] = cost
+    
+    
+  for ig in range(0,num_graphs):
+    graph = graphs[ig]
+    for n in range(0,num_subsets):
+      out_edges = list(graph.out_edges(n,'weight'))
+      num_edges = len(out_edges)
+      out_edges = [out_edges[i][2] for i in range(num_edges)]
+      time_to_solve[ig][n] = max(out_edges)
+  
+  return graphs,time_to_solve
+      
 
 #Offsets edge weighting for initial nodes for angular pipelining.
 def pipeline_offset(graphs,num_angles,time_to_solve):
@@ -1305,8 +1369,8 @@ def unpack_parameters_3d(params,global_x_min,global_x_max,global_y_min,global_y_
 
 def tweak_parameters(x_cuts,y_cuts,global_x_min,global_x_max,global_y_min,global_y_max,numcol,numrow):
   
-  tweak_x = 0.05*(global_x_max - global_x_min)
-  tweak_y = 0.05*(global_y_max - global_y_min)
+  tweak_x = (0.05/numcol)*(global_x_max - global_x_min)
+  tweak_y = (0.05/numrow)*(global_y_max - global_y_min)
   
   #Quickly sorting the cut lines.
   x_cuts = sorted(x_cuts)
@@ -1328,6 +1392,43 @@ def tweak_parameters(x_cuts,y_cuts,global_x_min,global_x_max,global_y_min,global
     y_cuts[col] = y_cuts_col
   
   return x_cuts,y_cuts
+
+def tweak_parameters_3d(x_cuts,y_cuts,z_cuts,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,numcol,numrow,numplane):
+  
+  tweak_x = (0.05/numcol)*(global_x_max - global_x_min)
+  tweak_y = (0.05/numrow)*(global_y_max - global_y_min)
+  tweak_z = (0.05/numplane)*(global_z_max - global_z_min)
+  
+  #Quickly sorting the cut lines.
+  z_cuts = sorted(z_cuts)
+  for plane in range(0,numplane):
+    x_cuts[plane] = sorted(x_cuts[plane])
+    for col in range(0,numcol):
+      y_cuts[plane][col] = sorted(y_cuts[plane][col])
+  
+  #Tweaking the zcuts if necessary.
+  for cut in range(2,numplane):
+    if z_cuts[cut] == z_cuts[cut-1]:
+      z_cuts[cut] += tweak_z
+      
+  #Tweaking the xcuts and ycuts if necessary.
+  for plane in range(0,numplane):
+    x_cuts_plane = x_cuts[plane]
+    for cut in range(2,numcol):
+      if x_cuts_plane[cut] == x_cuts_plane[cut-1]:
+        x_cuts_plane[cut] += tweak_x
+    x_cuts[plane] = x_cuts_plane
+    
+    #Tweaking the y_cuts.
+    for col in range(0,numcol):
+      y_cuts_col = y_cuts[plane][col]
+      for cut in range(2,numrow):
+        if y_cuts_col[cut] == y_cuts_col[cut-1]:
+          y_cuts_col[cut] += tweak_y
+      
+      y_cuts[plane][col] = y_cuts_col
+  
+  return x_cuts,y_cuts,z_cuts
 
 #The driving function to compute the time to solution.
 def time_to_solution(f,x_cuts,y_cuts,machine_params,num_col,num_row,num_angles,test,unweighted):
