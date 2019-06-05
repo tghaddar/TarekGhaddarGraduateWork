@@ -42,8 +42,8 @@ def create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane):
   
 def create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol):
   
-  x_tol = 0.05*(global_xmax - global_xmin)/numcol
-  y_tol = 0.05*(global_ymax - global_ymin)/numrow
+  x_tol = (0.05/numcol)*(global_xmax - global_xmin)/numcol
+  y_tol = (0.05/numrow)*(global_ymax - global_ymin)/numrow
   nx = numcol - 1
   cut_id = 0
   bounds = [()for i in range(0,num_params)]
@@ -56,45 +56,26 @@ def create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,num
     cut_id += 1
   return bounds
 
-#The machine parameters.
-#Communication time per double
-#t_comm = 4.47e-02
-##The number of bytes to communicate per subset.
-##The message latency time.
-#m_l = 1
-#latency = 4110.0e-02
-##Solve time per unknown.
-#t_u = 450.0e-02
-#upc = 4.0
-#upbc = 2.0
-#
-#machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
-#
-##Number of rows and columns.
-#numrow = 3
-#numcol = 3
-#
-##Global boundaries.
-#global_xmin = 0.0
-#global_xmax = 10.0
-#global_ymin = 0.0
-#global_ymax = 10.0
-#
-##The subset boundaries.
-#x_cuts,y_cuts = create_2d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow)
-#
-#interior_cuts = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-#num_params = len(interior_cuts)
-#bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numcol)
-#
-#test_x_cuts,test_y_cuts = unpack_parameters(interior_cuts,global_xmin,global_xmax,global_ymin,global_ymax,numcol,numrow)
-#
-##The mesh density function.
-#f = lambda x,y: x + y
-#
-#args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l)
-#
-#max_time = minimize(optimized_tts,interior_cuts,args = args,bounds = bounds,options={'maxiter':10,'maxfun':10,'disp':False})
-
+def create_bounds_3d(num_params,global_xmin,global_xmax,global_ymin,global_ymax,global_zmin,global_zmax,numrow,numcol,numplane):
+  
+  x_tol = (0.05/numcol)*(global_xmax - global_xmin)/numcol
+  y_tol = (0.05/numrow)*(global_ymax - global_ymin)/numrow
+  z_tol = (0.05/numplane)*(global_zmax - global_zmin)/numplane
+  
+  nx = numcol-1
+  nz = numplane - 1
+  
+  cut_id = 0
+  bounds = [() for i in range(0,num_params)]
+  
+  for i in range(0,num_params):
+    if cut_id < nz:
+      bounds[i] += (global_zmin+z_tol,global_zmax-z_tol)
+    elif cut_id < nz+numplane*nx:
+      bounds[i] += (global_xmin+x_tol,global_xmax-x_tol)
+    else:
+      bounds[i] += (global_ymin+y_tol,global_ymax-y_tol)
+  
+  return bounds
 
 
