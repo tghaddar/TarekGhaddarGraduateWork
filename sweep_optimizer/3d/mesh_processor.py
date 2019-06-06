@@ -1,4 +1,4 @@
-#This library contains all mesh related functions.
+##This library contains all mesh related functions.
 import numpy as np
 import math
 from scipy import integrate
@@ -46,6 +46,59 @@ def get_cells_per_subset_2d_numerical(points,boundaries):
     bdy_cells_per_subset[s] = [nx,ny]
     
   return cells_per_subset,bdy_cells_per_subset
+
+def get_cells_per_subset_3d_numerical(points,boundaries):
+  #Number of points in the domain.
+  num_points = len(points[0])
+  #The total number of subsets.
+  num_subsets = len(boundaries)  
+  #Stores the number of cells per subset.
+  cells_per_subset = [0]*num_subsets
+  #Stores the number of boundary cells per subset.
+  bdy_cells_per_subset = [0.0]*num_subsets
+  
+  #Looping through the subsets.
+  for s in range(0,num_subsets):
+    
+    #The boundaries of this subset.
+    subset_bounds = boundaries[s]
+    xmin = subset_bounds[0]
+    xmax = subset_bounds[1]
+    ymin = subset_bounds[2]
+    ymax = subset_bounds[3]
+    zmin = subset_bounds[4]
+    zmax = subset_bounds[5]
+    
+    #The x,y, and z lengths of the subset.
+    Lx = xmax - xmin
+    Ly = ymax - ymin
+    Lz = zmax - zmin
+    #Subset volume.
+    subset_vol = Lx*Ly*Lz
+    
+    #Looping through the points and assigning them to the subset if they fit.
+    for p in range(0,num_points):
+      xpoint = points[0][p]
+      ypoint = points[1][p]
+      zpoint = points[2][p]
+      
+      if zpoint >= zmin and zpoint <= zmax:
+        if xpoint >= xmin and xpoint <= xmax:
+          if ypoint >= ymin and ypoint <= ymax:
+            cells_per_subset[s] += 1
+      
+    #If there are no centroids in the subset, then the subset boundaries form a cell.
+    if cells_per_subset[s] == 0:
+      cells_per_subset = 1
+      
+    N = cells_per_subset[s]
+    #Computing boundary cells along xy, xz, and yz faces.
+    n_xy = pow((N/subset_vol),2.0/3.0)*Lx*Ly
+    n_xz = pow((N/subset_vol),2.0/3.0)*Lx*Lz
+    n_yz = pow((N/subset_vol),2.0/3.0)*Ly*Lz
+    bdy_cells_per_subset[s] = [n_xy,n_xz,n_yz]
+  
+  return cells_per_subset,bdy_cells_per_subset
   
 #Integrating an analytical mesh density function.
 #f = the analytical description of the mesh density function.
@@ -83,7 +136,7 @@ def get_cells_per_subset_3d(f,boundaries):
     #Subset volume.
     subset_vol = Lx*Ly*Lz
     
-    N = analytical_mesh_integration_3d(f,xmin,xmax,ymin,ymax,zmin,zmax)
+    N = analytical_mesh_integration_3d(f,xmin,xmax,ymin,ymax,zmin,zmax)[0]
     cells_per_subset[s] = N
     
     #Computing boundary cells along xy, xz, and yz faces.

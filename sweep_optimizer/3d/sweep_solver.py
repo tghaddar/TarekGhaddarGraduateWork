@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from copy import copy
 import build_adjacency_matrix as bam
+import build_3d_adjacency as b3a
 from build_global_subset_boundaries import build_global_subset_boundaries
 from copy import deepcopy
 from copy import copy
@@ -12,7 +13,7 @@ from utilities import get_ijk
 from utilities import get_ij,get_ss_id
 from math import isclose
 from matplotlib.pyplot import imshow,pause
-from mesh_processor import get_cells_per_subset_2d,get_cells_per_subset_2d_numerical
+from mesh_processor import get_cells_per_subset_2d,get_cells_per_subset_2d_numerical,get_cells_per_subset_3d
 import time
 import operator
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -1507,7 +1508,7 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
 
 #The time to solution function that is fed into the optimizer.
 def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted):
-  #f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l = args
+
   machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
@@ -1531,4 +1532,30 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
+  return max_time
+
+def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted,test):
+  
+  machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
+  
+  x_cuts,y_cuts,z_cuts = unpack_parameters_3d(params,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_col,num_row,num_plane)
+  x_cuts,y_cuts,z_cuts = tweak_parameters_3d(x_cuts,y_cuts,z_cuts,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_col,num_row,num_plane)
+  #Building the subset boundaries.
+  subset_bounds = b3a.build_3d_global_subset_boundaries(num_col-1,num_row-1,num_plane-1,x_cuts,y_cuts,z_cuts)
+  #Getting mesh information.
+  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_3d(f,subset_bounds)
+  #Building the adjacency matrix.
+  adjacency_matrix = b3a.build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane)
+  #Building the graphs.
+  graphs = b3a.build_graphs(adjacency_matrix,num_row,num_col,num_plane,num_angles)
+  #Weighting the graphs based on cells per subset and boundary cells per subset.
+  graphs,time_to_solve = add_edge_cost_3d(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,test)
+  #Adjusting the graphs for multiple angles per octant.
+  graphs= pipeline_offset(graphs,num_angles,time_to_solve)
+  #Making the edges universal.
+  graphs = make_edges_universal(graphs)
+  #Adding delay weighting.
+  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
+  solve_times,max_time = compute_solve_time(graphs)
+  
   return max_time

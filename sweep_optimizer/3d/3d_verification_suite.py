@@ -54,7 +54,7 @@ for angle in range(0,num_angular_test):
     num_row = num_space
     num_col = num_space
     num_plane = num_space
-    num_subsets = num_row*num_row*num_plane
+    num_subsets = num_row*num_col*num_plane
     
     z_cuts,x_cuts,y_cuts = create_3d_cuts(global_x_min,global_x_max,num_col,global_y_min,global_y_max,num_row,global_z_min,global_z_max,num_plane)
     

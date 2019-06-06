@@ -81,8 +81,6 @@ def overlap(s_bounds,n_bounds):
   return True
 
 
-
-
 def build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane):
   
   num_subsets = num_row*num_col*num_plane
