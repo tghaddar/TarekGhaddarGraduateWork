@@ -1,0 +1,119 @@
+\documentclass[xcolor={usenames,dvipsnames,svgnames,table}]{beamer}
+
+\mode<presentation>
+\usetheme{Madrid}
+
+\usecolortheme[RGB={80,0,0}]{structure}
+\useoutertheme[subsection=false]{miniframes}
+\useinnertheme{default}
+
+% hide navigation controlls
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamercolor{normal text}{fg=black}
+\setbeamercovered{dynamic}
+\beamertemplatetransparentcovereddynamicmedium
+%\usepackage{chronology}
+\setbeamertemplate{caption}[numbered]
+
+\definecolor{Maroon}{RGB}{80,0,0}
+\definecolor{BurntOrange}{RGB}{204,85,0}
+
+% load macros and prevent authblk from loading
+\input{common/macros.tex}
+\dontusepackage{authblk}
+
+% load packages, settings and definitions
+\input{common/packages.tex}
+\input{common/settings.tex}
+\input{common/definitions.tex}
+
+% nicer item settings
+\setlist[1]{nolistsep,label=\(\textcolor{Maroon}{\blacksquare}\)}
+\setlist[2]{nolistsep,label=\(\textcolor{Maroon}{\bullet}\)}
+
+\setenumerate[1]{
+	label=\protect\usebeamerfont{enumerate item}%
+	\protect\usebeamercolor[fg]{enumerate item}%
+	\insertenumlabel.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% edit to fit your document
+
+% set up pdf support and indexing
+\hypersetup{
+    pdftitle={<Title>},
+    pdfauthor={<author>},
+    pdfsubject={<subject>},
+    pdfkeywords={<keywords>},
+}
+
+\title[Partitioning Optimization]{Partitioning Optimization for Massively Parallel Transport Sweeps on Unstructured Grids}
+\author[Ghaddar]{Tarek Habib Ghaddar \\ \small{Chair: Jean C. Ragusa \\ Committee: Marvin L. Adams, Nancy Amato, Jim E. Morel}}
+\institute[Texas A\&M]{Department of Nuclear Engineering \\ Texas A\&M University}
+\date[June 19, 2019]
+
+\begin{document}
+
+% title page, do not edit
+{
+\setbeamertemplate{headline}[default] 
+\begin{frame}
+\vspace{-1.1cm}
+	\begin{figure}[t]
+		\centering
+			\includegraphics[width=.25\textwidth]{images/seal.png}
+	\end{figure}
+\vspace{-0.75cm}
+\titlepage
+\end{frame}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}	% define sections here, it is possible to get section slides automatically, but this is not enabled
+\subsection{}	% we have to keep these to get the navigation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[t]\frametitle{Motivation}
+    \begin{minipage}{0.60\textwidth}
+        \begin{flushleft}
+%         \begin{block}{Modern reactor designs (e.g. HTGRs) are challenging to model}
+             Modern reactor designs (e.g. HTGRs) are challenging to model
+          	 \begin{itemize}
+			      \item Gas cooling channel
+			      \item Instrumentation and guiding tubes
+                  \item Small void or near void volumes with big impact on the flux
+  			 \end{itemize} 
+            \end{flushleft}
+               \ \\[1em]
+%         \end{block}
+%         \pause
+%         \begin{block}{Example: Transient Test Reactor}
+             Example: Transient Test Reactor
+             TREAT is an air cooled, graphite moderated reactor
+             \begin{itemize}
+                 \item streaming effects in cooling channels
+                 \item high scattering ratio (slow convergence)
+            \end{itemize}
+%        \end{block}
+    \end{minipage} \hfill
+%    \pause
+    \begin{minipage}{0.3\textwidth}
+%        \only<3>
+        {
+%        \includegraphics[width=0.75\textwidth]{pics/treat_fuel.pdf}
+        \captionof{figure}{\scriptsize Sketch of TREAT fuel assembly with graphite region and cooling channels}
+        }
+    \end{minipage}
+ \end{frame}
+ 
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}\frametitle{Second slide}
+	\begin{block}{This can be omitted}
+		This is in a gray box
+	\end{block}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,92 @@
+% this file contains all commonly used packages for the Rattlesnake documentation
+% new package, add comment what they are used for
+
+% command packages
+\usepackage{xifthen}     % if -then else command
+
+% language and font improvements
+\usepackage[english]{babel}	% Multilingual support - https://www.ctan.org/pkg/babel
+\usepackage[utf8]{inputenc} % Accept different input encodings - https://www.ctan.org/pkg/inputenc
+\usepackage[kerning,spacing,babel]{microtype} % Subliminal refinements towards typographical perfection - https://www.ctan.org/pkg/microtype
+\usepackage{eepic}      % Extensions to epic - https://www.ctan.org/pkg/eepic
+\usepackage{epic}       % Enhance LaTeX picture mode - https://www.ctan.org/pkg/epic
+\usepackage[T1]{fontenc} % selecting font encodingsselecting font encodings - https://www.ctan.org/pkg/fontenc
+\usepackage{lmodern}
+
+% title packages
+\usepackage{authblk}		% footnote style author/affiliation - https://www.ctan.org/pkg/authblk
+
+% symbols
+\usepackage{upgreek}		% Upright Greek letters - https://www.ctan.org/pkg/upgreek
+\usepackage{cancel}			% \cancel cmd - https://www.ctan.org/pkg/cancel
+
+% chemical and isotope packages
+\usepackage{isotope}		% isotope command - https://www.ctan.org/pkg/isotope
+\usepackage{mhchem}			% chemical formulae/equations - https://www.ctan.org/pkg/mhchem
+
+% layout packages
+\usepackage{xspace}			% smart space \xspace - https://www.ctan.org/pkg/xspace
+\usepackage{icomma}			% smart math comma - https://www.ctan.org/pkg/icomma
+\usepackage{chngpage}		% page layout change during document - https://www.ctan.org/pkg/chngpage
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}			% color definitions - https://www.ctan.org/pkg/xcolor
+\usepackage{enumitem}   % layout for itemize and enumerate - http://www.ctan.org/pkg/enumitem
+\usepackage{setspace}    % allows for \singlespacing, \onehalfspacing, and \doublespacing commands - https://www.ctan.org/pkg/setspace
+
+% floating packages
+% needed by the breakalgo environment labelsep=quad
+\usepackage[singlelinecheck=false, labelsep=quad]{caption}	% table captions - https://www.ctan.org/pkg/caption
+\usepackage{subcaption}		% Support for sub-captions - https://www.ctan.org/pkg/subcaption
+\usepackage{placeins}   	% Control float placement - https://www.ctan.org/pkg/placeins
+\usepackage{float}      	% Improved interface for floating objects - https://www.ctan.org/pkg/float
+
+% table packages
+\usepackage{supertabular}	% multi-page tables package - https://www.ctan.org/pkg/supertabular
+\usepackage{booktabs}		% table settings - https://www.ctan.org/pkg/booktabs
+\usepackage{array}			% Extending the array and tabular environments - https://www.ctan.org/pkg/array
+\usepackage{multirow}		% tabular cells spanning multiple rows - https://www.ctan.org/pkg/multirow
+% \usepackage{tabls}      % Better vertical spacing in tables and arrays - https://www.ctan.org/pkg/tabls
+\usepackage{colortbl}      % Allows for color manipulation within tables - https://www.ctan.org/pkg/colortbl
+
+% pictures, plots and listings
+\usepackage{graphicx}		% include graphics - https://www.ctan.org/pkg/graphicx
+\usepackage{wrapfig}		% wrapfigure enviroment - https://www.ctan.org/pkg/wrapfig
+\usepackage{pgfplots}		% latex plots - https://www.ctan.org/pkg/pgfplots
+
+
+% source code and algorithms
+\usepackage{algorithmicx} % newer version of algorithmic - https://www.ctan.org/pkg/algorithmicx
+\usepackage{listings} 	% source code listings - http://www.ctan.org/pkg/listings
+\usepackage{verbatim}   % verbatim - https://www.ctan.org/pkg/verbatim
+
+% misc packages
+\usepackage{url}        % provide \url command for web addresses - https://www.ctan.org/pkg/url
+\usepackage{import}			% Establish input relative to a directory - https://www.ctan.org/pkg/import
+\usepackage{afterpage}  % Execute command after the next page break - https://www.ctan.org/pkg/afterpage
+\usepackage{lscape}     % Place selected parts of a document in landscape - https://www.ctan.org/pkg/lscape
+\usepackage{rotating}   % Rotation tools, including rotated full-page floats - https://www.ctan.org/pkg/rotating
+\usepackage{chngcntr}   % Change the resetting of counters - http://ctan.org/pkg/chngcntr
+\usepackage{textpos}    % Allows logo and banner manipulation
+
+% eps support
+\usepackage{epsfig}       % include eps figures - https://www.ctan.org/pkg/epsfig
+\usepackage{epsf}          % Simple macros for EPS inclusion - https://www.ctan.org/pkg/epsf
+\usepackage{epstopdf}   %use .eps images (as pdf) in \includegraphics
+
+
+% reference packages
+% hyperref must be loaded before amsmath to avoid problems with subequations and align
+\usepackage{hyperref}		% Extensive support for hypertext - https://www.ctan.org/pkg/hyperref
+
+
+% packages that must be loaded after hyperref - http://tex.stackexchange.com/questions/1863/which-packages-should-be-loaded-after-hyperref-instead-of-before
+\usepackage{geometry}		% Flexible and complete interface to document dimensions - https://www.ctan.org/pkg/geometry
+\usepackage{algorithm}  % algorithm enviroment
+
+% ams math packages
+\usepackage{amsmath}    % mathematical facilities - https://www.ctan.org/pkg/amsmath
+\usepackage{amsfonts}   % fonts for math - https://www.ctan.org/pkg/amsfonts
+\usepackage{amssymb}    %
+\usepackage{amsthm}     % Typesetting theorems - https://www.ctan.org/pkg/amsthm
+
+\usepackage{nameref}		% allows references with names instread of numbers \nameref - http://www.ctan.org/pkg/nameref
+\usepackage[capitalize,nameinlink]{cleveref}   % smart references - http://ctan.org/pkg/cleveref
