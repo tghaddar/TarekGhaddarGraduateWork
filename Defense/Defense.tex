@@ -32,6 +32,15 @@
 \setlist[1]{nolistsep,label=\(\textcolor{Maroon}{\blacksquare}\)}
 \setlist[2]{nolistsep,label=\(\textcolor{Maroon}{\bullet}\)}
 
+\newcommand {\mathsym}[1]{{}}
+\newcommand {\unicode}{{}}
+\newcommand{\om}{\boldsymbol{\Omega}}
+\newcommand{\etal}{{\it et al.\,}}
+\newcommand{\vr}{\vec{r}}
+\newcommand{\vo}{\vec{\Omega}}
+\newcolumntype{L}{>{\centering\arraybackslash}m{3cm}}
+\newcommand{\tcr}[1]{\textcolor{red}{#1}}
+
 \setenumerate[1]{
 	label=\protect\usebeamerfont{enumerate item}%
 	\protect\usebeamercolor[fg]{enumerate item}%
@@ -70,50 +79,132 @@
 \end{frame}
 }
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Introduction}	% define sections here, it is possible to get section slides automatically, but this is not enabled
-\subsection{}	% we have to keep these to get the navigation
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\tableofcontents
+\end{frame}
 
-\begin{frame}[t]\frametitle{Motivation}
-    \begin{minipage}{0.60\textwidth}
-        \begin{flushleft}
-%         \begin{block}{Modern reactor designs (e.g. HTGRs) are challenging to model}
-             Modern reactor designs (e.g. HTGRs) are challenging to model
-          	 \begin{itemize}
-			      \item Gas cooling channel
-			      \item Instrumentation and guiding tubes
-                  \item Small void or near void volumes with big impact on the flux
-  			 \end{itemize} 
-            \end{flushleft}
-               \ \\[1em]
-%         \end{block}
-%         \pause
-%         \begin{block}{Example: Transient Test Reactor}
-             Example: Transient Test Reactor
-             TREAT is an air cooled, graphite moderated reactor
-             \begin{itemize}
-                 \item streaming effects in cooling channels
-                 \item high scattering ratio (slow convergence)
-            \end{itemize}
-%        \end{block}
-    \end{minipage} \hfill
-%    \pause
-    \begin{minipage}{0.3\textwidth}
-%        \only<3>
-        {
-%        \includegraphics[width=0.75\textwidth]{pics/treat_fuel.pdf}
-        \captionof{figure}{\scriptsize Sketch of TREAT fuel assembly with graphite region and cooling channels}
-        }
-    \end{minipage}
- \end{frame}
- 
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction and Background}
+\subsection{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}\frametitle{Second slide}
-	\begin{block}{This can be omitted}
-		This is in a gray box
-	\end{block}
+\begin{frame}[t]\frametitle{Introduction}
+\begin{block}{}
+\begin{itemize}
+	\item Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically cartesian grids.
+	\item Structured meshes are somewhat limiting when attempting to simulate more complex problems and experiments.
+	\item Unstructured meshes allow us to simulate realistic problems, but introduce unbalanced partitions. 
+	\item PDT (Texas A\&M's massively parallel transport code) introduced two load balancing algorithms that repartition the mesh in order to obtain a roughly equivalent amount of cells per processor. 
+	\item However, this can sacrifice the optimal sweep partitioning (cut lines all the way through the domain) in favor of balance. 
+	\item The method described will balance perfect load balancing and optimal sweep partitioning in order to achieve the best possible time to solution.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Transport Sweeps}
+\begin{block}{}
+\begin{equation}
+\vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
+\label{iteration}
+\end{equation}
+\begin{itemize}
+\item The domain is meshed and discretized, allowing one cell at a time to be solved.
+\item The solution across a cell interface is connected based on an upwind approach.
+\end{itemize}
+\end{block}
+\centering
+\includegraphics[scale = 0.15]{../figures/UnstructureMesh.pdf}
+\includegraphics[scale = 0.15]{../figures/StructuredMesh.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Parallel Transport Sweeps}
+
+\begin{block}{A parallel sweep algorithm is defined by three properties:}
+\begin{itemize}
+\item partitioning: dividing the domain among available processors,
+\item aggregation: grouping cells, directions, and energy groups into tasks,
+\item scheduling: choosing which task to execute if more than one is available.
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+\begin{frame}[t]\frametitle{KBA Algorithm}
+\begin{block}{}
+\begin{itemize}
+\item KBA limits the number of processors in $z$ to one, solves one group at a time, and does not aggregate in angle or group.
+\item KBA primarily uses a "successive in angle, successive in quadrant" approach.
+\item An octant pipelines its angular work, and once all directions are complete, the opposing octant pipelines them back.
+\item This is then done for all remaining octant pairs.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{KBA Algorithm}
+\begin{block}{}
+\begin{itemize}
+\item KBA utlilizes a "pipelining" or assembly line approach where new work is started before old work is fully completed.
+\end{itemize}
+\end{block}
+\centering
+\includegraphics[scale=0.6,trim={0cm 1cm 0cm 0cm},clip]{../figures/pipeline_example.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Sweeps in PDT}
+\begin{block}{}
+\begin{itemize}
+\item PDT's extension of the KBA algorithm does not limit $P_z, A_m, G,$ or $A_g$.
+\item PDT also launches all 8 octants (4 quadrants in 2D) simultaneously, rather than one octant-pair at a time.
+\item Unlike KBA, PDT must schedule around conflicts that emerge between octants.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Tie Breaking in PDT}
+
+\begin{block}{If two or more tasks reach a processor at the same time, PDT employs a tie breaking strategy:}
+
+\begin{enumerate}
+	\item The task with the greater depth-of-graph remaining (simply, more work remaining) goes first.
+	\item If the depth-of-graph remaining is tied, the task with $\Omega_x > 0$ wins.
+	\item If multiple tasks have $\Omega_x > 0$, then the task with $\Omega_y > 0$ wins.
+	\item If multiple tasks have $\Omega_y > 0$, then the task with $\Omega_z > 0$ wins.
+\end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Unstructured Meshing in PDT}
+  \begin{block}{}
+    \begin{itemize}
+      \item PDT using unstructured meshes has been a priority since early 2014. 
+      \item Unstructured meshes allow for simulation of a wider and more general variety of problems.
+      \item Three unstructured mesh types are supported in PDT:
+        \begin{itemize}
+          \item Triangle (2D and 2D extruded triangular/prismatic meshes).
+          \item Spiderweb (2D and 2D extruded prismatic meshes).
+          \item Cubit/OpenFOAM (fully unstructured 3D meshes).
+        \end{itemize}
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Unstructured Meshing in PDT}
+\begin{block}{Partitioning for Unstructured Meshes}
+\begin{itemize}
+\item ``Cut lines" in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
+\item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
+\item The subsets are distributed amongst the processor domain.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Partitioning Example}
+\centering
+\includegraphics[scale=0.45,trim={0.95in 0.64in 0.35in 0.44in},clip]{../figures/partitioning_example.pdf}
 \end{frame}
 
 \end{document}
