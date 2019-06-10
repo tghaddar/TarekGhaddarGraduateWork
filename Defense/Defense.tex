@@ -473,7 +473,24 @@ f_{D3,d2,d1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Building the Adjacency Matrix}
-
+\begin{block}{}
+\begin{itemize}
+  \item The adjacency matrix provides the crucial connectivity information necessary to build the Task Dependence Graphs (TDG's) in the time-to-solution estimator.
+\end{itemize}
+\end{block}
+\begin{minipage}{0.49\textwidth}
+\centering
+\includegraphics[scale=0.4]{../figures/base_adjacency_layout.pdf}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
+\centering
+$\begin{pmatrix}
+0 & 1 & 1  & 0  \\
+1 & 0 & 0 & 1 \\
+1 & 0 & 0 & 1 \\ 
+0 & 1 & 1 & 0 \\
+\end{pmatrix}$
+\end{minipage}
 \end{frame}
 
 
