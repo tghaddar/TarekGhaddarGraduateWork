@@ -456,6 +456,9 @@ f_{D3,d2,d1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}
 	\item The time to solution estimator will be fed into an optimizing function that minimizes the time to solution. The cut lines corresponding to the minimum time to solution are the optimal partitioning scheme.
 \end{itemize}
 \end{block}
+\begin{block}{IMPORTANT}
+The time-to-solution estimator is a graph-based method that uses graph algorithms that rely on an acyclic graph. The partitioning schemes used CANNOT induce cycles.
+\end{block}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Time To Solution Estimator}
@@ -491,6 +494,28 @@ $\begin{pmatrix}
 0 & 1 & 1 & 0 \\
 \end{pmatrix}$
 \end{minipage}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Building the Task Dependence Graphs}
+\begin{block}{}
+\begin{itemize}
+    \item Each quadrant/octant gets its own TDG.
+    \item The opposing quadrant/octant pairs have opposing sweep orderings. 
+    \item Each set of quadrant/octant pairs uses a different adjacency matrix. 
+    \item Python package \textbf{networkx} is used for all graph operations.
+\end{itemize}
+\end{block}
+\centering
+\includegraphics[scale=0.45]{../figures/quadrant_layout.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Quadrants 0 and 3}
+\begin{block}{}
+\begin{itemize}
+    \item We use the upper triangular portion of the adjacency matrix for quadrant 0.
+    \item We use the lower triangular portion of the adjacency matrix for quadrant 1.
+\end{itemize}
+\end{block}
 \end{frame}
 
 
