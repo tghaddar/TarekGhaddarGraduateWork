@@ -516,6 +516,49 @@ $\begin{pmatrix}
     \item We use the lower triangular portion of the adjacency matrix for quadrant 1.
 \end{itemize}
 \end{block}
+\begin{minipage}{0.49\textwidth}
+  \centering
+  \includegraphics[scale=0.35]{../figures/q0_preweight.pdf}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
+  \centering
+  \includegraphics[scale=0.35]{../figures/q3_preweight.pdf}
+\end{minipage}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Quadrants 1 and 2}
+  \begin{block}{}
+    \begin{itemize}
+      \item Before building the graphs for these opposing quadrants, we have to alter the adjacency matrix slightly.
+      \item The subsets get renumbered in a manner where subset 1 becomes subset 0, subset 0 becomes subset 1, etc. In short the column numbering is flipped, and a ``flipped'' adjacency matrix is built. 
+    \end{itemize}
+  \end{block}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.38]{../figures/base_adjacency_layout.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.38]{../figures/flipped_subset_layout.pdf}
+  \end{minipage}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Quadrants 1 and 2}
+  \begin{block}{}
+    \begin{itemize}
+      \item We use the upper triangular portion of the ``flipped'' adjacency matrix for quadrant 1.
+      \item We use the lower triangular portion of the ``flipped'' adjacency matrix for quadrant 2.
+    \end{itemize}
+  \end{block}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../figures/q1_preweight.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../figures/q2_preweight.pdf}
+  \end{minipage}
+
 \end{frame}
 
 
