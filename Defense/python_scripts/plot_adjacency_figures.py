@@ -1,11 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-#sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
-sys.path.append(r'C:\Users\tghad\Documents\GitHub\TarekGhaddarGraduateWork\sweep_optimizer\3d')
+sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
+#sys.path.append(r'C:\Users\tghad\Documents\GitHub\TarekGhaddarGraduateWork\sweep_optimizer\3d')
 from mesh_processor import create_2d_cuts
 from build_global_subset_boundaries import build_global_subset_boundaries
 from sweep_solver import plot_subset_boundaries_2d,add_edge_cost
+from sweep_solver import make_edges_universal,pipeline_offset
 from build_adjacency_matrix import build_adjacency,build_graphs 
 import networkx as nx
 from utilities import get_ijk
@@ -68,28 +69,28 @@ graphs = build_graphs(adjacency_matrix,numrow,numcol,1)
 plt.figure("Quadrant 0")
 plt.title("Quadrant 0 Graph")
 #edge_labels_1 = nx.get_edge_attributes(graphs[0])
-nx.draw(graphs[0],Q0,with_labels = True)
+nx.draw(graphs[0],Q0,with_labels = True,node_color='red')
 plt.savefig("../../figures/q0_preweight.pdf")
 plt.close()
 
 plt.figure("Quadrant 3")
 plt.title("Quadrant 3 Graph")
 #edge_labels_1 = nx.get_edge_attributes(graphs[0])
-nx.draw(graphs[3],Q3,with_labels = True)
+nx.draw(graphs[3],Q3,with_labels = True,node_color='red')
 plt.savefig("../../figures/q3_preweight.pdf")
 plt.close()
 
 plt.figure("Quadrant 1")
 plt.title("Quadrant 1 Graph")
 #edge_labels_1 = nx.get_edge_attributes(graphs[0])
-nx.draw(graphs[1],Q1,with_labels = True)
+nx.draw(graphs[1],Q1,with_labels = True,node_color='red')
 plt.savefig("../../figures/q1_preweight.pdf")
 plt.close()
 
 plt.figure("Quadrant 2")
 plt.title("Quadrant 2 Graph")
 #edge_labels_1 = nx.get_edge_attributes(graphs[0])
-nx.draw(graphs[2],Q2,with_labels = True)
+nx.draw(graphs[2],Q2,with_labels = True,node_color='red')
 plt.savefig("../../figures/q2_preweight.pdf")
 plt.close()
 
@@ -145,31 +146,66 @@ graphs,time_to_solve = add_edge_cost(graphs,bounds,cells_per_subset,bdy_cells_pe
 plt.figure("Quadrant 0")
 plt.title("Quadrant 0 Graph")
 edge_labels_1 = nx.get_edge_attributes(graphs[0],'weight')
-nx.draw(graphs[0],Q0,with_labels = True)
-nx.draw_networkx_edge_labels(graphs[0],Q0,edge_labels=edge_labels_1,font_size=6)
+nx.draw(graphs[0],Q0,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[0],Q0,edge_labels=edge_labels_1,font_size=12)
 plt.savefig("../../figures/q0_postweight.pdf")
 plt.close()
 
 plt.figure("Quadrant 1")
 plt.title("Quadrant 1 Graph")
 edge_labels_1 = nx.get_edge_attributes(graphs[1],'weight')
-nx.draw(graphs[1],Q1,with_labels = True)
-nx.draw_networkx_edge_labels(graphs[1],Q1,edge_labels=edge_labels_1,font_size=6)
+nx.draw(graphs[1],Q1,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[1],Q1,edge_labels=edge_labels_1,font_size=12)
 plt.savefig("../../figures/q1_postweight.pdf")
 plt.close()
 
 plt.figure("Quadrant 2")
 plt.title("Quadrant 2 Graph")
 edge_labels_1 = nx.get_edge_attributes(graphs[2],'weight')
-nx.draw(graphs[2],Q2,with_labels = True)
-nx.draw_networkx_edge_labels(graphs[2],Q2,edge_labels=edge_labels_1,font_size=6)
+nx.draw(graphs[2],Q2,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[2],Q2,edge_labels=edge_labels_1,font_size=12)
 plt.savefig("../../figures/q2_postweight.pdf")
 plt.close()
 
 plt.figure("Quadrant 3")
 plt.title("Quadrant 3 Graph")
 edge_labels_1 = nx.get_edge_attributes(graphs[3],'weight')
-nx.draw(graphs[3],Q3,with_labels = True)
-nx.draw_networkx_edge_labels(graphs[3],Q3,edge_labels=edge_labels_1,font_size=6)
+nx.draw(graphs[3],Q3,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[3],Q3,edge_labels=edge_labels_1,font_size=12)
 plt.savefig("../../figures/q3_postweight.pdf")
+plt.close()
+
+
+graphs = pipeline_offset(graphs,1,time_to_solve)
+#POST PIPELINENING
+plt.figure("Quadrant 0")
+plt.title("Quadrant 0 Graph")
+edge_labels_1 = nx.get_edge_attributes(graphs[0],'weight')
+nx.draw(graphs[0],Q0,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[0],Q0,edge_labels=edge_labels_1,font_size=12)
+plt.savefig("../../figures/q0_postpipeline.pdf")
+plt.close()
+
+plt.figure("Quadrant 1")
+plt.title("Quadrant 1 Graph")
+edge_labels_1 = nx.get_edge_attributes(graphs[1],'weight')
+nx.draw(graphs[1],Q1,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[1],Q1,edge_labels=edge_labels_1,font_size=12)
+plt.savefig("../../figures/q1_postpipeline.pdf")
+plt.close()
+
+plt.figure("Quadrant 2")
+plt.title("Quadrant 2 Graph")
+edge_labels_1 = nx.get_edge_attributes(graphs[2],'weight')
+nx.draw(graphs[2],Q2,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[2],Q2,edge_labels=edge_labels_1,font_size=12)
+plt.savefig("../../figures/q2_postpipeline.pdf")
+plt.close()
+
+plt.figure("Quadrant 3")
+plt.title("Quadrant 3 Graph")
+edge_labels_1 = nx.get_edge_attributes(graphs[3],'weight')
+nx.draw(graphs[3],Q3,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[3],Q3,edge_labels=edge_labels_1,font_size=12)
+plt.savefig("../../figures/q3_postpipeline.pdf")
 plt.close()
