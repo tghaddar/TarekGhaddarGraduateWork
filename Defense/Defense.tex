@@ -558,7 +558,23 @@ $\begin{pmatrix}
     \centering
     \includegraphics[scale=0.35]{../figures/q2_preweight.pdf}
   \end{minipage}
+\end{frame}
 
+\begin{frame}[t]\frametitle{Weighting the TDGs}
+\begin{block}{}
+\begin{itemize}
+	\item In order to weight the graph properly, we need to have a mesh density function that we can calculate the cells (and then unknowns) per subset from.
+	\item The weight of the edge between two nodes (subsets) in the graph represents the solve and communication time of the base node.
+\end{itemize}
+\end{block}
+\begin{block}{}
+\begin{align}
+\text{cells per subset} &= \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz \\
+\label{weight}
+\text{weight} &= N_u\cdot T_u + N_b\cdot T_{\text{comm}} + \text{latency}\cdot M_L \\
+N_u &= \text{num cells}\cdot \text{unknowns per cell} \\
+N_b &\approx(\text{num boundary cells})\cdot \text{boundary unknowns per cell}
+\end{align}
 \end{frame}
 
 
