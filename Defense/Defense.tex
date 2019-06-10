@@ -208,7 +208,7 @@
 \end{frame}
 
 
-\section{Load Balancing Algorithms}
+\section{Load Balancing}
 \subsection{}
 
 \begin{frame}[t]\frametitle{Load Balancing}
@@ -437,6 +437,43 @@ f_{D3,d2,d1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}
     \centering
 	\animategraphics[loop,controls,width=0.7\linewidth]{10}{../figures/sweeps_png/sweep_worst_20x20_as1_dog/sweep_worst_20x20_as1_dog_}{1}{230}
 	%\href{run:figures/sweep_figs/sweeps_png/sweep_worst_20x20_as1_dog/animation.gif}{Animation.gif}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Time-To-Solution Estimator}
+\subsection{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[t]\frametitle{Overview}
+\begin{block}{}
+\begin{itemize}
+	\item We need to optimize the cut line location not for balance, but for the best possible sweep time.
+	\item We must build a time-to-solution estimator that calculates the time to solution for a given cut line partitioning.
+	\item The time to solution estimator will be fed into an optimizing function that minimizes the time to solution. The cut lines corresponding to the minimum time to solution are the optimal partitioning scheme.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Time To Solution Estimator}
+\begin{block}{}
+\begin{enumerate}
+    \item Given a partitioning scheme, build an adjacency matrix.
+    \item From the adjacency matrix, build Directed Acyclic Graphs (DAGs), one for each quadrant/octant.
+    \item Weight each DAG's edges based on the solve and communication time of each subset to its neighbors.
+    \item Adjust the weights of each graph to reflect a universal timescale.
+    \item Adjust the weights of each graph based on the number of anglesets.
+    \item Adjust the weights of each graph to reflect sweep conflicts between octants.
+    \item Obtain the time-to-solution.
+\end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Building the Adjacency Matrix}
+
 \end{frame}
 
 
