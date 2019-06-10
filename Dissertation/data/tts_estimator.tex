@@ -28,8 +28,8 @@ The time-to-solution estimator determines the time to sweep across a domain by:
 	\item Build Directed Acyclic Graphs  (DAGs) from the adjacency matrices, one for each quadrant/octant.
 	\item Determine the cells per subset and boundary cells per subset for the given mesh.
 	\item Weight the edges of each graph based on the solve and communication time of each subset to its neighbors.
-	\item Adjust the weights of each graph to operate on the universal timescale.
 	\item Adjust the weights of each graph to accommodate angular pipelining.
+	\item Adjust the weights of each graph to operate on the universal timescale.
 	\item Adjust the weights of each graph to reflect sweep conflicts between octants. 
 	\item Calculate the time to solution.
 \end{enumerate}
