@@ -9,6 +9,7 @@ from sweep_solver import plot_subset_boundaries_2d,add_edge_cost
 from sweep_solver import make_edges_universal,pipeline_offset
 from build_adjacency_matrix import build_adjacency,build_graphs 
 import networkx as nx
+from copy import deepcopy
 from utilities import get_ijk
 plt.close("all")
 
@@ -64,7 +65,7 @@ Q3[3] = [4, 0]
 Q3[-1] = [-2,0]
 
 adjacency_matrix = build_adjacency(bounds,numcol-1,numrow-1,y_cuts)
-graphs = build_graphs(adjacency_matrix,numrow,numcol,1)
+graphs = build_graphs(adjacency_matrix,numrow,numcol,2)
 
 plt.figure("Quadrant 0")
 plt.title("Quadrant 0 Graph")
@@ -176,7 +177,8 @@ plt.savefig("../../figures/q3_postweight.pdf")
 plt.close()
 
 
-graphs = pipeline_offset(graphs,1,time_to_solve)
+
+graphs = pipeline_offset(graphs,2,time_to_solve)
 #POST PIPELINENING
 plt.figure("Quadrant 0")
 plt.title("Quadrant 0 Graph")
@@ -208,4 +210,37 @@ edge_labels_1 = nx.get_edge_attributes(graphs[3],'weight')
 nx.draw(graphs[3],Q3,with_labels = True,node_color='red')
 nx.draw_networkx_edge_labels(graphs[3],Q3,edge_labels=edge_labels_1,font_size=12)
 plt.savefig("../../figures/q3_postpipeline.pdf")
+plt.close()
+
+#Second Angle.
+plt.figure("Quadrant 0")
+plt.title("Quadrant 0 Angle 2")
+edge_labels_1 = nx.get_edge_attributes(graphs[4],'weight')
+nx.draw(graphs[4],Q0,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[4],Q0,edge_labels=edge_labels_1,font_size=12)
+plt.savefig("../../figures/q4_postpipeline.pdf")
+plt.close()
+
+plt.figure("Quadrant 1")
+plt.title("Quadrant 1 Angle 2")
+edge_labels_1 = nx.get_edge_attributes(graphs[5],'weight')
+nx.draw(graphs[5],Q1,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[5],Q1,edge_labels=edge_labels_1,font_size=12)
+plt.savefig("../../figures/q5_postpipeline.pdf")
+plt.close()
+
+plt.figure("Quadrant 2")
+plt.title("Quadrant 2 Angle 2")
+edge_labels_1 = nx.get_edge_attributes(graphs[6],'weight')
+nx.draw(graphs[6],Q2,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[6],Q2,edge_labels=edge_labels_1,font_size=12)
+plt.savefig("../../figures/q6_postpipeline.pdf")
+plt.close()
+
+plt.figure("Quadrant 3")
+plt.title("Quadrant 3 Angle 2")
+edge_labels_1 = nx.get_edge_attributes(graphs[7],'weight')
+nx.draw(graphs[7],Q3,with_labels = True,node_color='red')
+nx.draw_networkx_edge_labels(graphs[7],Q3,edge_labels=edge_labels_1,font_size=12)
+plt.savefig("../../figures/q7_postpipeline.pdf")
 plt.close()
