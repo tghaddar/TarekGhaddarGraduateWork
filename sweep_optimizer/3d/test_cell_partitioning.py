@@ -1,5 +1,5 @@
 import numpy as np
-from mesh_processor import get_cells_per_subset_2d_numerical
+from mesh_processor import get_cells_per_subset_2d_numerical,get_cells_per_subset_2d_test
 from build_global_subset_boundaries import build_global_subset_boundaries
 
 nx = 1
@@ -12,5 +12,5 @@ bounds = build_global_subset_boundaries(nx,ny,x_cuts,y_cuts)
 
 points = np.genfromtxt("unbalanced_pins_centroid_data").T
 
-cps,bcps = get_cells_per_subset_2d_numerical(points,bounds)
+cps,bzc,bcpsb = get_cells_per_subset_2d_test(points,bounds)
 

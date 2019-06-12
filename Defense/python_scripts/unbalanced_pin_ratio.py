@@ -10,19 +10,19 @@ from mesh_processor import create_2d_cuts
 
 #The machine parameters.
 #Communication time per double
-t_comm = 4.47e-02
+t_comm = 4.47e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
 m_l = 1
-latency = 4110.0e-02
+latency = 4110.0e-09
 #Solve time per unknown.
-t_u = 450.0e-02
+t_u = 450.0e-09
 upc = 4.0
 upbc = 2.0
 machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
 
-num_row = 3
-num_col = 3
+num_row = 2
+num_col = 2
 num_angles = 1
 unweighted = True
 xmin = 0.0

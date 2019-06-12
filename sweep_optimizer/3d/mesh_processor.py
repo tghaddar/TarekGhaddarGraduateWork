@@ -47,6 +47,63 @@ def get_cells_per_subset_2d_numerical(points,boundaries):
     
   return cells_per_subset,bdy_cells_per_subset
 
+def get_cells_per_subset_2d_test(points,boundaries):
+  num_points = len(points[0])
+  #Number of subsets.
+  num_subsets = len(boundaries)
+  #Stores the number of cells per subset.
+  cells_per_subset = [0]*num_subsets
+  #Stores the number of boundary cells per subset.
+  bdy_cells_per_subset = [0.0]*num_subsets  
+  bdy_zone_cells = np.zeros([num_subsets,4])
+  
+  #Looping through the subsets.
+  for s in range(0,num_subsets):
+    
+    subset_bounds = boundaries[s]
+    xmin = subset_bounds[0]
+    xmax = subset_bounds[1]
+    ymin = subset_bounds[2]
+    ymax = subset_bounds[3]
+    
+    #The x length of the subset.
+    Lx = xmax - xmin
+    #The y length of the subset.
+    Ly = ymax - ymin
+    #The area of the subset.
+    subset_area = Lx*Ly
+    
+    x_boundary_zone = [xmin + 0.05*Lx, xmax - 0.05*Lx]
+    y_boundary_zone = [ymin + 0.05*Ly, ymax - 0.05*Ly]    
+    for p in range(0,num_points):
+      xpoint = points[0][p]
+      ypoint = points[1][p]
+      
+      if xpoint >= xmin and xpoint <= xmax:
+        if ypoint >= ymin and ypoint <=ymax:
+          cells_per_subset[s] += 1
+          #Checking if this cell is in the boundary zone.
+          if xpoint < x_boundary_zone[0]:
+            bdy_zone_cells[s][0] += 1
+          elif xpoint > x_boundary_zone[1]:
+            bdy_zone_cells[s][1] += 1
+          if ypoint < y_boundary_zone[0]:
+            bdy_zone_cells[s][2] += 1
+          elif ypoint > y_boundary_zone[1]:
+            bdy_zone_cells[s][3] += 1
+            
+    if cells_per_subset[s] == 0:
+      cells_per_subset[s] = 1
+      
+    N = cells_per_subset[s]
+    
+    #Computing the boundary cells along x and y.
+    nx = math.sqrt(N/subset_area)*Lx
+    ny =  math.sqrt(N/subset_area)*Ly
+    bdy_cells_per_subset[s] = [nx,ny]
+    
+  return cells_per_subset,bdy_zone_cells,bdy_cells_per_subset
+
 def get_cells_per_subset_3d_numerical(points,boundaries):
   #Number of points in the domain.
   num_points = len(points[0])
