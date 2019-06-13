@@ -14,6 +14,7 @@ from utilities import get_ij,get_ss_id
 from math import isclose
 from matplotlib.pyplot import imshow,pause
 from mesh_processor import get_cells_per_subset_2d,get_cells_per_subset_2d_numerical,get_cells_per_subset_3d,get_cells_per_subset_3d_numerical
+from mesh_processor import get_cells_per_subset_2d_test
 import time
 import operator
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -1516,10 +1517,11 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   print(x_cuts,y_cuts)
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
-  #Getting mesh information.
-  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_numerical(points,subset_bounds)  
+ 
   #Building the adjacency matrix.
   adjacency_matrix = bam.build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
+   #Getting mesh information.
+  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_test(points,subset_bounds,adjacency_matrix,num_row,num_col)  
   #Building the graphs.
   graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
