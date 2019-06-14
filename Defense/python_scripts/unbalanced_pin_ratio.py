@@ -1,12 +1,11 @@
 import numpy as np
-import matplotlib.pyplot as plt
+
 import sys
 sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
 #sys.path.append(r'C:\Users\tghad\Documents\GitHub\TarekGhaddarGraduateWork\sweep_optimizer\3d')
 from sweep_solver import optimized_tts_numerical
-from optimizer import create_parameter_space
+from optimizer import create_parameter_space,create_bounds
 from mesh_processor import create_2d_cuts
-import uncertainties.unumpy as unumpy  
 
 #The machine parameters.
 #Communication time per double
@@ -31,6 +30,7 @@ ymax = 1.0
 ns = [2,3,4,5,6,7,8,9,10]
 num_suite = len(ns)
 ratio_tts = [None]*num_suite
+ratio_tts_lbd = [0.0]*(num_suite-1)
 
 for i in range(0,num_suite):
   s = ns[i]
@@ -53,18 +53,28 @@ for i in range(0,num_suite):
   max_time_lb = optimized_tts_numerical(params, points,xmin,xmax,ymin,ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
   
   ratio_tts[i] = max_time_lb/max_time_reg
-
-
+  
+  #LBD
+  if (i < num_suite-1) and (s!=7):
+    x_cuts = np.genfromtxt("cut_line_data_x_"+str(s)+"_lbd")
+    y_cuts = np.genfromtxt("cut_line_data_y_"+str(s)+"_lbd") 
+    max_time_lbd = optimized_tts_numerical(params, points,xmin,xmax,ymin,ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
+    ratio_tts_lbd[i] = max_time_lbd/max_time_reg
 
 max_time_reg_pdt = np.genfromtxt("solvepersweep_regular_fcfs.txt")
 max_time_lb_pdt = np.genfromtxt("solvepersweep_lb_fcfs.txt")
+max_time_lbd_pdt = np.genfromtxt("solvepersweep_lbd_fcfs.txt")
 max_time_reg_shape = np.reshape(max_time_reg_pdt,(10,9))
 max_time_lb_shape = np.reshape(max_time_lb_pdt,(10,9))
+max_time_lbd_shape = np.reshape(max_time_lbd_pdt,(10,7))
+max_time_lbd_shape = np.insert(max_time_lbd_shape,5,np.zeros(10).T,axis=1)
 max_time_reg_median = np.zeros([9])
 max_time_lb_median = np.zeros([9])
+max_time_lbd_median = np.ones([8])
 max_time_reg_stdev = np.zeros([9])
 max_time_lb_stdev = np.zeros([9])
 for i in range(0,9):
+  s = ns[i]
   cur_med = np.median(max_time_reg_shape[:,i])
   stdev = np.std(max_time_reg_shape[:,i])
   cur_med_lb = np.median(max_time_lb_shape[:,i])
@@ -74,15 +84,23 @@ for i in range(0,9):
   max_time_reg_stdev[i] = stdev
   max_time_lb_stdev[i] = stdev_lb
   
-x = unumpy.uarray((max_time_reg_median,max_time_reg_stdev))
-y = unumpy.uarray((max_time_lb_median,max_time_lb_stdev))
-ratio_pdt_u = x/y
-ratio_tts_std = np.zeros([9])
-ratio_tts_u = unumpy.uarray((ratio_tts,ratio_tts_std))
-#ratio_pdt = np.divide(max_time_lb_median,max_time_reg_median)
+  if (i < 8) and (s != 7):
+    max_time_lbd_median[i] = np.median(max_time_lbd_shape[:,i])
+
+  
+
+ratio_pdt_lb = np.divide(max_time_lb_median,max_time_reg_median)
+ratio_pdt_lbd = np.divide(max_time_lbd_median,max_time_reg_median[0:8])
+np.savetxt("ratio_pdt_lb",ratio_pdt_lb)
+np.savetxt("ratio_tts_lb",ratio_tts)
+np.savetxt("ratio_pdt_lbd",ratio_pdt_lbd)
+np.savetxt("ratio_tts_lbd",ratio_tts_lbd)
+
 #
-diff = abs(ratio_pdt_u-ratio_tts_u)
-percent_diff = diff/ratio_pdt_u
+diff_lb = abs(ratio_pdt_lb-ratio_tts)
+percent_diff_lb = diff_lb/ratio_pdt_lb
+diff_lbd = abs(ratio_pdt_lbd-ratio_tts_lbd)
+percent_diff_lbd = diff_lbd/ratio_pdt_lbd
 
 ##Writing the xml portions.
 #f = open("cuts.xml",'w')
