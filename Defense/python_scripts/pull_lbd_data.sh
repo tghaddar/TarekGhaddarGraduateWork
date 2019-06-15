@@ -1,12 +1,12 @@
 #!/bin/bash
-linums="$(grep -n "Solve Time/Sweep" ubp_lbd_suite_fcfs.out | cut -d: -f1)"
+linums="$(grep -n "Solve Time/Sweep" ubp_sparse_lbd_suite_fcfs.out | cut -d: -f1)"
 solvepersweep=()
 solveperunknown=()
 ctr=0
 for l in $linums
 do
   newline=$((l+2))
-  curline=$(sed -n ${newline}p ubp_lbd_suite_fcfs.out)
+  curline=$(sed -n ${newline}p ubp_sparse_lbd_suite_fcfs.out)
   IFS=' ' read -r -a array <<< $curline
   item=${array[5]}
   item2=${array[6]}
@@ -16,5 +16,5 @@ done
 echo ${solvepersweep[@]}
 echo ${solveperunknown[@]}
 
-printf "%s " ${solvepersweep[@]} > solvepersweep_lbd_fcfs.txt
-printf "%s " ${solveperunknown[@]} > solveperunknown_lbd_fcfs.txt
+printf "%s " ${solvepersweep[@]} > solvepersweep_sparse_lbd_fcfs.txt
+printf "%s " ${solveperunknown[@]} > solveperunknown_sparse_lbd_fcfs.txt
