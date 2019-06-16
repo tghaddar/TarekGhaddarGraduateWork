@@ -1534,6 +1534,7 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
+  print(max_time)
   return max_time
 
 def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted,test):

@@ -57,7 +57,7 @@ for i in range(0,10):
   else:
     points = np.append(points,points_local,axis=1)
 
-eps = ((gxmax-gxmin)/num_row)
+
 
 x_cuts = np.genfromtxt("x_cuts_10_worst.csv",delimiter=",")
 y_cuts = np.genfromtxt("y_cuts_10_worst.csv",delimiter=",")
@@ -65,9 +65,10 @@ params = create_parameter_space(x_cuts,y_cuts,num_row,num_col)
 num_params = len(params)
 bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,num_row,num_col)
 args = (points,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
-#max_time = minimize(optimized_tts_numerical,params,method='SLSQP',args=args,bounds=bounds,options={'maxiter':1000,'maxfun':1000,'disp':True,'eps':eps},tol=1e-08)
-max_time = differential_evolution(optimized_tts_numerical,bounds,args=args)
+eps = 1e-04
+max_time = minimize(optimized_tts_numerical,params,method='SLSQP',args=args,bounds=bounds,options={'maxiter':1000,'maxfun':500,'disp':True,'eps':eps},tol=1e-08)
+#max_time = differential_evolution(optimized_tts_numerical,bounds,args=args,strategy='best2bin',maxiter=2)
 x_cuts,y_cuts = unpack_parameters(max_time.x,gxmin,gxmax,gymin,gymax,num_col,num_row)
-    
+
   
   
