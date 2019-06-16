@@ -685,6 +685,21 @@ $\begin{pmatrix}
   \end{block}
 \end{frame}
 
+\begin{frame}[t]\frametitle{First Come First Serve Conflict Resolution}
+\begin{block}{}
+\begin{itemize}
+	\item The first octant to arrive to a node will begin solving it, and the remaining octants will incur a delay (if applicable).
+	\item The delay is reflected in each remaining TDG by adding the corresponding delay as a weight to the applicable edge.
+  \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant (same as PDT) wins the tie.
+\end{itemize}
+\end{block}
+\begin{block}{Potential Future Work: hybrid depth-of-graph/first come first serve conflict resolution}
+\begin{itemize}
+	\item Two (or more) paths arrive to a node at different time, and when that node is free to solve, the path with the greater depth-of-graph remaining solves first.
+\end{itemize}
+\end{block}
+\end{frame}
+
 \begin{frame}[t]\frametitle{2D Verification}
 \vspace{-0.3cm}
   \begin{block}{}
