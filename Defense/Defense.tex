@@ -693,11 +693,11 @@ $\begin{pmatrix}
   \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant (same as PDT) wins the tie.
 \end{itemize}
 \end{block}
-\begin{block}{Potential Future Work: hybrid depth-of-graph/first come first serve conflict resolution}
-\begin{itemize}
-	\item Two (or more) paths arrive to a node at different time, and when that node is free to solve, the path with the greater depth-of-graph remaining solves first.
-\end{itemize}
-\end{block}
+  \begin{block}{Unweighted vs. Weighted Depth-of-Graph Remaining}
+    \begin{itemize}
+      \item There are two options for the depth-of-graph remaining. Unweighted does not take the weights into account, and weighted looks at the final time for the conflicting graphs on the universal time scale.
+    \end{itemize}
+  \end{block}
 \end{frame}
 
 \begin{frame}[t]\frametitle{2D Verification}
