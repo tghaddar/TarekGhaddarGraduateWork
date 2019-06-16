@@ -675,7 +675,14 @@ $\begin{pmatrix}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Conflict Detection and Resolution}
-
+  \begin{block}{}
+    \begin{itemize}
+      \item Best summarized as a ``marching" process. 
+      \item Starting at time $t=0$, find the first interaction (recalling that the incoming weight to a node reflects the time it is ready to solve).
+      \item If at time $t$, multiple TDGs are solving the same node, this means there is a conflict. 
+      \item  ``Losing" TDGs modify their downstream weights according to how long they are delayed.
+    \end{itemize}
+  \end{block}
 \end{frame}
 
 \begin{frame}[t]\frametitle{2D Verification}
@@ -716,6 +723,86 @@ $\begin{pmatrix}
     \centering
     \includegraphics[scale=0.32]{../figures/cut_line_files/10_regular.pdf}
   \end{minipage}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Regular Partitions}
+  \centering
+  \includegraphics[scale=0.6]{../figures/regular_verification.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Mildly Random Partitions}
+  \vspace{-.35cm}
+   \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/4_mild_random.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/6_mild_random.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/8_mild_random.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/10_mild_random.pdf}
+  \end{minipage}  
+\end{frame}
+
+\begin{frame}[t]\frametitle{Mildly Random Partitions}
+  \centering
+  \includegraphics[scale=0.6]{../figures/mild_random_verification.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Random Partitions}
+  \vspace{-.35cm}
+   \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/4_random.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/6_random.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/8_random.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/10_random.pdf}
+  \end{minipage}  
+\end{frame}
+
+\begin{frame}[t]\frametitle{Random Partitions}
+  \centering
+  \includegraphics[scale=0.6]{../figures/random_verification.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Probable Worst-Case Partitions}
+  \vspace{-.35cm}
+   \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/4_worst.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/6_worst.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/8_worst.pdf}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../figures/cut_line_files/10_worst.pdf}
+  \end{minipage}  
+\end{frame}
+
+\begin{frame}[t]\frametitle{Probable Worst-Case Partitions}
+  \centering
+  \includegraphics[scale=0.6]{../figures/worst_verification.pdf}
 \end{frame}
 
 \end{document}

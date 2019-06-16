@@ -1569,6 +1569,7 @@ def optimized_tts_3d_numerical(params,points,global_x_min,global_x_max,global_y_
   
   x_cuts,y_cuts,z_cuts = unpack_parameters_3d(params,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_col,num_row,num_plane)
   x_cuts,y_cuts,z_cuts = tweak_parameters_3d(x_cuts,y_cuts,z_cuts,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_col,num_row,num_plane)
+  print(z_cuts,x_cuts,y_cuts)
   #Building the subset boundaries.
   subset_bounds = b3a.build_3d_global_subset_boundaries(num_col-1,num_row-1,num_plane-1,x_cuts,y_cuts,z_cuts)
   #Getting mesh information.

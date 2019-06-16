@@ -5,7 +5,9 @@ from sweep_solver import optimized_tts_numerical,unpack_parameters
 from mesh_processor import create_2d_cuts
 from optimizer import create_parameter_space,create_bounds
 from scipy.optimize import minimize,differential_evolution
-
+from build_global_subset_boundaries import build_global_subset_boundaries
+import matplotlib.pyplot as plt
+plt.close("all")
 
 #The machine parameters.
 #Communication time per double
@@ -57,18 +59,45 @@ for i in range(0,10):
   else:
     points = np.append(points,points_local,axis=1)
 
-
-
 x_cuts = np.genfromtxt("x_cuts_10_worst.csv",delimiter=",")
 y_cuts = np.genfromtxt("y_cuts_10_worst.csv",delimiter=",")
-params = create_parameter_space(x_cuts,y_cuts,num_row,num_col)
-num_params = len(params)
-bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,num_row,num_col)
-args = (points,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
-eps = 1e-04
-max_time = minimize(optimized_tts_numerical,params,method='SLSQP',args=args,bounds=bounds,options={'maxiter':1000,'maxfun':500,'disp':True,'eps':eps},tol=1e-08)
-#max_time = differential_evolution(optimized_tts_numerical,bounds,args=args,strategy='best2bin',maxiter=2)
-x_cuts,y_cuts = unpack_parameters(max_time.x,gxmin,gxmax,gymin,gymax,num_col,num_row)
+
+boundaries = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
+
+plt.figure()
+plt.scatter(points.T[:,0],points.T[:,1],s=0.5)
+for i in range(0,num_row*num_col):
+  
+    subset_boundary = boundaries[i]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+  
+    center_x = (xmin+xmax)/2
+    center_y = (ymin+ymax)/2
+  
+    x = [xmin, xmax, xmax, xmin,xmin]
+    y = [ymin, ymin, ymax, ymax,ymin]
+  
+    plt.plot(x,y,'r')
+
+
+
+#params = create_parameter_space(x_cuts,y_cuts,num_row,num_col)
+#num_params = len(params)
+##bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,num_row,num_col)
+##args = (points,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
+##eps = 1e-04
+##max_time = minimize(optimized_tts_numerical,params,method='SLSQP',args=args,bounds=bounds,options={'maxiter':1000,'maxfun':500,'disp':True,'eps':eps},tol=1e-08)
+#max_time = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
+#
+#x_cuts,y_cuts = create_2d_cuts(gxmin,gxmax,num_col,gymin,gymax,num_row)
+#params = create_parameter_space(x_cuts,y_cuts,num_row,num_col)
+#max_time = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
+##max_time = differential_evolution(optimized_tts_numerical,bounds,args=args,strategy='best2bin',maxiter=2)
+##x_cuts,y_cuts = unpack_parameters(max_time.x,gxmin,gxmax,gymin,gymax,num_col,num_row)
+
 
   
   
