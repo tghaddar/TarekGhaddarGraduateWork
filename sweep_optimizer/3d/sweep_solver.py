@@ -36,7 +36,7 @@ def plot_graphs(graphs,t,counter,num_angle):
   Q0[1] = [2,1]
   Q0[2] = [2,-1]
   Q0[3] = [4, 0]
-  Q0[-1] = [8,0]
+  Q0[-1] = [6,0]
   
   #A dictionary for node positions for quadrant 1.
   Q1 = {}
@@ -45,25 +45,25 @@ def plot_graphs(graphs,t,counter,num_angle):
   Q1[0] = [2,-1]
   Q1[3] = [2,1]
   Q1[2] = [4,0]
-  Q1[-1] = [8,0]
+  Q1[-1] = [6,0]
   
   #A dictionary for node positions for quadrant 2.
   Q2 = {}
-  Q2[-2] = [-2,0]
-  Q2[2] = [0,0]
+  Q2[-2] = [6,0]
+  Q2[1] = [0,0]
   Q2[0] = [2,-1]
   Q2[3] = [2,1]
-  Q2[1] = [4,0]
-  Q2[-1] = [8,0]
+  Q2[2] = [4,0]
+  Q2[-1] = [-2,0]
   
   #A dictionary for node positions for quadrant 3.
   Q3 = {}
-  Q3[-2] = [-2,0]
-  Q3[3] = [0,0]
+  Q3[-2] = [6,0]
+  Q3[0] = [0,0]
   Q3[1] = [2,1]
   Q3[2] = [2,-1]
-  Q3[0] = [4, 0]
-  Q3[-1] = [8,0]
+  Q3[3] = [4, 0]
+  Q3[-1] = [-2,0]
   
   Q = [Q0,Q1,Q2,Q3]
   for angle in range(0,num_angle-1):
@@ -73,14 +73,14 @@ def plot_graphs(graphs,t,counter,num_angle):
     Q.append(copy(Q3))
   
   num_graphs = len(graphs)
-  grange = range(0,num_graphs)
+  grange = range(0,4)
   for g in grange:
     plt.figure(str(g)+str(t) + str(counter))
     plt.title("Time " + str(t) + " Graph " + str(g))
     edge_labels_1 = nx.get_edge_attributes(graphs[g],'weight')
-    nx.draw(graphs[g],Q[g],with_labels = True)
-    nx.draw_networkx_edge_labels(graphs[g],Q[g],edge_labels=edge_labels_1,font_size=6)
-    plt.savefig("debug_graph_plots/graph_"+str(t)+ "_" + str(counter)+"_"+str(g)+".pdf")
+    nx.draw(graphs[g],Q[g],with_labels = True,node_color='red')
+    nx.draw_networkx_edge_labels(graphs[g],Q[g],edge_labels=edge_labels_1,font_size=12)
+    plt.savefig("../../figures/graph_"+str(int(t))+ "_" + str(counter)+"_"+str(g)+".pdf")
     plt.close()
     
 
@@ -1246,7 +1246,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
       if (num_conflicting_nodes == len(first_nodes)):
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
-#    plot_graphs(graphs,t,counter)
+    plot_graphs(graphs,t,counter,num_angles)
     counter += 1
 #    print("here")
     #Checking if any of the graphs have finished.

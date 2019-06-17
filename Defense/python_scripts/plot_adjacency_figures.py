@@ -1,12 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
-#sys.path.append(r'C:\Users\tghad\Documents\GitHub\TarekGhaddarGraduateWork\sweep_optimizer\3d')
+#sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
+sys.path.append(r'C:\Users\tghad\Documents\GitHub\TarekGhaddarGraduateWork\sweep_optimizer\3d')
 from mesh_processor import create_2d_cuts
 from build_global_subset_boundaries import build_global_subset_boundaries
 from sweep_solver import plot_subset_boundaries_2d,add_edge_cost
-from sweep_solver import make_edges_universal,pipeline_offset
+from sweep_solver import make_edges_universal,pipeline_offset,add_conflict_weights
 from build_adjacency_matrix import build_adjacency,build_graphs 
 import networkx as nx
 from copy import deepcopy
@@ -17,6 +17,7 @@ plt.close("all")
 numrow = 2
 numcol = 2
 numplane = 1
+unweighted = True
 num_subsets = numrow*numcol
 xmin = 0.0
 xmax = 10.0
@@ -311,3 +312,5 @@ nx.draw(graphs[7],Q3,with_labels = True,node_color='red')
 nx.draw_networkx_edge_labels(graphs[7],Q3,edge_labels=edge_labels_1,font_size=12)
 plt.savefig("../../figures/q7_postuniversal.pdf")
 plt.close()
+
+graphs = add_conflict_weights(graphs[0:4],time_to_solve,1,unweighted)
