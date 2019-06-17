@@ -10,9 +10,9 @@ y0 = max_times[:,1]
 y1 = max_times[:,2]
 time = max_times[:,3]
 
-fig = plt.figure()
-ax = fig.add_subplot(111,projection='3d')
-yeet=ax.scatter(x,y0,y1,c=time,cmap=plt.hot())
-fig.colorbar(yeet)
+fig = plt.figure("Brute Force Result")
+ax = fig.gca(projection='3d')
+img=ax.scatter(y0,y1,,c=time,cmap=plt.hot())
+fig.colorbar(img)
 plt.savefig("../../figures/brute_force_result.pdf")
 plt.close()

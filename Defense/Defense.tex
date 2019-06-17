@@ -1,3 +1,4 @@
+\pdfminorversion=4
 \documentclass[xcolor={usenames,dvipsnames,svgnames,table}]{beamer}
 
 \mode<presentation>
@@ -896,8 +897,64 @@ $\begin{pmatrix}
   \includegraphics[scale=0.6]{../figures/worst_verification.pdf}
 \end{frame}
 
+\begin{frame}[t]\frametitle{PDT vs. TTS}
+
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Partitioning Optimization}
 \subsection{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[t]\frametitle{Optimizing the Cut Lines}
+\begin{block}{}
+  \begin{itemize}
+    \item The time-to-solution estimator provides us with the maximum time-to-solution given a set of cut lines/planes.
+    \item The estimator can be fed into an optimization function that minimizes the maximum time-to-solution using the cut lines/planes as the parameter space. 
+    \item This was attempted using \textbf{scipy.optimize.minimize}. 
+  \end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Brute Force Optimization}
+\begin{block}{}
+  \begin{itemize}
+    \item  A brute force optimization study was run on analytical mesh density data picture below with 2x2 cut lines in x and y.
+    \item The global domain was from 0 to 10 cm in each dimension.
+    \item The cut lines were varied by 0.1 each, leading to the time to solution estimator being run 99\textsuperscript{3}= 970,299 times.
+  \end{itemize}
+\end{block}
+  \centering
+  \includegraphics[scale=0.35]{../figures/analytical_mesh_density.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Brute Force Optimization}
+  \centering
+  \includegraphics[scale=0.5]{../figures/brute_force_result.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Brute Force Optimization}
+\begin{block}{}
+  \begin{itemize}
+    \item The brute force optimization study took about 3 hours to run.
+    \item The same mesh run through \textbf{scipy.optimize.minimize} with the Sequential Quadratic Programming method took 6.85 seconds with only 491 TTS evaluations as opposed to 970,299.
+  \end{itemize}
+\end{block}
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c|c} 
+\bf Params &Brute Force & SciPy   \\ \hline \hline
+ x & 6.2& 6.180 \\
+ y0 & 6.4 & 6.420 \\ 
+ y1 & 5.9 & 5.922 \\ 
+ tts & 18205  &  18045 \\ 
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case}
+
+\end{frame}
 
 \section{Conclusions and Future Work}
 \subsection{}

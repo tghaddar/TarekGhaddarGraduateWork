@@ -6,7 +6,7 @@ import mpmath
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-max_times = np.genfromtxt("max_times.csv")
+max_times = np.genfromtxt("max_times_0.1.csv")
 plt.close("all")
 #The mesh density function.
 f = lambda x,y: x+y
@@ -22,8 +22,8 @@ time = max_times[:,3]
 mintime = min(time)
 
 
-fig = plt.figure("Result")
-ax = fig.gca(projection='3d')
-
-img = ax.scatter(y1,y2,x,c=time,cmap = plt.cool())
-fig.colorbar(img)
+#fig = plt.figure("Result")
+#ax = fig.gca(projection='3d')
+#
+#img = ax.scatter(y1,y2,x,c=time,cmap = plt.cool())
+#fig.colorbar(img)

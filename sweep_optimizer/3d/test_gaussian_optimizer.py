@@ -49,6 +49,7 @@ machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
 numrow = 2
 numcol = 2
 num_angles = 1
+unweighted=True
 
 #Global boundaries.
 global_xmin = 0.0
@@ -61,7 +62,7 @@ interior_cuts = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
 num_params = len(interior_cuts)
 
 bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol)
-args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles)
+args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
 
 
 
@@ -88,8 +89,8 @@ max_times = []
 
 
 start = time.time()
-#max_time = minimize(optimized_tts,interior_cuts,method='SLSQP',args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':False},tol=1e-08)
-max_time = minimize(optimized_tts,interior_cuts,method='Newton-CG',jac = jacobian,args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':True},tol=1e-08)
+max_time = minimize(optimized_tts,interior_cuts,method='SLSQP',args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':False},tol=1e-08)
+#max_time = minimize(optimized_tts,interior_cuts,method='Newton-CG',jac = jacobian,args = args,bounds = bounds,options={'maxiter':1000,'maxfun':1000,'disp':True},tol=1e-08)
 end = time.time()
 print(end - start)
 

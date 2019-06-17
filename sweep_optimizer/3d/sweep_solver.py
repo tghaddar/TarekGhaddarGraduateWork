@@ -13,7 +13,7 @@ from utilities import get_ijk
 from utilities import get_ij,get_ss_id
 from math import isclose
 from matplotlib.pyplot import imshow,pause
-from mesh_processor import get_cells_per_subset_2d,get_cells_per_subset_2d_numerical,get_cells_per_subset_3d,get_cells_per_subset_3d_numerical
+from mesh_processor import get_cells_per_subset_2d,get_cells_per_subset_2d_numerical,get_cells_per_subset_3d,get_cells_per_subset_3d_numerical,get_cells_per_subset_3d_numerical_test
 from mesh_processor import get_cells_per_subset_2d_test
 import time
 import operator
@@ -1246,7 +1246,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
       if (num_conflicting_nodes == len(first_nodes)):
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
-    plot_graphs(graphs,t,counter,num_angles)
+    #plot_graphs(graphs,t,counter,num_angles)
     counter += 1
 #    print("here")
     #Checking if any of the graphs have finished.
@@ -1564,7 +1564,7 @@ def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_ma
   return max_time
 
 def optimized_tts_3d_numerical(params,points,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted,test):
-  
+  start = time.time() 
   machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
   
   x_cuts,y_cuts,z_cuts = unpack_parameters_3d(params,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_col,num_row,num_plane)
@@ -1573,7 +1573,7 @@ def optimized_tts_3d_numerical(params,points,global_x_min,global_x_max,global_y_
   #Building the subset boundaries.
   subset_bounds = b3a.build_3d_global_subset_boundaries(num_col-1,num_row-1,num_plane-1,x_cuts,y_cuts,z_cuts)
   #Getting mesh information.
-  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_3d_numerical(points,subset_bounds)
+  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_3d_numerical_test(points,subset_bounds)
   #Building the adjacency matrix.
   adjacency_matrix = b3a.build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane)
   #Building the graphs.
@@ -1587,6 +1587,7 @@ def optimized_tts_3d_numerical(params,points,global_x_min,global_x_max,global_y_
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
-  print(max_time)
+  end = time.time()
+  print(max_time, end-start)
   
   return max_time
