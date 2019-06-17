@@ -967,6 +967,14 @@ $\begin{pmatrix}
 \includegraphics[scale=0.6]{../figures/synthetic_opt_cuts.pdf}
 \end{frame}
 
+\begin{frame}[t]\frametitle{Lessons Learned  during Optimization}
+  \begin{block}{}
+    \item The \textbf{scipy.optimize.minimize} libraries are finding local minima, the parameters are not traversing the entire boundaries before converging.
+    \item Combining the local minimization method with a stochastic global minimization method yielded improved results, but still depended strongly on the initial parameter guess.
+    \item The time-to-solution-estimator needs 
+  \end{block}
+\end{frame}
+
 \section{Conclusions and Future Work}
 \subsection{}
 

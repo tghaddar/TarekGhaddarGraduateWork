@@ -4,7 +4,7 @@ sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer
 from sweep_solver import optimized_tts_numerical,unpack_parameters
 from mesh_processor import create_2d_cuts
 from optimizer import create_parameter_space,create_bounds
-from scipy.optimize import minimize,differential_evolution
+from scipy.optimize import minimize,basinhopping
 from build_global_subset_boundaries import build_global_subset_boundaries
 import matplotlib.pyplot as plt
 from copy import copy
@@ -105,7 +105,8 @@ max_time_lbd = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,num
 #max_time = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
 #
 x_cuts,y_cuts = create_2d_cuts(gxmin,gxmax,num_col,gymin,gymax,num_row)
-
+#x_cuts = [0.0, 0.0005, 0.0055, 0.09921133233307862, 0.29974632453223393, 0.5997395667360341, 0.7000000000000001, 0.8, 0.9, 0.9995, 1.0] 
+#y_cuts = [[0.0, 0.0005, 0.2, 0.30000000000000004, 0.4, 0.5, 0.6000000000000001, 0.7000000000000001, 0.8, 0.9995, 1.0], [0.0, 0.0005, 0.0055, 0.29993324329795634, 0.39993455731388405, 0.4999294889667341, 0.5999244440841545, 0.6998330261188953, 0.7996925672020468, 0.9995, 1.0], [0.0, 0.0005, 0.0005, 0.0055, 0.0055, 0.30000000000000004, 0.4, 0.5, 0.6000000000000001, 0.7000000000000001, 1.0], [0.0, 0.0005, 0.0005, 0.0055, 0.5, 0.6000000000000001, 0.7000000000000001, 0.9995, 0.9995, 1.0, 1.0045], [0.0, 0.0005, 0.0005, 0.0055, 0.0055, 0.3998589779334683, 0.499870968328809, 0.599870968328809, 0.6998465182467248, 0.9995, 1.0], [0.0, 0.0005, 0.0005, 0.0005, 0.0005, 0.0055, 0.0055, 0.0055, 0.0055, 0.1, 1.0], [0.0, 0.0005, 0.0055, 0.30000000000000004, 0.4, 0.5, 0.6000000000000001, 0.7000000000000001, 0.9, 0.9995, 1.0], [0.0, 0.0005, 0.0055, 0.2, 0.30000000000000004, 0.4, 0.5, 0.6000000000000001, 0.7000000000000001, 0.8, 1.0], [0.0, 0.0005, 0.0055, 0.2, 0.30000000000000004, 0.4, 0.5, 0.6000000000000001, 0.7000000000000001, 0.9995, 1.0], [0.0, 0.0005, 0.0055, 0.1, 0.2, 0.30000000000000004, 0.4, 0.5, 0.6000000000000001, 0.7000000000000001, 1.0]
 params = create_parameter_space(x_cuts,y_cuts,num_row,num_col)
 num_params = len(params)
 bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,num_row,num_col)
@@ -113,8 +114,9 @@ args = (points,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,laten
 params = create_parameter_space(x_cuts,y_cuts,num_row,num_col)
 eps = 0.05
 
-max_time = minimize(optimized_tts_numerical,params,method='Newton-CG',jac=jacobian,args=args,bounds=bounds,options={'maxiter':1000,'maxfun':1000,'disp':True},tol=1e-05)
+#max_time = minimize(optimized_tts_numerical,params,method='Newton-CG',jac=jacobian,args=args,bounds=bounds,options={'maxiter':1000,'maxfun':1000,'disp':True},tol=1e-05)
 #max_time = differential_evolution(optimized_tts_numerical,bounds,args=args,strategy='best2bin',maxiter=2)
+max_time = basinhopping(optimized_tts_numerical,params,niter=100,stepsize=0.05,minimizer_kwargs={"args":args,"bounds":bounds,"method":"SLSQP"})
 #x_cuts,y_cuts = unpack_parameters(max_time.x,gxmin,gxmax,gymin,gymax,num_col,num_row)
 x_cuts,y_cuts = unpack_parameters(max_time.x,gxmin,gxmax,gymin,gymax,num_col,num_row)
 boundaries = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)

@@ -5,7 +5,7 @@ from mesh_processor import create_3d_cuts
 from optimizer import create_parameter_space_3d
 from optimizer import create_bounds_3d
 from sweep_solver import optimized_tts_3d_numerical
-from scipy.optimize import minimize
+from scipy.optimize import minimize,basinhopping
 import time
 
 gxmin = 0.0
@@ -43,5 +43,5 @@ bounds = create_bounds_3d(num_params,gxmin,gxmax,gymin,gymax,gzmin,gzmax,num_row
 args = (im1points,gxmin,gxmax,gymin,gymax,gzmin,gzmax,num_row,num_col,num_plane,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted,test)
 eps = 0.01
 start = time.time()
-max_time = minimize(optimized_tts_3d_numerical,params,method='SLSQP',args=args,bounds=bounds,options={'maxiter':500,'maxfun':500,'disp':True,'eps':eps},tol=1e-07)
+#max_time = minimize(optimized_tts_3d_numerical,params,method='SLSQP',args=args,bounds=bounds,options={'maxiter':500,'maxfun':500,'disp':True,'eps':eps},tol=1e-07)
 end = time.time()
