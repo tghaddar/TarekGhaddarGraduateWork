@@ -61,6 +61,25 @@ def get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow,numco
   #Stores the number of boundary cells per subset.
   bdy_cells_per_subset = [0.0]*num_subsets  
   
+  #Looping through the points and assigning them to the subset if they fit.
+  for p in range(0,num_points):
+    xpoint = points[0][p]
+    ypoint = points[1][p]
+
+    for s in range(0,num_subsets):
+      #The boundaries of this subset.
+      subset_bounds = boundaries[s]
+      xmin = subset_bounds[0]
+      xmax = subset_bounds[1]
+      ymin = subset_bounds[2]
+      ymax = subset_bounds[3]
+    
+      if xpoint >= xmin and xpoint <= xmax:
+        if ypoint >= ymin and ypoint <= ymax:
+          cells_per_subset[s] += 1
+          break
+    
+      
   #Looping through the subsets.
   for s in range(0,num_subsets):
     
@@ -77,21 +96,18 @@ def get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow,numco
     #The area of the subset.
     subset_area = Lx*Ly
     
-    for p in range(0,num_points):
-      xpoint = points[0][p]
-      ypoint = points[1][p]
-      
-      if xpoint >= xmin and xpoint <= xmax:
-        if ypoint >= ymin and ypoint <=ymax:
-          cells_per_subset[s] += 1            
     if cells_per_subset[s] == 0:
       cells_per_subset[s] = 1
-      
+    
     N = cells_per_subset[s]
     
     #Computing the boundary cells along x and y.
     nx = math.sqrt(N/subset_area)*Lx
     ny =  math.sqrt(N/subset_area)*Ly
+    if nx < 1:
+      nx = 1
+    if ny < 1:
+      ny = 1
     bdy_cells_per_subset[s] = [nx,ny]
   
   #Time to adjust the number of cells to take into account cell creation from cuts.
@@ -180,25 +196,6 @@ def get_cells_per_subset_3d_numerical_test(points,boundaries):
   #Stores the number of boundary cells per subset.
   bdy_cells_per_subset = [0.0]*num_subsets
   
-  #Looping through the subsets.
-  for s in range(0,num_subsets):
-    
-    #The boundaries of this subset.
-    subset_bounds = boundaries[s]
-    xmin = subset_bounds[0]
-    xmax = subset_bounds[1]
-    ymin = subset_bounds[2]
-    ymax = subset_bounds[3]
-    zmin = subset_bounds[4]
-    zmax = subset_bounds[5]
-    
-    #The x,y, and z lengths of the subset.
-    Lx = xmax - xmin
-    Ly = ymax - ymin
-    Lz = zmax - zmin
-    #Subset volume.
-    subset_vol = Lx*Ly*Lz
-    
   #Looping through the points and assigning them to the subset if they fit.
   for p in range(0,num_points):
     xpoint = points[0][p]

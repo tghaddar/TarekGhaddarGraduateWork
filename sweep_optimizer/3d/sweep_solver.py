@@ -1383,7 +1383,7 @@ def tweak_parameters(x_cuts,y_cuts,global_x_min,global_x_max,global_y_min,global
   for cut in range(2,numcol):
     if x_cuts[cut] == x_cuts[cut-1]:
       x_cuts[cut] += tweak_x
-  
+  x_cuts = sorted(x_cuts) 
   #Tweaking the ycuts if necessary
   for col in range(0,numcol):
     y_cuts_col = y_cuts[col]
@@ -1391,7 +1391,7 @@ def tweak_parameters(x_cuts,y_cuts,global_x_min,global_x_max,global_y_min,global
       if y_cuts_col[cut] == y_cuts_col[cut-1]:
         y_cuts_col[cut] += tweak_y
     
-    y_cuts[col] = y_cuts_col
+    y_cuts[col] = sorted(y_cuts_col)
   
   return x_cuts,y_cuts
 
@@ -1509,7 +1509,7 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
 
 #The time to solution function that is fed into the optimizer.
 def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted):
-
+  start = time.time()
   machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
@@ -1534,7 +1534,9 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
-  print(max_time)
+  end = time.time()
+  max_time *= 400
+  print(max_time,end-start)
   return max_time
 
 def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted,test):
@@ -1561,7 +1563,7 @@ def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_ma
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
   
-  return max_time
+  return 100*max_time
 
 def optimized_tts_3d_numerical(params,points,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted,test):
   start = time.time() 
