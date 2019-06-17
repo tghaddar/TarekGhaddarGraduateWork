@@ -159,7 +159,7 @@ def get_cells_per_subset_3d_numerical(points,boundaries):
       
     #If there are no centroids in the subset, then the subset boundaries form a cell.
     if cells_per_subset[s] == 0:
-      cells_per_subset = 1
+      cells_per_subset[s] = 1
       
     N = cells_per_subset[s]
     #Computing boundary cells along xy, xz, and yz faces.
