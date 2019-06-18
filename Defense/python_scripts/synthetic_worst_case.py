@@ -26,7 +26,7 @@ unweighted = True
 
 
 light_case = 100
-mid_case = 1000
+lighter_case = 10
 heavy_case = 1000
 
 gxmin = 0.0
