@@ -50,7 +50,7 @@ for i in range(0,num_suite):
 #  x_cuts_lbd = [xmin,]
   #max_time = (optimized_tts_numerical,params,method='SLSQP',args=args,bounds=bounds,options={'maxiter':1000,'maxfun':1000,'disp':True},tol=1e-08)
 #  mt = optimized_tts_numerical(params,points,xmin,xmax,ymin,ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
-  max_time = basinhopping(optimized_tts_numerical,params,niter=10,T=1.0,stepsize=0.01,minimizer_kwargs={"args":args,"bounds":bounds,"method":"SLSQP","options":{'eps':0.01}})
+  max_time = basinhopping(optimized_tts_numerical,params,niter=10,T=1.0,stepsize=0.1,minimizer_kwargs={"args":args,"bounds":bounds,"method":"SLSQP","options":{'eps':0.01}})
   x_cuts,y_cuts = unpack_parameters(max_time.x,xmin,xmax,ymin,ymax,num_col,num_row)
   print(max_time)
   all_x_cuts[i] = x_cuts
