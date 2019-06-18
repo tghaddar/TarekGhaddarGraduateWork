@@ -986,14 +986,70 @@ $\begin{pmatrix}
 \end{table}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case}
-\centering
-\includegraphics[scale=0.6]{../figures/synthetic_lbd_cuts.pdf}
+\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 100 Points/Subset}
+   \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../figures/synthetic_lbd_cuts.pdf}
+    \begin{block}{}
+    \centering
+      $t = 1.335$
+    \end{block}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../figures/synthetic_opt_cuts.pdf}
+    \begin{block}{}
+    \centering
+    $t = 0.756$
+    \end{block}
+  \end{minipage}
+  \vspace{1cm}
+  \centering
+    Improvement: $\frac{1.335 - 0.756}{1.335} = 0.434$
 \end{frame}
 
-\begin{frame}[t]\frametitle{Synthetic Optimized}
-\centering
-\includegraphics[scale=0.6]{../figures/synthetic_opt_cuts.pdf}
+\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 10 Points/Subset}
+   \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../figures/synthetic_lbd_cuts_lighter.pdf}
+    \begin{block}{}
+    \centering
+      $t = 0.145$
+    \end{block}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../figures/synthetic_opt_cuts_lighter.pdf}
+    \begin{block}{}
+    \centering
+    $ t = 0.080$
+    \end{block}
+  \end{minipage}
+  \vspace{1cm}
+  \centering
+    Improvement: $\frac{0.145 - 0.080}{0.145} = 0.447$
+\end{frame}
+
+\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 1000 Points/Subset}
+   \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../figures/synthetic_lbd_cuts_heavy.png}
+    \begin{block}{}
+    \centering
+    $t = 7.298$
+    \end{block}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../figures/synthetic_opt_cuts_heavy.png}
+    \begin{block}{}
+    \centering
+    $t = 12.499$
+    \end{block}
+  \end{minipage}
+  \vspace{1cm}
+  \centering
+    Improvement: $\frac{12.499-7.289}{12.499} = 0.416$
 \end{frame}
 
 \section{Conclusions and Future Work}

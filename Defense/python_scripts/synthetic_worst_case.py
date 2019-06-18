@@ -40,14 +40,14 @@ num_col = 10
 x_cuts_lbd = np.genfromtxt("x_cuts_10_worst.csv",delimiter=",")
 y_cuts_lbd = np.genfromtxt("y_cuts_10_worst.csv",delimiter=",")
 
-boundaries = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts_lbd,y_cuts_lbd)
+boundaries_lbd = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts_lbd,y_cuts_lbd)
 
 
-for i in range(0,len(boundaries)):
-  xmin = boundaries[i][0]
-  xmax = boundaries[i][1]
-  ymin = boundaries[i][2]
-  ymax = boundaries[i][3]
+for i in range(0,len(boundaries_lbd)):
+  xmin = boundaries_lbd[i][0]
+  xmax = boundaries_lbd[i][1]
+  ymin = boundaries_lbd[i][2]
+  ymax = boundaries_lbd[i][3]
   #Setting up the local for this column.
   pointsx = np.random.uniform(xmin,xmax,light_case)
   pointsy = np.random.uniform(ymin,ymax,light_case)
@@ -71,26 +71,26 @@ for i in range(0,len(boundaries)):
     points_heavy = np.append(points_heavy,points_local_heavy,axis=1)
 
 
-#plt.figure()
-#plt.scatter(points.T[:,0],points.T[:,1],s=0.5)
-#for i in range(0,num_row*num_col):
-#  
-#    subset_boundary = boundaries[i]
-#    xmin = subset_boundary[0]
-#    xmax = subset_boundary[1]
-#    ymin = subset_boundary[2]
-#    ymax = subset_boundary[3]
-#  
-#    center_x = (xmin+xmax)/2
-#    center_y = (ymin+ymax)/2
-#  
-#    x = [xmin, xmax, xmax, xmin,xmin]
-#    y = [ymin, ymin, ymax, ymax,ymin]
-#  
-#    plt.plot(x,y,'r')
-#
-#plt.savefig("../../figures/synthetic_lbd_cuts.pdf")
-#plt.close()
+plt.figure()
+plt.scatter(points.T[:,0],points.T[:,1],s=0.5)
+for i in range(0,num_row*num_col):
+  
+    subset_boundary = boundaries_lbd[i]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+  
+    center_x = (xmin+xmax)/2
+    center_y = (ymin+ymax)/2
+  
+    x = [xmin, xmax, xmax, xmin,xmin]
+    y = [ymin, ymin, ymax, ymax,ymin]
+  
+    plt.plot(x,y,'r')
+
+plt.savefig("../../figures/synthetic_lbd_cuts.pdf")
+plt.close()
 
 params_lbd = create_parameter_space(x_cuts_lbd,y_cuts_lbd,num_row,num_col)
 num_params = len(params_lbd)
@@ -101,38 +101,121 @@ x_cuts,y_cuts = create_2d_cuts(gxmin,gxmax,num_col,gymin,gymax,num_row)
 params = create_parameter_space(x_cuts,y_cuts,num_row,num_col)
 max_time_reg = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
 
-#boundaries = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
-#plt.figure()
-#plt.scatter(points.T[:,0],points.T[:,1],s=0.5)
-#for i in range(0,num_row*num_col):
-#  
-#    subset_boundary = boundaries[i]
-#    xmin = subset_boundary[0]
-#    xmax = subset_boundary[1]
-#    ymin = subset_boundary[2]
-#    ymax = subset_boundary[3]
-#  
-#    center_x = (xmin+xmax)/2
-#    center_y = (ymin+ymax)/2
-#  
-#    x = [xmin, xmax, xmax, xmin,xmin]
-#    y = [ymin, ymin, ymax, ymax,ymin]
-#  
-#    plt.plot(x,y,'r')
-#
-#plt.savefig("../../figures/synthetic_opt_cuts.pdf")
-#plt.close()
+boundaries = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
+plt.figure()
+plt.scatter(points.T[:,0],points.T[:,1],s=0.5)
+for i in range(0,num_row*num_col):
+  
+    subset_boundary = boundaries[i]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+  
+    center_x = (xmin+xmax)/2
+    center_y = (ymin+ymax)/2
+  
+    x = [xmin, xmax, xmax, xmin,xmin]
+    y = [ymin, ymin, ymax, ymax,ymin]
+  
+    plt.plot(x,y,'r')
+
+plt.savefig("../../figures/synthetic_opt_cuts.pdf")
+plt.close()
 
 
 
 max_time_lbd_lighter = optimized_tts_numerical(params_lbd,points_lighter,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
+plt.figure()
+plt.scatter(points_lighter.T[:,0],points_lighter.T[:,1],s=0.5)
+for i in range(0,num_row*num_col):
+  
+    subset_boundary = boundaries_lbd[i]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+  
+    center_x = (xmin+xmax)/2
+    center_y = (ymin+ymax)/2
+  
+    x = [xmin, xmax, xmax, xmin,xmin]
+    y = [ymin, ymin, ymax, ymax,ymin]
+  
+    plt.plot(x,y,'r')
+
+plt.savefig("../../figures/synthetic_lbd_cuts_lighter.pdf")
+plt.close()
+
 
 max_time_reg_lighter = optimized_tts_numerical(params,points_lighter,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
+
+plt.figure()
+plt.scatter(points_lighter.T[:,0],points_lighter.T[:,1],s=0.5)
+for i in range(0,num_row*num_col):
+  
+    subset_boundary = boundaries[i]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+  
+    center_x = (xmin+xmax)/2
+    center_y = (ymin+ymax)/2
+  
+    x = [xmin, xmax, xmax, xmin,xmin]
+    y = [ymin, ymin, ymax, ymax,ymin]
+  
+    plt.plot(x,y,'r')
+
+plt.savefig("../../figures/synthetic_opt_cuts_lighter.pdf")
+plt.close()
+
 
 
 max_time_lbd_heavy = optimized_tts_numerical(params_lbd,points_heavy,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
 
+plt.figure()
+plt.scatter(points_heavy.T[:,0],points_heavy.T[:,1],s=0.5)
+for i in range(0,num_row*num_col):
+  
+    subset_boundary = boundaries_lbd[i]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+  
+    center_x = (xmin+xmax)/2
+    center_y = (ymin+ymax)/2
+  
+    x = [xmin, xmax, xmax, xmin,xmin]
+    y = [ymin, ymin, ymax, ymax,ymin]
+  
+    plt.plot(x,y,'r')
+
+plt.savefig("../../figures/synthetic_lbd_cuts_heavy.png")
+plt.close()
+
 max_time_reg_heavy = optimized_tts_numerical(params,points_heavy,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
 
   
+plt.figure()
+plt.scatter(points_heavy.T[:,0],points_heavy.T[:,1],s=0.5)
+for i in range(0,num_row*num_col):
   
+    subset_boundary = boundaries[i]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+  
+    center_x = (xmin+xmax)/2
+    center_y = (ymin+ymax)/2
+  
+    x = [xmin, xmax, xmax, xmin,xmin]
+    y = [ymin, ymin, ymax, ymax,ymin]
+  
+    plt.plot(x,y,'r')
+
+plt.savefig("../../figures/synthetic_opt_cuts_heavy.png")
+plt.close()
