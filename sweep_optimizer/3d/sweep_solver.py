@@ -314,7 +314,7 @@ def plot_subset_boundaries(global_3d_subset_boundaries,num_subsets):
   
   plt.savefig("subset_plot.pdf")
 
-def plot_subset_boundaries_2d(global_3d_subset_boundaries,num_subsets):
+def plot_subset_boundaries_2d(global_3d_subset_boundaries,num_subsets,fname):
   plt.figure(1)
   subset_centers = []
   for i in range(0,num_subsets):
@@ -334,9 +334,10 @@ def plot_subset_boundaries_2d(global_3d_subset_boundaries,num_subsets):
     y = [ymin, ymin, ymax, ymax,ymin]
   
     plt.plot(x,y,'b')
-    plt.text(center_x,center_y,str(i))
+    #plt.text(center_x,center_y,str(i))
   
-  plt.savefig("subset_plot_2d.pdf")
+  plt.savefig(fname)
+  plt.close()
   
 #Checking if the current node shares x or y subset boundaries.
 def find_shared_bound(node,succ,num_row,num_col,num_plane):

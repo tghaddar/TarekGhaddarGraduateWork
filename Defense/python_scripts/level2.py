@@ -5,6 +5,8 @@ from sweep_solver import optimized_tts_numerical,unpack_parameters
 from mesh_processor import create_2d_cuts
 from optimizer import create_parameter_space,create_bounds
 from scipy.optimize import basinhopping
+import matplotlib.pyplot as plt
+plt.close("all")
 
 gxmin = 0.0
 gxmax = 152.0
@@ -42,7 +44,13 @@ for n in num_subsets:
   max_time = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
   max_times[ctr] = max_time
   ctr+=1
-
+  
+plt.figure()
+plt.title("Level 2 Solution Times against Number of Subsets in Each Dimension")
+plt.xlabel("Number of Subsets in Each Dimension")
+plt.ylabel("Solution Time")
+plt.scatter(num_subsets,max_times)
+plt.savefig("../../figures/level2solutionsuite.pdf")
 
 #Trying optimizing the spiderweb.
 x_cuts,y_cuts = create_2d_cuts(gxmin,gxmax,42,gymin,gymax,13)
