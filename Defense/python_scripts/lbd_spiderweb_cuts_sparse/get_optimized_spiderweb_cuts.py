@@ -20,7 +20,7 @@ upc = 4.0
 upbc = 2.0
 machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
 
-ns = [6]
+ns = [2,3,4,5,6,7,9]
 num_suite = len(ns)
 
 num_angles = 1
@@ -47,11 +47,11 @@ for i in range(0,num_suite):
   mt = optimized_tts_numerical(params,points,xmin,xmax,ymin,ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
   mts[i] = mt
   
-  bounds = create_bounds(num_params,xmin,xmax,ymin,ymax,num_row,num_col)
-  args = (points,xmin,xmax,ymin,ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
-  start = time.time()
-  max_time = basinhopping(optimized_tts_numerical,params,niter=10,T=1.0,stepsize=0.1,minimizer_kwargs={"args":args,"bounds":bounds,"method":"SLSQP","options":{'eps':0.01}})
-  end = time.time()
-  print(end-start)
-  opt_mts[i] = max_time.fun
+#  bounds = create_bounds(num_params,xmin,xmax,ymin,ymax,num_row,num_col)
+#  args = (points,xmin,xmax,ymin,ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
+#  start = time.time()
+#  max_time = basinhopping(optimized_tts_numerical,params,niter=5,T=1.0,stepsize=0.1,minimizer_kwargs={"args":args,"bounds":bounds,"method":"SLSQP","options":{'eps':0.01,'maxiter':30}})
+#  end = time.time()
+#  print(end-start)
+#  opt_mts[i] = max_time.fun
 
