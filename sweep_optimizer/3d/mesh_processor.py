@@ -60,24 +60,9 @@ def get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow,numco
   cells_per_subset = [0]*num_subsets
   #Stores the number of boundary cells per subset.
   bdy_cells_per_subset = [0.0]*num_subsets  
-  
-  #Looping through the points and assigning them to the subset if they fit.
-  for p in range(0,num_points):
-    xpoint = points[0][p]
-    ypoint = points[1][p]
+  xpoints = points[0,:]
+  ypoints = points[1,:]
 
-    for s in range(0,num_subsets):
-      #The boundaries of this subset.
-      subset_bounds = boundaries[s]
-      xmin = subset_bounds[0]
-      xmax = subset_bounds[1]
-      ymin = subset_bounds[2]
-      ymax = subset_bounds[3]
-    
-      if xpoint >= xmin and xpoint <= xmax:
-        if ypoint >= ymin and ypoint <= ymax:
-          cells_per_subset[s] += 1
-          break
     
       
   #Looping through the subsets.
@@ -96,6 +81,12 @@ def get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow,numco
     #The area of the subset.
     subset_area = Lx*Ly
     
+    #Looping through the points and assigning them to the subset if they fit.
+    x1 = np.argwhere(np.logical_and(xpoints >= xmin, xpoints <= xmax)).flatten()
+    y1 = ypoints[x1]
+    y2 = np.argwhere(np.logical_and(y1 >= ymin, y1 <= ymax)).flatten()
+    num_cells = len(y2)
+    cells_per_subset[s] = num_cells
     if cells_per_subset[s] == 0:
       cells_per_subset[s] = 1
     
@@ -196,7 +187,6 @@ def get_cells_per_subset_3d_numerical_test2(points,boundaries):
   #Stores the number of boundary cells per subset.
   bdy_cells_per_subset = [0.0]*num_subsets
   xpoints = points[0,:]
-  print(xpoints.shape)
   ypoints = points[1,:]
   zpoints = points[2,:]
   
@@ -221,9 +211,13 @@ def get_cells_per_subset_3d_numerical_test2(points,boundaries):
     
     #Looping through the points and assigning them to the subset if they fit.
     x1 = np.argwhere(np.logical_and(xpoints >= xmin, xpoints <= xmax)).flatten()
-    y1 = np.argwhere(np.logical_and(ypoints >= ymin,ypoints<=ymax)).flatten()
-    z1 = np.argwhere(np.logical_and(zpoints >= zmin,zpoints<=zmax)).flatten()
-    print (x1.any() == z1.any())
+    y1 = ypoints[x1]
+    z1 = zpoints[x1]
+    y2 = np.argwhere(np.logical_and(y1 >= ymin, y1 <= ymax)).flatten()
+    z2 = z1[y2]
+    z3 = np.argwhere(np.logical_and(z2 >= zmin, z2 <= zmax)).flatten()
+    num_cells = len(z3)
+    cells_per_subset[s] = num_cells
    
       
     #If there are no centroids in the subset, then the subset boundaries form a cell.
