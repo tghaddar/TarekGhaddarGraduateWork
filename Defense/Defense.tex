@@ -898,8 +898,8 @@ $\begin{pmatrix}
 \end{frame}
 
 \begin{frame}[t]\frametitle{PDT vs. TTS}
-
-
+\centering
+  \includegraphics[scale=0.6]{../figures/ratio_refined.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Unbalanced Pins}
@@ -930,7 +930,7 @@ $\begin{pmatrix}
   \end{itemize}
 \end{block}
   \centering
-  \includegraphics[scale=0.35]{../figures/analytical_mesh_density.pdf}
+  %\includegraphics[scale=0.35]{../figures/analytical_mesh_density.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Brute Force Optimization}
@@ -959,24 +959,40 @@ $\begin{pmatrix}
 
 \begin{frame}[t]\frametitle{Synthetic Probable-Worst Case}
 \centering
-\includegraphics[scale=0.6]{../figures/synthetic_lbd_cuts.pdf}
+%\includegraphics[scale=0.6]{../figures/synthetic_lbd_cuts.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Synthetic Optimized}
 \centering
-\includegraphics[scale=0.6]{../figures/synthetic_opt_cuts.pdf}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Lessons Learned  during Optimization}
-  \begin{block}{}
-    \item The \textbf{scipy.optimize.minimize} libraries are finding local minima, the parameters are not traversing the entire boundaries before converging.
-    \item Combining the local minimization method with a stochastic global minimization method yielded improved results, but still depended strongly on the initial parameter guess.
-    \item The time-to-solution-estimator needs 
-  \end{block}
+%\includegraphics[scale=0.6]{../figures/synthetic_opt_cuts.pdf}
 \end{frame}
 
 \section{Conclusions and Future Work}
 \subsection{}
+
+\begin{frame}[t]\frametitle{Lessons Learned comparing to PDT}
+  \begin{block}{}
+    \begin{itemize}
+      \item Many of the PDT runs either crashed in the stitcher or hung once the sweep began (likely due to cycles). Some of these issues are expected to be resolved once Sweep Plane Data Structures are implemented in PDT.  
+      \item All PDT problems were run on quartz at LLNL, an x86 machine. 
+      \item The results from PDT runs were a bit noisy, which is the reason the median value of 10 runs were taken to weed out outliers. In the future, comparisons to PDT can be run on BGQ machine, which should be less noisy.
+      \item Future work should include feeding the scheduler output from the time-to-solution estimator directly into PDT to get as accurate a comparison as possible (potentially a future Master's thesis?).
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Lessons Learned during Optimization}
+  \begin{block}{}
+    \begin{itemize}
+    \item The \textbf{scipy.optimize.minimize} libraries are finding local minima, the parameters are not traversing the entire boundaries before converging.
+    \item Combining the local minimization method with a stochastic global minimization method yielded improved
+      results, but still depended strongly on the initial parameter guess.
+     \item The python optimization libraries do not respect the boundaries passed in during certain iterations. This causes the time-to-solution estimator to fail, and the optimizer to crash.
+    \item The time-to-solution-estimator needs to be sped up significantly if larger cases are expected to run in reasonable amounts of time. The target is a few minutes for large cases, which currently can take up to a day, if they don't crash.  
+    \end{itemize}
+  \end{block}
+\end{frame}
+
 
 \begin{frame}[t]\frametitle{Future Work}
   \begin{block}{}
