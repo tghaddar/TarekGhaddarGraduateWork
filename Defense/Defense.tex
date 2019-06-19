@@ -96,12 +96,12 @@
 \begin{frame}[t]\frametitle{Introduction}
 \begin{block}{}
 \begin{itemize}
-	\item Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically cartesian grids.
-	\item Structured meshes are somewhat limiting when attempting to simulate more complex problems and experiments.
-	\item Unstructured meshes allow us to simulate realistic problems, but introduce unbalanced partitions. 
+	\item Massively parallel transport sweeps have been shown to scale up to 1.5 million processes on logically cartesian grids.
+	\item Structured meshes are somewhat limiting when attempting to model more complex problems and experiments.
+	\item Unstructured meshes allow us to model realistic problems, but introduce unbalanced partitions. 
 	\item PDT (Texas A\&M's massively parallel transport code) introduced two load balancing algorithms that repartition the mesh in order to obtain a roughly equivalent amount of cells per processor. 
 	\item However, this can sacrifice the optimal sweep partitioning (cut lines all the way through the domain) in favor of balance. 
-	\item The method described will balance perfect load balancing and optimal sweep partitioning in order to achieve the best possible time to solution.
+	\item The method described will offset perfect load balancing with optimal sweep partitioning in order to achieve the best possible time to solution.
 \end{itemize}
 \end{block}
 \end{frame}
@@ -113,8 +113,8 @@
 \label{iteration}
 \end{equation}
 \begin{itemize}
-\item The domain is meshed and discretized, allowing one cell at a time to be solved.
-\item The solution across a cell interface is connected based on an upwind approach.
+\item The domain is meshed, allowing one cell at a time to be solved.
+\item The solution across a cell interface is connected based on an upwind approach, allowing cells to be solved one at a time.
 \end{itemize}
 \end{block}
 \centering
@@ -137,7 +137,7 @@
 \begin{frame}[t]\frametitle{KBA Algorithm}
 \begin{block}{}
 \begin{itemize}
-\item KBA limits the number of processors in $z$ to one, solves one group at a time, and does not aggregate in angle or group.
+\item KBA limits the number of processors in $z$ to one ($P_z$), solves one group at a time ($G=1$), and does not aggregate in angle or group ($A_g = A_m = 1$).
 \item KBA primarily uses a "successive in angle, successive in quadrant" approach.
 \item An octant pipelines its angular work, and once all directions are complete, the opposing octant pipelines them back.
 \item This is then done for all remaining octant pairs.
@@ -221,7 +221,6 @@
       \end{itemize}
     \item Column-wise metric: $f_I = \underset{i}{\text{max}}[\sum_{j} N_{ij}]/\frac{N_{tot}}{I}$
     \item Row-wise metric: $f_J = \underset{j}{\text{max}}[\sum_{i} N_{ij}]/\frac{N_{tot}}{J}$
-    \item Per Column row-wise metric: $f_{J_i} = \text{max}[N_{ij}]_i/\frac{\sum_{j}N_{ij}}{J_i}$
   \end{itemize}		
   \tcr{Goal: minimize $f$ using locations of cut lines in X and Y}\\
     
@@ -234,13 +233,13 @@ f =\frac{\underset{ijk}{\text{max}}(N_{ijk})}{\frac{N_{tot}}{I\cdot J\cdot K}},
 \label{metric_def}
 \end{equation}
 \begin{align}
-f_{D1} &= \underset{d1}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D1}, \label{f_d1} \\
-f_{D2,d1} &= \Big(\underset{d2}{\text{max}}[\sum_{d3} N_{ijk,d1}]/\frac{N_{d1}}{D2}\Big), \label{f_d2}\\
-f_{D3,d2,d1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}{D3} \Big) . \label{f_d3}
+f_{K} &= \underset{k}{\text{max}}[\sum_{i,j} N_{ijk}]/\frac{N_{tot}}{K}, \label{f_d1} \\
+f_{I,k} &= \Big(\underset{i}{\text{max}}[\sum_{j} N_{ijk,k}]/\frac{N_{k}}{I}\Big), \label{f_d2}\\
+f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{K} \Big) . \label{f_j}
 \end{align}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Original Load Balancing Algorithm}
+\begin{frame}[t]\frametitle{Original Load Balancing Algorithm (2D Only)}
 \begin{algorithm}[H]
 \label{initial_algorithm}
 \begin{algorithmic}
@@ -253,47 +252,6 @@ f_{D3,d2,d1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}
   	\STATE Redistribute the Y cut planes.
   \ENDIF
 \ENDWHILE
-\end{algorithmic}
-\end{algorithm}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Theoretical Motivation for LBD}
-  \begin{block}{}
-  \begin{itemize}
-    \item Consider simple 2D layout with $M$ unaligned patches of high mesh density
-    \item The cellset layout is $[M(N+1)+1] \times [M(N+1)+1]$ but only $MN^2$ cellsets have much work.
-    \item Load Imbalance Factor $= \frac{\left( M(N+1)+1 \right)^2}{MN^2} \xrightarrow{N\to \infty} \frac{M^2N^2}{MN^2} = M$
-  \end{itemize}
-  \end{block}
-  \begin{center}
-    \includegraphics[width=5cm ]{../figures/2dgeneral.png}
-  \end{center}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Load Balancing By Dimension Algorithm}
-\begin{algorithm}[H]
-\label{lbd}
-\begin{algorithmic}
-
-  \WHILE {$f_{D1} > \text{tol}_{\text{D1}}$}
-    \STATE Redistribute the D1 cut planes.
-  \ENDWHILE  
-  
-  \FOR {$d1$ in $D1$}
-    \WHILE {$f_{D2,d1} > \text{tol}_{\text{D2}}$}
-      \STATE Redistribute the D2 cut planes within d1. 
-    \ENDWHILE
-  \ENDFOR
-  
-  \FOR{$d1$ in $D1$}
-    \FOR{$d2$ in $D2$}
-      \WHILE {$f_{D3,d2,d1} > \text{tol}_{\text{D3}}$ }
-        \STATE Redistribute the D3 cut planes within d2 within d1. 
-      \ENDWHILE
-    \ENDFOR
-  \ENDFOR
-  
-  \STATE Calculate $f$.
 \end{algorithmic}
 \end{algorithm}
 \end{frame}
@@ -319,6 +277,46 @@ f_{D3,d2,d1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}
 \includegraphics[trim={1cm 0cm 0cm 3cm},clip,scale=0.25]{../figures/im12d_oldlb.png}
 \end{frame}
 
+\begin{frame}[t]\frametitle{Theoretical Motivation for LBD}
+  \begin{block}{}
+  \begin{itemize}
+    \item Consider simple 2D layout with $M$ unaligned subsets of high mesh density that each have $N$ cells.
+    \item There are $M^2$ subsets, but only M have much work.
+    \item Load Imbalance Factor $= \frac{N}{(MN+C)/M^2} \xrightarrow{N\to \infty} \frac{N}{N/M} = M$
+  \end{itemize}
+  \end{block}
+  \begin{center}
+    \includegraphics[scale=0.2]{../figures/theoretical_plot.png}
+  \end{center}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Load Balancing By Dimension Algorithm}
+\begin{algorithm}[H]
+\label{lbd}
+\begin{algorithmic}
+
+  \WHILE {$f_{K} > \text{tol}_{\text{K}}$}
+    \STATE Redistribute the Z cut planes.
+  \ENDWHILE  
+  
+  \FOR {$k$ in $K$}
+    \WHILE {$f_{I,k} > \text{tol}_{\text{I}}$}
+      \STATE Redistribute the X cut planes within each Z layer. 
+    \ENDWHILE
+  \ENDFOR
+  
+  \FOR{$k$ in $K$}
+    \FOR{$i$ in $I$}
+      \WHILE {$f_{J,i,k} > \text{tol}_{\text{J}}$ }
+        \STATE Redistribute the Y cut planes within each column within each Z layer. 
+      \ENDWHILE
+    \ENDFOR
+  \ENDFOR
+  
+  \STATE Calculate $f$.
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
 
 \begin{frame}[t]\frametitle{Load Balancing By Dimension, f = 2.02}
 \centering
@@ -414,8 +412,8 @@ f_{D3,d2,d1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}
   \begin{block}{}
   \begin{itemize}
     \item Perfect load balance in some cases will come at the cost of optimal sweeping.
-    \item Time to solution is the most important parameter, and if keeping a more optimal sweeping grid means a less balanced problem, then so be it.
-    \item The concept of a stage may be misleading when dealing with imbalanced partitions, as we cannot easily characterize the idle time.
+    \item Time to solution is the most pertinent parameter, and if keeping a more optimal sweeping grid means a less balanced problem, then so be it.
+    \item With imbalanced partitions it is harder to characterize the idle time, or the time where a processor has no work to do, and thus obtain an accurate stage count.
     \item A time-to-solution estimator must be built to more accurately predict sweep time.
   \end{itemize}
   \end{block}
@@ -452,9 +450,9 @@ f_{D3,d2,d1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}
 \begin{frame}[t]\frametitle{Overview}
 \begin{block}{}
 \begin{itemize}
-	\item We need to optimize the cut line location not for balance, but for the best possible sweep time.
-	\item We must build a time-to-solution estimator that calculates the time to solution for a given cut line partitioning.
-	\item The time to solution estimator will be fed into an optimizing function that minimizes the time to solution. The cut lines corresponding to the minimum time to solution are the optimal partitioning scheme.
+	\item We need to optimize the cut plane location not for balance, but for the best possible sweep time.
+	\item We must build a time-to-solution estimator that calculates the time to solution for a given cut line partitioning and mesh cell density.
+	\item The time to solution estimator will be fed into an optimizing function that minimizes the time to solution. The cut planes corresponding to the minimum time to solution are the optimal partitioning scheme.
 \end{itemize}
 \end{block}
 \begin{block}{IMPORTANT}
@@ -599,7 +597,7 @@ $\begin{pmatrix}
  
 \end{frame}
 
-\begin{frame}[t]\frametitle{Adjusting for Multiple Anglesets}
+\begin{frame}[t]\frametitle{Adjusting for Multiple Angles}
  \begin{minipage}{0.49\textwidth}
     \centering
     \includegraphics[scale=0.32]{../figures/q1_postpipeline.pdf}
@@ -690,7 +688,7 @@ $\begin{pmatrix}
 \begin{block}{}
 \begin{itemize}
 	\item The first octant to arrive to a node will begin solving it, and the remaining octants will incur a delay (if applicable).
-	\item The delay is reflected in each remaining TDG by adding the corresponding delay as a weight to the applicable edge.
+	\item The delay is reflected in each remaining TDG by adding the corresponding delay as a weight to the applicable edge and applicable downstream edges.
   \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant (same as PDT) wins the tie.
 \end{itemize}
 \end{block}
@@ -701,7 +699,7 @@ $\begin{pmatrix}
   \end{block}
 \end{frame}
 
-\begin{frame}[t]\frametitle{$t=1$}
+\begin{frame}[t]\frametitle{$t=1$: Graphs 0,3 and Graphs 1,2 in Conflict}
  \begin{minipage}{0.49\textwidth}
     \centering
     \includegraphics[scale=0.32]{../figures/graph_1_0_1.pdf}
@@ -720,7 +718,7 @@ $\begin{pmatrix}
   \end{minipage}
 \end{frame}
 
-\begin{frame}[t]\frametitle{$t=2$}
+\begin{frame}[t]\frametitle{$t=2$: Graphs 0 and 1 Won, Still in Conflict}
  \begin{minipage}{0.49\textwidth}
     \centering
     \includegraphics[scale=0.32]{../figures/graph_2_1_1.pdf}
@@ -739,7 +737,7 @@ $\begin{pmatrix}
   \end{minipage}
 \end{frame}
 
-\begin{frame}[t]\frametitle{$t=3$}
+\begin{frame}[t]\frametitle{$t=3$: Graphs 2 and 3 Won, No More Conflict}
  \begin{minipage}{0.49\textwidth}
     \centering
     \includegraphics[scale=0.32]{../figures/graph_3_2_1.pdf}
@@ -758,7 +756,7 @@ $\begin{pmatrix}
   \end{minipage}
 \end{frame}
 
-\begin{frame}[t]\frametitle{$t=4$}
+\begin{frame}[t]\frametitle{$t=4$, Done Sweeping!}
  \begin{minipage}{0.49\textwidth}
     \centering
     \includegraphics[scale=0.32]{../figures/graph_4_3_1.pdf}
@@ -897,9 +895,20 @@ $\begin{pmatrix}
   \includegraphics[scale=0.6]{../figures/worst_verification.pdf}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Unbalanced Pins}
+\begin{frame}[t]\frametitle{Unbalanced Pin Comparison Between PDT and TTS}
   \centering
   \includegraphics[scale=0.25,trim={2cm 0cm 1cm 1.3cm},clip]{../figures/unbalanced_pins_refined.png}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Unbalanced Pin Comparison Between PDT and TTS}
+\begin{block}{}
+ Using the mesh from the previous slide, PDT and the time-to-solution estimator were run on the following problems:
+ \begin{itemize}
+   \item 2-6,8, and 9 subsets in each dimension with load balance by dimension and regular cuts.
+   \item The ratio of the solve time per sweep was taken between the LBD cuts and regular cuts for PDT and the time-to-solution estimator respectively.
+   \item The percent difference between the ratios was calculated: $\frac{R_{\text{PDT}} - R_{\text{TTS}}}{R_{PDT}}$.
+ \end{itemize}
+\end{block}
 \end{frame}
 
 \begin{frame}[t]\frametitle{PDT vs. TTS}
@@ -913,8 +922,13 @@ $\begin{pmatrix}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Level 2 Experiment TTS}
-  \centering
-  \includegraphics[scale=0.6]{../figures/level2solutionsuite.pdf}
+\begin{block}{}
+   \begin{itemize}
+   \item Using the Level 2 mesh, the time-to-solution estimator was run from 2-10 subsets in each dimension with regular cuts.
+ \end{itemize}
+ \end{block}
+ \centering
+  \includegraphics[scale=0.4]{../figures/level2solutionsuite.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Level 2 Experiment 42x13}
@@ -936,7 +950,7 @@ $\begin{pmatrix}
   \end{minipage}  
 \end{frame}
 
-\begin{frame}[t]\frametitle{IM1C Experiment}
+\begin{frame}[t]\frametitle{IM1C Experiment with 5 Subsets in Each Dimension}
 \centering
 \includegraphics[scale=0.15]{../figures/im1_228.png}
 \begin{block}{}
@@ -991,7 +1005,7 @@ $\begin{pmatrix}
 \begin{table}[H]
 \centering
 \begin{tabular}{c|c|c} 
-\bf Params &Brute Force & SciPy   \\ \hline \hline
+\bf Params & \bf Brute Force & \bf SciPy   \\ \hline \hline
  x & 6.2& 6.180 \\
  y0 & 6.4 & 6.420 \\ 
  y1 & 5.9 & 5.922 \\ 
@@ -1019,7 +1033,7 @@ $\begin{pmatrix}
   \end{minipage}
   \vspace{1cm}
   \centering
-    Improvement: $\frac{1.335 - 0.756}{1.335} = 0.434$
+    Improvement: $\frac{0.756}{1.335} = 0.566$
 \end{frame}
 
 \begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 10 Points/Subset}
@@ -1041,7 +1055,7 @@ $\begin{pmatrix}
   \end{minipage}
   \vspace{1cm}
   \centering
-    Improvement: $\frac{0.145 - 0.080}{0.145} = 0.447$
+    Improvement: $\frac{0.080}{0.145} = 0.552$
 \end{frame}
 
 \begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 1000 Points/Subset}
@@ -1050,7 +1064,7 @@ $\begin{pmatrix}
     \includegraphics[scale=0.35]{../figures/synthetic_lbd_cuts_heavy.png}
     \begin{block}{}
     \centering
-    $t = 7.298$
+    $t = 12.499$
     \end{block}
   \end{minipage}
   \begin{minipage}{0.49\textwidth}
@@ -1058,19 +1072,19 @@ $\begin{pmatrix}
     \includegraphics[scale=0.35]{../figures/synthetic_opt_cuts_heavy.png}
     \begin{block}{}
     \centering
-    $t = 12.499$
+    $t = 7.298$
     \end{block}
   \end{minipage}
   \vspace{1cm}
   \centering
-    Improvement: $\frac{12.499-7.289}{12.499} = 0.416$
+    Improvement: $\frac{7.289}{12.499} = 0.583$
 \end{frame}
 
 \begin{frame}[t]\frametitle{Global Optimization Process}
 \begin{block}{}
   \begin{itemize}
-    \item Local Minimization method (SLSQP)
-    \item Basinhopping or stochastic global minimization method
+   \item Methods in \textbf{scipy.optimize.minimze} find local minima only, and we needed to combine this with a global optimization routine.
+    \item From \textbf{scipy.optimize} we used basinhopping (a stochastic global minimization method) to call the local minimization method in order optimize over our global parameter space.
   \end{itemize}
 \end{block}
 \end{frame}
@@ -1083,9 +1097,22 @@ $\begin{pmatrix}
 \begin{frame}[t]\frametitle{Sparse Spiderweb Optimization Results}
 \begin{block}{}
   \begin{itemize}
-    \item Used LBD cuts as the initial guess.
+    \item Using LBD cuts as the initial guess, 10 global iterations, and 100 local iterations, the following results were obtained.
   \end{itemize}
 \end{block}
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c|c|c} 
+\bf N & \bf LBD & \bf Opt & \bf Ratio   \\ \hline \hline
+ 2 & 0.734 & 0.611 & 0.832\\
+ 3 & 0.742 & 0.678 & 0.914\\ 
+ 4 & 0.586 & 0.507 & 0.865\\ 
+ 5 & 0.561& 0.509 & 0.907\\
+ 6 & 0.465  &  0.461 & 0.991\\
+ 7 & 0.463 & 0.416 & 0.898\\
+ 9& 0.373& 0.373 & 1.0\\
+\end{tabular}
+\end{table}
 \end{frame}
 
 \section{Conclusions and Future Work}
@@ -1108,7 +1135,7 @@ $\begin{pmatrix}
     \item The \textbf{scipy.optimize.minimize} libraries are finding local minima, and the parameters are not traversing the entire boundaries before converging.
     \item Combining the local minimization method with a stochastic global minimization method yielded improved
       results, but still depended strongly on the initial parameter guess.
-     \item The python optimization libraries do not respect the boundaries passed in during certain iterations. This causes the time-to-solution estimator to fail, and the optimizer to crash.
+     \item The python optimization libraries do not consistently respect the parameter boundaries passed in. This causes the time-to-solution estimator to fail, and the optimizer to crash.
     \item The time-to-solution-estimator needs to be sped up significantly if larger cases are expected to run in reasonable amounts of time. The target is a few minutes for large cases, which currently can take up to a day, if they don't crash.  
     \end{itemize}
   \end{block}
