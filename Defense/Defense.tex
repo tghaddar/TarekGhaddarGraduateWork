@@ -1142,14 +1142,16 @@ $\begin{pmatrix}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Future Work}
-  \begin{block}{}
-    \begin{itemize}
-      \item The time-to-solution estimator has a complexity of $O(\text{num subsets}\cdot \text{num angles} \cdot \text{dim})$.
-      \item Portions of the time-to-solution estimator are embarrassingly parallel, and probably can be sped up significantly.
-      \item Further exploration into optimization libraries and methods is needed, particularly for larger parameter spaces.
-    \end{itemize}
-  \end{block}
-
+\begin{block}{Immediate Priorities}
+  \begin{itemize}
+    \item Speed up TTS! Problems modeling greater than 1000 subsets take about 1.5 mins to solve. 
+    \item With the optimization tools evaluating the time-to-solution up to 10,000 times, this is extremely costly.
+  \end{itemize}
+\end{block}
+\begin{block}{}
+  \item Explore a wider variety of optimization tools that can optimize large parameter spaces. 
+  \item Potentially move to C++ in order to faster than python, and open up the possibility to better optimization tools.
+\end{block}
 \end{frame}
 
 \end{document}
