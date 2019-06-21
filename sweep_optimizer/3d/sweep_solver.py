@@ -1168,7 +1168,7 @@ def calculate_delay(first_graph,second_graph,graphs,node,time_to_solve_node):
   #The delay is the difference in start times.
   delay = first_start_time + time_to_solve_node - second_start_time
   #If this delay value is less than zero, then the first graph has finished solving it by the time the second graph gets to it.
-  if delay < 0.0 or delay < 1e-15:
+  if delay < 0.0:
     delay = 0.0
   
   return delay
@@ -1488,8 +1488,8 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
-  print("pre-tweak: ",x_cuts,y_cuts)
-  x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
+  #print("pre-tweak: ",x_cuts,y_cuts)
+  #x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   print(x_cuts,y_cuts)
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)

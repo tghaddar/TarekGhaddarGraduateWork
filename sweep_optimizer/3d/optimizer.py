@@ -56,6 +56,30 @@ def create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,num
     cut_id += 1
   return bounds
 
+def create_constraints(global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol):
+  
+  x_tol = (0.05/numcol)*(global_xmax - global_xmin)/numcol
+  y_tol = (0.05/numrow)*(global_ymax - global_ymin)/numrow
+  
+  #The number of constraints for each dimension.
+  num_cons_x = numcol-2
+  num_cons_y = numcol*(numrow-2)
+  #LIst of dictionaries storing the constraints.
+  constraints = [None]*(num_cons_x+num_cons_y)
+
+  for xcons in range(0,num_cons_x):
+    current_constraint = {}
+    current_constraint['type'] = 'ineq'
+    current_constraint['fun'] = lambda x: x[xcons+1] - x[xcons] - x_tol
+    constraints[xcons] = current_constraint
+
+  for ycons in range(num_cons_x,num_cons_x+num_cons_y):
+    current_constraint = {}
+    current_constraint['type'] = 'ineq'
+    current_constraint['fun'] = lambda x: x[ycons+1] - x[ycons] - y_tol
+    constraints[ycons] = current_constraint 
+
+  return constraints
 def create_bounds_3d(num_params,global_xmin,global_xmax,global_ymin,global_ymax,global_zmin,global_zmax,numrow,numcol,numplane):
   
   x_tol = (0.05/numcol)*(global_xmax - global_xmin)/numcol
