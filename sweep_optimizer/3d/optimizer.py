@@ -66,6 +66,7 @@ def create_constraints(global_xmin,global_xmax,global_ymin,global_ymax,numrow,nu
   num_cons_y = numcol*(numrow-2)
   #LIst of dictionaries storing the constraints.
   constraints = [None]*(num_cons_x+num_cons_y)
+  print(len(constraints))
 
   for xcons in range(0,num_cons_x):
     current_constraint = {}

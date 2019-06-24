@@ -20,8 +20,8 @@ upc = 4.0
 upbc = 2.0
 
 #Number of rows and columns.
-numrow = 3
-numcol = 3
+numrow = 20
+numcol = 20
 num_angles = 1
 unweighted=True
 
@@ -32,14 +32,10 @@ global_ymin = 0.0
 global_ymax = 10.0
 
 x_cuts,y_cuts = create_2d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow)
-interior_cuts = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-num_params = len(interior_cuts)
-
-bounds = create_bounds(num_params,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol)
-constraints = create_constraints(global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol)
-args = (f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
+params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+num_params = len(params)
 
 start = time.time()
-max_time = basinhopping(optimized_tts,interior_cuts,niter=10,minimizer_kwargs={"method":"Nelder-Mead","bounds":bounds,"constraints":constraints,'args':args})
+max_time,graphs = optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
 end = time.time()
 print(end-start)

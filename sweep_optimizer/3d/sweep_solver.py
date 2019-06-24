@@ -224,11 +224,7 @@ def get_max_incoming_weight(G,node):
   
   in_edges = list(G.in_edges(node,'weight'))
   weights = [z for x,y,z in in_edges]
-  
-  if (in_edges):
-    return max(weights)
-  else:
-    return 0.0
+  return max(weights)
 
 def get_subset_cell_dist(num_total_cells,global_subset_boundaries):
   
@@ -580,34 +576,19 @@ def make_edges_universal(graphs):
     graphs[g] = graph
   return graphs
 
-#A weight based traversal of a graph G. In the context of our problem, this returns all nodes solving at time t = weight_limit.
-def nodes_being_solved_simple(G,prev_nodes,weight_limit,time_to_solve):
-  #The ending node of the graph is always -1. 
-  end_node =  -1
-  
-  #The nodes being solved.
-  nodes_being_solved = []
-  #Looping over the previous nodes and getting the simple paths to the ending node.
-  for prev_node in prev_nodes:
-    
-    node_generator = all_simple_paths_modified(G,prev_node,end_node,time_to_solve,cutoff=weight_limit)
-    nodes_being_solved += list(node_generator)
 
-  #Making the list unique.
-  nodes_being_solved = list(set(nodes_being_solved))
-  nodes_being_solved = sorted(nodes_being_solved)
-  return nodes_being_solved
-
-
+#Loops through nodes and finds out who is ready to solve.
 def nodes_being_solved_general(G,weight_limit,time_to_solve):
   
   nodes_being_solved = []
   nodes = list(G.nodes())
   nodes.remove(-2)
   
+  
   for n in nodes:
-    
-    ready_to_solve = get_max_incoming_weight(G,n)
+    in_edges = list(G.in_edges(n,data='weight'))
+    ready_to_solve = max([z for x,y,z in in_edges])
+    #ready_to_solve = get_max_incoming_weight(G,n)
     if ready_to_solve > weight_limit:
       continue
     elif ready_to_solve == weight_limit:
@@ -618,7 +599,31 @@ def nodes_being_solved_general(G,weight_limit,time_to_solve):
         nodes_being_solved.append(n)
   
   return sorted(nodes_being_solved)
+
+#Attempting to speed up nodes_being_solved_general.
+def nodes_being_solved_general_sped(G,weight_limit,nodes_already_solved,time_to_solve):
+  nodes_being_solved = []
+  nodes = list(G.nodes())
+  nodes.remove(-2)
+  nodes = list(set(nodes) - set(nodes_already_solved))
+
+  for n in nodes:
+    in_edges = list(G.in_edges(n,data='weight'))
+    ready_to_solve = max([z for x,y,z in in_edges])
+    #ready_to_solve = get_max_incoming_weight(G,n)
+    if ready_to_solve > weight_limit:
+      continue
+    elif ready_to_solve == weight_limit:
+      if n != -1:
+        nodes_being_solved.append(n)
+    elif ready_to_solve + time_to_solve[n] > weight_limit:
+      if n != -1:
+        nodes_being_solved.append(n)
+    elif ready_to_solve + time_to_solve[n] < weight_limit:
+      if n != -1:
+        nodes_already_solved.append(n)
   
+  return sorted(nodes_being_solved),sorted(nodes_already_solved)
   
 def sum_weights_of_path(graph,path):
   weight_sum = 0.0
@@ -631,46 +636,6 @@ def sum_weights_of_path(graph,path):
 
   return weight_sum
 
-#An attempt to speep up nodes_being_solved (def on line 218).
-
-def nodes_being_solved_faster(G,prev_nodes,weight_limit,time_to_solve):
-  #The ending node of the graph is always -1. 
-  end_node =  -1
-  
-  #The nodes being solved.
-  nodes_being_solved = []
-  #Looping over the previous nodes and getting the simple paths to the ending node.
-  for prev_node in prev_nodes:
-    
-    simple_paths = nx.all_simple_paths(G,prev_node,end_node)
-    #Looping over the simple paths from the previous node to the ending node.
-    for path in simple_paths:
-      #Number of nodes in this path
-      num_nodes_path = len(path)
-      for n in range(1,num_nodes_path):
-        node1 = path[n-1]
-        node2 = path[n]
-        current_weight = G[node1][node2]['weight']
-        #Checking if the node is solving by the weight limit.
-        if ( current_weight >= weight_limit):
-          #The time this node starts solving at.
-          try:
-            start_time = list(G.in_edges(node1,'weight'))[0][2]
-          except:
-            start_time = 0.0
-          #If the start time of the node has already passed t, we break out of the loop.
-          if (start_time > weight_limit):
-            break
-          #Is this node is actually being solved? Or just waiting to communicate?
-          elif (start_time+time_to_solve[node1] > weight_limit):
-            #The node is actually being solved.
-            nodes_being_solved.append(node1)
-            break
-          
-  #Making the list unique.
-  nodes_being_solved = list(set(nodes_being_solved))
-  nodes_being_solved = sorted(nodes_being_solved)
-  return nodes_being_solved
 
 #Returns the heaviest path to a node.
 def get_heaviest_path_faster(graph,start_node,target_node):
@@ -1177,7 +1142,8 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
   
   #The number of graphs.
   num_graphs = len(graphs)
-  
+  #Storing nodes that have already been solved.
+  nodes_already_solved = [[] for g in range(0,num_graphs)]
   #Storing the ending nodes of all graphs.
   end_nodes = {}
   starting_nodes = []
@@ -1198,7 +1164,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
   #Keep iterating until all graphs have finished.
   counter = 0
   while num_finished_graphs < num_graphs:
-    #print('Time t = ', t)
+#    print('Time t = ', t)
     #if (t == 0.0011634222038497584)
     #  print("debug stop")
 
@@ -1208,12 +1174,11 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
       graph = graphs[g]
       if not prev_nodes[g]:
         prev_nodes[g] = starting_nodes[g]
-      #all_nodes_being_solved[g] = nodes_being_solved_faster(graph,prev_nodes[g],t,time_to_solve)
-      #all_nodes_being_solved[g] = nodes_being_solved_simple(graph,prev_nodes[g],t,time_to_solve[g])
-      all_nodes_being_solved[g] = nodes_being_solved_general(graph,t,time_to_solve[g])
+      #all_nodes_being_solved[g] = nodes_being_solved_general(graph,t,time_to_solve[g])
+      all_nodes_being_solved[g],nodes_already_solved[g] = nodes_being_solved_general_sped(graph,t,nodes_already_solved[g],time_to_solve[g])
     prev_nodes = all_nodes_being_solved
-    #print("Nodes being solved in each graph")
-    #print(all_nodes_being_solved)
+#    print("Nodes being solved in each graph")
+#    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
     num_conflicting_nodes = len(conflicting_nodes)
@@ -1490,7 +1455,7 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   #print("pre-tweak: ",x_cuts,y_cuts)
   #x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
-  print(x_cuts,y_cuts)
+  print(params)
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Getting mesh information.
@@ -1508,7 +1473,9 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
-  return max_time
+  max_time /= 15.0
+  print(max_time)
+  return max_time,graphs
 
 #The time to solution function that is fed into the optimizer.
 def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted):
