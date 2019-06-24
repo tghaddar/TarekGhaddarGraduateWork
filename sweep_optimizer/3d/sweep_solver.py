@@ -158,25 +158,8 @@ def modify_downstream_edges(G,source,target,modified_edges,delay):
       
   return G
 
-def modify_downstream_edges_faster(G,graph_index,source,modified_edges,time_to_solve,og_delay):
-#  downstream_nodes = nx.descendants(G,source)
-#  for node in downstream_nodes:
-#  
-#    #Getting incoming edges to this node.
-#    in_edges = G.in_edges(node)
-#    #Get the weights of  in_edges.
-#    weights = [z for x,y,z in in_edges]
-#    #The maximum weight (which is when this downstream node is ready to solve)
-#    ready_to_solve = copy(max(weights))
-#    
-#    for u,v in in_edges:
-#      if (u == source or u in downstream_nodes):
-#        if not modified_edges:
-#          G[u][v]['weight'] += delay
-#          modified_edges.append((u,v))
-#        elif (u,v) not in modified_edges:
-#          G[u][v]['weight'] += delay
-#          modified_edges.append((u,v))
+def modify_downstream_edges_faster(G,graph_index,source,time_to_solve,og_delay):
+
   source_ready_to_solve = get_max_incoming_weight(G,source)
   ready_to_solve_all = {source:source_ready_to_solve}
   
@@ -205,18 +188,10 @@ def modify_downstream_edges_faster(G,graph_index,source,modified_edges,time_to_s
     out_edges = G.out_edges(node)
     for u,v in out_edges:
       if (v in downstream_nodes):
-        if not modified_edges:
-          delay = time_to_solve[graph_index][node] + ready_to_solve - G[u][v]['weight']
-          if delay > 0.0:
-            G[u][v]['weight'] += delay
-            ready_to_solve_all[v] = get_max_incoming_weight(G,v)
-            #modified_edges.append((u,v))
-        elif (u,v) not in modified_edges:
-          delay = time_to_solve[graph_index][node] + ready_to_solve - G[u][v]['weight']
-          if delay > 0.0:
-            G[u][v]['weight'] += delay
-            ready_to_solve_all[v] = get_max_incoming_weight(G,v)
-            #modified_edges.append((u,v))
+        delay = time_to_solve[graph_index][node] + ready_to_solve - G[u][v]['weight']
+        if delay > 0.0:
+          G[u][v]['weight'] += delay
+          ready_to_solve_all[v] = get_max_incoming_weight(G,v)
   
   return G
 
@@ -927,80 +902,20 @@ def find_first_graph(conflicting_graphs,graphs,node,num_angles,unweighted):
       
   return first_graph
 
-#This function does the same thing as modify_secondary_graphs but in the case that multiple nodes are ready to solve at time t.
-def modify_secondary_graphs_mult_node(graphs,conflicting_nodes,nodes,time_to_solve,unweighted):
-  
-  #Copying the graphs frozen at time t.
-  frozen_graphs = deepcopy(graphs)
-  num_graphs = len(graphs)
-  num_nodes = len(nodes)
-  #Storing modified edges per graph over all nodes per time t.
-  modified_edges_over_nodes = [{k: [] for k in range(num_graphs)} for i in range(num_nodes+1)]
-  node_ind = 1
-  #We loop over all nodes ready to solve at time t.
-  for node in nodes:
-    #The time to solve this node.
-    time_to_solve_node = time_to_solve[node]
-    #We get the graphs in conflict at this node.
-    conflicting_graphs = conflicting_nodes[node]
-    num_conflicting_graphs = len(conflicting_graphs)
-    #modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
-    for outer in range(0,num_conflicting_graphs-1):
-      #print(node,conflicting_graphs)
-      #Storing modified edges per graph at time t.
-      modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
-      #The fastest graph to the node.
-      first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node,unweighted)
-      #Removed from conflicting graphs.
-      conflicting_graphs.remove(first_graph) 
-      #Loop over the secondary graphs.
-      for g in range(0,len(conflicting_graphs)):
-        second_graph = conflicting_graphs[g]
-        #The delay the second_graph will incur.
-        delay = calculate_delay(first_graph,second_graph,frozen_graphs,node,time_to_solve_node)
-        secondary_graph = graphs[second_graph]
-        #We need to first add the delay to the preceding edges, in order to update the time this node is ready to solve at.
-        edges = list(secondary_graph.in_edges(node))
-        num_edges = len(edges)
-        for e in range(0,num_edges):
-          node1,node2 = edges[e]
-          secondary_graph[node1][node2]['weight'] += delay
-        
-        #if (second_graph == 6):
-          #print("debug stop")
-        #secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
-        secondary_graph = modify_downstream_edges_faster(secondary_graph,second_graph,node,modified_edges[second_graph],time_to_solve,delay)
-        #if (second_graph == 6):
-          #print("debug stop")
-      
-        graphs[second_graph] = secondary_graph
-    
-    modified_edges_over_nodes[node_ind] = modified_edges
-    node_ind += 1
-      
-  #Make sure all incoming edges to all nodes match up. We do this later in the multi-node case because this all occurs within one time iteration.
-  for g in range(0,num_graphs):
-    graphs[g] = match_delay_weights(graphs[g])
-  
-  return graphs
 
 #This function does the same thing as modify_secondary_graphs but in the case that multiple nodes are ready to solve at time t.
-def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,time_to_solve,num_angles,unweighted):
+def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,time_to_solve,num_angles,unweighted,nodes_already_solved):
   
   #Copying the graphs frozen at time t.
   frozen_graphs = deepcopy(graphs)
   num_graphs = len(graphs)
-  num_nodes = len(nodes)
   #Storing modified edges per graph over all nodes per time t.
-  modified_edges_over_nodes = [{k: [] for k in range(num_graphs)} for i in range(num_nodes+1)]
   node_ind = 1
   #We loop over all nodes ready to solve at time t.
   for node in nodes:
     #We get the graphs in conflict at this node.
     conflicting_graphs = conflicting_nodes[node]
     #print(node,conflicting_graphs)
-    #Storing modified edges per graph at time t.
-    modified_edges = deepcopy(modified_edges_over_nodes[node_ind-1])
     #The fastest graph to the node.
     first_graph = find_first_graph(conflicting_graphs,frozen_graphs,node,num_angles,unweighted)
     #print("FIRST GRAPH: ", first_graph)
@@ -1021,69 +936,17 @@ def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,ti
           secondary_graph[node1][node2]['weight'] += delay
         
         #secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
-        secondary_graph = modify_downstream_edges_faster(secondary_graph,second_graph,node,modified_edges[second_graph],time_to_solve,delay)    
+        secondary_graph = modify_downstream_edges_faster(secondary_graph,second_graph,node,time_to_solve,delay)    
         graphs[second_graph] = secondary_graph
       
-    modified_edges_over_nodes[node_ind] = modified_edges
     
     node_ind += 1
       
   #Make sure all incoming edges to all nodes match up. We do this later in the multi-node case because this all occurs within one time iteration.
   for g in range(0,num_graphs):
-    graphs[g] = match_delay_weights(graphs[g])
+    #graphs[g] = match_delay_weights(graphs[g])
+    graphs[g] = match_delay_weights_test(graphs[g],nodes_already_solved[g])
   
-  return graphs
-
-#Modifies the weights of the secondary conflicting graphs at a particular node.
-def modify_secondary_graphs(graphs,conflicting_graphs,node,time_to_solve):
-  
-  #The number of secondary conflicting graphs.
-  num_conflicting_graphs = copy(len(conflicting_graphs))
-  
-  for outer in range(0,num_conflicting_graphs-1):
-    #The fastest graph to the node.
-    first_graph = find_first_graph(conflicting_graphs,graphs,node)
-#    print("Conflicted Node: ", node)
-#    print("First graph: ", first_graph)
-    #Removed from conflicting graphs.
-    conflicting_graphs.remove(first_graph)
-    #Loop over the secondary graphs.
-    for g in range(0,len(conflicting_graphs)):
-      second_graph = conflicting_graphs[g]
-      #The delay the second_graph will incur.
-      delay = calculate_delay(first_graph,second_graph,graphs,node,time_to_solve[first_graph][node])
-      #The secondary graph who's weights we are modifying.
-      secondary_graph = graphs[second_graph]
-      #We need to first add the delay to the preceding edges, in order to update the time this node is ready to solve at.
-      edges = list(secondary_graph.in_edges(node))
-      num_edges = len(edges)
-      for e in range(0,num_edges):
-        node1,node2 = edges[e]
-        secondary_graph[node1][node2]['weight'] += delay
-      #All paths from the node in conflict until the end of the graph.
-      secondary_paths = nx.all_simple_paths(secondary_graph,node,-1)
-      #A list of edges that have already been modified.
-      modified_edges = []
-      #Looping over all of downstream secondary paths.
-      for path in secondary_paths:
-        len_path = len(path)-1
-        for n in range(0,len_path):
-          node1 = path[n]
-          node2 = path[n+1]
-          #The edge.
-          edge = (node1,node2)
-          #Checking if this edge has already been modified. If it has, we DO NOT need to modify it again.
-          if (edge not in modified_edges):
-            #Adding the delay. 
-            secondary_graph[node1][node2]['weight'] += delay
-            #Adding this edge to the modified edges.
-            modified_edges.append(edge)
-      
-      #Make sure all incoming edges to all nodes match up.
-      secondary_graph = match_delay_weights(secondary_graph)
-      
-      graphs[second_graph] = secondary_graph
-
   return graphs
 
 def match_delay_weights(graph):
@@ -1112,7 +975,31 @@ def match_delay_weights(graph):
         else:
           graph[node1][node2]['weight'] = max_weight
       
-  return graph   
+  return graph
+
+def match_delay_weights_test(G,nodes_already_solved):
+  
+  nodes = list(G.nodes())
+  nodes.remove(-1)
+  nodes.remove(-2)
+  nodes = list(set(nodes) - set(nodes_already_solved))
+  
+  for n in nodes:
+    in_edges = list(G.in_edges(n,data='weight'))
+    max_weight = max([z for x,y,z in in_edges])
+    num_edges = len(in_edges)
+    
+    #If the number of incoming edges is greater than one, we need to match the weights.
+    if num_edges > 1:
+      #Looping through the edges 
+      for e in range(0,num_edges):
+        node1,node2,weight = in_edges[e]
+        if weight == max_weight:
+          continue
+        else:
+          G[node1][node2]['weight'] = max_weight
+  
+  return G
   
 #Calculates the delay that is incurred to a secondary graph by the winning graph at the node.
 def calculate_delay(first_graph,second_graph,graphs,node,time_to_solve_node):
@@ -1193,23 +1080,8 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
     #Otherwise, we address the conflicts between nodes across all graphs.
     else:
       #Find nodes ready to solve at time t that are in conflict.
-      first_nodes = find_first_conflict(conflicting_nodes,graphs)
-      #print(first_nodes)
-#      num_nodes_ready_to_solve = len(first_nodes)
-#      if (num_nodes_ready_to_solve == 1):
-#        first_node = first_nodes[0]
-#        #The conflicting grpahs at this node.
-#        conflicting_graphs = conflicting_nodes[first_node]
-#        #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.
-#        graphs = modify_secondary_graphs(graphs,conflicting_graphs,first_node,time_to_solve)
-#        #To update our march through, we need to update t here, with a find_next_interaction.
-#        if (num_conflicting_nodes == 1):
-#          #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
-#          t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
-#      
-#      else:
-        #We need to modify the weights of the secondary graphs. This function will find the "winning" graph and modify everything downstream in losing graphs.        
-      graphs = modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,first_nodes,time_to_solve,num_angles,unweighted)
+      first_nodes = find_first_conflict(conflicting_nodes,graphs)        
+      graphs = modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,first_nodes,time_to_solve,num_angles,unweighted,nodes_already_solved)
       #To update our march through, we need to update t here, with a find_next_interaction.
       if (num_conflicting_nodes == len(first_nodes)):
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)

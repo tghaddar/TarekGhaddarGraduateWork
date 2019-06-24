@@ -20,8 +20,8 @@ upc = 4.0
 upbc = 2.0
 
 #Number of rows and columns.
-numrow = 3
-numcol = 3
+numrow = 10
+numcol = 10
 num_angles = 1
 unweighted=True
 
@@ -36,6 +36,6 @@ params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
 num_params = len(params)
 
 start = time.time()
-max_time,graphs = optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
+max_time = optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
 end = time.time()
 print(end-start)

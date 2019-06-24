@@ -20,8 +20,8 @@ upc = 4.0
 upbc = 2.0
 
 #Number of rows and columns.
-numrow = 3
-numcol = 3
+numrow = 10
+numcol = 10
 num_angles = 1
 unweighted=True
 
