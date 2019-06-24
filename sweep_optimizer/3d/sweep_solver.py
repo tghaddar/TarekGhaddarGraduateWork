@@ -1475,7 +1475,7 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   solve_times,max_time = compute_solve_time(graphs)
   max_time /= 15.0
   print(max_time)
-  return max_time,graphs
+  return max_time
 
 #The time to solution function that is fed into the optimizer.
 def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted):
