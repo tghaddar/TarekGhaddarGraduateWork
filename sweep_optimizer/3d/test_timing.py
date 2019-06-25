@@ -1,28 +1,37 @@
 import numpy as np
-from mesh_processor import create_2d_cuts
-from optimizer import create_parameter_space, create_bounds, create_constraints
-from sweep_solver import optimized_tts
+from mesh_processor import create_2d_cuts,create_3d_cuts
+from optimizer import create_parameter_space,create_parameter_space_3d
+from sweep_solver import optimized_tts,optimized_tts_3d
 from scipy.optimize import minimize,basinhopping
 import time
 
 
-f = lambda x,y: x + y
+f = lambda x,y,z: 1
 #The machine parameters.
 #Communication time per double
-t_comm = 4.47e-05
+t_comm = 4.47e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
 m_l = 1
-latency = 4110.0e-05
+latency = 4110.0e-09
 #Solve time per unknown.
-t_u = 450.0e-05
-upc = 4.0
-upbc = 2.0
+Tc = 1000.0e-09
+upc = 8.0
+upbc = 4.0
+Twu = 35000.0e-09
+Tm = 100.0e-09
+Tg = 75.0e-09
+mcff = 1.310
+
+machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
+
 
 #Number of rows and columns.
-numrow = 20
-numcol = 20
+numrow = 4
+numcol = 4
+numplane = 4
 num_angles = 1
+Am = 2
 unweighted=True
 
 #Global boundaries.
@@ -30,12 +39,14 @@ global_xmin = 0.0
 global_xmax = 10.0
 global_ymin = 0.0
 global_ymax = 10.0
+global_zmin = 0.0
+global_zmax = 10.0
 
-x_cuts,y_cuts = create_2d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow)
-params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+z_cuts,x_cuts,y_cuts = create_3d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow,global_zmin,global_zmax,numplane)
+params = create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane)
 num_params = len(params)
 
 start = time.time()
-max_time = optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,numrow,numcol,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted)
+max_time = optimized_tts_3d(params,f,global_xmin,global_xmax,global_ymin,global_ymax,global_zmin,global_zmax,numrow,numcol,numplane,machine_parameters,num_angles,Am,unweighted,False)
 end = time.time()
 print(end-start)

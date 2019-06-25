@@ -8,15 +8,12 @@ import build_adjacency_matrix as bam
 import build_3d_adjacency as b3a
 from build_global_subset_boundaries import build_global_subset_boundaries
 from copy import deepcopy
-from copy import copy
 from utilities import get_ijk
 from utilities import get_ij,get_ss_id
 from math import isclose
-from matplotlib.pyplot import imshow,pause
 from mesh_processor import get_cells_per_subset_2d,get_cells_per_subset_2d_numerical,get_cells_per_subset_3d,get_cells_per_subset_3d_numerical,get_cells_per_subset_3d_numerical_test
 from mesh_processor import get_cells_per_subset_2d_test
 import time
-import operator
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 #This function computes the solve time for a sweep for each octant. 
@@ -335,45 +332,35 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
   num_subsets = len(global_subset_boundaries)
   #Storing the time to solve and communicate each subset.
   time_to_solve = [[None]*num_subsets for g in range(num_graphs)]
-  t_u,upc,upbc,t_comm,latency,m_l = machine_params
+  Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l = machine_params
   
   for ig in range(0,num_graphs):
     graph = graphs[ig]
     for e in graph.edges():
       #The starting node of this edge.
       node = e[0]
-      #Checking the successors.
-      node_successors = list(graph.successors(node))
+      #The ending node of this edge.
+      neighbor = e[1]
       bounds = [False, False]
-      #Determining if this subset has neighbors in both x and y.
-      for n in range(0,len(node_successors)):
-        neighbor = node_successors[n]
-        if neighbor == -1:
-          break
-        i_neighbor,j_neighbor = get_ij(neighbor,num_row,num_col)
-        i_node,j_node = get_ij(node,num_row,num_col)
-        #Checking which boundary this is on.
-        if i_neighbor == i_node:
-          bounds[1] = True
-        else:
-          bounds[0] = True
       
+      i_neighbor,j_neighbor = get_ij(neighbor,num_row,num_col)
+      i_node,j_node = get_ij(node,num_row,num_col)
+      #Checking which boundary this is on.
+      if i_neighbor == i_node:
+        bounds[1] = True
+      else:
+        bounds[0] = True
+    
       #Determining the number of boundary cells to add to the cost.
       boundary_cells = 0.0
-      comm_overhead = 0.0
-      #We first see how many True entries are in bounds.
-      num_true = sum(bounds)
-      if num_true == 2:
-        boundary_cells = max(bdy_cells_per_subset[node])
-        comm_overhead = latency*m_l
-      elif num_true == 1:
-        #Communicating across an x-boundary only.
-        if  bounds[0] == True:
-          boundary_cells = bdy_cells_per_subset[node][1]
-        #Communicating across a y-boundary only.
-        elif bounds[1] == True:
-          boundary_cells = bdy_cells_per_subset[node][0]
+      #Communicating across an x-boundary.
+      if  bounds[0] == True:
+        boundary_cells = bdy_cells_per_subset[node][1]
+      #Communicating across a y-boundary.
+      elif bounds[1] == True:
+        boundary_cells = bdy_cells_per_subset[node][0]
       
+      #boundary_cells = sum(bdy_cells_per_subset[node])
       #Cells in this subset.
       num_cells = cells_per_subset[node]
       #If this is a testing run, our cost is 1.
@@ -381,8 +368,8 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       if test:
         cost = 1.0
       else:
-        cost = (num_cells*t_u*upc + (boundary_cells*upbc*t_comm + comm_overhead))
-      graph[e[0]][e[1]]['weight'] = cost
+        cost = mcff*(Twu + 2*latency*m_l + t_comm*boundary_cells*upbc + upc*num_cells*(Tc + Tm + Tg))
+      graph[node][neighbor]['weight'] = cost
     
   for ig in range(0,num_graphs):
     graph = graphs[ig]
@@ -394,50 +381,39 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       
   return graphs,time_to_solve
 
-def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,test):
+def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,Am,test):
   num_graphs = len(graphs)
   num_subsets = len(global_subset_boundaries)
   #Storing the time to solve and communicate each subset.
   time_to_solve = [[None]*num_subsets for g in range(num_graphs)]
-  t_u,upc,upbc,t_comm,latency,m_l = machine_params
+  Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l = machine_params
   #Looping over graphs.
   for ig in range(0,num_graphs):
     graph = graphs[ig]
     for e in graph.edges():
       #The starting node of this edge.
       node = e[0]
-      #Checking the successors.
-      node_successors = list(graph.successors(node))
-      #Stores whether the neighboring boundaries are xy, xz, or yz.
+      #The second node of this edge.
+      neighbor = e[1]
       bounds = [False, False,False]
       #Checking where the neighbors are located.
-      for n in range(0,len(node_successors)):
-        neighbor = node_successors[n]
-        if neighbor == -1:
-          break
-        i_n,j_n,k_n = get_ijk(neighbor, num_row,num_col,num_plane)
-        i,j,k = get_ijk(node,num_row,num_col,num_plane)
-        if k_n != k:
-          bounds[0] = True
-        else:
-          if i_n == i:
-            bounds[1] = True
-          else:
-            bounds[2] = True
-      
-      num_true = sum(bounds)
-      boundary_cells = 0.0
-      comm_overhead = 0.0
-      if num_true == 3:
-        boundary_cells = max(bdy_cells_per_subset[node])
-        comm_overhead = latency*m_l
+      i_n,j_n,k_n = get_ijk(neighbor, num_row,num_col,num_plane)
+      i,j,k = get_ijk(node,num_row,num_col,num_plane)
+      if k_n != k:
+        bounds[0] = True
       else:
-        if bounds[0] == True:
-          boundary_cells = bdy_cells_per_subset[node][0]
-        if bounds[1] == True:
-          boundary_cells = bdy_cells_per_subset[node][1]
-        if bounds[2] == True:
-          boundary_cells = bdy_cells_per_subset[node][2]
+        if i_n == i:
+          bounds[1] = True
+        else:
+          bounds[2] = True
+      
+      boundary_cells = 0.0
+      if bounds[0] == True:
+        boundary_cells = bdy_cells_per_subset[node][0]
+      if bounds[1] == True:
+        boundary_cells = bdy_cells_per_subset[node][1]
+      if bounds[2] == True:
+        boundary_cells = bdy_cells_per_subset[node][2]
       
       #Cells in this subset.
       num_cells = cells_per_subset[node]
@@ -446,7 +422,7 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
       if test:
         cost = 1.0
       else:
-        cost = (num_cells*t_u*upc + (boundary_cells*upbc*t_comm + comm_overhead))
+        cost = mcff*(Twu + 3*latency*m_l + t_comm*boundary_cells*Am*upbc + upc*num_cells*(Tc + Am*(Tm + Tg)))
       graph[e[0]][e[1]]['weight'] = cost
     
     
@@ -1527,14 +1503,9 @@ def time_to_solution_numerical(points,x_cuts,y_cuts,machine_params,num_col,num_r
 
 
 #The time to solution function that is fed into the optimizer.
-def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted):
-  #f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l = args
-  machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
+def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,machine_params,num_angles,unweighted):
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
-  #print("pre-tweak: ",x_cuts,y_cuts)
-  #x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
-  print(params)
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Getting mesh information.
@@ -1552,7 +1523,6 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
-  max_time /= 15.0
   print(max_time)
   return max_time
 
@@ -1589,12 +1559,9 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   print(max_time,end-start)
   return max_time
 
-def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted,test):
-  
-  machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
-  
+def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,machine_params,num_angles,Am,unweighted,test):
+    
   x_cuts,y_cuts,z_cuts = unpack_parameters_3d(params,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_col,num_row,num_plane)
-  x_cuts,y_cuts,z_cuts = tweak_parameters_3d(x_cuts,y_cuts,z_cuts,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_col,num_row,num_plane)
   #Building the subset boundaries.
   subset_bounds = b3a.build_3d_global_subset_boundaries(num_col-1,num_row-1,num_plane-1,x_cuts,y_cuts,z_cuts)
   #Getting mesh information.
@@ -1604,7 +1571,7 @@ def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_ma
   #Building the graphs.
   graphs = b3a.build_graphs(adjacency_matrix,num_row,num_col,num_plane,num_angles)
   #Weighting the graphs based on cells per subset and boundary cells per subset.
-  graphs,time_to_solve = add_edge_cost_3d(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,test)
+  graphs,time_to_solve = add_edge_cost_3d(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,Am,test)
   #Adjusting the graphs for multiple angles per octant.
   graphs= pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
@@ -1612,8 +1579,8 @@ def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_ma
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
-  
-  return 100*max_time
+  print(max_time) 
+  return max_time
 
 def optimized_tts_3d_numerical(params,points,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted,test):
   start = time.time() 
