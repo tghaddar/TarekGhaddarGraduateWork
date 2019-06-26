@@ -351,8 +351,7 @@ def get_cells_per_subset_3d(f,boundaries):
     subset_vol = Lx*Ly*Lz
     
     N = analytical_mesh_integration_3d(f,xmin,xmax,ymin,ymax,zmin,zmax)[0]
-    cells_per_subset[s] = N
-    
+    cells_per_subset[s] = N    
     #Computing boundary cells along xy, xz, and yz faces.
     n_xy = pow((N/subset_vol),2.0/3.0)*Lx*Ly
     n_xz = pow((N/subset_vol),2.0/3.0)*Lx*Lz

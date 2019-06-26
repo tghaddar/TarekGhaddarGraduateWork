@@ -27,8 +27,8 @@ machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 
 
 #Number of rows and columns and planes.
-numcol = 8
-numrow = 4
+numcol = 64
+numrow = 32
 numplane = 2
 num_angles = 1
 Am = 10
@@ -36,11 +36,11 @@ unweighted=True
 
 #Global boundaries.
 global_xmin = 0.0
-global_xmax = 64.0
+global_xmax = 256.0
 global_ymin = 0.0
-global_ymax = 64.0
+global_ymax = 256.0
 global_zmin = 0.0
-global_zmax = 64.0
+global_zmax = 256.0
 
 z_cuts,x_cuts,y_cuts = create_3d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow,global_zmin,global_zmax,numplane)
 params = create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane)

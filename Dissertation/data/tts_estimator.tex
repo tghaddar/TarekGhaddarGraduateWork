@@ -36,14 +36,10 @@ The time-to-solution estimator determines the time to sweep across a domain by:
 \subsection{Building the adjacency matrices}
 
 Before building the graph for each quadrant/octant, an adjacency matrix must be built for the given partitioning scheme. 
+The adjacency matrix proves connectivity information for each subset to its neighboring subset. 
 The adjacency building process relies on a major assumption: The z dimension has partitions all the way across the domain, then the x dimension has partitions per plane, then the y dimension has partitions per plane per column. 
-In future work, these three dimensions will be interchangeable, but for now, this ordering must be preserved. The adjacency building algorithm differs slightly for 2D and 3D cases. Both are detailed in the following subsection. 
+In future work, these three dimensions will be interchangeable, but for now, this ordering must be preserved. 
 
-\subsubsection{2D adjacency matrices}
-
-To build the adjacency matrices in 2 dimensions, we only need the partitioning scheme.
-
-\subsubsection{3D adjacency matrices}
 
 \subsection{Building the directed acyclic graphs (DAGs)}
 
@@ -78,7 +74,7 @@ In order to obtain the graphs for quadrants 1 and 2, a flipped version of the ad
 
 Each graph is weighted to reflect the solve and communication time of each node to its neighbors. Explicitly, the edge weight between node A and node B represents the solve time of node A added to the time it takes to communicate boundary information to node B. Equation \ref{weight_function} shows how the weight is calculated:
 \begin{equation}
-\text{weight} = \text{mcff}\cdot [T_{wu} + N_n\cdot \text{latency}\cdot M_L + T_{\text{comm}}\cdot N_b\cdot \cdot A_m\cdot upbc + upc\cdot N_c\cdot (T_c + A_m\cdot (T_m + T_g))],
+\text{weight} = \text{mcff}\cdot [T_{wu} + N_n\cdot \text{latency}\cdot M_L + T_{\text{comm}}\cdot N_b\cdot A_m\cdot upbc + upc\cdot N_c\cdot (T_c + A_m\cdot (T_m + T_g))],
 \label{weight_function}
 \end{equation}
 where:
@@ -121,8 +117,42 @@ where $A$ is the subset area. With this information, we can successfully compute
 
 \subsection{Adding graphs for angular pipelining}
 
-If there are angles to be pipelined, the time-to-solution estimator adds a new set of graphs for each additional angle to be pipelined. 
+If there are angles to be pipelined, the time-to-solution estimator adds a new set of graphs for each additional angle to be pipelined. For example, if there are two anglesets per octant, this would results in 16 graphs, or 8 graphs per angleset, or 1 graph per octant per angleset.
 
+\subsection{Adjusting the weights of each graph to reflect a universal timescale}
+
+Once we have our full set of graphs with angular pipelining accounted for, we set up each graph to reflect a universal timescale. For each node in each graph, the following is done:
+\begin{enumerate}
+  \item Get the longest path to the node.
+  \item Sum this longest path.
+  \item Set all incoming edge values to the node to the sum of the longest path. 
+\end{enumerate}
+The incoming edges to each node in each graph now reflect the time at which it is ready to solve. This universal edge weighting is crucial for detecting and resolving conflicts during the sweep.
+
+\subsection{Adjusting the weights of each graph to detect and resolve conflicts}
+
+At this point in the time-to-solution estimation process, we have a graph per octant/quadrant per angleset, each weighted on a universal time scale. The time to solution is best summarized as a ``marching'' process:
+\begin{enumerate}
+  \item Starting at time $t=0$, we find the first interaction across all graphs. 
+  \item If at that time, multiple graphs are solving the same node, we have a conflict. 
+  \item The graph that ``wins'' the conflict does not have its weights modified, while the graph that lose the conflict modify their downstream weights according to how long they are delayed. 
+  \item Update $t$ to the next interaction across all graphs. 
+  \item Repeat steps 3 and 4 until all graphs are finished sweeping.
+\end{enumerate}
+
+When a conflict is detected, the time-to-solution estimator defaults to a first-come-first-serve conflict resolution method. The first graph to arrive to a node will begin solving it, and the remaining graphs that arrive while it is being solved will incur a delay. The delay is reflected in the remaining graphs by adding the delay as a weight to the applicable edge and all downstream edges in the losing graphs. 
+
+If two or more graphs arrive to a node at the same time, the octant with the grater remaining depth-of-graph (simply, more work remaining), wins. In the case of a tie in the depth-of-graph, the graph with the priority direction wins according to the following rules:
+\begin{enumerate}
+    \item The graph with $\Omega_x > 0$ wins,
+	\item If multiple graphs have $\Omega_x > 0$, then the task with $\Omega_y > 0$ wins,
+	\item If multiple graphs have $\Omega_y > 0$, then the task with $\Omega_z > 0$ wins.
+\end{enumerate}
+The delay is once again added to the applicable edge's weight and all downstream edges' weights.
+
+\subsection{Estimating the final time-to-solution}
+
+Once all graphs have had their weights adjusted for conflicts, the graphs now reflect a schedule. The incoming edges to each node in each graph represent what time they are ready to solve. The final weight in each graph represents the time it takes for that graph to sweep across its domain. The maximum final weight across all graphs represents the estimate for the time-to-solution for the problem.
 
 \section{2D Verification}
 
@@ -298,3 +328,7 @@ Using probable worst-case partitions as shown in Fig. \ref{random_partitions}, t
 \section{3D Verification}
 
 The 3d verification results will go here.
+
+\section{PDT performance model vs. TTS}
+
+\section{PDT vs. TTS}
