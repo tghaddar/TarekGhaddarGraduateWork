@@ -11,7 +11,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                           TIME TO SOLUTION ESTIMATOR CHAPTER
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\newcommand{\tcr}[1]{\textcolor{red}{#1}}
 
 
 \chapter{TIME-TO-SOLUTION ESTIMATOR \label{cha:tts}}
@@ -26,9 +26,8 @@ The time-to-solution estimator determines the time to sweep across a domain by:
 \begin{enumerate}
 	\item Given a partitioning scheme, build adjacency matrices.
 	\item Build Directed Acyclic Graphs  (DAGs) from the adjacency matrices, one for each quadrant/octant.
-	\item Determine the cells per subset and boundary cells per subset for the given mesh.
 	\item Weight the edges of each graph based on the solve and communication time of each subset to its neighbors.
-	\item Adjust the weights of each graph to accommodate angular pipelining.
+     \item Add and adjust graphs based on how many angles are pipelined.
 	\item Adjust the weights of each graph to operate on the universal timescale.
 	\item Adjust the weights of each graph to reflect sweep conflicts between octants. 
 	\item Calculate the time to solution.
@@ -72,6 +71,57 @@ We feed the upper triangular portion of the adjacency matrix to DiGraph to get t
 In order to obtain the graphs for quadrants 1 and 2, a flipped version of the adjacency matrix is necessary.
 
 \subsubsection{Building the 3d graphs}
+
+
+%Weighting the TDGS
+\subsection{Weighting the task dependence graphs}
+
+Each graph is weighted to reflect the solve and communication time of each node to its neighbors. Explicitly, the edge weight between node A and node B represents the solve time of node A added to the time it takes to communicate boundary information to node B. Equation \ref{weight_function} shows how the weight is calculated:
+\begin{equation}
+\text{weight} = \text{mcff}\cdot [T_{wu} + N_n\cdot \text{latency}\cdot M_L + T_{\text{comm}}\cdot N_b\cdot \cdot A_m\cdot upbc + upc\cdot N_c\cdot (T_c + A_m\cdot (T_m + T_g))],
+\label{weight_function}
+\end{equation}
+where:
+\begin{itemize}
+  \item mcff = the Multi-Core Fudge Factor, a corrective factor that accounts for performance drop-off from 1 to 8 cores,
+  \item $T_{wu}$ = the time to get into the sweep operator,
+  \item $N_n$ = the number of neighbors this node has to communicate to,
+  \item latency = the machine specific communication latency,
+  \item $M_L$ = the machine specific latency multiplier,
+  \item $T_{\text{comm}}$ = the communication time per double,
+  \item $N_b$ = the number of boundary cells shared by node A and node B,
+  \item $A_m$ = the number of angles node A has to solve prior to communicating,
+  \item $upbc$ = the number of boundary unknowns per boundary cell,
+  \item $upc$ = the number of unknowns per cell,
+  \item $N_c$ = the number of cells in node A,
+  \item $T_c$ = the time spent solving cell-specific work,
+  \item $T_m$ = the time spent solving angle-specific work,
+  \item $T_g$ = the time spent solving group-specific work.
+\end{itemize}
+The weighting function is based on PDT's performance model\cite{mpadams15}, which is specific to how PDT solves the transport sweep. The cost function can be modified based on different sweep methodologies if a user desires.
+
+As shown in Eq. \ref{weight_function}, a crucial part of determining the weight of each edge is knowing the number of cells each subset has, and the amount of shared boundary cells with each neighbor. Given a mesh density, the number of cells per subset is given by Eq \ref{cellspersubset}:
+\begin{equation}
+   \text{cells per subset} = \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz,
+\label{cellspersubset}
+\end{equation}
+where the integral bounds represent the cut plane coordinates that form the subset. To estimate the boundary cells to each neighbor, we assume that the mesh within each subset is mostly uniform. Equations \ref{nxy}-\ref{nyz} calculate the boundary cells along each face in 3D:
+\begin{align}
+n_{xy} &= \big(\frac{N}{V}\big)^{2/3}\cdot L_x\cdot L_y \label{nxy}, \\
+n_{xz} &= \big(\frac{N}{V}\big)^{2/3}\cdot L_x\cdot L_z \label{nxz}, \\
+n_{yz} &= \big(\frac{N}{V}\big)^{2/3}\cdot L_y\cdot L_z \label{nyz},
+\end{align}
+where $N$ is the number of cells in the subset, $V$ is the subset volume, and $L_d$ is the length of the subset in dimension $d$.
+Equations \ref{nx} and \ref{ny} show the 2-dimensional equivalents to \ref{nxy}-\ref{nyz}:
+\begin{align}
+n_x &= \big(\frac{N}{A}\big)\cdot L_x, \label{nx} \\
+n_y &= \big(\frac{N}{A}\big)\cdot L_y, \label{ny}
+\end{align}
+where $A$ is the subset area. With this information, we can successfully compute all weights in each graph according to Eq. \ref{weight_function}. Once graphs are weighted, we add and adjust graphs for the number of angles pipelined per octant/quadrant.
+
+\subsection{Adding graphs for angular pipelining}
+
+If there are angles to be pipelined, the time-to-solution estimator adds a new set of graphs for each additional angle to be pipelined. 
 
 
 \section{2D Verification}

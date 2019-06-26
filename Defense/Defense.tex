@@ -466,8 +466,8 @@ The time-to-solution estimator is a graph-based method that uses graph algorithm
     \item Given a partitioning scheme, build an adjacency matrix.
     \item From the adjacency matrix, build Directed Acyclic Graphs (DAGs), one for each quadrant/octant.
     \item Weight each DAG's edges based on the solve and communication time of each subset to its neighbors.
+     \item Add and adjust graphs based on how many angles are pipelined.
     \item Adjust the weights of each graph to reflect a universal timescale.
-    \item Adjust the weights of each graph based on the number of angles.
     \item Adjust the weights of each graph to reflect sweep conflicts between octants.
     \item Obtain the time-to-solution.
 \end{enumerate}

@@ -429,10 +429,13 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
   for ig in range(0,num_graphs):
     graph = graphs[ig]
     for n in range(0,num_subsets):
-      out_edges = list(graph.out_edges(n,'weight'))
-      num_edges = len(out_edges)
-      out_edges = [out_edges[i][2] for i in range(num_edges)]
+      out_edges_list = list(graph.out_edges(n,'weight'))
+      num_edges = len(out_edges_list)
+      out_edges = [out_edges_list[i][2] for i in range(num_edges)]
       time_to_solve[ig][n] = max(out_edges)
+      neighbors = list(graph.successors(n))
+      for i in neighbors:
+        graph[n][i]['weight'] = max(out_edges)
   
   return graphs,time_to_solve
       
