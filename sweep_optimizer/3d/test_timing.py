@@ -21,26 +21,26 @@ upbc = 4.0
 Twu = 35000.0e-09
 Tm = 100.0e-09
 Tg = 75.0e-09
-mcff = 1.310
+mcff = 1.330
 
 machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 
 
-#Number of rows and columns.
+#Number of rows and columns and planes.
+numcol = 8
 numrow = 4
-numcol = 4
-numplane = 4
+numplane = 2
 num_angles = 1
-Am = 2
+Am = 10
 unweighted=True
 
 #Global boundaries.
 global_xmin = 0.0
-global_xmax = 10.0
+global_xmax = 64.0
 global_ymin = 0.0
-global_ymax = 10.0
+global_ymax = 64.0
 global_zmin = 0.0
-global_zmax = 10.0
+global_zmax = 64.0
 
 z_cuts,x_cuts,y_cuts = create_3d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow,global_zmin,global_zmax,numplane)
 params = create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane)

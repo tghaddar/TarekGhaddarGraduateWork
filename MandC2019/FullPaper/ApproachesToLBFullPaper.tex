@@ -186,18 +186,18 @@ The initial approach to load balancing was implemented on 2D extruded meshes, me
 While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$ (defined by Eq. (\ref{f_d})), are balanced. If they are not, we redistribute the corresponding cut planes.
 %\vspace{-3.5cm}
 
-The original load balancing algorithm placed cut planes in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches of high mesh density.
+The original load balancing algorithm placed cut planes in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches of high mesh density of N cells.
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[scale=0.4]{Figures/2dgeneral.png}
+\includegraphics[scale=0.35]{../../figures/theoretical_plot.png}
 \caption{A 2D subset layout with $M$ unaligned patches of high mesh density.}
 \label{2dgeneral}
 \end{figure}
 
-The subset layout is $[M(N+1)+1] \times [M(N+1)+1]$, but only $MN^2$ subset have significant work, leading to a theoretical limit for the load imbalance factor:
+The subset layout is $M^2$, but only $M$ subsets have significant work, leading to a theoretical limit for the load imbalance factor:
 \begin{equation}
-f= \frac{\left( M(N+1)+1 \right)^2}{MN^2} \xrightarrow{N\to \infty} \frac{M^2N^2}{MN^2} = M.
+f= \frac{N}{(MN+C)/M^2} \xrightarrow{N\to \infty} \frac{N}{N/M} = M
 \end{equation}
 
 Due to this theoretical limit, the load balancing by dimension algorithm was developed.
@@ -250,7 +250,7 @@ Figure \ref{alg_illustration} illustrates the behavior of both algorithms. In th
 \centering
 \includegraphics[scale=0.45,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/og_lb_example.pdf}
 \includegraphics[scale=0.45,trim={0.95in 0.64in 0.35in 0.44in},clip]{Figures/lbd_example.pdf}
-\caption{The partitions of a problem after the original load balancing (left) and the load balancing by dimension (right) algorithms.}
+\caption{The partitions of a problem after the original load balancing (top) and the load balancing by dimension (bottom) algorithms.}
 \label{alg_illustration}
 \end{figure}
 
@@ -262,8 +262,8 @@ To show the behavior of the original load balancing algorithm and the load balan
 %\vspace{-1cm}
 \begin{table}[!htb]
 \centering
-  \caption{\bf The results of the parametric study using the original load balancing algorithm (left) and the load balancing by dimension algorithm (right).}
-  \scalebox{0.5}{
+  \caption{\bf The results of the parametric study using the original load balancing algorithm (top) and the load balancing by dimension algorithm (bottom).}
+  \scalebox{0.65}{
   \begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
   \bf Area, $N^{1/2}$ & \bf  2 &  \bf 3    &  \bf  4   &  \bf  5   &  \bf  6   &  \bf  7   & \bf   8   &  \bf 9    &  \bf 10   \\ \hline \hline
 \bf Coarse&1.993 & 2.735 & 4.360 & 4.812 & 5.545 & 6.321 & 3.114 & 2.697 & 1.893 \\ \hline 
@@ -285,7 +285,7 @@ To show the behavior of the original load balancing algorithm and the load balan
 \bf 0.02& 1.005 & 1.008 & 1.010 & 1.013 & 1.021 & 1.035 & 1.623 & 1.137 & 1.016 \\ \hline
 \bf 0.01& 1.003 & 1.009 & 1.009 & 1.011 & 1.016 & 1.013 & 1.281 & 1.058 & 1.015 \\ \hline
   \end{tabular}}
- \scalebox {0.5}{
+ \scalebox {0.65}{
    \begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
 \bf Area, $N^{1/2}$ & \bf  2 & \bf 3    &  \bf  4   &  \bf  5   &  \bf 6    &  \bf  7   &   \bf 8   &  \bf 9    &  \bf 10   \\ \hline \hline
 \bf Coarse & 1.645 & 1.455 & 1.878 & 2.348 & 3.046 & 3.022 & 1.752 & 2.304 & 1.451 \\ \hline 
@@ -313,8 +313,8 @@ To show the behavior of the original load balancing algorithm and the load balan
 
 \begin{table}[!htb]
 \centering
-\caption{\bf The percent improvement of the original load balancing algorithm (left) and the load balancing by dimension algorithm (right).}
-\scalebox{0.5}{
+\caption{\bf The percent improvement of the original load balancing algorithm (top) and the load balancing by dimension algorithm (bottom).}
+\scalebox{0.65}{
 \begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
 
 \bf Area, $N^{1/2}$ & \bf  2 & \bf 3    &  \bf  4   &  \bf  5   &  \bf 6    &  \bf  7   &   \bf 8   &  \bf 9    &  \bf 10   \\ \hline \hline
@@ -337,7 +337,7 @@ To show the behavior of the original load balancing algorithm and the load balan
  \bf 0.02&0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 \\ \hline 
  \bf 0.01&0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 \\ \hline 
 \end{tabular}}
-\scalebox{0.5}{
+\scalebox{0.65}{
 \begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
 \bf Area, $N^{1/2}$ & \bf  2 & \bf 3    &  \bf  4   &  \bf  5   &  \bf 6    &  \bf  7   &   \bf 8   &  \bf 9    &  \bf 10   \\ \hline \hline
 \bf Coarse& 0.175 & 0.663 & 0.743 & 0.781 & 0.796 & 0.757 & 0.938 & 0.760 & 0.820 \\ \hline 
@@ -369,7 +369,7 @@ The data in Tables \ref{og_table} and \ref{all_improvements} showcase an importa
 \begin{table}[!htb]
 \centering
 \caption{\bf The percent improvement of the load balancing by dimension algorithm over the original load balancing algorithm.}
-\scalebox{0.5}{
+\scalebox{0.65}{
 \begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
 \bf Area, $N^{1/2}$ & \bf  2 & \bf 3    &  \bf  4   &  \bf  5   &  \bf 6    &  \bf  7   &   \bf 8   &  \bf 9    &  \bf 10   \\ \hline \hline
 Coarse & 0.175 & 0.468 & 0.569 & 0.512 & 0.451 & 0.522 & 0.437 & 0.146 & 0.234 \\ \hline 
@@ -397,17 +397,17 @@ Coarse & 0.175 & 0.468 & 0.569 & 0.512 & 0.451 & 0.522 & 0.437 & 0.146 & 0.234 \
 \FloatBarrier
 \section{CONCLUSIONS AND FUTURE WORK}
 The load balancing by dimension algorithm has allowed PDT to solve large scale simulations in reasonable times, decreasing the amount of idle time spent on processors with little work. However, while perfect load balance was the initial goal, we needed to know if this affected the efficiency of the parallel transport sweep. 
-Figure \ref{partitions} shows three theoretical sweep domains with 20 subsets in $x$ and $y$. In the figure, only the subset domain is shown, with the assumption that there is an equivalent number of mesh cells per subset. In the top image of Fig. \ref{partitions}, we see a regular processor grid, which will lead to a nice wavelike sweep that finishes in 40 stages. 
+Figure \ref{partitions} shows three theoretical sweep domains with 20 subsets in $x$ and $y$. In the figure, only the subset domain is shown, with the assumption that there is an equivalent number of mesh cells per subset. In the top left image of Fig. \ref{partitions}, we see a regular processor grid, which will lead to a nice wavelike sweep that finishes in 40 stages. 
 \begin{figure}[!htb]
   \centering
-  \includegraphics[scale=0.4]{Figures/regular_partition_4.png}
-   \includegraphics[scale=0.4]{Figures/random_partition_4.png}
-    \includegraphics[scale=0.4]{Figures/worst_partition_4.png}
-  \caption{Three different perfectly load balanced partitions.}
+  \includegraphics[scale=0.39]{Figures/regular_partition_4.png}
+   \includegraphics[scale=0.39]{Figures/random_partition_4.png}
+    \includegraphics[scale=0.39]{Figures/worst_partition_4.png}
+  \caption{Three different perfectly load balanced partitions: regular (top left), random (top right), and worst (bottom).}
   \label{partitions}
 \end{figure}
 
-With the improved load balancing by dimension, we are likely to see a partition similar to the partitioning shown in  the middle image of Fig. \ref{partitions} for most geometries. It can be observed that we do not have the nice wavelike transport sweep, as communication penalties take their toll. As a result, this sweep completes in 101 stages, as opposed to 40 stages for the regular partition.
+With the improved load balancing by dimension, we are likely to see a partition similar to the partitioning shown in  the top right image of Fig. \ref{partitions} for most geometries. It can be observed that we do not have the nice wavelike transport sweep, as communication penalties take their toll. As a result, this sweep completes in 101 stages, as opposed to 40 stages for the regular partition.
 
 %\begin{figure}[!htb]
 %  \centering

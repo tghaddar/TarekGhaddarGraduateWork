@@ -30,7 +30,7 @@ def create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane):
   interior_cuts = [z_cuts[i] for i in range(1,numplane)]
   
   for plane in range(0,numplane):
-    interior_x_cuts = [x_cuts[plane][i] for i in range(1,numplane)]
+    interior_x_cuts = [x_cuts[plane][i] for i in range(1,numcol)]
     interior_cuts += interior_x_cuts
     
   for plane in range(0,numplane):

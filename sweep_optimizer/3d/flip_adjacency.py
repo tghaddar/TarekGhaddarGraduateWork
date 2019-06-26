@@ -57,8 +57,8 @@ def flip_adjacency_2(adjacency_matrix,numrow,numcol,num_plane):
   for s in range(0,num_subsets):
     #Getting the i,j indices of the subset.
     i,j,k = get_ijk(s,numrow,numcol,num_plane)
-    #Getting the new subset id if subset 2 is the new "subset 0".
-    new_i = numrow - i - 1
+    #Getting the new subset id if octant 2 starts with subset 0.
+    new_i = numcol - i - 1
     new_ss_id = k*num_subsets_2d + (new_i*numrow+j) 
     #Recording the new id.
     id_map[s] = new_ss_id
@@ -75,7 +75,7 @@ def flip_adjacency_2(adjacency_matrix,numrow,numcol,num_plane):
       #Getting the i,j indices of this neighbor.
       i_ind,j_ind,k_ind = get_ijk(neighbor_id,numrow,numcol,num_plane)
       #Getting the new i_ind
-      new_i_ind = numrow - i_ind - 1
+      new_i_ind = numcol - i_ind - 1
       new_neighbor_id = k_ind*num_subsets_2d + (new_i_ind*numrow+j_ind) 
       #Adding this neighbor into the new neighbors.
       new_neighbors[new_neighbor_id] = 1
@@ -97,8 +97,8 @@ def flip_adjacency_3(adjacency_matrix,numrow,numcol,num_plane):
   for s in range(0,num_subsets):
     #Getting the i,j indices of the subset.
     i,j,k = get_ijk(s,numrow,numcol,num_plane)
-    new_i = numrow - i - 1
-    new_j = numcol - j - 1
+    new_i = numcol - i - 1
+    new_j = numrow - j - 1
     
     new_ss_id = k*num_subsets_2d + (new_i*numrow+new_j)
     #Recording the new id.
@@ -116,8 +116,8 @@ def flip_adjacency_3(adjacency_matrix,numrow,numcol,num_plane):
       #Getting the i,j indices of this neighbor.
       i_ind,j_ind,k_ind = get_ijk(neighbor_id,numrow,numcol,num_plane)
       #Getting the new i_ind
-      new_i_ind = numrow - i_ind - 1
-      new_j_ind = numcol - j_ind - 1
+      new_i_ind = numcol - i_ind - 1
+      new_j_ind = numrow - j_ind - 1
       new_neighbor_id = k_ind*num_subsets_2d + (new_i_ind*numrow+new_j_ind) 
       #Adding this neighbor into the new neighbors.
       new_neighbors[new_neighbor_id] = 1

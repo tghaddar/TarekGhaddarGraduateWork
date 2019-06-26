@@ -1233,9 +1233,9 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
   #Keep iterating until all graphs have finished.
   counter = 0
   while num_finished_graphs < num_graphs:
-#    print('Time t = ', t)
-    #if (t == 0.0011634222038497584)
-    #  print("debug stop")
+    print('Time t = ', t)
+    if (t == 0.119972786724):
+      print("debug stop")
 
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
@@ -1246,14 +1246,14 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
       #all_nodes_being_solved[g] = nodes_being_solved_general(graph,t,time_to_solve[g])
       all_nodes_being_solved[g],nodes_already_solved[g] = nodes_being_solved_general_sped_up(graph,t,nodes_already_solved[g],time_to_solve[g])
     prev_nodes = all_nodes_being_solved
-#    print("Nodes already being solved in each graph")
-#    print(nodes_already_solved)
+    print("Nodes being solved in each graph")
+    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
     num_conflicting_nodes = len(conflicting_nodes)
     
-    #print("The graphs in conflict for each node")
-    #print(conflicting_nodes)
+    print("The graphs in conflict for each node")
+    print(conflicting_nodes)
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
       #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)

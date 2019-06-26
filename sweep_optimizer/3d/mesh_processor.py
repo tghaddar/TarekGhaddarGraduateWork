@@ -419,9 +419,9 @@ def create_3d_cuts(xmin,xmax,nx,ymin,ymax,ny,zmin,zmax,nz):
   ystep = (ymax - ymin)/ny
   y_range = range(0,ny+1)
   y_cuts_i = [ymin + i*ystep for i in y_range]
-  mid_range = range(0,nz)
+  mid_range = range(0,nx)
   y_cuts_j = [y_cuts_i for i in mid_range]
-  final_range = range(0,nx)
+  final_range = range(0,nz)
   y_cuts = [y_cuts_j for i in final_range]
   
   
