@@ -27,9 +27,9 @@ machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 
 
 #Number of rows and columns and planes.
-numcol = 64
-numrow = 32
-numplane = 2
+numcol = 4
+numrow = 4
+numplane = 1
 num_angles = 1
 Am = 10
 unweighted=True
