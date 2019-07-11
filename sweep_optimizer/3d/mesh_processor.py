@@ -320,6 +320,9 @@ def analytical_mesh_integration_3d(f,xmin,xmax,ymin,ymax,zmin,zmax):
   
   return integrate.tplquad(f,xmin,xmax,lambda x: ymin, lambda x: ymax, lambda x,y: zmin, lambda x,y: zmax)
 
+def get_z_cells(f,zmin,zmax):
+  return integrate.tplquad(f,zmin,zmax)
+
 def analytical_mesh_integration_2d(f,xmin,xmax,ymin,ymax):
   return integrate.dblquad(f,xmin,xmax,lambda x: ymin, lambda x: ymax)
 
