@@ -120,5 +120,15 @@ def get_column_cdf(points,gxmin,gxmax,numcol):
   
   return cdf,bin_edges
   
+def get_row_cdf(points,gymin,gymax,numrow):
+  y_points = points[:,1]
+  num_steps = int((gymax-gymin)/(0.01*(gymax - gymin)/numrow))
+   #The number of bins in the CDF.
+  hist_range = (gymin,gymax)
+  #Building a histogram
+  hist,bin_edges = np.histogram(y_points,bins=num_steps,range=hist_range,normed=False)
   
+  cdf = np.cumsum(hist)
+  cdf = cdf/max(cdf)
   
+  return cdf,bin_edges
