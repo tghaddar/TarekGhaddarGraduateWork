@@ -326,7 +326,7 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
     
   return bounds_check
 
-def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col,test):
+def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col,Am,test):
   
   num_graphs = len(graphs)
   num_subsets = len(global_subset_boundaries)
@@ -341,6 +341,8 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       node = e[0]
       #The ending node of this edge.
       neighbor = e[1]
+      #Number of neighbors.
+      num_neigh = len(list(graph.successors(node)))
       bounds = [False, False]
       
       i_neighbor,j_neighbor = get_ij(neighbor,num_row,num_col)
@@ -368,7 +370,7 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       if test:
         cost = 1.0
       else:
-        cost = mcff*(Twu + 2*latency*m_l + t_comm*boundary_cells*upbc + upc*num_cells*(Tc + Tm + Tg))
+        cost = mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*upbc + num_cells*(Tc + Am*(Tm + Tg)))
       graph[node][neighbor]['weight'] = cost
     
   for ig in range(0,num_graphs):
@@ -421,7 +423,7 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
       if test:
         cost = 1.0
       else:
-        cost = mcff*(Twu + 3*latency*m_l + t_comm*boundary_cells*Am*upbc + upc*num_cells*(Tc + Am*(Tm + Tg))/Az)*15.0
+        cost = mcff*(Twu + 3*latency*m_l + t_comm*boundary_cells*Am*upbc + num_cells*(Tc + Am*(Tm + Tg))/Az)*(Az/8.21875)
       graph[e[0]][e[1]]['weight'] = cost
     
     
@@ -1529,12 +1531,10 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   return max_time
 
 #The time to solution function that is fed into the optimizer.
-def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted):
+def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,machine_params,num_angles,Am,unweighted):
   start = time.time()
-  machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
-  print(x_cuts,y_cuts)
   x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   
   #Building subset boundaries.
@@ -1544,11 +1544,15 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   adjacency_matrix = bam.build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
    #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_test(points,subset_bounds,adjacency_matrix,num_row,num_col)  
+  print(cells_per_subset)
+#  cells_per_subset = [96, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 96]
+#  bdy_cells_per_subset = [[9.433981132056603, 9.433981132056603], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4.0, 4.0], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [9.433981132056603, 9.433981132056603]]
+#  print(cells_per_subset)
   #Building the graphs.
   graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
   
-  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,False)
+  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,Am,False)
   graphs= pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
@@ -1557,7 +1561,6 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
   end = time.time()
-  max_time *= 100
   print(max_time,end-start)
   return max_time
 
