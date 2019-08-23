@@ -15,6 +15,7 @@ plt.plot(nss,f_reg,'o',label='Regular')
 plt.plot(nss_lb,f_lb,'o',label='LB')
 plt.plot(nss,f_lbd,'o',label='LBD')
 plt.legend(loc='best')
+plt.savefig("../../figures/lbd_results.pdf")
 
 f_reg_sparse = [1.7619,3.41379,5.82759,9.7619,10.022,11.1726,12.4389,8.81481,9.7619]
 f_lb_sparse = [1.7619,2.90204,4.29572,5]
