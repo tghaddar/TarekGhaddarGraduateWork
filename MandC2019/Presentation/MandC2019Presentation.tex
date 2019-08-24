@@ -392,7 +392,6 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
     \item Given a partitioning scheme, build an adjacency matrix.
     \item From the adjacency matrix, build Directed Acyclic Graphs (DAGs), one for each quadrant/octant.
     \item Weight each DAG's edges based on the solve and communication time of each subset to its neighbors.
-     \item Add and adjust graphs based on how many angles are pipelined.
     \item Adjust the weights of each graph to reflect a universal timescale.
     \item Adjust the weights of each graph to reflect sweep conflicts between octants.
     \item Obtain the time-to-solution.
@@ -561,6 +560,16 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %  \end{minipage}
 %\end{frame}
 %
+\begin{frame}[t]\frametitle{Universal Edge Weighting}
+  \begin{block}{}
+    \begin{itemize}
+      \item Once the outgoing edges of each node are independently weighted, the next step is to have our graphs weighted on a universal time scale. 
+      \item To do this, we calculate the sum of the longest weighted path to each node, and set all incoming edges to each node to this value.
+      \item To find the longest weighted path, the graph weights are inverted, and the shortest weighted path is found. The original edge weights are used to calculate the value of the longest weighted path.
+      \item The resulting graph is weighted so that the incoming edge to each node represents the time that node is ready to solve.
+    \end{itemize}
+  \end{block}
+\end{frame}
 %\begin{frame}[t]\frametitle{Universal Edge Weighting}
 % \begin{minipage}{0.49\textwidth}
 %    \centering
@@ -615,7 +624,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 \begin{itemize}
 	\item The first octant to arrive to a node will begin solving it, and the remaining octants will incur a delay (if applicable).
 	\item The delay is reflected in each remaining TDG by adding the corresponding delay as a weight to the applicable edge and applicable downstream edges.
-  \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant (same as PDT) wins the tie.
+  \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant wins the tie.
 \end{itemize}
 \end{block}
   \begin{block}{Unweighted vs. Weighted Depth-of-Graph Remaining}
@@ -770,47 +779,47 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %
 
 %
-%\begin{frame}[t]\frametitle{Level 2 Experiment TTS}
-%\begin{block}{}
-%   \begin{itemize}
-%   \item Using the Level 2 mesh, the time-to-solution estimator was run from 2-10 subsets in each dimension with regular cuts.
-% \end{itemize}
-% \end{block}
-% \centering
-%  \includegraphics[scale=0.4]{../../figures/level2solutionsuite.pdf}
-%\end{frame}
+\begin{frame}[t]\frametitle{Level 2 Experiment TTS}
+\begin{block}{}
+   \begin{itemize}
+   \item Using the Level 2 mesh, the time-to-solution estimator was run from 2-10 subsets in each dimension with regular cuts.
+ \end{itemize}
+ \end{block}
+ \centering
+  \includegraphics[scale=0.4]{../../figures/level2solutionsuite.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Level 2 Experiment 42x13}
+   \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../../figures/lvl2regularcuts.pdf}
+    \begin{block}{}
+    \centering
+      $t = 0.314$
+    \end{block}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{../../figures/lvl2lbcuts.pdf}
+    \begin{block}{}
+    \centering
+      $t = 0.152$
+    \end{block}
+  \end{minipage}  
+\end{frame}
 %
-%\begin{frame}[t]\frametitle{Level 2 Experiment 42x13}
-%   \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/lvl2regularcuts.pdf}
-%    \begin{block}{}
-%    \centering
-%      $t = 0.314$
-%    \end{block}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/lvl2lbcuts.pdf}
-%    \begin{block}{}
-%    \centering
-%      $t = 0.152$
-%    \end{block}
-%  \end{minipage}  
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{IM1C Experiment with 5 Subsets in Each Dimension}
-%\centering
-%\includegraphics[scale=0.15]{../../figures/im1_228.png}
-%\begin{block}{}
-%\begin{table}
-%\begin{tabular}{c|c} 
-%\bf LBD &\bf Regular   \\ \hline \hline
-% 0.5723& 0.364
-%\end{tabular}
-%\end{table}
-%\end{block}
-%\end{frame}
+\begin{frame}[t]\frametitle{IM1C Experiment with 5 Subsets in Each Dimension}
+\centering
+\includegraphics[scale=0.15]{../../figures/im1_228.png}
+\begin{block}{}
+\begin{table}
+\begin{tabular}{c|c} 
+\bf LBD &\bf Regular   \\ \hline \hline
+ 0.5723& 0.364
+\end{tabular}
+\end{table}
+\end{block}
+\end{frame}
 %
 %
 
