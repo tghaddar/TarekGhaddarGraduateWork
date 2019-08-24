@@ -74,7 +74,7 @@ In order to obtain the graphs for quadrants 1 and 2, a flipped version of the ad
 
 Each graph is weighted to reflect the solve and communication time of each node to its neighbors. Explicitly, the edge weight between node A and node B represents the solve time of node A added to the time it takes to communicate boundary information to node B. Equation \ref{weight_function} shows how the weight is calculated:
 \begin{equation}
-\text{weight} = \text{mcff}\cdot [T_{wu} + N_n\cdot \text{latency}\cdot M_L + T_{\text{comm}}\cdot N_b\cdot A_m\cdot upbc + upc\cdot N_c\cdot (T_c + A_m\cdot (T_m + T_g))],
+\text{weight} = \text{mcff}\cdot [T_{wu} + N_n\cdot \text{latency}\cdot M_L + T_{\text{comm}}\cdot N_b\cdot A_m\cdot upbc + \cdot N_c\cdot (T_c + A_m\cdot (T_m + T_g))],
 \label{weight_function}
 \end{equation}
 where:
@@ -327,10 +327,12 @@ Using probable worst-case partitions as shown in Fig. \ref{random_partitions}, t
 
 \section{3D Verification}
 
+PDT's performance model was used to verify stage counts for 3D problems with regular grids. Figure \ref{3d_verification} shows PDT's performance model stage counts matching perfectly with the time-to-solution estimator's stage counts for 2\textsuperscript{3} to 10\textsuperscript{3} subsets and from 1 to 6 angles per octant.
+
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{../figures/3d_verification.pdf}
-\caption{A 3D verification suite with regular partitions run from 2x2 to 10x10 subsets with each case being run from 1 to 6 angles per octant.}
+\caption{A 3D verification suite with regular partitions run from 2\textsuperscript{3} to 10\textsuperscript{3} subsets with each case being run from 1 to 6 angles per octant.}
 \label{3d_verification}
 \end{figure}
 

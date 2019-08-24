@@ -21,14 +21,14 @@ upbc = 4.0
 Twu = 5779.92891144936e-09
 Tm = 111.971932555903e-09
 Tg = 559.127e-09
-mcff = 1.320
+mcff = 1.32
 
 machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 
 
 #Number of rows and columns and planes.
-numcol = 32
-numrow = 16
+numcol = 2
+numrow = 2
 numplane = 2
 num_angles = 1
 Am = 10
@@ -37,14 +37,15 @@ unweighted=True
 
 #Global boundaries.
 global_xmin = 0.0
-global_xmax = 128.0
+global_xmax = 32.0
 global_ymin = 0.0
-global_ymax = 128.0
+global_ymax = 32.0
 global_zmin = 0.0
-global_zmax = 256.0
+global_zmax = 32.0
 
 #An adjusted Az for regular cases that normalizes the boundary cost for each processor so it matches the performance model.
 Az = global_zmax/(numplane)
+#Az = 1
 
 
 z_cuts,x_cuts,y_cuts = create_3d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow,global_zmin,global_zmax,numplane)

@@ -367,10 +367,13 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       num_cells = cells_per_subset[node]
       #If this is a testing run, our cost is 1.
       cost = 0.0
+      if (num_col*num_row == 1):
+        boundary_cells = 0.0
+        latency  = 0.0
       if test:
         cost = 1.0
       else:
-        cost = mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*upbc + num_cells*(Tc + Am*(Tm + Tg)))
+        cost = mcff*(Twu + 2*latency*m_l + t_comm*boundary_cells*upbc + num_cells*(Tc + Am*(Tm + Tg)))
       graph[node][neighbor]['weight'] = cost
     
   for ig in range(0,num_graphs):
@@ -395,6 +398,8 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
     for e in graph.edges():
       #The starting node of this edge.
       node = e[0]
+      #Number of neighbors.
+      num_neigh = len(list(graph.successors(node)))
       #The second node of this edge.
       neighbor = e[1]
       bounds = [False, False,False]
@@ -420,10 +425,14 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
       num_cells = cells_per_subset[node]
       #If this is a testing run, our cost is 1.
       cost = 0.0
+      #serial runs have no commucation constants.
+      if (num_col*num_row == 1):
+        boundary_cells = 0.0
+        latency  = 0.0
       if test:
         cost = 1.0
       else:
-        cost = mcff*(Twu + 3*latency*m_l + t_comm*boundary_cells*Am*upbc + num_cells*(Tc + Am*(Tm + Tg))/Az)*(Az/8.21875)
+        cost = mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*Am*upbc + num_cells*(Tc + Am*(Tm + Tg)))
       graph[e[0]][e[1]]['weight'] = cost
     
     
@@ -1507,19 +1516,20 @@ def time_to_solution_numerical(points,x_cuts,y_cuts,machine_params,num_col,num_r
 
 
 #The time to solution function that is fed into the optimizer.
-def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,machine_params,num_angles,unweighted):
+def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,machine_params,num_angles,Am,unweighted):
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d(f,subset_bounds)  
+  print(cells_per_subset,bdy_cells_per_subset)
   #Building the adjacency matrix.
   adjacency_matrix = bam.build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
   #Building the graphs.
   graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
-  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,False)
+  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,Am,False)
   graphs = pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
@@ -1527,7 +1537,7 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   #Adding delay weighting.
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
   solve_times,max_time = compute_solve_time(graphs)
-  print(max_time)
+  print('{0:1.3e}'.format(max_time))
   return max_time
 
 #The time to solution function that is fed into the optimizer.
