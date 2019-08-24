@@ -38,3 +38,34 @@ plt.xlabel("X Cut Line Location (cm)")
 plt.ylabel("CDF of Cells Per Column")
 plt.plot(x,cdf,'-o')
 plt.savefig("../../figures/spiderweb_redistribute_before.pdf")
+
+cells =  np.genfromtxt('10_cell_counts.txt',delimiter='\n')
+cells_reshaped = np.reshape(cells,(10,10))
+cell_sum = 0.0
+cdf = np.empty(11)
+cdf[0] = 0
+for i in range(0,10):
+  cell_sum += sum(cells_reshaped[i])
+  cdf[i+1] = cell_sum
+
+total_cells = cdf[10]
+x = [0,1,2,3,4,5,6,7,8,9,10]
+avg = [42*x for x in range(1,10)]
+
+plt.figure()
+plt.xlabel("X Cut Line Location (cm)")
+plt.ylabel("CDF of Cells Per Column")
+plt.plot(x,cdf,'-o')
+plt.savefig("../../figures/spiderweb_redistribute_before_sparse.pdf")
+
+plt.figure()
+plt.xlabel("X Cut Line Location (cm)")
+plt.ylabel("CDF of Cells Per Column")
+plt.plot(x,cdf,'-o')
+for i in range(1,10):
+  x_i = [0,10]
+  y_i = [avg[i-1],avg[i-1]]
+  plt.plot(x_i,y_i,'--r')
+plt.savefig("../../figures/spiderweb_redistribute_after_sparse.pdf")
+
+

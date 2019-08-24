@@ -200,10 +200,10 @@
   \end{columns}
 \end{frame}
 
-%\begin{frame}[t]\frametitle{Partitioning Example}
-%\centering
-%\includegraphics[scale=0.25,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/unbalanced_pins_regular_10.png}
-%\end{frame}
+\begin{frame}[t]\frametitle{Partitioning into 100 Subsets}
+\centering
+\includegraphics[scale=0.25,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/spiderweb_sparse.png}
+\end{frame}
 
 \section{Load Balancing}
 \subsection{}
@@ -221,8 +221,8 @@
 \begin{frame}[t]\frametitle{Redistribution}
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.37]{../../figures/spiderweb_redistribute_before.pdf}
-\includegraphics[scale=0.37]{../../figures/spiderweb_redistribute_after.pdf}
+\includegraphics[scale=0.37]{../../figures/spiderweb_redistribute_before_sparse.pdf}
+\includegraphics[scale=0.37]{../../figures/spiderweb_redistribute_after_sparse.pdf}
 \caption{The use of the CDF of triangles per column to redistribute the cut planes in X.}
 \label{redistribute}
 \end{figure}
@@ -397,6 +397,17 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
     \item Obtain the time-to-solution.
 \end{enumerate}
 \end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{DAG}
+  \begin{columns}
+  \column{0.5\textwidth}
+    \centering
+    \includegraphics[scale=0.5]{../../figures/boundaries_worst.pdf}
+    \column{0.5\textwidth}
+    \centering
+    \includegraphics[scale=0.35,trim={0cm 0cm 0cm 5cm},clip]{../../figures/layered.pdf}
+  \end{columns}
 \end{frame}
 %
 %\begin{frame}[t]\frametitle{Building the Adjacency Matrix}
