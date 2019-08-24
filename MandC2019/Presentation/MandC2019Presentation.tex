@@ -1,5 +1,6 @@
 \pdfminorversion=4
 \documentclass[xcolor={usenames,dvipsnames,svgnames,table},10pt]{beamer}
+\geometry{paperwidth=140mm,paperheight=105mm}
 
 \mode<presentation>
 \usetheme{Madrid}
@@ -130,7 +131,7 @@
 \end{itemize}
 \end{block}
 \centering
-\includegraphics[scale=0.5]{../../figures/weak_scaling.pdf}
+\includegraphics[scale=0.25]{../../figures/sweep_scale2b.png}
 \end{frame}
 
 %\begin{frame}[t]\frametitle{Tie Breaking in PDT}
@@ -171,17 +172,38 @@
 \item The subsets are distributed amongst the processor domain.
 \end{itemize}
 \end{block}
+  \begin{block}{PWLD}
+     Using Piece-Wise Linear Discontinuous finite element basis functions, we can solve the transport equation for arbitrary and degenerate polyhedra.
+  \end{block}
+  \centering
+  \includegraphics[scale=0.25]{../../figures/deg_square_PWLD1_contour_b5.png}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Partitioning Example}
-\centering
-\includegraphics[scale=0.45,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/partitioning_example.pdf}
+\begin{frame}[t]\frametitle{Partitioning in PDT}
+  \begin{columns}
+    \column{0.5\textwidth}
+    \begin{minipage}[c][0.4\textheight][c]{\linewidth}
+      \includegraphics[scale=0.14,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/im1_cubit_slice.png}
+    \end{minipage}
+    \begin{minipage}[c][0.4\textheight][c]{\linewidth}
+      \includegraphics[scale=0.05]{../../figures/FuelAndGuideZoom.png}
+    \end{minipage}
+    \column{0.5\textwidth}
+    \begin{minipage}[c][0.4\textheight][c]{\linewidth}
+      \begin{block}{}
+        PWLD allows us to solve these partitioned arbitrary and degenerate meshes.
+      \end{block}
+    \end{minipage}
+    \begin{minipage}[c][0.4\textheight][c]{\linewidth}
+      \includegraphics[scale=0.15]{../../figures/spiderweb4.png}
+    \end{minipage}
+  \end{columns}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Partitioning Example}
-\centering
-\includegraphics[scale=0.25,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/unbalanced_pins_regular_10.png}
-\end{frame}
+%\begin{frame}[t]\frametitle{Partitioning Example}
+%\centering
+%\includegraphics[scale=0.25,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/unbalanced_pins_regular_10.png}
+%\end{frame}
 
 \section{Load Balancing}
 \subsection{}
@@ -277,99 +299,7 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 \end{algorithm}
 \end{frame}
 
-\begin{frame}[t]\frametitle{No Load Balancing, f = 41.82}
-\centering
-\includegraphics[scale=0.25]{../../figures/im12d_nolb.png}
-\end{frame}
 
-\begin{frame}[t]\frametitle{Load Balancing, f = 2.97}
-\centering
-\includegraphics[trim={1cm 0cm 0cm 3cm},clip,scale=0.25]{../../figures/im12d_oldlb.png}
-\end{frame}
-
-
-
-
-\begin{frame}[t]\frametitle{Load Balancing By Dimension, f = 2.02}
-\centering
-\includegraphics[scale=0.22]{../../figures/im12d_newlb.png}
-\end{frame}
-
-\begin{frame}[t]\frametitle{3D LBD, $f = 1.0199$}
-\centering
-\includegraphics[trim={0cm 1cm 0cm 3cm},clip,scale=0.23]{../../figures/im1_foam_448.png}
-\end{frame}
-
-%\begin{frame}[t]\frametitle{Load Balancing Study}
-%\begin{figure}[H]
-%\centering
-%\includegraphics[scale=0.25,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/og_lb_example.pdf}
-%\includegraphics[scale=0.25,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/lbd_example.pdf}
-%\label{alg_illustration}
-%\end{figure}
-%  \begin{block}{Parametric Study Parameters}
-%    \begin{itemize}
-%      \item Number of subsets ranging from 2 to 10 each in $x$ and $y$.
-%      \item Maximum triangle area ranging from coarsest possible to 0.01 cm\textsuperscript{2}.
-%      \item Minimum triangle angle kept constant at $20^{\circ}$.
-%    \end{itemize}
-%  \end{block}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Load Balancing Study}
-%\begin{table}[H]
-%\centering
-%\caption{\bf The percent improvement of the original load balancing algorithm (left) and the load balancing by dimension algorithm (right).}
-%\scalebox{0.4}{
-%\begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
-%
-%\bf Area, $N^{1/2}$ & \bf  2 & \bf 3    &  \bf  4   &  \bf  5   &  \bf 6    &  \bf  7   &   \bf 8   &  \bf 9    &  \bf 10   \\ \hline \hline
-%\bf Coarse& 0.000 & 0.367 & 0.403 & 0.552 & 0.628 & 0.491 & 0.890 & 0.720 & 0.765 \\ \hline 
-% \bf 1.8& 0.000 & 0.091 & 0.337 & 0.364 & 0.473 & 0.390 & 0.767 & 0.413 & 0.683 \\ \hline 
-% \bf 1.6& 0.000 & 0.093 & 0.398 & 0.368 & 0.499 & 0.370 & 0.815 & 0.353 & 0.774 \\ \hline 
-% \bf 1.4& 0.000 & 0.061 & 0.080 & 0.410 & 0.415 & 0.412 & 0.570 & 0.413 & 0.545 \\ \hline 
-% \bf 1.2& 0.000 & 0.007 & 0.391 & 0.340 & 0.378 & 0.315 & 0.536 & 0.245 & 0.196 \\ \hline 
-% \bf 1.0& 0.000 & 0.038 & 0.206 & 0.420 & 0.341 & 0.186 & 0.696 & 0.201 & 0.160 \\ \hline 
-% \bf 0.8& 0.000 & 0.049 & 0.109 & 0.336 & 0.434 & 0.139 & 0.637 & 0.228 & 0.000 \\ \hline 
-% \bf 0.6& 0.000 & 0.000 & 0.057 & 0.199 & 0.163 & 0.346 & 0.517 & 0.000 & 0.090 \\ \hline 
-% \bf 0.4& 0.000 & 0.000 & 0.065 & 0.013 & 0.267 & 0.147 & 0.528 & 0.179 & 0.000 \\ \hline 
-% \bf 0.2& 0.000 & 0.000 & 0.000 & 0.000 & 0.001 & 0.041 & 0.566 & 0.121 & 0.000 \\ \hline 
-% \bf 0.1& 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.540 & 0.089 & 0.000 \\ \hline 
-% \bf 0.08&0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.458 & 0.000 & 0.000 \\ \hline 
-% \bf 0.06&0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.409 & 0.000 & 0.000 \\ \hline 
-% \bf 0.05&0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.360 & 0.000 & 0.000 \\ \hline 
-% \bf 0.04&0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.348 & 0.000 & 0.000 \\ \hline 
-% \bf 0.03&0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.293 & 0.000 & 0.000 \\ \hline 
-% \bf 0.02&0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 \\ \hline 
-% \bf 0.01&0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 \\ \hline 
-%\end{tabular}}
-%\scalebox{0.4}{
-%\begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
-%\bf Area, $N^{1/2}$ & \bf  2 & \bf 3    &  \bf  4   &  \bf  5   &  \bf 6    &  \bf  7   &   \bf 8   &  \bf 9    &  \bf 10   \\ \hline \hline
-%\bf Coarse& 0.175 & 0.663 & 0.743 & 0.781 & 0.796 & 0.757 & 0.938 & 0.760 & 0.820 \\ \hline 
-%  \bf 1.8& 0.266 & 0.417 & 0.511 & 0.661 & 0.766 & 0.665 & 0.896 & 0.647 & 0.512 \\ \hline 
-%  \bf 1.6& 0.262 & 0.426 & 0.568 & 0.635 & 0.760 & 0.631 & 0.897 & 0.542 & 0.557 \\ \hline 
-%  \bf 1.4& 0.244 & 0.369 & 0.497 & 0.618 & 0.769 & 0.595 & 0.901 & 0.722 & 0.741 \\ \hline 
-%  \bf 1.2& 0.242 & 0.336 & 0.552 & 0.614 & 0.663 & 0.583 & 0.886 & 0.208 & 0.597 \\ \hline 
-%  \bf 1.0& 0.203 & 0.287 & 0.458 & 0.549 & 0.442 & 0.605 & 0.875 & 0.536 & 0.552 \\ \hline 
-%  \bf 0.8& 0.162 & 0.330 & 0.435 & 0.460 & 0.638 & 0.542 & 0.888 & 0.393 & 0.000 \\ \hline 
-%  \bf 0.6& 0.122 & 0.291 & 0.447 & 0.460 & 0.503 & 0.610 & 0.844 & 0.267 & 0.058 \\ \hline 
-%  \bf 0.4& 0.093 & 0.274 & 0.310 & 0.400 & 0.488 & 0.519 & 0.888 & 0.328 & 0.000 \\ \hline 
-%  \bf 0.2& 0.042 & 0.147 & 0.185 & 0.267 & 0.344 & 0.299 & 0.810 & 0.349 & 0.025 \\ \hline 
-%  \bf 0.1& 0.026 & 0.067 & 0.109 & 0.156 & 0.144 & 0.210 & 0.735 & 0.367 & 0.000 \\ \hline 
-%  \bf 0.08&0.002 & 0.032 & 0.059 & 0.060 & 0.122 & 0.150 & 0.699 & 0.268 & 0.041 \\ \hline 
-%  \bf 0.06&0.005 & 0.014 & 0.036 & 0.057 & 0.094 & 0.073 & 0.643 & 0.246 & 0.058 \\ \hline 
-%  \bf 0.05&0.006 & 0.017 & 0.006 & 0.005 & 0.033 & 0.068 & 0.579 & 0.208 & 0.008 \\ \hline 
-%  \bf 0.04&0.002 & 0.008 & 0.009 & 0.000 & 0.011 & 0.022 & 0.544 & 0.168 & 0.000 \\ \hline 
-%  \bf 0.03&0.002 & 0.000 & 0.005 & 0.024 & 0.028 & 0.027 & 0.479 & 0.089 & 0.000 \\ \hline 
-%  \bf 0.02&0.003 & 0.002 & 0.001 & 0.000 & 0.001 & 0.004 & 0.361 & 0.070 & 0.000 \\ \hline 
-%  \bf 0.01&0.002 & 0.003 & 0.002 & 0.000 & 0.001 & 0.000 & 0.196 & 0.027 & 0.000 \\ \hline 
-%
-%\end{tabular}}
-%\label{all_improvements}
-%\end{table}
-%\end{frame}
-%
 %\begin{frame}[t]\frametitle{Paramtric Study Conclusions}
 %  \begin{block}{}
 %  \begin{itemize}
@@ -384,7 +314,7 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 \begin{block}{}
 \begin{itemize}
   \item This mesh was run through the load balancing and load balancing by dimension algorithm.
-  \item The number of subsets ranged from 2 to 10 in both dimensions.
+  \item The number of subsets ranged from 2 to 7 in both dimensions.
 \end{itemize}
 \end{block}
   \centering
@@ -394,6 +324,7 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 \begin{frame}[t]\frametitle{Results of Load Balancing By Dimension}
 \centering
 \includegraphics[scale=0.6]{../../figures/lbd_results.pdf}
+Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 \end{frame}
 
 \begin{frame}[t]\frametitle{Consequences of Load Balancing By Dimension}
@@ -407,25 +338,32 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
   \end{block}
 \end{frame}
 
-%\begin{frame}[t]\frametitle{Sweep on Regular Grid with 3 Angle Sets}
-%    \centering
-%	\animategraphics[loop,controls,width=0.7\linewidth]{10}{../../figures/sweeps_png/sweep_regular_20x20_as3_dog/sweep_regular_20x20_as3_dog_}{1}{48}
-%	%\href{run:figures/sweep_figs/sweeps_png/sweep_regular_20x20_as3_dog/animation.gif}{Animation.gif}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Sweep on LBD Grid with 3 Angle Sets}
-%   \centering
-%	\animategraphics[loop,controls,width=0.7\linewidth]{10}{../../figures/sweeps_png/sweep_random_20x20_as3_dog/sweep_random_20x20_as3_dog_}{1}{101}
-%	%\href{run:figures/sweep_figs/sweeps_png/sweep_random_20x20_as3_dog/animation.gif}{Animation.gif}
-%\end{frame}
-%
-%
-%\begin{frame}[t]\frametitle{Sweep on Worst Grid with 1 Angle Set}
-%    \centering
-%	\animategraphics[loop,controls,width=0.7\linewidth]{10}{../../figures/sweeps_png/sweep_worst_20x20_as1_dog/sweep_worst_20x20_as1_dog_}{1}{230}
-%	%\href{run:figures/sweep_figs/sweeps_png/sweep_worst_20x20_as1_dog/animation.gif}{Animation.gif}
-%\end{frame}
+\begin{frame}[t]\frametitle{3D LBD, $f = 1.0199$}
+\centering
+\includegraphics[trim={0cm 1cm 0cm 3cm},clip,scale=0.23]{../../figures/im1_foam_448.png}
+\end{frame}
 
+\begin{frame}[t]\frametitle{Sweep on Regular Grid with 3 Angle Sets}
+    \centering
+	\animategraphics[loop,controls,width=0.7\linewidth]{10}{../../figures/sweeps_png/sweep_regular_20x20_as3_dog/sweep_regular_20x20_as3_dog_}{1}{48}
+	%\href{run:figures/sweep_figs/sweeps_png/sweep_regular_20x20_as3_dog/animation.gif}{Animation.gif}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Sweep on LBD Grid with 3 Angle Sets}
+   \centering
+	\animategraphics[loop,controls,width=0.7\linewidth]{10}{../../figures/sweeps_png/sweep_random_20x20_as3_dog/sweep_random_20x20_as3_dog_}{1}{101}
+	%\href{run:figures/sweep_figs/sweeps_png/sweep_random_20x20_as3_dog/animation.gif}{Animation.gif}
+\end{frame}
+
+
+\begin{frame}[t]\frametitle{Sweep on Worst Grid with 1 Angle Set}
+    \centering
+	\animategraphics[loop,controls,width=0.7\linewidth]{10}{../../figures/sweeps_png/sweep_worst_20x20_as1_dog/sweep_worst_20x20_as1_dog_}{1}{230}
+	%\href{run:figures/sweep_figs/sweeps_png/sweep_worst_20x20_as1_dog/animation.gif}{Animation.gif}
+\end{frame}
+
+\section{Ongoing Work}
+\subsection{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -448,19 +386,19 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 %\end{block}
 %\end{frame}
 %
-%\begin{frame}[t]\frametitle{Time To Solution Estimator}
-%\begin{block}{}
-%\begin{enumerate}
-%    \item Given a partitioning scheme, build an adjacency matrix.
-%    \item From the adjacency matrix, build Directed Acyclic Graphs (DAGs), one for each quadrant/octant.
-%    \item Weight each DAG's edges based on the solve and communication time of each subset to its neighbors.
-%     \item Add and adjust graphs based on how many angles are pipelined.
-%    \item Adjust the weights of each graph to reflect a universal timescale.
-%    \item Adjust the weights of each graph to reflect sweep conflicts between octants.
-%    \item Obtain the time-to-solution.
-%\end{enumerate}
-%\end{block}
-%\end{frame}
+\begin{frame}[t]\frametitle{Time To Solution Estimator}
+\begin{block}{}
+\begin{enumerate}
+    \item Given a partitioning scheme, build an adjacency matrix.
+    \item From the adjacency matrix, build Directed Acyclic Graphs (DAGs), one for each quadrant/octant.
+    \item Weight each DAG's edges based on the solve and communication time of each subset to its neighbors.
+     \item Add and adjust graphs based on how many angles are pipelined.
+    \item Adjust the weights of each graph to reflect a universal timescale.
+    \item Adjust the weights of each graph to reflect sweep conflicts between octants.
+    \item Obtain the time-to-solution.
+\end{enumerate}
+\end{block}
+\end{frame}
 %
 %\begin{frame}[t]\frametitle{Building the Adjacency Matrix}
 %\begin{block}{}
@@ -547,23 +485,23 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 %  \end{minipage}
 %\end{frame}
 %
-%\begin{frame}[t]\frametitle{Weighting the TDGs}
-%  \begin{block}{}
-%    \begin{itemize}
-%    	\item In order to weight the graph properly, we need to have a mesh density function that we can calculate the cells (and then unknowns) per subset from.
-%    	\item The weight of the edge between two nodes (subsets) in the graph represents the solve and communication time of the base node.
-%    \end{itemize}
-%  \end{block}
-%  \begin{block}{}
-%    \begin{align}
-%    \text{cells per subset} &= \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz \\
-%    \label{weight}
-%    \text{weight} &= N_u\cdot T_u + N_b\cdot T_{\text{comm}} + \text{latency}\cdot M_L \\
-%    N_u &= \text{num cells}\cdot \text{unknowns per cell} \\
-%    N_b &\approx(\text{num boundary cells})\cdot \text{boundary unknowns per cell}
-%    \end{align}
-%  \end{block}
-%\end{frame}
+\begin{frame}[t]\frametitle{Weighting the TDGs}
+  \begin{block}{}
+    \begin{itemize}
+    	\item In order to weight the graph properly, we need to have a mesh density function that we can calculate the cells per subset from.
+    	\item The weight of the edge between two nodes (subsets) in the graph represents the solve and communication time of the base node.
+    \end{itemize}
+  \end{block}
+  \begin{block}{}
+    \begin{align}
+    \text{cells per subset} &= \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz \\
+    \label{weight}
+      \text{weight} &= N_c\cdot (T_c+ A_m\cdot(T_m + T_g)) + N_{b}\cdot A_m\cdot T_{\text{comm}} + \text{latency}\cdot M_L \\
+      N_u &= \text{number of cells} \\
+    N_b &\approx(\text{num boundary cells})\cdot \text{boundary unknowns per cell}
+    \end{align}
+  \end{block}
+\end{frame}
 %
 %\begin{frame}[t]\frametitle{Weighting the TDGs}
 %  \begin{minipage}{0.49\textwidth}
@@ -661,31 +599,31 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 %  \end{minipage}
 %\end{frame}
 %
-%\begin{frame}[t]\frametitle{Conflict Detection and Resolution}
-%  \begin{block}{}
-%    \begin{itemize}
-%      \item Best summarized as a ``marching" process. 
-%      \item Starting at time $t=0$, find the first interaction (recalling that the incoming weight to a node reflects the time it is ready to solve).
-%      \item If at time $t$, multiple TDGs are solving the same node, this means there is a conflict. 
-%      \item  ``Losing" TDGs modify their downstream weights according to how long they are delayed.
-%    \end{itemize}
-%  \end{block}
-%\end{frame}
+\begin{frame}[t]\frametitle{Conflict Detection and Resolution}
+  \begin{block}{}
+    \begin{itemize}
+      \item Best summarized as a ``marching" process. 
+      \item Starting at time $t=0$, find the first interaction (recalling that the incoming weight to a node reflects the time it is ready to solve).
+      \item If at time $t$, multiple TDGs are solving the same node, this means there is a conflict. 
+      \item  ``Losing" TDGs modify their downstream weights according to how long they are delayed.
+    \end{itemize}
+  \end{block}
+\end{frame}
 %
-%\begin{frame}[t]\frametitle{First Come First Serve Conflict Resolution}
-%\begin{block}{}
-%\begin{itemize}
-%	\item The first octant to arrive to a node will begin solving it, and the remaining octants will incur a delay (if applicable).
-%	\item The delay is reflected in each remaining TDG by adding the corresponding delay as a weight to the applicable edge and applicable downstream edges.
-%  \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant (same as PDT) wins the tie.
-%\end{itemize}
-%\end{block}
-%  \begin{block}{Unweighted vs. Weighted Depth-of-Graph Remaining}
-%    \begin{itemize}
-%      \item There are two options for the depth-of-graph remaining. Unweighted does not take the weights into account, and weighted looks at the final time for the conflicting graphs on the universal time scale.
-%    \end{itemize}
-%  \end{block}
-%\end{frame}
+\begin{frame}[t]\frametitle{First Come First Serve Conflict Resolution}
+\begin{block}{}
+\begin{itemize}
+	\item The first octant to arrive to a node will begin solving it, and the remaining octants will incur a delay (if applicable).
+	\item The delay is reflected in each remaining TDG by adding the corresponding delay as a weight to the applicable edge and applicable downstream edges.
+  \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant (same as PDT) wins the tie.
+\end{itemize}
+\end{block}
+  \begin{block}{Unweighted vs. Weighted Depth-of-Graph Remaining}
+    \begin{itemize}
+      \item There are two options for the depth-of-graph remaining. Unweighted does not take the weights into account, and weighted looks at the final time for the conflicting graphs on the universal time scale.
+    \end{itemize}
+  \end{block}
+\end{frame}
 %
 %\begin{frame}[t]\frametitle{$t=1$: Graphs 0,3 and Graphs 1,2 in Conflict}
 % \begin{minipage}{0.49\textwidth}
@@ -762,131 +700,7 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 %    \includegraphics[scale=0.32]{../../figures/graph_4_3_2.pdf}
 %  \end{minipage}
 %\end{frame}
-
-%\begin{frame}[t]\frametitle{2D Verification}
-%\vspace{-0.3cm}
-%  \begin{block}{}
-%    \begin{itemize}
-%      \item A verification study was run to verify the time-to-solution estimator for 2D partitioning schemes with perfectly balanced partitions. 
-%      \item Verified against a code written by Dr. Ragusa that perfectly mimics PDT's scheduler in two dimensions. For consistency, the time-to-solution estimator utilized an unweighted depth-of-graph remaining conflict resolution.
-%    \end{itemize}
-%  \end{block}
-%  \begin{block}{Problems}
-%  \begin{small}
-%    \begin{enumerate}
-%      \item 2x2 to 10x10 subsets in x and y with regular partitions and 1 to 6 angles per quadrant.
-%	  \item 2x2 to 10x10 subsets in x and y with mildly random partitions and 1 to 6 angles per quadrant.
-%	  \item  2x2 to 10x10 subsets in x and y with random partitions and 1 to 6 angles per quadrant.
-%	  \item  2x2 to 10x10 subsets in x and y with probable worst-case partitions and 1 to 6 angles per quadrant.
-%    \end{enumerate}
-%    \end{small}
-%  \end{block}
-%\end{frame}
 %
-%\begin{frame}[t]\frametitle{Regular Partitions}
-%  \vspace{-.35cm}
-%   \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/4_regular.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/6_regular.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/8_regular.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/10_regular.pdf}
-%  \end{minipage}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Regular Partitions}
-%  \centering
-%  \includegraphics[scale=0.6]{../../figures/regular_verification.pdf}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Mildly Random Partitions}
-%  \vspace{-.35cm}
-%   \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/4_mild_random.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/6_mild_random.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/8_mild_random.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/10_mild_random.pdf}
-%  \end{minipage}  
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Mildly Random Partitions}
-%  \centering
-%  \includegraphics[scale=0.6]{../../figures/mild_random_verification.pdf}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Random Partitions}
-%  \vspace{-.35cm}
-%   \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/4_random.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/6_random.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/8_random.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/10_random.pdf}
-%  \end{minipage}  
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Random Partitions}
-%  \centering
-%  \includegraphics[scale=0.6]{../../figures/random_verification.pdf}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Probable Worst-Case Partitions}
-%  \vspace{-.35cm}
-%   \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/4_worst.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/6_worst.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/8_worst.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.32]{../../figures/cut_line_files/10_worst.pdf}
-%  \end{minipage}  
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Probable Worst-Case Partitions}
-%  \centering
-%  \includegraphics[scale=0.6]{../../figures/worst_verification.pdf}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{3D Verification with Regular Partitions}
-%  \centering
-%  \includegraphics[scale=0.6]{../../figures/3d_verification.pdf}
-%\end{frame}
 %
 %\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 100 Points/Subset}
 %   \begin{minipage}{0.49\textwidth}
@@ -910,75 +724,51 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 %    Improvement: $\frac{0.756}{1.335} = 0.566$
 %\end{frame}
 %
-%\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 10 Points/Subset}
-%   \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.35]{../../figures/synthetic_lbd_cuts_lighter.pdf}
-%    \begin{block}{}
-%    \centering
-%      $t = 0.145$
-%    \end{block}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.35]{../../figures/synthetic_opt_cuts_lighter.pdf}
-%    \begin{block}{}
-%    \centering
-%    $ t = 0.080$
-%    \end{block}
-%  \end{minipage}
-%  \vspace{1cm}
-%  \centering
-%    Improvement: $\frac{0.080}{0.145} = 0.552$
-%\end{frame}
+\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 10 Points/Subset}
+   \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../../figures/synthetic_lbd_cuts_lighter.pdf}
+    \begin{block}{}
+    \centering
+      $t = 0.145$
+    \end{block}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../../figures/synthetic_opt_cuts_lighter.pdf}
+    \begin{block}{}
+    \centering
+    $ t = 0.080$
+    \end{block}
+  \end{minipage}
+  \vspace{1cm}
+  \centering
+    Improvement: $\frac{0.080}{0.145} = 0.552$
+\end{frame}
+
+\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 1000 Points/Subset}
+   \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../../figures/synthetic_lbd_cuts_heavy.png}
+    \begin{block}{}
+    \centering
+    $t = 12.499$
+    \end{block}
+  \end{minipage}
+  \begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.35]{../../figures/synthetic_opt_cuts_heavy.png}
+    \begin{block}{}
+    \centering
+    $t = 7.298$
+    \end{block}
+  \end{minipage}
+  \vspace{1cm}
+  \centering
+    Improvement: $\frac{7.289}{12.499} = 0.583$
+\end{frame}
 %
-%\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 1000 Points/Subset}
-%   \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.35]{../../figures/synthetic_lbd_cuts_heavy.png}
-%    \begin{block}{}
-%    \centering
-%    $t = 12.499$
-%    \end{block}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.35]{../../figures/synthetic_opt_cuts_heavy.png}
-%    \begin{block}{}
-%    \centering
-%    $t = 7.298$
-%    \end{block}
-%  \end{minipage}
-%  \vspace{1cm}
-%  \centering
-%    Improvement: $\frac{7.289}{12.499} = 0.583$
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Unbalanced Pin Comparison Between PDT and TTS}
-%  \centering
-%  \includegraphics[scale=0.25,trim={2cm 0cm 1cm 1.3cm},clip]{../../figures/unbalanced_pins_refined.png}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Unbalanced Pin Comparison Between PDT and TTS}
-%\begin{block}{}
-% Using the mesh from the previous slide, PDT and the time-to-solution estimator were run on the following problems:
-% \begin{itemize}
-%   \item 2-6,8, and 9 subsets in each dimension with load balance by dimension and regular cuts.
-%   \item The ratio of the solve time per sweep was taken between the LBD cuts and regular cuts for PDT and the time-to-solution estimator respectively.
-%   \item The percent difference between the ratios was calculated: $\frac{R_{\text{PDT}} - R_{\text{TTS}}}{R_{PDT}}$.
-% \end{itemize}
-%\end{block}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{PDT vs. TTS}
-%\centering
-%  \includegraphics[scale=0.6]{../../figures/ratio_refined.pdf}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Level 2 Experiment}
-%  \centering
-%  \includegraphics[scale=0.35,trim={2cm 0cm 1cm 15cm},clip]{../../figures/level2base.png}
-%\end{frame}
+
 %
 %\begin{frame}[t]\frametitle{Level 2 Experiment TTS}
 %\begin{block}{}
@@ -1023,133 +813,8 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 %\end{frame}
 %
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\section{Partitioning Optimization}
-%\subsection{}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\begin{frame}[t]\frametitle{Optimizing the Cut Lines}
-%\begin{block}{}
-%  \begin{itemize}
-%    \item The time-to-solution estimator provides us with the maximum time-to-solution given a set of cut lines/planes.
-%    \item The estimator can be fed into an optimization function that minimizes the maximum time-to-solution using the cut lines/planes as the parameter space. 
-%    \item This was attempted using \textbf{scipy.optimize.minimize}. 
-%  \end{itemize}
-%\end{block}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Brute Force Optimization}
-%\begin{block}{}
-%  \begin{itemize}
-%    \item  A brute force optimization study was run on analytical mesh density data picture below with 2x2 cut lines in x and y.
-%    \item The global domain was from 0 to 10 cm in each dimension.
-%    \item The cut lines were varied by 0.1 each, leading to the time to solution estimator being run 99\textsuperscript{3}= 970,299 times.
-%  \end{itemize}
-%\end{block}
-%  \centering
-%  \includegraphics[scale=0.35]{../../figures/analytical_mesh_density.pdf}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Brute Force Optimization}
-%  \centering
-%  \includegraphics[scale=0.5]{../../figures/brute_force_result.pdf}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Brute Force Optimization}
-%\begin{block}{}
-%  \begin{itemize}
-%    \item The brute force optimization study took about 3 hours to run.
-%    \item The same mesh run through \textbf{scipy.optimize.minimize} with the Sequential Quadratic Programming method took 6.85 seconds with only 491 TTS evaluations as opposed to 970,299.
-%  \end{itemize}
-%\end{block}
-%\begin{table}[H]
-%\centering
-%\begin{tabular}{c|c|c} 
-%\bf Params & \bf Brute Force & \bf SciPy   \\ \hline \hline
-% x & 6.2& 6.180 \\
-% y0 & 6.4 & 6.420 \\ 
-% y1 & 5.9 & 5.922 \\ 
-% tts & 18205  &  18045 \\ 
-%\end{tabular}
-%\end{table}
-%\end{frame}
-%
-%
-%\begin{frame}[t]\frametitle{Global Optimization Process}
-%\begin{block}{}
-%  \begin{itemize}
-%   \item Methods in \textbf{scipy.optimize.minimze} find local minima only, and we needed to combine this with a global optimization routine.
-%    \item From \textbf{scipy.optimize} we used basinhopping (a stochastic global minimization method) to call the local minimization method in order optimize over our global parameter space.
-%  \end{itemize}
-%\end{block}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Sparse Spiderweb Optimization}
-%\centering
-%  \includegraphics[scale=0.25,trim={2cm 0cm 1cm 1.3cm},clip]{../../figures/unbalanced_pins_refined.png}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Sparse Spiderweb Optimization Results}
-%\begin{block}{}
-%  \begin{itemize}
-%    \item Using LBD cuts as the initial guess, 10 global iterations, and 100 local iterations, the following results were obtained.
-%  \end{itemize}
-%\end{block}
-%\begin{table}[H]
-%\centering
-%\begin{tabular}{c|c|c|c} 
-%\bf N & \bf LBD & \bf Opt & \bf Ratio   \\ \hline \hline
-% 2 & 0.734 & 0.611 & 0.832\\
-% 3 & 0.742 & 0.678 & 0.914\\ 
-% 4 & 0.586 & 0.507 & 0.865\\ 
-% 5 & 0.561& 0.509 & 0.907\\
-% 6 & 0.465  &  0.461 & 0.991\\
-% 7 & 0.463 & 0.416 & 0.898\\
-% 9& 0.373& 0.373 & 1.0\\
-%\end{tabular}
-%\end{table}
-%\end{frame}
 
-\section{Conclusions and Future Work}
-\subsection{}
 
-%\begin{frame}[t]\frametitle{Lessons Learned comparing to PDT}
-%  \begin{block}{}
-%    \begin{itemize}
-%      \item Many of the PDT runs either crashed in the stitcher or hung once the sweep began (likely due to cycles). Some of these issues are expected to be resolved once Sweep Plane Data Structures are implemented in PDT.  
-%      \item All PDT problems were run on quartz at LLNL, an x86 machine. 
-%      \item The results from PDT runs were a bit noisy, which is the reason the median value of 10 runs were taken to weed out outliers. In the future, comparisons to PDT can be run on BGQ machine, which should be less noisy.
-%      \item Future work should include feeding the scheduler output from the time-to-solution estimator directly into PDT to get as accurate a comparison as possible (potentially a future Master's thesis?).
-%    \end{itemize}
-%  \end{block}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Lessons Learned during Optimization}
-%  \begin{block}{}
-%    \begin{itemize}
-%    \item The \textbf{scipy.optimize.minimize} libraries are finding local minima, and the parameters are not traversing the entire boundaries before converging.
-%    \item Combining the local minimization method with a stochastic global minimization method yielded improved
-%      results, but still depended strongly on the initial parameter guess.
-%     \item The python optimization libraries do not consistently respect the parameter boundaries passed in. This causes the time-to-solution estimator to fail, and the optimizer to crash.
-%    \item The time-to-solution-estimator needs to be sped up significantly if larger cases are expected to run in reasonable amounts of time. The target is a few minutes for large cases, which currently can take up to a day, if they don't crash.  
-%    \end{itemize}
-%  \end{block}
-%\end{frame}
-%
-%\begin{frame}[t]\frametitle{Future Work}
-%\begin{block}{Immediate Priorities}
-%  \begin{itemize}
-%    \item Speed up TTS! Problems modeling greater than 1000 subsets take about 1.5 mins to solve. 
-%    \item With the optimization tools evaluating the time-to-solution up to 10,000 times, this is extremely costly.
-%  \end{itemize}
-%\end{block}
-%\begin{block}{}
-%\begin{itemize}
-%  \item Explore a wider variety of optimization tools that can optimize large parameter spaces. 
-%  \item Potentially move to C++ in order to faster than python, and open up the possibility to better optimization tools.
-%  \end{itemize}
-%\end{block}
-%
-%\end{frame}
 
 \begin{frame}[t]\frametitle{Acknowledgements}
 \begin{block}{}
