@@ -305,7 +305,7 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
   \end{block}
   \centering
   \includegraphics[scale=0.5]{../../figures/degen_penta.png}
-  \includegraphics[scale=0.25]{../../figures/deg_square_PWLD1_contour_b4.png}
+  \includegraphics[scale=0.25,angle=270,origin=c]{../../figures/deg_square_PWLD1_contour_b4.png}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -313,23 +313,27 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
   \begin{columns}
     \column{0.5\textwidth}
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
+      \centering
       \includegraphics[scale=0.14,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/im1_cubit_slice.png}
     \end{minipage}
     
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
+      \centering
       \includegraphics[scale=0.05]{../../figures/FuelAndGuideZoom.png}
     \end{minipage}
     \column{0.5\textwidth}
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
-      \includegraphics[scale=0.14,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/im1_cubit_slice_v2.png}
+      \centering
+      \includegraphics[scale=0.35,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/im1_cubit_slice_v2.png}
     \end{minipage}
 %      \begin{block}{}
 %        PWLD allows us to solve these partitioned arbitrary and degenerate meshes.
 %      \end{block}
     \end{minipage}
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
-      \includegraphics[scale=0.15]{../../figures/spiderweb4.png}
+      \centering
+      \includegraphics[scale=0.125]{../../figures/spiderweb4.png}
     \end{minipage}
   \end{columns}
 \end{frame}
@@ -343,100 +347,51 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
 \section{Load Balancing}
 \subsection{}
 
-\begin{frame}[t]\frametitle{Load Balancing By Dimension}
+\begin{frame}[t]\frametitle{Load Balancing}
 \begin{block}{}
   \begin{itemize}
     \item The load balancing by dimension algorithm expands upon load balancing work presented at M\&C 2017.
-    \item We load balance by moving partitions into mesh dense areas in order to redistribute the workload more evenly across processors.
-    \item The load balancing algorithms rely on a few metrics to assist with the movement of cut lines.
+    \item The algorithm looks to achieve an equivalent number of cells across all subsets by minimizing \tcr{the maximum number of cells per subset divided by the average number of cells per subset}.
+    \item This is done through an iterative process where in each iteration we balance the maximum cells per column divided by the average number of cells per column, with the same being done for rows.This is done by moving the partitions in each dimension.
   \end{itemize}		
 \end{block}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}[t]\frametitle{Redistribution}
-\begin{figure}[H]
+\begin{minipage}[c]{0.45\textwidth}
 \centering
-\includegraphics[scale=0.37]{../../figures/spiderweb_redistribute_before_sparse.pdf}
-\includegraphics[scale=0.37]{../../figures/spiderweb_redistribute_after_sparse.pdf}
-\caption{The use of the CDF of triangles per column to redistribute the cut planes in X.}
-\label{redistribute}
-\end{figure}
+\includegraphics[scale=0.3]{../../figures/spiderweb_redistribute_before_sparse.pdf}
+\end{minipage}
+\begin{minipage}[c]{0.45\textwidth}
+\centering
+\includegraphics[scale=0.3]{../../figures/spiderweb_redistribute_after_sparse.pdf}
+\end{minipage}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-\begin{frame}[t]\frametitle{Load Balancing Metrics}
-\begin{equation}
-f =\frac{\underset{ijk}{\text{max}}(N_{ijk})}{\frac{N_{tot}}{I\cdot J\cdot K}},
-\label{metric_def}
-\end{equation}
-\begin{align}
-f_{K} &= \underset{k}{\text{max}}[\sum_{i,j} N_{ijk}]/\frac{N_{tot}}{K}, \label{f_d1} \\
-f_{I,k} &= \Big(\underset{i}{\text{max}}[\sum_{j} N_{ijk,k}]/\frac{N_{k}}{I}\Big), \label{f_d2}\\
-f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big) . \label{f_j}
-\end{align}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}[t]\frametitle{Original Load Balancing Algorithm (2D Only)}
-\begin{algorithm}[H]
-\label{initial_algorithm}
-\begin{algorithmic}
-
-\WHILE{$f > \text{tol}_{\text{subset}}$}
-  \IF {$f_I > \text{tol}_{\text{col}}$}
-    \STATE Redistribute the X cut planes.
-  \ENDIF
-  \IF {$f_J > \text{tol}_{\text{row}}$}
-  	\STATE Redistribute the Y cut planes.
-  \ENDIF
-\ENDWHILE
-\end{algorithmic}
-\end{algorithm}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}[t]\frametitle{Theoretical Motivation for LBD}
-  \begin{block}{}
+\begin{frame}[t]\frametitle{Load Balancing By Dimension}
+\begin{block}{}
+Take a 3D mesh.
+\begin{enumerate}
+    \item  Slice it in axial layers such that each layer has about the same \# of cells.
+    \item  Then, for each layer, slice it in columns such that each column has about the same \# of cells.
+    \item Then, for each column, slice it in blocks such that each block has about the same \# of cells. 
+\end{enumerate}
+In practice, we often achieve close to perfect load balance. (typical imbalance is < 1\%)
+ %on that new slide, I would split the bottom half on 2 columns: left column some text from slide 15, on the right, the figure from slide 15
+\end{block}
+\begin{minipage}[c]{0.49\textwidth}
+\centering
+ \begin{block}{Theoretical motivation for LBD}
   \begin{itemize}
     \item Consider simple 2D layout with $M$ unaligned subsets of high mesh density that each have $N$ cells.
     \item There are $M^2$ subsets, but only M have much work.
     \item Load Imbalance Factor $= \frac{N}{(MN+C)/M^2} \xrightarrow{N\to \infty} \frac{N}{N/M} = M$
   \end{itemize}
   \end{block}
-  \begin{center}
-    \includegraphics[scale=0.2]{../../figures/theoretical_plot.png}
-  \end{center}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{minipage}
+\begin{minipage}[c]{0.49\textwidth}
+\centering
+\includegraphics[scale=0.2]{../../figures/theoretical_plot.png}
+\end{minipage}
 
-\begin{frame}[t]\frametitle{Load Balancing By Dimension Algorithm}
-\begin{algorithm}[H]
-\label{lbd}
-\begin{algorithmic}
-
-  \WHILE {$f_{K} > \text{tol}_{\text{K}}$}
-    \STATE Redistribute the Z cut planes.
-  \ENDWHILE  
-  
-  \FOR {$k$ in $K$}
-    \WHILE {$f_{I,k} > \text{tol}_{\text{I}}$}
-      \STATE Redistribute the X cut planes within each Z layer. 
-    \ENDWHILE
-  \ENDFOR
-  
-  \FOR{$k$ in $K$}
-    \FOR{$i$ in $I$}
-      \WHILE {$f_{J,i,k} > \text{tol}_{\text{J}}$ }
-        \STATE Redistribute the Y cut planes within each column within each Z layer. 
-      \ENDWHILE
-    \ENDFOR
-  \ENDFOR
-  
-  \STATE Calculate $f$.
-\end{algorithmic}
-\end{algorithm}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -464,21 +419,12 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Results of Load Balancing By Dimension}
-\centering
-\includegraphics[scale=0.6]{../../figures/lbd_results.pdf}
-Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}[t]\frametitle{Consequences of Load Balancing By Dimension}
-  \begin{block}{}
-  \begin{itemize}
-    \item Perfect load balance in some cases will come at the cost of optimal sweeping.
-    \item Time to solution is the most pertinent parameter, and if keeping a more optimal sweeping grid means a less balanced problem, then so be it.
-    \item With imbalanced partitions it is harder to characterize the idle time, or the time where a processor has no work to do, and thus obtain an accurate stage count.
-    \item A time-to-solution estimator must be built to more accurately predict sweep time.
-  \end{itemize}
-  \end{block}
+\begin{minipage}[c]{0.7\textwidth}
+\includegraphics[scale=0.5]{../../figures/lbd_results.pdf}
+\end{minipage}
+\begin{minipage}[c]{0.25\textwidth}
+\small Minimum LBD metric: 1.07692\\ Max LBD metric: 1.33636
+\end{minipage}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -487,6 +433,20 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 \includegraphics[trim={0cm 1cm 0cm 3cm},clip,scale=0.23]{../../figures/im1_foam_448.png}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[t]\frametitle{Consequences of Load Balancing By Dimension}
+  \begin{block}{}
+  \begin{itemize}
+    \item Perfect load balance in some cases will come at the cost of optimal sweeping (as shown in the next few slides).
+    \item Time to solution is the most pertinent parameter, and if keeping a more optimal sweeping grid means a less balanced problem, then so be it.
+    \item With imbalanced partitions it is harder to characterize the idle time, or the time where a processor has no work to do, and thus obtain an accurate stage count.
+    \item A time-to-solution estimator must be built to more accurately predict sweep time.
+  \end{itemize}
+  \end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 \begin{frame}[t]\frametitle{Sweep on Regular Grid with 3 Angle Sets}
     \centering
@@ -553,7 +513,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
   \begin{columns}
   \column{0.5\textwidth}
     \centering
-    \includegraphics[scale=0.5]{../../figures/boundaries_worst.pdf}
+    \includegraphics[scale=0.5]{../../figures/boundaries_worst_pres.pdf}
     \column{0.5\textwidth}
     \centering
     \includegraphics[scale=0.35,trim={0cm 0cm 0cm 5cm},clip]{../../figures/layered.pdf}
@@ -662,10 +622,23 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
     \begin{align}
     \text{cells per subset} &= \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz \\
     \label{weight}
-      \text{weight} &= N_c\cdot (T_c+ A_m\cdot(T_m + T_g)) + N_{b}\cdot A_m\cdot T_{\text{comm}} + \text{latency}\cdot M_L \\
-      N_u &= \text{number of cells} \\
-    N_b &\approx(\text{num boundary cells})\cdot \text{boundary unknowns per cell}
-    \end{align}
+      \text{weight} &= T_{wu} + N_c\cdot (T_c+ A_m\cdot(T_m + T_g)) + N_{b}\cdot A_m\cdot T_{\text{comm}} + \text{latency}\\
+      \end{align}
+    \footnotesize
+    \begin{equation*}
+    \begin{aligned}[c]
+    N_c &= \text{number of cells}  \\
+    A_m &= \text{Number of angles per task}  \\
+    T_c &= \text{Time spent on cell-specific work}  \\
+    T_{\text{comm}} &= \text{Comm time per double} \\ 
+    \end{aligned}
+    \begin{aligned}[c]
+     N_b &\approx(\text{num boundary cells})\cdot \text{boundary unknowns per cell} \\
+     T_m &= \text{Time spent on angle-specific work} \\
+     T_g &= \text{Time spend on group-specific work} \\
+     T_{wu} &= \text{Time to get into sweep operator} \\
+     \end{aligned}
+    \end{equation*}
   \end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -22,4 +22,4 @@ num_col = 5
 num_subsets = num_row*num_col
 boundaries_lbd = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts_lbd,y_cuts_lbd)
 
-plot_subset_boundaries_2d(boundaries_lbd,num_subsets,"../../figures/boundaries_worst.pdf")
+plot_subset_boundaries_2d(boundaries_lbd,num_subsets,"../../figures/boundaries_worst_pres.pdf")

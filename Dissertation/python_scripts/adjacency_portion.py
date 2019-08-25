@@ -84,3 +84,17 @@ f.close()
 
 #The flipped adjacency matrix.
 adjacency_flip,id_map = flip_adjacency(adjacency_matrix,num_row,num_col)
+#Quadrant 1
+adjacency_matrix_1 = np.triu(adjacency_flip)
+G1 = nx.DiGraph(adjacency_matrix_1)
+G1 = nx.relabel_nodes(G1,id_map,copy=True)
+plt.figure()
+nx.draw(G1,nx.kamada_kawai_layout(G1),with_labels=True)
+
+#Bottom right quadrant.
+adjacency_matrix_2 = np.tril(adjacency_flip)
+G2 = nx.DiGraph(adjacency_matrix_2)
+G2 = nx.relabel_nodes(G2,id_map,copy=True)
+plt.figure()
+nx.draw(G2,nx.kamada_kawai_layout(G2),with_labels=True)
+

@@ -170,7 +170,9 @@ $\begin{pmatrix}
 \caption{The upper triangular (left) and lower triangular(right) portions of the adjacency matrix in Fig. \ref{25basematrix}.}
 \label{25baseportionmatrices}
 \end{figure}
-These matrix portions provide connectivity \textit{and} dependency information for quadrants 0 and 3. With this information, network's Digraph function is able to construct the DAGs for these quadrants. Figure \ref{25_q0q3graphs} shows the the DAGS associated with quadrants 0 and 3, built from the adjacency matrices in Fig. \ref{25baseportionmatrices}.
+These matrix portions provide connectivity \textit{and} dependency information for quadrants 0 and 3. 
+With this information, network's Digraph function is able to construct the DAGs for these quadrants. 
+Figure \ref{25_q0q3graphs} shows the the DAGS associated with quadrants 0 and 3, built from the adjacency matrices in Fig. \ref{25baseportionmatrices}.
 
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
@@ -183,8 +185,13 @@ These matrix portions provide connectivity \textit{and} dependency information f
 \label{25_q0q3graphs}
 \end{figure}
 Upon inspection of these two DAGs, we see that they show the correct connectivity, dependency, and expected opposing sweep ordering. 
+Quadrant 0 starts its sweep from subset 0, finishing at subset 24, and quadrant 3 starts its sweep from subset 24, finishing at subset 0.
 
-To obtain the graphs for quadrants 1 and 2, a ``flipped'' version of the adjacency matrix is necessary. We temporarily renumber the subsets starting from the top left corner, and increasing down each column, as shown in Fig. \ref{25flippedmatrix}.
+To obtain the graphs for quadrants 1 and 2, a ``flipped'' version of the adjacency matrix is necessary. 
+We temporarily renumber the subsets starting from the top left corner, and increasing down each column, as shown in Fig. \ref{25flippedmatrix}.
+\begin{figure}
+
+\end{figure}
 
 \subsubsection{Building the 3d graphs}
 
