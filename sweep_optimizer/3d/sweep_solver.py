@@ -284,6 +284,7 @@ def plot_subset_boundaries(global_3d_subset_boundaries,num_subsets):
 
 def plot_subset_boundaries_2d(global_3d_subset_boundaries,num_subsets,fname):
   plt.figure(1)
+  plt.axis("off")
   subset_centers = []
   for i in range(0,num_subsets):
   
@@ -302,7 +303,7 @@ def plot_subset_boundaries_2d(global_3d_subset_boundaries,num_subsets,fname):
     y = [ymin, ymin, ymax, ymax,ymin]
   
     plt.plot(x,y,'b')
-    #plt.text(center_x,center_y,str(i))
+    plt.text(center_x,center_y,str(i))
   
   plt.savefig(fname)
   plt.close()
@@ -1523,7 +1524,7 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d(f,subset_bounds)  
-  print(cells_per_subset,bdy_cells_per_subset)
+  #print(cells_per_subset,bdy_cells_per_subset)
   #Building the adjacency matrix.
   adjacency_matrix = bam.build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
   #Building the graphs.
