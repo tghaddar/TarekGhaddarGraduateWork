@@ -81,7 +81,7 @@
 }
 
 \title[Approaches to Load Balancing]{Approaches to Load Balancing Massively Parallel Transport Sweeps on Unstructured Grids}
-\author[Ghaddar]{Tarek Habib Ghaddar, Jean C. Ragusa}
+\author[Ghaddar]{Tarek Habib Ghaddar, Jean C. Ragusa, Marvin L. Adams}
 \institute[Texas A\&M]{Department of Nuclear Engineering \\ Texas A\&M University}
 \date[August 27, 2019]
 
@@ -339,11 +339,6 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}[t]\frametitle{Partitioning into 100 Subsets}
-\centering
-\includegraphics[scale=0.25,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/spiderweb_sparse.png}
-\end{frame}
-
 \section{Load Balancing}
 \subsection{}
 
@@ -355,16 +350,28 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
     \item This is done through an iterative process where in each iteration we balance the maximum cells per column divided by the average number of cells per column, with the same being done for rows.This is done by moving the partitions in each dimension.
   \end{itemize}		
 \end{block}
-\begin{minipage}[c]{0.45\textwidth}
+\begin{minipage}[c]{0.49\textwidth}
 \centering
 \includegraphics[scale=0.3]{../../figures/spiderweb_redistribute_before_sparse.pdf}
 \end{minipage}
-\begin{minipage}[c]{0.45\textwidth}
+\begin{minipage}[c]{0.49\textwidth}
 \centering
 \includegraphics[scale=0.3]{../../figures/spiderweb_redistribute_after_sparse.pdf}
 \end{minipage}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[t]\frametitle{Load Balancing}
+\begin{minipage}[c]{0.49\textwidth}
+\centering
+\includegraphics[scale=0.2,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/spiderweb_sparse.png}
+\end{minipage}
+\begin{minipage}[c]{0.49\textwidth}
+\centering
+\includegraphics[scale=0.2,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/sparse_spiderweb_lb.png}
+\end{minipage}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Load Balancing By Dimension}
 \begin{block}{}
@@ -391,20 +398,25 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
 \centering
 \includegraphics[scale=0.2]{../../figures/theoretical_plot.png}
 \end{minipage}
-
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\begin{frame}[t]\frametitle{Load Balancing By Dimension}
+\begin{minipage}[c]{0.32\textwidth}
+\centering
+\includegraphics[scale=0.12,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/spiderweb_sparse.png}
+\end{minipage}
+\begin{minipage}[c]{0.32\textwidth}
+\centering
+\includegraphics[scale=0.12,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/sparse_spiderweb_lb.png}
+\end{minipage}
+\begin{minipage}[c]{0.32\textwidth}
+\centering
+\includegraphics[scale=0.12,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/sparse_spiderweb_lbd.png}
+\end{minipage}
 
-%\begin{frame}[t]\frametitle{Paramtric Study Conclusions}
-%  \begin{block}{}
-%  \begin{itemize}
-%    \item The more uniformly refined your mesh, the more inherently balanced it is.
-%    \item With the exception of a few outliers, the load balancing by dimension algorithm was an improvement over the original load balancing algorithm.
-%    \item The metric improved by a max of 76.9\% and a mean of 21.7\% with the load balancing by dimension algorithm over the original load balancing algorithm. 
-%  \end{itemize}
-%  \end{block}
-%\end{frame}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Testing Load Balancing}
 \begin{block}{}
@@ -984,9 +996,9 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
 A special thank you to the following individuals for their help and support:
 \begin{itemize}
 \item Drs. Ragusa, Morel, Adams, and Amato
-\item Michael Adams, Daryl Hawkins, Timmie Smith
+\item Michael Adams, Daryl Hawkins, Timmie Smith, Milan Hanus
 \item Andrew Till
-\item The CERT team and fellow grad students (particularly my officemate Ian Halvic, who has dealt with my screaming). 
+\item The CERT team and fellow grad students.
 \end{itemize}
 \end{block}
 \end{frame}
