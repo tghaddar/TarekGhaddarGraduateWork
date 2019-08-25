@@ -84,12 +84,32 @@ f.close()
 
 #The flipped adjacency matrix.
 adjacency_flip,id_map = flip_adjacency(adjacency_matrix,num_row,num_col)
+f = open("flipped_adjacency_matrix.txt",'w')
+f.write('$\\begin{pmatrix}\n')
+#Looping over the adjacency matrix and writing it to latex.
+for i in range(0,num_subsets):
+  for j in range(0,num_subsets):
+    f.write(str(int(adjacency_flip[i][j])))
+    if j < num_subsets-1:
+      f.write('&')
+  
+  f.write('\\\ \n')
+
+
+f.write('\\end{pmatrix}$\n')
+f.close()
+#Plotting the flipped subset ordering.
+plot_subset_boundaries_2d(boundaries_lbd,num_subsets,id_map,"../../figures/boundaries_worst_flipped.pdf")
+
+
 #Quadrant 1
 adjacency_matrix_1 = np.triu(adjacency_flip)
 G1 = nx.DiGraph(adjacency_matrix_1)
 G1 = nx.relabel_nodes(G1,id_map,copy=True)
 plt.figure()
 nx.draw(G1,nx.kamada_kawai_layout(G1),with_labels=True)
+plt.savefig("../../figures/25_graph1.pdf")
+plt.close()
 
 #Bottom right quadrant.
 adjacency_matrix_2 = np.tril(adjacency_flip)
@@ -97,4 +117,6 @@ G2 = nx.DiGraph(adjacency_matrix_2)
 G2 = nx.relabel_nodes(G2,id_map,copy=True)
 plt.figure()
 nx.draw(G2,nx.kamada_kawai_layout(G2),with_labels=True)
+plt.savefig("../../figures/25_graph2.pdf")
+plt.close()
 

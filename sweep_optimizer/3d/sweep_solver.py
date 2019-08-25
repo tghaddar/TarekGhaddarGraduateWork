@@ -282,7 +282,7 @@ def plot_subset_boundaries(global_3d_subset_boundaries,num_subsets):
   
   plt.savefig("subset_plot.pdf")
 
-def plot_subset_boundaries_2d(global_3d_subset_boundaries,num_subsets,fname):
+def plot_subset_boundaries_2d(global_3d_subset_boundaries,num_subsets,id_map,fname):
   plt.figure(1)
   plt.axis("off")
   subset_centers = []
@@ -303,7 +303,7 @@ def plot_subset_boundaries_2d(global_3d_subset_boundaries,num_subsets,fname):
     y = [ymin, ymin, ymax, ymax,ymin]
   
     plt.plot(x,y,'b')
-    plt.text(center_x,center_y,str(i))
+    plt.text(center_x,center_y,str(id_map[i]))
   
   plt.savefig(fname)
   plt.close()
