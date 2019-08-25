@@ -11,6 +11,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                           TIME TO SOLUTION ESTIMATOR CHAPTER
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ \setcounter{MaxMatrixCols}{30}
 \newcommand{\tcr}[1]{\textcolor{red}{#1}}
 
 
@@ -24,8 +25,8 @@ This library gives us a wide variety of graph mathematics that is optimized and 
 \section{Method}
 The time-to-solution estimator determines the time to sweep across a domain by:
 \begin{enumerate}
-	\item Given a partitioning scheme, build adjacency matrices.
-	\item Build Directed Acyclic Graphs  (DAGs) from the adjacency matrices, one for each quadrant/octant.
+	\item Given a partitioning scheme, build an adjacency matrix.
+	\item Build Directed Acyclic Graphs  (DAGs) from the adjacency matrix, one for each quadrant/octant.
 	\item Weight the edges of each graph based on the solve and communication time of each subset to its neighbors.
      \item Add and adjust graphs based on how many angles are pipelined.
 	\item Adjust the weights of each graph to operate on the universal timescale.
@@ -40,10 +41,51 @@ The adjacency matrix proves connectivity information for each subset to its neig
 The adjacency building process relies on a major assumption: The z dimension has partitions all the way across the domain, then the x dimension has partitions per plane, then the y dimension has partitions per plane per column. 
 In future work, these three dimensions will be interchangeable, but for now, this ordering must be preserved. 
 
+Figure \ref{25basematrix} shows a partitioning scheme for 5 subsets each in the x and y dimensions with its corresponding adjacency matrix.
+
+\begin{figure}[H]
+\begin{minipage}[c]{0.5\textwidth}
+\raggedleft
+\includegraphics[scale=0.55]{../../figures/boundaries_worst.pdf}
+\end{minipage}
+\begin{minipage}[c]{0.5\textwidth}
+\raggedright
+\scalebox{0.5}{
+$\begin{pmatrix}
+0&1&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+1&0&1&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&1&0&1&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&1&0&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&1&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+1&1&1&1&1&0&1&0&0&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&1&1&0&1&0&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&1&0&1&0&1&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&1&0&0&1&0&1&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&1&0&0&0&1&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&1&0&0&0&0&0&1&0&0&0&1&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&1&0&0&0&0&1&0&1&0&0&1&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&1&0&0&0&0&0&1&0&1&0&1&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&1&0&0&0&0&0&0&1&0&1&1&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&1&1&1&1&1&0&0&0&1&0&1&1&1&1&1&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&1&0&0&0&1&1&1&1&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&0&1&0&0&0&0&0&0&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&1&0&1&0&0&0&0&0&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&1&0&1&0&0&0&0&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&1&0&0&0&0&0&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&1&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&1&0&1&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&1&0&1&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&0&1&0&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&0&0&1&0\\ 
+\end{pmatrix}$}
+\end{minipage}
+\caption{A 5x5 subset partitioning scheme and its corresponding adjacency matrix.}
+\label{25basematrix}
+\end{figure}
 
 \subsection{Building the directed acyclic graphs (DAGs)}
 
-The adjacency matrices give us crucial connectivity information in order to build our graphs. This process also slightly from 2D to 3D. Both processes rely on networkx's DiGraph function to build the DAGs.
+The adjacency matrix give us crucial connectivity information in order to build our graphs. This process differs slightly from 2D to 3D. Both processes rely on networkx's DiGraph function to build the DAGs.
 
 \subsubsection{Building the 2d graphs}
 In two dimensions, we build four graphs corresponding to four quadrants. 
@@ -63,6 +105,72 @@ Figure \ref{quadrant_layout} illustrates this numbering.
 \end{figure}
 The initial adjacency matrix we obtain can be immediately used to build the graphs for quadrants 0 and 3 by using networkx's DiGraph function.
 We feed the upper triangular portion of the adjacency matrix to DiGraph to get the quadrant 0 graph, and the lower triangular portion to get the quadrant 3 graph.
+Utilizing the same partitioning scheme shown in Fig. \ref{25basematrix}, pull the upper triangular and lower triangular portions of the matrix, shown in Fig. \ref{25baseportionmatrices}.
+\begin{figure}[H]
+\begin{minipage}[c]{0.5\textwidth}
+\scalebox{0.5}{
+$\begin{pmatrix}
+0&1&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&1&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&1&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&1&0&0&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&1&0&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&1&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&1&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&1&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&1&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&1&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&1&1&1&1&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&0&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+\end{pmatrix}$}
+\end{minipage}
+\begin{minipage}[c]{0.5\textwidth}
+\scalebox{0.5}{
+$\begin{pmatrix}
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+1&1&1&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&1&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&1&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&1&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&1&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&1&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&1&0&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&1&1&1&1&1&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&1&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&1&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&1&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&1&0&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&1&0&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&0&1&0&0\\ 
+0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&0&0&1&0\\ 
+\end{pmatrix}$}
+\end{minipage}
+\caption{The upper triangular (left) and lower triangular(right) portions of the adjacency matrix in Fig. \ref{25basematrix}.}
+\label{25baseportionmatrices}
+\end{figure}
+These matrix portions provide connectivity \textit{and} dependency information for quadrants 0 and 3. With this information, network's Digraph function is able to construct the DAGs for these quadrants.
 
 In order to obtain the graphs for quadrants 1 and 2, a flipped version of the adjacency matrix is necessary.
 
