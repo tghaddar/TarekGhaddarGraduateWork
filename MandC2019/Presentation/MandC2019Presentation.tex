@@ -41,7 +41,27 @@
 \newcommand{\vr}{\vec{r}}
 \newcommand{\vo}{\vec{\Omega}}
 \newcolumntype{L}{>{\centering\arraybackslash}m{3cm}}
+
+\definecolor{dkblue}{named}{blue}
+\definecolor{dkgreen}{rgb}{0,0.5,0}
+\definecolor{dkred}{rgb}{0.4,0,0}
+\definecolor{dkgrey}{rgb}{0.4,0.4,0.4}
+\definecolor{ltgrey}{rgb}{0.6,0.6,0.6}
+
+\newcommand{\tcb}[1]{\textcolor{blue}{#1}}
 \newcommand{\tcr}[1]{\textcolor{red}{#1}}
+\newcommand{\tcm}[1]{\textcolor{magenta}{#1}}
+\newcommand{\tcdr}[1]{\textcolor{dkred}{#1}}
+\newcommand{\tcg}[1]{\textcolor{green}{#1}}
+\newcommand{\tcdg}[1]{\textcolor{dkgreen}{#1}}
+\newcommand{\hili}[1]{\underline{\bf \textcolor{red}{#1}}}
+% 
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
 
 \setenumerate[1]{
 	label=\protect\usebeamerfont{enumerate item}%
@@ -97,42 +117,148 @@
 \begin{frame}[t]\frametitle{Introduction}
 \begin{block}{}
 \begin{itemize}
-	\item Massively parallel transport sweeps have been shown to scale up to 1.5 million processes on logically cartesian grids.
-	\item Structured meshes are somewhat limiting when attempting to model more complex problems and experiments.
-	\item Unstructured meshes allow us to model realistic problems, but introduce unbalanced partitions. 
-	\item PDT (Texas A\&M's massively parallel transport code) introduced two load balancing algorithms that repartition the mesh in order to obtain a roughly equivalent amount of cells per processor. 
+	\item Massively parallel transport sweeps have been shown to scale up to 1.5 million processes on logically cartesian grids.\\
+	\begin{center}
+		\includegraphics[scale=0.2]{../../figures/sweep_scale2b.png}
+	\end{center}
+	\item Structured meshes are limiting when modeling complex geometries.
+	\item Unstructured meshes introduce unbalanced partitions. 
+	\item PDT (Texas A\&M's massively parallel transport code) has two load balancing algorithms that repartition the mesh in order to obtain a roughly equivalent amount of cells per processor. 
 \end{itemize}
 \end{block}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Transport Sweeps}
+\vspace{-2mm}
 \begin{block}{}
-\begin{equation}
-\vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
-\label{iteration}
-\end{equation}
 \begin{itemize}
-\item The domain is meshed, allowing one cell at a time to be solved.
-\item The solution across a cell interface is connected based on an upwind approach, allowing cells to be solved one at a time.
+\item Transport equation is discretized over phase-space (space, direction, energy)
+\item Discrete-ordinates in angle \textcolor{red}{+} Discontinuous FEM in space \textcolor{red}{+} upwind information at cell interfces \textcolor{red}{$\Longrightarrow$} solution one cell/one direction at a time,aka, \textbf{transport sweeps}
+%\begin{equation}
+%\vo_m \cdot \vec\nabla \psi_m^{(\ell+1)}(\vr) + \Sigma_t \psi_m^{(\ell+1)}(\vr) = q_m^{(\ell)}(\vr),
+%\label{iteration}
+%\end{equation}
+%\begin{itemize}
+%\item The domain is meshed, allowing one cell at a time to be solved.
+%\item The solution across a cell interface is connected based on an upwind approach, allowing cells to be solved one at a time.
 \end{itemize}
 \end{block}
-\centering
-\includegraphics[scale = 0.15]{../../figures/UnstructureMesh.pdf}
-\includegraphics[scale = 0.15]{../../figures/StructuredMesh.pdf}
-\end{frame}
 
-\begin{frame}[t]\frametitle{Parallel Transport Sweeps}
-
-\begin{block}{A parallel sweep algorithm is defined by three properties:}
-\begin{itemize}
-\item partitioning: dividing the domain among available processors,
-\item aggregation: grouping cells, directions, and energy groups into tasks,
-\item scheduling: choosing which task to execute if more than one is available.
-\end{itemize}
+\begin{block}{\tcr{Structured-grid} sweeps}
+\begin{figure}
+	\centering
+		\includegraphics[scale=0.2]{../../figures/sweep_struct.png}
+\end{figure}
 \end{block}
-\centering
-\includegraphics[scale=0.25]{../../figures/sweep_scale2b.png}
+
+\begin{block}{\tcr{Unstructured-grid} sweeps}
+\begin{figure}
+	\centering
+		\includegraphics[scale=0.2]{../../figures/sweep_unstruct.png}
+\end{figure}
+\end{block}
+
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%-------------------------------------------------------------------
+\begin{frame}{Provably Optimal Parallel Transport Sweeps On Structured Grids (Adams \& Adams)}
+
+
+\begin{block}{Ingredients for optimality}
+\begin{enumerate}
+\item spatial domain decomposition distributes the domain across processors (e.g., $P_x \times P_y \times P_z$),
+\tcm{partition = dividing the domain among processors}
+\item \tcm{aggregation} lumps fine-grained computations into ``tasks''
+\begin{itemize}
+\item cell-sets
+\item angle-sets
+\item energy-group-sets
+\end{itemize}
+\item \tcm{scheduling:} choosing which task of the graph to execute if more than one is available.
+\end{enumerate}
+\end{block}
+
+\begin{center}
+%\includegraphics[scale=0.3]{\FigDir/sweep_multi_angle}
+\includegraphics[scale=0.3]{../../figures/laundry1.png}
+\includegraphics[scale=0.3]{../../figures/laundry2.png}
+\end{center}
+\end{frame}
+
+%-------------------------------------------------------------------
+\begin{frame}{Provably Optimal Parallel Transport Sweeps}
+\vspace{-2mm}
+\begin{block}{Usefulness of a performance model}
+\begin{enumerate}
+\item When a (deterministic) scheduling algorithm is well understood, stage counts can be \fbox{predicted} with significant benefits.
+\item In a nutshell, we have a \tcr{performance model} that depends on the processor partition, the aggregation factors, the scheduler, and \tcr{machine parameters} (grind time, latency). \\
+PDT runs in {\bf \tcr{auto-mode}} and picks the optimal solution to traverse the TDG's.
+% \[
+% T_{\text{sweeps}} = N_\text{stages}
+% \left( T_\text{work function} + 3T_\text{latency} +
+% N_\text{bytes}T_\text{band-width} + A_x A_y A_z N_\text{?}
+% \left( T_\text{cell} + A_m
+% \left(T_\text{mom}+A_g T\text{g}
+% \right)\right)\right)
+% \]
+\end{enumerate}
+\end{block}
+
+%\begin{block}{Optimality}
+%\ben
+%\item Execute the sweeps in the \tcr{fewest possible stages}
+%\item Have a performance model (function of problem dimension, machine parameters, partition, aggregation)
+%\item Have an optimization of the performance model to select the best aggregation factors
+%\een
+%\end{block}
+
+%\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%-------------------------------------------------------------------
+%\begin{frame}{Parallel Transport Sweeps}
+
+\vspace{-2mm}
+\begin{block}{Number of Tasks}
+\be
+% N_{tasks} = \frac{ N_x N_y N_z 8M G}{A_x A_y A_z A_m A_g P_x P_y P_z}
+N_{tasks} = \frac{ N_x N_y N_z}{A_x A_y A_z } \times \frac{8D}{A_d}
+\times \frac{G}{A_g} \times \frac{1}{P_x P_y P_z}
+\ee
+\end{block}
+
+\vspace{-2mm}
+\begin{block}{Number of Parallel stages}
+\be
+%N_{stages} = N_{tasks} + \tcr{N_{idle}} =  N_{tasks} + \tcr{P_x+P_y+P_z-6}
+N_{stages} = N_{tasks} + \tcr{N_{idle}} =  N_{tasks} +
+\tcr{2\left( \frac{P_x}{2}-1+\frac{P_y}{2}-1+\frac{P_z}{2}-1 \right)}
+\ee
+The ``depth-of-graph'' scheduling algorithm prioritizes tasks based on the number of downstream dependencies and yields the smallest $N_{stages}$.
+\end{block}
+%
+An optimal scheduling algorithm executes the sweeps in the fewest possible stages (limit the idle time of pieces of work far form boundaries)
+%\be
+%\epsilon = \frac{N_{tasks}T_{task}}{N_{stages}(T_{task}+T_{comm})} =
+%\frac{1}{\left( 1+\frac{N_{idle}}{N_{tasks}}\right) \left( 1+\frac{T_{comm}}{T_{task}}\right)}
+%\ee
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%
+%\begin{frame}[t]\frametitle{Parallel Transport Sweeps}
+%
+%\begin{block}{A parallel sweep algorithm is defined by three properties:}
+%\begin{itemize}
+%\item partitioning: dividing the domain among available processors,
+%\item aggregation: grouping cells, directions, and energy groups into tasks,
+%\item scheduling: choosing which task to execute if more than one is available.
+%\end{itemize}
+%\end{block}
+%\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %\begin{frame}[t]\frametitle{Tie Breaking in PDT}
 %
@@ -146,6 +272,7 @@
 %\end{enumerate}
 %\end{block}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Unstructured Meshing in PDT}
   \begin{block}{}
@@ -161,23 +288,26 @@
     \end{itemize}
   \end{block}
   \centering
-  \includegraphics[scale=0.10]{../../figures/im1_228.png}
+  \includegraphics[scale=0.14]{../../figures/im1_228.png}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Partitioning in PDT}
 \begin{block}{Partitioning for Unstructured Meshes}
 \begin{itemize}
 \item ``Cut lines" in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
 \item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
-\item The subsets are distributed amongst the processor domain.
+\item The subsets are distributed amongst the processors.
 \end{itemize}
 \end{block}
   \begin{block}{PWLD}
      Using Piece-Wise Linear Discontinuous finite element basis functions, we can solve the transport equation for arbitrary and degenerate polyhedra.
   \end{block}
   \centering
-  \includegraphics[scale=0.25]{../../figures/deg_square_PWLD1_contour_b5.png}
+  \includegraphics[scale=0.5]{../../figures/degen_penta.png}
+  \includegraphics[scale=0.25]{../../figures/deg_square_PWLD1_contour_b4.png}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Partitioning in PDT}
   \begin{columns}
@@ -185,20 +315,25 @@
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
       \includegraphics[scale=0.14,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/im1_cubit_slice.png}
     \end{minipage}
+    
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
       \includegraphics[scale=0.05]{../../figures/FuelAndGuideZoom.png}
     \end{minipage}
     \column{0.5\textwidth}
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
-      \begin{block}{}
-        PWLD allows us to solve these partitioned arbitrary and degenerate meshes.
-      \end{block}
+    \begin{minipage}[c][0.4\textheight][c]{\linewidth}
+      \includegraphics[scale=0.14,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/im1_cubit_slice_v2.png}
+    \end{minipage}
+%      \begin{block}{}
+%        PWLD allows us to solve these partitioned arbitrary and degenerate meshes.
+%      \end{block}
     \end{minipage}
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
       \includegraphics[scale=0.15]{../../figures/spiderweb4.png}
     \end{minipage}
   \end{columns}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Partitioning into 100 Subsets}
 \centering
@@ -217,6 +352,7 @@
   \end{itemize}		
 \end{block}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Redistribution}
 \begin{figure}[H]
@@ -227,6 +363,7 @@
 \label{redistribute}
 \end{figure}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \begin{frame}[t]\frametitle{Load Balancing Metrics}
@@ -240,6 +377,7 @@ f_{I,k} &= \Big(\underset{i}{\text{max}}[\sum_{j} N_{ijk,k}]/\frac{N_{k}}{I}\Big
 f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big) . \label{f_j}
 \end{align}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Original Load Balancing Algorithm (2D Only)}
 \begin{algorithm}[H]
@@ -257,6 +395,7 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 \end{algorithmic}
 \end{algorithm}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Theoretical Motivation for LBD}
   \begin{block}{}
@@ -270,6 +409,7 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
     \includegraphics[scale=0.2]{../../figures/theoretical_plot.png}
   \end{center}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Load Balancing By Dimension Algorithm}
 \begin{algorithm}[H]
@@ -298,6 +438,7 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 \end{algorithmic}
 \end{algorithm}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %\begin{frame}[t]\frametitle{Paramtric Study Conclusions}
@@ -320,12 +461,14 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
   \centering
   \includegraphics[scale=0.17,trim={2cm 0cm 1cm 1.3cm},clip]{../../figures/unbalanced_pins_refined.png}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Results of Load Balancing By Dimension}
 \centering
 \includegraphics[scale=0.6]{../../figures/lbd_results.pdf}
 Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Consequences of Load Balancing By Dimension}
   \begin{block}{}
@@ -337,23 +480,27 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
   \end{itemize}
   \end{block}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{3D LBD, $f = 1.0199$}
 \centering
 \includegraphics[trim={0cm 1cm 0cm 3cm},clip,scale=0.23]{../../figures/im1_foam_448.png}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Sweep on Regular Grid with 3 Angle Sets}
     \centering
 	\animategraphics[loop,controls,width=0.7\linewidth]{10}{../../figures/sweeps_png/sweep_regular_20x20_as3_dog/sweep_regular_20x20_as3_dog_}{1}{48}
 	%\href{run:figures/sweep_figs/sweeps_png/sweep_regular_20x20_as3_dog/animation.gif}{Animation.gif}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Sweep on LBD Grid with 3 Angle Sets}
    \centering
 	\animategraphics[loop,controls,width=0.7\linewidth]{10}{../../figures/sweeps_png/sweep_random_20x20_as3_dog/sweep_random_20x20_as3_dog_}{1}{101}
 	%\href{run:figures/sweep_figs/sweeps_png/sweep_random_20x20_as3_dog/animation.gif}{Animation.gif}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \begin{frame}[t]\frametitle{Sweep on Worst Grid with 1 Angle Set}
@@ -361,6 +508,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 	\animategraphics[loop,controls,width=0.7\linewidth]{10}{../../figures/sweeps_png/sweep_worst_20x20_as1_dog/sweep_worst_20x20_as1_dog_}{1}{230}
 	%\href{run:figures/sweep_figs/sweeps_png/sweep_worst_20x20_as1_dog/animation.gif}{Animation.gif}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Ongoing Work}
 \subsection{}
@@ -385,6 +533,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %The time-to-solution estimator is a graph-based method that uses graph algorithms that rely on an acyclic graph. The partitioning schemes used CANNOT induce cycles.
 %\end{block}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \begin{frame}[t]\frametitle{Time To Solution Estimator}
 \begin{block}{}
@@ -398,6 +547,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 \end{enumerate}
 \end{block}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{DAG}
   \begin{columns}
@@ -409,6 +559,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
     \includegraphics[scale=0.35,trim={0cm 0cm 0cm 5cm},clip]{../../figures/layered.pdf}
   \end{columns}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{Building the Adjacency Matrix}
 %\begin{block}{}
@@ -430,6 +581,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %\end{pmatrix}$
 %\end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{Building the Task Dependence Graphs}
 %\begin{block}{}
@@ -443,6 +595,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %\centering
 %\includegraphics[scale=0.45]{../../figures/quadrant_layout.pdf}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{Quadrants 0 and 3}
 %\begin{block}{}
@@ -460,6 +613,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %  \includegraphics[scale=0.35]{../../figures/q3_preweight.pdf}
 %\end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{Quadrants 1 and 2}
 %  \begin{block}{}
@@ -477,6 +631,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %    \includegraphics[scale=0.38]{../../figures/flipped_subset_layout.pdf}
 %  \end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{Quadrants 1 and 2}
 %  \begin{block}{}
@@ -494,6 +649,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %    \includegraphics[scale=0.35]{../../figures/q2_preweight.pdf}
 %  \end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \begin{frame}[t]\frametitle{Weighting the TDGs}
   \begin{block}{}
@@ -512,6 +668,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
     \end{align}
   \end{block}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{Weighting the TDGs}
 %  \begin{minipage}{0.49\textwidth}
@@ -532,6 +689,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %  \end{minipage}
 % 
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{Adjusting for Multiple Angles}
 % \begin{minipage}{0.49\textwidth}
@@ -551,6 +709,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %    \includegraphics[scale=0.32]{../../figures/q2_postpipeline.pdf}
 %  \end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{Second Angleset}
 % \begin{minipage}{0.49\textwidth}
@@ -570,6 +729,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %    \includegraphics[scale=0.32]{../../figures/q6_postpipeline.pdf}
 %  \end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \begin{frame}[t]\frametitle{Universal Edge Weighting}
   \begin{block}{}
@@ -581,6 +741,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
     \end{itemize}
   \end{block}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\begin{frame}[t]\frametitle{Universal Edge Weighting}
 % \begin{minipage}{0.49\textwidth}
 %    \centering
@@ -599,6 +760,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %    \includegraphics[scale=0.32]{../../figures/q2_postuniversal.pdf}
 %  \end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{Second Angleset}
 % \begin{minipage}{0.49\textwidth}
@@ -618,6 +780,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %    \includegraphics[scale=0.32]{../../figures/q6_postuniversal.pdf}
 %  \end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \begin{frame}[t]\frametitle{Conflict Detection and Resolution}
   \begin{block}{}
@@ -629,6 +792,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
     \end{itemize}
   \end{block}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \begin{frame}[t]\frametitle{First Come First Serve Conflict Resolution}
 \begin{block}{}
@@ -644,6 +808,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
     \end{itemize}
   \end{block}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{$t=1$: Graphs 0,3 and Graphs 1,2 in Conflict}
 % \begin{minipage}{0.49\textwidth}
@@ -663,6 +828,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %    \includegraphics[scale=0.32]{../../figures/graph_1_0_2.pdf}
 %  \end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{$t=2$: Graphs 0 and 1 Won, Still in Conflict}
 % \begin{minipage}{0.49\textwidth}
@@ -682,6 +848,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %    \includegraphics[scale=0.32]{../../figures/graph_2_1_2.pdf}
 %  \end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{$t=3$: Graphs 2 and 3 Won, No More Conflict}
 % \begin{minipage}{0.49\textwidth}
@@ -701,6 +868,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %    \includegraphics[scale=0.32]{../../figures/graph_3_2_2.pdf}
 %  \end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %\begin{frame}[t]\frametitle{$t=4$, Done Sweeping!}
 % \begin{minipage}{0.49\textwidth}
@@ -720,6 +888,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %    \includegraphics[scale=0.32]{../../figures/graph_4_3_2.pdf}
 %  \end{minipage}
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %
 %\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 100 Points/Subset}
@@ -743,6 +912,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 %  \centering
 %    Improvement: $\frac{0.756}{1.335} = 0.566$
 %\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 10 Points/Subset}
    \begin{minipage}{0.49\textwidth}
@@ -765,6 +935,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
   \centering
     Improvement: $\frac{0.080}{0.145} = 0.552$
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 1000 Points/Subset}
    \begin{minipage}{0.49\textwidth}
@@ -787,6 +958,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
   \centering
     Improvement: $\frac{7.289}{12.499} = 0.583$
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
 %
@@ -794,6 +966,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
   \centering
   \includegraphics[scale=0.35,trim={2cm 0cm 1cm 15cm},clip]{../../figures/level2base.png}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Level 2 Experiment 42x13}
    \begin{minipage}{0.49\textwidth}
@@ -813,6 +986,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
     \end{block}
   \end{minipage}  
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \begin{frame}[t]\frametitle{IM1C Experiment with 5 Subsets in Each Dimension}
 \centering
@@ -826,6 +1000,7 @@ Minimum LBD metric: 1.07692, Max LBD metric: 1.33636
 \end{table}
 \end{block}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %
 
@@ -842,5 +1017,6 @@ A special thank you to the following individuals for their help and support:
 \end{itemize}
 \end{block}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{document}
