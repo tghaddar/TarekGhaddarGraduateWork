@@ -337,6 +337,7 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
   
   for ig in range(0,num_graphs):
     graph = graphs[ig]
+    
     for e in graph.edges():
       #The starting node of this edge.
       node = e[0]
@@ -396,6 +397,7 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
   #Looping over graphs.
   for ig in range(0,num_graphs):
     graph = graphs[ig]
+    start_node = [x for x in graph.nodes() if graph.in_degree(x) == 0][0]
     for e in graph.edges():
       #The starting node of this edge.
       node = e[0]
@@ -423,7 +425,7 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
       if bounds[2] == True:
         boundary_cells = bdy_cells_per_subset[node][2]/Az
       #Cells in this subset.
-      num_cells = cells_per_subset[node]
+      num_cells = cells_per_subset[node]/Az
       #If this is a testing run, our cost is 1.
       cost = 0.0
       #serial runs have no commucation constants.
@@ -431,9 +433,13 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
         boundary_cells = 0.0
         latency  = 0.0
       if test:
-        cost = 1.0
+        if (k == k_n):
+          cost = 1
+        else:
+          cost = Az
+        #cost = Az
       else:
-        cost = mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*Am*upbc + num_cells*(Tc + Am*(Tm + Tg)))
+        cost = 16.0*mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*Am*upbc + num_cells*(Tc + Am*(Tm + Tg)))
       graph[e[0]][e[1]]['weight'] = cost
     
     
