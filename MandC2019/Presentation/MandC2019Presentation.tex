@@ -310,6 +310,7 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Partitioning in PDT}
+  
   \begin{columns}
     \column{0.5\textwidth}
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
@@ -321,16 +322,18 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
       \centering
       \includegraphics[scale=0.05]{../../figures/FuelAndGuideZoom.png}
     \end{minipage}
+    
     \column{0.5\textwidth}
-    \begin{minipage}[c][0.4\textheight][c]{\linewidth}
+      \vspace{-3mm}
+%    \begin{minipage}[c][0.4\textheight][c]{\linewidth}
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
       \centering
-      \includegraphics[scale=0.35,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/im1_cubit_slice_v2.png}
+      \includegraphics[scale=0.4,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/im1_cubit_slice_v2.png}
     \end{minipage}
 %      \begin{block}{}
 %        PWLD allows us to solve these partitioned arbitrary and degenerate meshes.
 %      \end{block}
-    \end{minipage}
+%    \end{minipage}
     \begin{minipage}[c][0.4\textheight][c]{\linewidth}
       \centering
       \includegraphics[scale=0.125]{../../figures/spiderweb4.png}
@@ -346,8 +349,8 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
 \begin{block}{}
   \begin{itemize}
     \item The load balancing by dimension algorithm expands upon load balancing work presented at M\&C 2017.
-    \item The algorithm looks to achieve an equivalent number of cells across all subsets by minimizing \tcr{the maximum number of cells per subset divided by the average number of cells per subset}.
-    \item This is done through an iterative process where in each iteration we balance the maximum cells per column divided by the average number of cells per column, with the same being done for rows.This is done by moving the partitions in each dimension.
+    \item The algorithm looks to achieve an equivalent number of cells across all subsets by \tcr{placing cut lines/planes  when creating subsets}.
+    \item Placement of cut lines/planes done by analyzing the CDF of mesh density function integrated over the spatial other dimensions (example below).
   \end{itemize}		
 \end{block}
 \begin{minipage}[c]{0.49\textwidth}
@@ -370,11 +373,13 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
 \centering
 \includegraphics[scale=0.2,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/sparse_spiderweb_lb.png}
 \end{minipage}
+\tcr{TAREK: ADD BELOW EACH FIGURE THE IMBALANCE FACTOR}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}[t]\frametitle{Load Balancing By Dimension}
+\begin{frame}[t]\frametitle{Load Balancing By Dimension (LBD)}
 \begin{block}{}
+LBD: a more efficient load-balancing approach:\\
 Take a 3D mesh.
 \begin{enumerate}
     \item  Slice it in axial layers such that each layer has about the same \# of cells.
@@ -402,6 +407,8 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Load Balancing By Dimension}
+
+\vspace{2cm}
 \begin{minipage}[c]{0.32\textwidth}
 \centering
 \includegraphics[scale=0.12,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/spiderweb_sparse.png}
@@ -414,6 +421,7 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
 \centering
 \includegraphics[scale=0.12,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/sparse_spiderweb_lbd.png}
 \end{minipage}
+\tcr{TAREK: ADD BELOW EACH FIGURE THE IMBALANCE FACTOR}
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -434,9 +442,11 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
 \begin{minipage}[c]{0.7\textwidth}
 \includegraphics[scale=0.5]{../../figures/lbd_results.pdf}
 \end{minipage}
-\begin{minipage}[c]{0.25\textwidth}
+\begin{minipage}[c]{0.35\textwidth}
 \small Minimum LBD metric: 1.07692\\ Max LBD metric: 1.33636
 \end{minipage}
+\tcr{TAREK: ADD line in between dots. Make a small table for the results}
+
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -513,15 +523,19 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
     \item Given a partitioning scheme, build an adjacency matrix.
     \item From the adjacency matrix, build Directed Acyclic Graphs (DAGs), one for each quadrant/octant.
     \item Weight each DAG's edges based on the solve and communication time of each subset to its neighbors.
-    \item Adjust the weights of each graph to reflect a universal timescale.
-    \item Adjust the weights of each graph to reflect sweep conflicts between octants.
-    \item Obtain the time-to-solution.
+    \item Create a universal timescale and launch processes based on when graph predecessor has finished its work.
+    \item When conflicts arise between octants, resolve with first-come/first-serve and adjust weights (time delays) of the losing graph nodes.
+    \item Sweeping time is obtain at the conclusion of this process.
 \end{enumerate}
 \end{block}
+Using this as performance model, we can evaluate the qualities of various parallel partitions for unstructured grids.
+
+\vspace{2cm}
+In the next slides, some details on items \#2-5.
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}[t]\frametitle{DAG}
+\begin{frame}[t]\frametitle{Directed Acyclic Graphs (DAG)}
   \begin{columns}
   \column{0.5\textwidth}
     \centering
@@ -626,17 +640,11 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
 \begin{frame}[t]\frametitle{Weighting the TDGs}
   \begin{block}{}
     \begin{itemize}
-    	\item In order to weight the graph properly, we need to have a mesh density function that we can calculate the cells per subset from.
-    	\item The weight of the edge between two nodes (subsets) in the graph represents the solve and communication time of the base node.
-    \end{itemize}
-  \end{block}
-  \begin{block}{}
+    \item Graph edge weight = time to solve cells in subset \& communicate boundary values to downwind subsets.
     \begin{align}
-    \text{cells per subset} &= \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz \\
-    \label{weight}
-      \text{weight} &= T_{wu} + N_c\cdot (T_c+ A_m\cdot(T_m + T_g)) + N_{b}\cdot A_m\cdot T_{\text{comm}} + \text{latency}\\
+      \text{weight} = T_{wu} + N_c\cdot (T_c+ A_m\cdot(T_m + T_g)) + N_{b}\cdot A_m\cdot T_{\text{comm}} + \text{latency}\\
       \end{align}
-    \footnotesize
+    \begin{footnotesize}
     \begin{equation*}
     \begin{aligned}[c]
     N_c &= \text{number of cells}  \\
@@ -645,13 +653,42 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
     T_{\text{comm}} &= \text{Comm time per double} \\ 
     \end{aligned}
     \begin{aligned}[c]
-     N_b &\approx(\text{num boundary cells})\cdot \text{boundary unknowns per cell} \\
+     N_b &=(\text{num boundary cells})\cdot \text{boundary unknowns per cell} \\
      T_m &= \text{Time spent on angle-specific work} \\
      T_g &= \text{Time spend on group-specific work} \\
      T_{wu} &= \text{Time to get into sweep operator} \\
      \end{aligned}
     \end{equation*}
+    \end{footnotesize}
+    \end{itemize}
   \end{block}
+
+For unstructured grids, we use a mesh density function to calculate the \# cells per subset and \# of boundary cells. \\
+\vspace{1cm}
+In practice, we use mesh cell centroids to build a discrete mesh density function.
+%    	\item The weight of the edge between two nodes (subsets) in the graph represents the solve and communication time of the base node.
+%  \begin{block}{}
+%    \begin{align}
+%    \text{cells per subset} &= \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz \\
+%    \label{weight}
+%      \text{weight} &= T_{wu} + N_c\cdot (T_c+ A_m\cdot(T_m + T_g)) + N_{b}\cdot A_m\cdot T_{\text{comm}} + \text{latency}\\
+%      \end{align}
+%    \footnotesize
+%    \begin{equation*}
+%    \begin{aligned}[c]
+%    N_c &= \text{number of cells}  \\
+%    A_m &= \text{Number of angles per task}  \\
+%    T_c &= \text{Time spent on cell-specific work}  \\
+%    T_{\text{comm}} &= \text{Comm time per double} \\ 
+%    \end{aligned}
+%    \begin{aligned}[c]
+%     N_b &\approx(\text{num boundary cells})\cdot \text{boundary unknowns per cell} \\
+%     T_m &= \text{Time spent on angle-specific work} \\
+%     T_g &= \text{Time spend on group-specific work} \\
+%     T_{wu} &= \text{Time to get into sweep operator} \\
+%     \end{aligned}
+%    \end{equation*}
+%  \end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -719,10 +756,10 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
 \begin{frame}[t]\frametitle{Universal Edge Weighting}
   \begin{block}{}
     \begin{itemize}
-      \item Once the outgoing edges of each node are independently weighted, the next step is to have our graphs weighted on a universal time scale. 
+      \item Once the weight (solve + comm. time) for each edge are known, the next step is to order them on a universal time scale. 
       \item To do this, we calculate the sum of the longest weighted path to each node, and set all incoming edges to each node to this value.
-      \item To find the longest weighted path, the graph weights are inverted, and the shortest weighted path is found. The original edge weights are used to calculate the value of the longest weighted path.
-      \item The resulting graph is weighted so that the incoming edge to each node represents the time that node is ready to solve.
+%      \item To find the longest weighted path, the graph weights are inverted, and the shortest weighted path is found. The original edge weights are used to calculate the value of the longest weighted path.
+      \item The resulting graph is thus weighted so that the incoming edge to each node represents the time at which that node is ready to solve.
     \end{itemize}
   \end{block}
 \end{frame}
@@ -767,24 +804,24 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
 %\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-\begin{frame}[t]\frametitle{Conflict Detection and Resolution}
-  \begin{block}{}
-    \begin{itemize}
-      \item Best summarized as a ``marching" process. 
-      \item Starting at time $t=0$, find the first interaction (recalling that the incoming weight to a node reflects the time it is ready to solve).
-      \item If at time $t$, multiple TDGs are solving the same node, this means there is a conflict. 
-      \item  ``Losing" TDGs modify their downstream weights according to how long they are delayed.
-    \end{itemize}
-  \end{block}
-\end{frame}
+%\begin{frame}[t]\frametitle{Conflict Detection and Resolution}
+%  \begin{block}{}
+%    \begin{itemize}
+%      \item Best summarized as a ``marching" process. 
+%      \item Starting at time $t=0$, find the first interaction (recalling that the incoming weight to a node reflects the time it is ready to solve).
+%      \item If at time $t$, multiple TDGs are solving the same node, this means there is a conflict. 
+%      \item  ``Losing" TDGs modify their downstream weights according to how long they are delayed.
+%    \end{itemize}
+%  \end{block}
+%\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \begin{frame}[t]\frametitle{First Come First Serve Conflict Resolution}
 \begin{block}{}
 \begin{itemize}
-	\item The first octant to arrive to a node will begin solving it, and the remaining octants will incur a delay (if applicable).
-	\item The delay is reflected in each remaining TDG by adding the corresponding delay as a weight to the applicable edge and applicable downstream edges.
-  \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant wins the tie.
+	\item The first octant to arrive to a graph node will begin solving it, and the remaining octants will incur a delay (if applicable).
+	\item The delay is reflected in each remaining Task-Dependent Graph by adding the corresponding delay as a weight to the applicable edge and applicable downstream edges.
+  \item If two octants arrive to a node at exactly the same time, the octant with the greater remaining depth-of-graph and priority-octant wins the tie.
 \end{itemize}
 \end{block}
   \begin{block}{Unweighted vs. Weighted Depth-of-Graph Remaining}
@@ -984,6 +1021,8 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
 \end{tabular}
 \end{table}
 \end{block}
+
+\tcr{TAREK: please show both partitioned meshes, regular and LBD for viewing} 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1001,6 +1040,9 @@ A special thank you to the following individuals for their help and support:
 \item The CERT team and fellow grad students.
 \end{itemize}
 \end{block}
+
+\tcr{TAREK: update this !!!!} 
+
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
