@@ -295,7 +295,7 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
 \begin{frame}[t]\frametitle{Partitioning in PDT}
 \begin{block}{Partitioning for Unstructured Meshes}
 \begin{itemize}
-\item ``Cut lines" in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
+\item ``Cut lines'' in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
 \item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
 \item The subsets are distributed amongst the processors.
 \end{itemize}
@@ -367,13 +367,16 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
 \begin{frame}[t]\frametitle{Load Balancing}
 \begin{minipage}[c]{0.49\textwidth}
 \centering
-\includegraphics[scale=0.2,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/spiderweb_sparse.png}
+\includegraphics[scale=0.2,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/spiderweb_sparse.png}\\
+\centering
+$f = 9.7619$
 \end{minipage}
 \begin{minipage}[c]{0.49\textwidth}
 \centering
-\includegraphics[scale=0.2,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/sparse_spiderweb_lb.png}
+\includegraphics[scale=0.2,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/sparse_spiderweb_lb.png}\\
+\centering
+$f = 6.85358$
 \end{minipage}
-\tcr{TAREK: ADD BELOW EACH FIGURE THE IMBALANCE FACTOR}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -411,18 +414,22 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
 \vspace{2cm}
 \begin{minipage}[c]{0.32\textwidth}
 \centering
-\includegraphics[scale=0.12,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/spiderweb_sparse.png}
+\includegraphics[scale=0.12,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/spiderweb_sparse.png} \\
+\centering
+$f = 9.7619$
 \end{minipage}
 \begin{minipage}[c]{0.32\textwidth}
 \centering
-\includegraphics[scale=0.12,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/sparse_spiderweb_lb.png}
+\includegraphics[scale=0.12,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/sparse_spiderweb_lb.png}\\
+\centering
+$f = 6.85358$
 \end{minipage}
 \begin{minipage}[c]{0.32\textwidth}
 \centering
-\includegraphics[scale=0.12,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/sparse_spiderweb_lbd.png}
+\includegraphics[scale=0.12,trim={0.95in 0.64in 0.35in 0.44in},clip]{../../figures/sparse_spiderweb_lbd.png} \\
+\centering
+$f = 1.49813$
 \end{minipage}
-\tcr{TAREK: ADD BELOW EACH FIGURE THE IMBALANCE FACTOR}
-
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -440,10 +447,23 @@ In practice, we often achieve close to perfect load balance. (typical imbalance 
 
 \begin{frame}[t]\frametitle{Results of Load Balancing By Dimension}
 \begin{minipage}[c]{0.7\textwidth}
-\includegraphics[scale=0.5]{../../figures/lbd_results.pdf}
-\end{minipage}
-\begin{minipage}[c]{0.35\textwidth}
+\includegraphics[scale=0.5]{../../figures/lbd_results.pdf} \\
 \small Minimum LBD metric: 1.07692\\ Max LBD metric: 1.33636
+\end{minipage}
+\begin{minipage}[c]{0.29\textwidth}
+  \centering
+  \begin{table}[H]  
+  \scalebox{0.9}{
+    \begin{tabular}{c | c | c | c}
+      \textbf{N} & \textbf{f\textsubscript{reg}} & \textbf{f\textsubscript{lb}} & \textbf{f\textsubscript{lbd}}  \\
+      2&1.38462&1.384615&1.07692 \\ 
+      3&2.15702&2.04545&1.13445 \\ 
+      4&3.69231&3.1453&1.11498 \\ 
+      5&4.28571&3.74564&1.11386 \\ 
+      6&5.72143&4.42105&1.30796 \\ 
+      7&6.77174&6.37778&1.33636 \\ 
+    \end{tabular}}
+  \end{table}
 \end{minipage}
 \tcr{TAREK: ADD line in between dots. Make a small table for the results}
 

@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 #Storing data for runs. 
 
 plt.close("all")
@@ -17,12 +18,23 @@ f_reg = [1.38462,2.15702,3.69231,4.28571,5.72143,6.77174]
 f_lb = [1.384615,2.04545,3.1453,3.74564,4.42105,6.37778]
 f_lbd = [1.07692,1.13445,1.11498,1.11386,1.30796,1.33636]
 
+data = np.array([nss,f_reg,f_lb,f_lbd]).T
+
+f = open('lb_data.txt','w')
+for i in range(0,len(nss)):
+  f.write(str(int(data[i][0])) + '&')
+  f.write(str(data[i][1]) + '&')
+  f.write(str(data[i][2]) + '&')
+  f.write(str(data[i][3]) + " \\\ " )
+  f.write('\n')
+
+f.close()
 plt.figure()
 plt.xlabel('Subsets in x and y')
 plt.ylabel('f')
-plt.plot(nss,f_reg,'o',label='Regular')
-plt.plot(nss_lb,f_lb,'o',label='LB')
-plt.plot(nss,f_lbd,'o',label='LBD')
+plt.plot(nss,f_reg,'-o',label='Regular')
+plt.plot(nss_lb,f_lb,'-o',label='LB')
+plt.plot(nss,f_lbd,'-o',label='LBD')
 plt.legend(loc='best')
 plt.savefig("../../figures/lbd_results.pdf")
 
