@@ -83,7 +83,7 @@
 \title[Approaches to Load Balancing]{Approaches to Load Balancing Massively Parallel Transport Sweeps on Unstructured Grids}
 \author[Ghaddar]{Tarek Habib Ghaddar, Jean C. Ragusa, Marvin L. Adams}
 \institute[Texas A\&M]{Department of Nuclear Engineering \\ Texas A\&M University}
-\date[August 27, 2019]
+\date[August 28, 2019]
 
 \begin{document}
 
@@ -237,7 +237,7 @@ N_{stages} = N_{tasks} + \tcr{N_{idle}} =  N_{tasks} +
 The ``depth-of-graph'' scheduling algorithm prioritizes tasks based on the number of downstream dependencies and yields the smallest $N_{stages}$.
 \end{block}
 %
-An optimal scheduling algorithm executes the sweeps in the fewest possible stages (limit the idle time of pieces of work far form boundaries)
+An optimal scheduling algorithm executes the sweeps in the fewest possible stages (limit the idle time of pieces of work far from boundaries)
 %\be
 %\epsilon = \frac{N_{tasks}T_{task}}{N_{stages}(T_{task}+T_{comm})} =
 %\frac{1}{\left( 1+\frac{N_{idle}}{N_{tasks}}\right) \left( 1+\frac{T_{comm}}{T_{task}}\right)}
@@ -287,12 +287,18 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
         \end{itemize}
     \end{itemize}
   \end{block}
-  \centering
-  \includegraphics[scale=0.14]{../../figures/im1_228.png}
+  \begin{minipage}[c]{0.4\textwidth}
+    \centering
+    \includegraphics[scale=0.075,trim={3in 2in 3in 2.5in},clip]{../../figures/125im1.png}
+  \end{minipage}
+  \begin{minipage}[c]{0.59\textwidth}
+    \centering
+    \includegraphics[scale=0.085,trim={3in 3in 3in 2in},clip]{../../figures/125im1zoom.png}
+  \end{minipage}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}[t]\frametitle{Partitioning in PDT}
+\begin{frame}[t]\frametitle{PDT}
 \begin{block}{Partitioning for Unstructured Meshes}
 \begin{itemize}
 \item ``Cut lines'' in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
@@ -309,7 +315,7 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}[t]\frametitle{Partitioning in PDT}
+\begin{frame}[t]\frametitle{PDT can partition meshes using planar cuts}
   
   \begin{columns}
     \column{0.5\textwidth}
@@ -350,7 +356,7 @@ An optimal scheduling algorithm executes the sweeps in the fewest possible stage
   \begin{itemize}
     \item The load balancing by dimension algorithm expands upon load balancing work presented at M\&C 2017.
     \item The algorithm looks to achieve an equivalent number of cells across all subsets by \tcr{placing cut lines/planes  when creating subsets}.
-    \item Placement of cut lines/planes done by analyzing the CDF of mesh density function integrated over the spatial other dimensions (example below).
+    \item Placement of cut lines/planes done by analyzing the CDF of mesh density function integrated over the other spatial dimensions (example below).
   \end{itemize}		
 \end{block}
 \begin{minipage}[c]{0.49\textwidth}
@@ -470,7 +476,7 @@ $f = 1.49813$
 
 \begin{frame}[t]\frametitle{3D LBD, $f = 1.0199$}
 \centering
-\includegraphics[trim={0cm 1cm 0cm 3cm},clip,scale=0.23]{../../figures/im1_foam_448.png}
+\includegraphics[trim={10cm 1.5cm 0cm 3cm},clip,scale=0.275,angle=350,origin=c]{../../figures/im1_foam_448.png}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -554,14 +560,14 @@ In the next slides, some details on items \#2-5.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[t]\frametitle{Directed Acyclic Graphs (DAG)}
-  \begin{columns}
-  \column{0.5\textwidth}
+  \begin{minipage}[t]{0.3\textwidth}
     \centering
-    \includegraphics[scale=0.5]{../../figures/boundaries_worst_pres.pdf}
-    \column{0.5\textwidth}
+    \includegraphics[scale=0.25]{../../figures/boundaries_worst_pres.pdf}
+  \end{minipage}
+    \begin{minipage}[b]{0.69\textwidth}
     \centering
-    \includegraphics[scale=0.35,trim={0cm 0cm 0cm 5cm},clip]{../../figures/layered.pdf}
-  \end{columns}
+    \includegraphics[scale=0.6,trim={3.7cm 10cm 3.2cm 8cm},clip]{../../figures/layered.pdf}
+  \end{minipage}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -660,7 +666,7 @@ In the next slides, some details on items \#2-5.
     \begin{itemize}
     \item Graph edge weight = time to solve cells in subset \& communicate boundary values to downwind subsets.
     \begin{align}
-      \text{weight} = T_{wu} + N_c\cdot (T_c+ A_m\cdot(T_m + T_g)) + N_{b}\cdot A_m\cdot T_{\text{comm}} + \text{latency}\\
+      \text{weight} = T_{wu} + N_c\cdot (T_c+ A_m\cdot(T_m + T_g)) + N_{b}\cdot A_m\cdot T_{\text{comm}} + T_{\text{latency}}
       \end{align}
     \begin{footnotesize}
     \begin{equation*}
@@ -780,6 +786,15 @@ In practice, we use mesh cell centroids to build a discrete mesh density functio
       \item The resulting graph is thus weighted so that the incoming edge to each node represents the time at which that node is ready to solve.
     \end{itemize}
   \end{block}
+  \begin{minipage}[c]{0.49\textwidth}
+    \centering
+     \includegraphics[scale=0.4]{../../figures/G_pre_universal.pdf} 
+   \end{minipage}
+   \begin{minipage}[c]{0.49\textwidth}
+     \centering
+     \includegraphics[scale=0.4]{../../figures/G_universal.pdf}
+    \end{minipage}
+   
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\begin{frame}[t]\frametitle{Universal Edge Weighting}
@@ -838,7 +853,7 @@ In practice, we use mesh cell centroids to build a discrete mesh density functio
 \begin{block}{}
 \begin{itemize}
 	\item The first octant to arrive to a graph node will begin solving it, and the remaining octants will incur a delay (if applicable).
-	\item The delay is reflected in each remaining Task-Dependent Graph by adding the corresponding delay as a weight to the applicable edge and applicable downstream edges.
+	\item The delay is reflected in each remaining Task-Dependent Graph by adding the corresponding delay to the weights of the edges on the delayed paths.
   \item If two octants arrive to a node at exactly the same time, the octant with the greater remaining depth-of-graph and priority-octant wins the tie.
 \end{itemize}
 \end{block}
@@ -1029,8 +1044,14 @@ In practice, we use mesh cell centroids to build a discrete mesh density functio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \begin{frame}[t]\frametitle{IM1C Experiment with 5 Subsets in Each Dimension}
-\centering
-\includegraphics[scale=0.15]{../../figures/im1_228.png}
+  \begin{minipage}[c]{0.4\textwidth}
+    \centering
+    \includegraphics[scale=0.1,trim={3in 2in 3in 2in},clip]{../../figures/125im1.png}
+  \end{minipage}
+  \begin{minipage}[c]{0.59\textwidth}
+    \centering
+    \includegraphics[scale=0.12,trim={3in 3in 3in 2in},clip]{../../figures/125im1zoom.png}
+  \end{minipage}
 \begin{block}{}
 \begin{table}
 \begin{tabular}{c|c} 
@@ -1039,18 +1060,18 @@ In practice, we use mesh cell centroids to build a discrete mesh density functio
 \end{tabular}
 \end{table}
 \end{block}
-
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %
 
-\begin{frame}[t]\frametitle{Conclusions}
+\begin{frame}[t]\frametitle{Summary and Future Work}
   \begin{block}{}
     \begin{itemize}
       \item Load balancing by dimension proved to be an improvement over the original load balancing algorithm shown in 2017. 
       \item Load balancing by dimension can be used on 3D unstructured meshes, not just 2D extruded meshes.
       \item However, preliminary studies with the time-to-solution estimator did show that a well balanced problem does not necessarily mean a faster sweep time, which should still be the most important parameter.
+      \item With confidence in our time-to-solution estimator, we can use it as the objective function in an optimization process to get the best partitioning scheme for a problem.
     \end{itemize}
   \end{block}
 \end{frame}
