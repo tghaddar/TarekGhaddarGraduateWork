@@ -397,7 +397,7 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
   #Looping over graphs.
   for ig in range(0,num_graphs):
     graph = graphs[ig]
-    start_node = [x for x in graph.nodes() if graph.in_degree(x) == 0][0]
+    #start_node = [x for x in graph.nodes() if graph.in_degree(x) == 0][0]
     for e in graph.edges():
       #The starting node of this edge.
       node = e[0]
@@ -441,18 +441,17 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
       else:
         cost = 16.0*mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*Am*upbc + num_cells*(Tc + Am*(Tm + Tg)))
       graph[e[0]][e[1]]['weight'] = cost
-    
-    
-  for ig in range(0,num_graphs):
-    graph = graphs[ig]
-    for n in range(0,num_subsets):
-      out_edges_list = list(graph.out_edges(n,'weight'))
-      num_edges = len(out_edges_list)
-      out_edges = [out_edges_list[i][2] for i in range(num_edges)]
-      time_to_solve[ig][n] = max(out_edges)
-      neighbors = list(graph.successors(n))
-      for i in neighbors:
-        graph[n][i]['weight'] = max(out_edges)
+
+    for ig in range(0,num_graphs):
+      graph = graphs[ig]
+      for n in range(0,num_subsets):
+        out_edges_list = list(graph.out_edges(n,'weight'))
+        num_edges = len(out_edges_list)
+        out_edges = [out_edges_list[i][2] for i in range(num_edges)]
+        time_to_solve[ig][n] = max(out_edges)
+        neighbors = list(graph.successors(n))
+        for i in neighbors:
+          graph[n][i]['weight'] = max(out_edges)
   
   return graphs,time_to_solve
       
