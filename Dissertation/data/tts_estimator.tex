@@ -303,7 +303,19 @@ Once we have our full set of graphs with angular pipelining accounted for, we se
   \item Sum this longest path.
   \item Set all incoming edge values to the node to the sum of the longest path. 
 \end{enumerate}
-The incoming edges to each node in each graph now reflect the time at which it is ready to solve. This universal edge weighting is crucial for detecting and resolving conflicts during the sweep.
+The incoming edges to each node in each graph now reflect the time at which it is ready to solve. This universal edge weighting is crucial for detecting and resolving conflicts during the sweep. Figure \ref{universal} shows a simple example of a TDG before and after this weight adjustment.
+\begin{figure}[H]
+  \begin{minipage}[c]{0.5\textwidth}
+    \centering
+    \includegraphics[scale=0.5]{../../figures/G_pre_universal.pdf}
+  \end{minipage}
+  \begin{minipage}[c]{0.5\textwidth}
+    \centering
+    \includegraphics[scale=0.5]{../../figures/G_universal.pdf}
+  \end{minipage}
+  \caption{A TDG before (left) and after (right) universal edge weighting is applied.}
+   \label{universal}
+\end{figure}
 
 \subsection{Adjusting the weights of each graph to detect and resolve conflicts}
 
