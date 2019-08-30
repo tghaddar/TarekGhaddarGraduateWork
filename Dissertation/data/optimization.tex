@@ -15,11 +15,18 @@
 
 
 \chapter{PARTITION OPTMIZIATION \label{cha:optimization}}
-
-This chapter is to describe the optimizer.
-
 \section{Method}
-The detailed method description will go here.
+With confidence in the time-to-solution estimator, it is used as the objective function in two optimization methods. The first optimization method utilizes scipy's optimize library, and the second method utilizes knowledge of a problem's mesh layout to assist in partition placement.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scipy optimize}
+  The scipy optimize library provides many tools for optimizing an input function with local and global minimization techniques. Our usage of the optimize library relies on the minimize function, using the basinhopping method as the global optimizer, and the constrained Nelder-Mead method as the local optimizer.
+  
+\subsubsection{Basinhopping\cite{basinhoppingwales}}
+  
+\subsubsection{Constrained Nelder-Mead}
+  
+\subsection{human optimization}
+  The cdf based optimization method.
 
 \section{Analytical Mesh Results}
 Analytical mesh density results will go here.

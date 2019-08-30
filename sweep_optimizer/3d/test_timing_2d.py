@@ -28,11 +28,11 @@ machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 
 num_rows = [2,4,8,16,32]
 num_cols = [2,4,8,16,32]
-#num_rows = [2]
-#num_cols=[2]
+num_rows = [2]
+num_cols=[2]
 unweighted = True
-num_angles = 2
-Am = 20
+num_angles = 1
+Am = 10
 
 xmin = 0.0
 xmaxs = [32.0,64.0,128.0,256.0,512.0]

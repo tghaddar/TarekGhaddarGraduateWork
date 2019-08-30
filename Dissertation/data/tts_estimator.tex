@@ -19,7 +19,7 @@
 
 Before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme. The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This chapter will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies. 
 
-The time to solution estimator is written in Python 3. Python was chosen as the language because of it's powerful graph library, networkx. 
+The time to solution estimator is written in Python 3. Python was chosen as the language because of its powerful graph library, networkx. 
 This library gives us a wide variety of graph mathematics that is optimized and easy to use. 
 
 \section{Method}
@@ -242,9 +242,6 @@ We feed the triangular matrices into networkx's DiGraph function, along with a m
 Upon inspection of these two DAGs, we see that they show the correct connectivity, dependency, and expected opposing sweep ordering. 
 Quadrant 1 starts its sweep from subset 4, finishing at subset 20, and quadrant 3 starts its sweep from subset 20, finishing at subset 4.
 
-\subsubsection{Building the 3d graphs}
-
-
 %Weighting the TDGS
 \subsection{Weighting the task dependence graphs}
 
@@ -264,7 +261,6 @@ where:
   \item $N_b$ = the number of boundary cells shared by node A and node B,
   \item $A_m$ = the number of angles node A has to solve prior to communicating,
   \item $upbc$ = the number of boundary unknowns per boundary cell,
-  \item $upc$ = the number of unknowns per cell,
   \item $N_c$ = the number of cells in node A,
   \item $T_c$ = the time spent solving cell-specific work,
   \item $T_m$ = the time spent solving angle-specific work,
