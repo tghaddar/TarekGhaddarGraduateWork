@@ -76,24 +76,22 @@ where the right hand side terms of Eq.~\eqref{angle} have been combined into one
 
 After the angular and energy dependence have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. This is done by meshing the domain and utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}, allowing one cell at a time to be solved. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Figure \ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
 
-\noindent\begin{minipage}{\textwidth}
+\begin{figure}[H]
 \centering
-\includegraphics[scale = 0.27]{../figures/UnstructureMesh.pdf}
-\includegraphics[scale = 0.27]{../figures/StructuredMesh.pdf}
-\captionof{figure}{A demonstration of a sweep on a structured and unstructured mesh. }
+%\includegraphics[scale = 0.27]{../figures/UnstructureMesh.pdf}
+\includegraphics[scale = 0.5]{../figures/StructuredMesh.pdf}
+\caption{A demonstration of a sweep on structured and unstructured meshes. }
 \label{sweeps}
-\end{minipage}
-\smallskip
+\end{figure}
 
 The number in each cell represents the order in which the cells are solved. All cells must receive the solution downwind from them before they can begin solving. This process can be represented and stored as a task dependence graph, shown in Fig. \ref{tdg}.
 
-\noindent\begin{minipage}{\textwidth}
+\begin{figure}[H]
 \centering
-\includegraphics[scale = 0.35]{../figures/tdg.pdf}
-\captionof{figure}{A task dependence graph of the unstructured mesh example in Fig. \ref{sweeps}.}
+\includegraphics[scale = 0.35,trim={0cm 3cm 0cm 3cm},clip]{../figures/tdg.pdf}
+\caption{A task dependence graph of the unstructured mesh example in Fig. \ref{sweeps}.}
 \label{tdg}
-\end{minipage}
-
+\end{figure}
 
 Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids. However, structured meshes are somewhat limiting when  simulating more complex problems and experiments, requiring the use of unstructured meshes in transport sweeps. While unstructured meshes provide the ability to simulate realistic problems, they introduce some challenges like unbalanced partitions, which can increase the time to solution. To combat this, PDT, Texas A\&M University's massively parallel deterministic transport code, introduced two load balancing algorithms that rely on moving the spatial partition boundaries, or cut planes (cut lines in 2D), throughout the mesh in order to obtain a roughly equivalent amount of cells (and therefore work) per processor. However, this sacrifices the optimal partitioning scheme\cite{mpadams2013} in favor of balance. We propose a method that weighs ideal load balancing against the consequences to the transport sweep in order to achieve the best possible time to solution.
 
