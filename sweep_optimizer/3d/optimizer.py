@@ -117,6 +117,7 @@ def get_column_cdf(points,gxmin,gxmax,numcol):
   
   cdf = np.cumsum(hist)
   cdf = cdf/max(cdf)
+  cdf = np.insert(cdf,0,0.0)
   
   return cdf,bin_edges
   

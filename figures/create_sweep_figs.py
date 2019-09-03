@@ -84,12 +84,14 @@ plt.text(x,y,'7',fontsize=20,fontweight='bold',color='k')
 
 #Arrow and omega.
 plt.arrow(-0.5,-0.5,0.3,0.3,width=0.05,color='k')
-plt.text(-0.75,-0.75,r'$\Omega$',fontsize=20,fontweight='extra bold')
+#plt.text(-0.75,-0.75,r'$\Omega$',fontsize=20,fontweight='extra bold')
 plt.savefig("StructuredMesh.pdf")
 
 
 #Unstructured Mesh.
 plt.figure()
+plt.axis("off")
+plt.ylim(-0.5,2.1)
 x = [0,1,1.5,1,0,-0.5,0]
 y = [0,0,1,2,2,1,0]
 plt.plot(x,y,'k')
@@ -142,4 +144,56 @@ x = [0.9,1.5]
 y = [1.5,1]
 plt.plot(x,y,'k')
 
+#Stage 1.
+x = 0.3
+y = 0.2
+plt.text(x,y,'1',fontsize=20,fontweight='bold')
+x = -0.1
+y = 0.45
+plt.text(x,y,'1',fontsize=20,fontweight='bold')
 
+#Stage 2.
+x = 0.73
+y = 0.45
+plt.text(x,y,'2',fontsize=20,fontweight='bold',color='r')
+x = 0.1
+y = 0.77
+plt.text(x,y,'2',fontsize=20,fontweight='bold',color='r')
+
+#Stage 3.
+x = 0.5
+y = 0.75
+plt.text(x,y,'3',fontsize=20,fontweight='bold',color='b')
+x = 0
+y = 1.3
+plt.text(x,y,'3',fontsize=20,fontweight='bold',color='b')
+x = 1.1
+y = 0.5
+plt.text(x,y,'3',fontsize=20,fontweight='bold',color='b')
+
+#Stage 4.
+x = 0.77
+y = 1.1
+plt.text(x,y,'4',fontsize=20,fontweight='bold',color='g')
+x = 0.4
+y = 1.5
+plt.text(x,y,'4',fontsize=20,fontweight='bold',color='g')
+
+#Stage 5.
+x = 0.6
+y = 1.5
+plt.text(x,y,'5',fontsize=20,fontweight='bold',color='m')
+x = 1.1
+y = 1.1
+plt.text(x,y,'5',fontsize=20,fontweight='bold',color='m')
+
+#Stage 6.
+x = 0.8
+y = 1.8
+plt.text(x,y,'6',fontsize=20,fontweight='bold',color='c')
+x = 1.05
+y = 1.5
+plt.text(x,y,'6',fontsize=20,fontweight='bold',color='c')
+#Arrow.
+plt.arrow(-0.4,-0.4,0.2,0.2,width=0.04,color='k')
+plt.savefig("UnstructuredMesh.pdf")
