@@ -54,7 +54,7 @@ Next, we discretize in angle using the discrete ordinates method\cite{denovo}, w
 \vo_m \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr),
 \label{angle}
 \end{equation}
-where the subscript $m$ is introduced to describe the angular flux in direction $m$. The subscript is not added to our inscatter term because of the isotropic scattering assumption and because the scalar flux does not depend on angle. However, in order to evaluate the scalar flux, we employ the angular weights $w_m$ and the angular flux solutions
+where the subscript $m$ is introduced to denote the angular flux in direction $m$. In order to evaluate the scalar flux, we employ the angular weights $w_m$ and the angular flux solutions
 $\psi_m$ to numerically perform the angular integration:
 \begin{equation}
 \label{def_scalar_flux_2}
@@ -67,7 +67,7 @@ At this point, it is clear that we are solving a sequence of transport equations
 \end{equation}
 where the group index is omitted for brevity.
 
-In order to obtain the solution for this discrete form of the transport equation, an iterative process, source iteration, is introduced. This is shown by a simplified transport equation Eq. ~\eqref{iteration}:
+In order to obtain the solution for this discrete form of the transport equation, an iterative process, source iteration, is introduced. This is shown in Eq. ~\eqref{iteration}:
 \begin{equation}
 \vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
 \label{iteration}
@@ -85,16 +85,30 @@ After the angular and energy dependences have been accounted for, Eq.~\eqref{ite
 \end{figure}
 
 The number in each cell represents the order in which the cells are solved.
-Obtaining the solution for current cells in the sweep is dependent on the solution of downwind cells.
-This process can be represented and stored as a task dependence graph, shown in Fig. \ref{tdg}.
+Obtaining the solution for current cells in the sweep is dependent on the solution of downwind cells.The base concept of solving the transport equation via the transport sweep is expanded on by four chapters in this dissertation.
 
-\begin{figure}[H]
-\centering
-\includegraphics[scale = 0.35,trim={0cm 3cm 0cm 3cm},clip]{../figures/tdg.pdf}
-\caption{A task dependence graph of the unstructured mesh example in Fig. \ref{sweeps}.}
-\label{tdg}
-\end{figure}
+\section{Parallel Transport Sweeps}
 
-Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids. However, structured meshes are somewhat limiting when  simulating more complex problems and experiments, requiring the use of unstructured meshes in transport sweeps. While unstructured meshes provide the ability to simulate realistic problems, they introduce some challenges like unbalanced partitions, which can increase the time to solution. To combat this, PDT, Texas A\&M University's massively parallel deterministic transport code, introduced two load balancing algorithms that rely on moving the spatial partition boundaries, or cut planes (cut lines in 2D), throughout the mesh in order to obtain a roughly equivalent amount of cells (and therefore work) per processor. However, this sacrifices the optimal partitioning scheme\cite{mpadams2013} in favor of balance. We propose a method that weighs ideal load balancing against the consequences to the transport sweep in order to achieve the best possible time to solution.
+Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids. 
+This chapter describes the basics of a parallel sweep algorithm, and specifically describes the KBA algorithm and PDT's extension of the KBA algorithm.
+This chapter also describes PDT's performance model, the precursor to the time-to-solution estimator described in Chapter \ref{cha:tts}.
+
+\section{Unstructured Meshing and Load Balancing in PDT}
+
+In order to solve a wider set of problems, and unstructured meshing capability was implemented in PDT. 
+This chapter describes how unstructured meshes are described in PDT. Unstructured meshes may lead to imbalanced partitions, or different numbers of mesh cells per processor. 
+To address this, two two load-balancing algorithms were implemented in PDT, the original load-balancing algorithm and the load-balancing-by-dimension algorithm, described in this chapter.
+
+\section{Time-to-Solution Estimator}
+
+PDT's existing performance model does not account for unstructured meshes and imbalanced partitions. 
+This chapter describes the time-to-solution estimator, a graph-based method that estimates the time it takes to sweep a problem given a mesh, partitioning scheme, and machine-specific parameters. 
+
+\section{Partitioning Optimization}
+
+The time-to-solution estimator described in Chapter \ref{cha:tts} is used to optimize the partitioning scheme. 
+This chapter details two optimization methods: a ``black box'' method that uses Python's scipy.optimize library and a ``human-intelligence'' method prioritizes partition placement in locations that don't add cells to a mesh. 
+
+%Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids. However, structured meshes are somewhat limiting when  simulating more complex problems and experiments, requiring the use of unstructured meshes in transport sweeps. While unstructured meshes provide the ability to simulate realistic problems, they introduce some challenges like unbalanced partitions, which can increase the time to solution. To combat this, PDT, Texas A\&M University's massively parallel deterministic transport code, introduced two load balancing algorithms that rely on moving the spatial partition boundaries, or cut planes (cut lines in 2D), throughout the mesh in order to obtain a roughly equivalent amount of cells (and therefore work) per processor. However, this sacrifices the optimal partitioning scheme\cite{mpadams2013} in favor of balance. We propose a method that weighs ideal load balancing against the consequences to the transport sweep in order to achieve the best possible time to solution.
 
 
