@@ -61,39 +61,51 @@ Figure \ref{redistribute} illustrates an example of redistributing the cut plane
 \caption{The use of the CDF of cells per column to redistribute the cut lines in X.}
 \label{redistribute}
 \end{figure}
-The image on the left side of Fig. \ref{redistribute} shows the CDF of the triangles per column. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut planes are redistributed to. 
+The image on the left side of Fig. \ref{redistribute} shows the CDF of the cells per column in Fig. \ref{partitioning_example}. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut lines are redistributed to. 
 
-Dimensional sub-metrics are defined to assist with the movement of the partitions:
+In order to decide the necessity of redistributing a dimension's cut lines/planes, we use dimensional sub-metrics of the following form:
 \begin{equation}
-f_{D} = \underset{d}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D}.
-\label{f_d}
+f_{Z} = \frac{\underset{k}{\text{max}}[\sum_{i,j} N_{ijk}]}{\frac{N_{tot}}{K}},
+\label{f_z}
 \end{equation}
-$f_{D}$ is calculated by taking the maximum number of cells per row, column, or plane and dividing it by the average number of cells per the corresponding dimension. If this number is greater than predefined tolerances, the cut planes in the respective dimension are redistributed. 
+where $K$ is the total number of z-planes. 
+Equation \ref{f_z} is a metric defining how imbalanced the problem's planes are. It calculates the maximum cells per plane divided by the average cells per plane. If $f_K$ is greater than a predefined tolerance, the z cut planes are redistributed using the process in Fig. \ref{redistribute}. 
  
-\section{Original load-balancing Algorithm}
+\section{Original Load-Balancing Algorithm}
 \label{sec:og_lb}
 
-The initial approach to load balancing was implemented on 2D extruded meshes, meaning the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. Algorithm \ref{initial_algorithm} summarizes the initial approach to load balancing meshes in PDT.
+The initial approach to load balancing was implemented on 2D extruded meshes, meaning the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. The metrics for this algorithm are defined as follows:
+\begin{align}
+f &= \frac{\underset{ij}{\text{max}}(N_{ij})}{\frac{N_{tot}}{I\cdot J}}  \label{og_metric}\\
+f_X &= \frac{\underset{i}{\text{max}}[\sum_{j} N_{ij}] } {\frac{N_{tot}}{I}} \label{og_i_metric} \\
+f_Y &= \frac{\underset{j}{\text{max}}[\sum_{i} N_{ij}] } {\frac{N_{tot}}{J}} \label{og_j_metric}
+\end{align}
+Equation \ref{og_metric} mirrors Eq. \ref{metric_def} for 2 dimensions, and Eqs. \ref{og_i_metric} and \ref{og_j_metric} define the column and row-wise metrics respectively. 
 
+ Algorithm \ref{initial_algorithm} summarizes the original approach to load balancing meshes in PDT.
 \begin{algorithm}[H]
 \caption{The original load-balancing algorithm.}
 \label{initial_algorithm}
 \begin{algorithmic}
 
-\WHILE{$f > \text{tol}_{\text{subset}}$}
-  \IF {$f_I > \text{tol}_{\text{col}}$}
+\WHILE{$f > 1 + \text{tol}_{\text{subset}}$}
+  \IF {$f_X > 1 + \text{tol}_{\text{col}}$}
     \STATE Redistribute the X cut planes.
   \ENDIF
-  \IF {$f_J > \text{tol}_{\text{row}}$}
+  \IF {$f_Y > 1 + \text{tol}_{\text{row}}$}
   	\STATE Redistribute the Y cut planes.
   \ENDIF
 \ENDWHILE
 \end{algorithmic}
 \end{algorithm}
-While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$ (defined by Eq. (\ref{f_d})), are balanced. If they are not, we redistribute the corresponding cut planes.
-%\vspace{-3.5cm}
+While the problem is not balanced:
+\begin{itemize}
+  \item Check if the columns are balanced, and if not redistribute the X cut planes.
+  \item Check if the rows are balanced, and if not redistribute the Y cut lines.
+  \item Repeat until the mesh is balanced or until a maximum number of iterations is reached.
+\end{itemize}
 
-The original load-balancing algorithm placed cut lines in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches with $N$ cells each.
+The original load-balancing algorithm placed cut lines in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2013,mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches with $N$ cells each.
 
 \begin{figure}[H]
 \centering
@@ -105,44 +117,53 @@ The subset layout is $M^2$, but only $M$ subset have significant work, leading t
 \begin{equation}
 f= \frac{N}{(MN+C)/M^2} \xrightarrow{N\to \infty} \frac{N}{N/M} = M
 \end{equation}
-
 Due to this theoretical limit, the load-balancing-by-dimension algorithm was developed.
 
 \section{Load-Balancing-by-Dimension Algorithm}
 \label{sec:lbd}
 
-The load-balancing-by-dimension by dimension algorithm, like the original load balancing algorithm, relies on the movement of cut planes to redistribute mesh cells in a more balanced manner. However rather than moving all cut planes in all dimensions in one iteration, one dimension is balanced first for all iterations, and then the cut planes that yield the best metric for that dimension are chosen. Then the next dimensions is balanced within the first dimension. For example, if the $x$ cut planes are balanced first, the $y$ cut planes are balanced \textit{within} each column.
-We slightly alter the definition for our dimensional sub-metrics (Eq. (\ref{f_d})) accordingly:
-\begin{align}
-f_{D1} &= \underset{d1}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D1}, \label{f_d1} \\
-f_{D2,d1} &= \Big(\underset{d2}{\text{max}}[\sum_{d3} N_{ijk,d1}]/\frac{N_{d1}}{D2}\Big), \label{f_d2}\\
-f_{D3,d2,d1} &= \Big( \underset{d3}{\text{max}}[ N_{ijk,d1,d2}]/\frac{N_{d1,d2}}{D3} \Big) . \label{f_d3}
-\end{align}
-Equation (\ref{f_d1}) represents the sub-metric for the first dimension we load balance. In order to assist in the explanation of $f_{D2,d1}$ and $f_{D3,d2,d1}$, we'll take $D1$ to be the $z$ dimension. In Eq. ({\ref{f_d1}), $D1$ represents the number of $z$ planes, $N_{tot}$ represents the number of cells in the mesh, and $N_{ijk}$ is the number of cells in subset $(i,j,k)$. $f_{D1}$ is the maximum number of cells per plane by the average number of cells per plane. 
+The load-balancing-by-dimension by dimension (LBD) algorithm, similar to the original load-balancing algorithm, relies on the movement of cut lines/planes to redistribute mesh cells in a more balanced manner.
+However, cut lines are no longer required to go all the way through the mesh, and the load-balancing-by-dimension algorithm is fully extensible to 3 dimensions. 
+The load-balancing-by-dimension algorithm balances by:
+\begin{enumerate}
+  \item Slice the mesh in $z$ and redistribute cut planes until each plane has approximately an equivalent number of cells.
+  \item For each $z$ layer, slice the layer in columns and redistribute the $x$ cut lines until each column has an approximately equivalent number of cells.
+  \item For each column within each $z$ layer, slice the column in rows and redistribute the $y$ cut lines until each row has an approximately equivalent number of cells.
+\end{enumerate}
 
-Once the z planes are balanced according to $f_{D1}$, we balance the second dimension (in this example, the columns, or $x$ cut planes) \textit{within} each $z$ plane. $f_{D2,d1}$ represents the column-wise sub-metrics for each $z$ plane. In other words, there are $D1$ column-wise sub-metrics, one for each plane. These column-wise sub-metrics are calculated by dividing the maximum number of cells per column divided by the average number cells per column \textit{in each plane}. 
+We once again use dimensional sub-metrics to determine whether or not a dimension's cut lines/planes need to be redistributed. The $z$ dimension's sub-metric is defined by Eq. \ref{f_z}. For the LBD algorithm, there are $K$ column-wise metrics, one for each $z$ layer:
+\begin{equation}
+f_{X,k} = \frac{ \underset{i}{\text{max}}[ \sum_{j} N_{ijk}]  }  {\frac{N_{tot,k}}{I}}.
+\label{lbd_x_metric}
+\end{equation}
+Equation \ref{lbd_x_metric} defines the column-wise metric for layer $k$, or the maximum number of cells per column in layer $k$ divided by the average number of cells per column in layer $k$. 
 
-Once the columns within each z-plane are balanced, we balance the rows $within$ the columns $within$ each plane. The row-wise sub-metrics for each plane for each column, $f_{D3,d2,d1}$, are calculated by dividing the maximum number of cells per row per column by the average number of cells per row per column in each plane. Algorithm \ref{lbd} summarizes the load-balancing-by-dimension process described. 
+For the LBD algorithm, there are $K\cdot I$ row-wise metrics, one for each column in each $z$ layer:
+\begin{equation}
+f_{Y,k,i} = \frac{\underset{j}{\text{max}} N_{ijk} } {\frac{N_{tot,k,i}}{J}}.
+\label{lbd_y_metric}
+\end{equation}
+Equation \ref{lbd_y_metric} defines the row-wise metric for layer $k$ in column $i$, or the maximum number of cells per row in column $i$ in layer $k$ divided by the average number of cells per row in column $i$ in layer $k$. 
 
 \begin{algorithm}[H]
 \caption{The load-balancing-by-dimension algorithm.}
 \label{lbd}
 \begin{algorithmic}
 
-  \WHILE {$f_{D1} > \text{tol}_{\text{D1}}$}
-    \STATE Redistribute the D1 cut planes.
+  \WHILE {$f_{Z} > 1 + \text{tol}_{\text{K}}$}
+    \STATE Redistribute the Z cut planes.
   \ENDWHILE  
   
-  \FOR {$d1$ in $D1$}
-    \WHILE {$f_{D2,d1} > \text{tol}_{\text{D2}}$}
-      \STATE Redistribute the D2 cut planes within d1. 
+  \FOR {$k$ in $K$}
+    \WHILE {$f_{X,k} > 1 + \text{tol}_{\text{I}}$}
+      \STATE Redistribute the X cut lines within layer $k$. 
     \ENDWHILE
   \ENDFOR
   
-  \FOR{$d1$ in $D1$}
-    \FOR{$d2$ in $D2$}
-      \WHILE {$f_{D3,d2,d1} > \text{tol}_{\text{D3}}$ }
-        \STATE Redistribute the D3 cut planes within d2 within d1. 
+  \FOR{$k$ in $K$}
+    \FOR{$i$ in $I$}
+      \WHILE {$f_{Y,k,i} > 1 +  \text{tol}_{\text{J}}$ }
+        \STATE Redistribute the Y cut lines in column $i$ in layer $k$. 
       \ENDWHILE
     \ENDFOR
   \ENDFOR
