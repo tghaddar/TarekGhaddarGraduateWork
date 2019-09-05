@@ -14,20 +14,31 @@
 
 \chapter{UNSTRUCTURED MESHING AND LOAD BALANCING IN PDT}\label{cha:lb}
 
-Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions, causing longer and unmanageable runtimes.
+Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions (or different amounts of cells per processor), causing longer and unmanageable runtimes.
 
-To combat imbalanced partitions, two load balancing algorithms were implemented, referred to in this paper as the original load balancing algorithm and the load balancing by dimension algorithm.
+To combat imbalanced partitions, two load balancing algorithms were implemented, referred to in this thesis as the original load balancing algorithm \cite{mastersthesis,mc2017} and the load balancing by dimension algorithm.
 
 Before detailing the two load balancing algorithms PDT employs, a quick review of partitioning unstructured meshes in PDT is necessary:
-%\vspace{-2.5cm}
 \begin{itemize}\itemsep 1pt \parskip 0pt \parsep 0pt
-\item ``Cut lines'' in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
+\item ``Cut lines'' in 2D (``cut planes'' in 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
 \item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
+\item Discontinuities along subset boundaries are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries.
 \item The subsets are distributed amongst the processor domain.
 \end{itemize}
-%\vspace{-2cm}
-Figure \ref{partitioning_example} shows an example of an unstructured mesh partitioned into four subsets in PDT. 
+Using cut lines/cut planes to partition unstructured meshes preserved the provably optimal sweep partitioning \cite{mpadams2013,mpadams2015} of logically Cartesian grids. 
+Subsets, rather than the cells, have $(i,j,k)$ indices and will become the base unit when aggregating spatial parameters. That is, $A_x$ and $A_y$ will now represent the number of subsets in $x$ and $y$ aggregated into a task. 
 
+Upon creation, the subsets may have geometric discontinuities as a result of slicing through the mesh. 
+Figure \ref{hanging_node} shows an example of a hanging node across a subset boundary. 
+This node is stitched across the boundary to preserve geometric continuity, forming a degenerate polygon \cite{degenerate}(in Fig. \ref{hanging_node}, a degenerate square). 
+PDT uses Piece-Wise Linear Discontinuous (PWLD) finite-element basis functions \cite{pwld_ragusa,pwld_teresa} that allow for solutions on degenerate polyhedra. 
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.2]{../../figures/hanging_node_spiderweb_example.png}
+   \caption{A hanging node (circled in black) on a subset boundary (highlighted in blue).}
+   \label{hanging_node}
+\end{figure}
+Figure \ref{partitioning_example} shows an example of an unstructured mesh partitioned into four subsets in PDT. 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.4,trim={0.95in 0.64in 0.35in 0.44in},clip]{../figures/partitioning_example.pdf}
@@ -81,18 +92,17 @@ The initial approach to load balancing was implemented on 2D extruded meshes, me
 While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$ (defined by Eq. (\ref{f_d})), are balanced. If they are not, we redistribute the corresponding cut planes.
 %\vspace{-3.5cm}
 
-The original load balancing algorithm placed cut planes in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches of high mesh density.
+The original load balancing algorithm placed cut lines in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches with $N$ cells each.
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.4]{../figures/2dgeneral.png}
-\caption{A 2D subset layout with $M$ unaligned patches of high mesh density.}
+\includegraphics[scale=0.4]{../figures/theoretical_plot.png}
+ \caption{A 2D subset layout with $M$ unaligned patches of high mesh density $N$.}
 \label{2dgeneral}
 \end{figure}
-
-The subset layout is $[M(N+1)+1] \times [M(N+1)+1]$, but only $MN^2$ subset have significant work, leading to a theoretical limit for the load imbalance factor:
+The subset layout is $M^2$, but only $M$ subset have significant work, leading to a theoretical limit for the load imbalance factor:
 \begin{equation}
-f= \frac{\left( M(N+1)+1 \right)^2}{MN^2} \xrightarrow{N\to \infty} \frac{M^2N^2}{MN^2} = M.
+f= \frac{N}{(MN+C)/M^2} \xrightarrow{N\to \infty} \frac{N}{N/M} = M
 \end{equation}
 
 Due to this theoretical limit, the load balancing by dimension algorithm was developed.
