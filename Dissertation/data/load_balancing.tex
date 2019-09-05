@@ -16,10 +16,10 @@
 
 Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions (or different amounts of cells per processor), causing longer and unmanageable runtimes.
 
-To combat imbalanced partitions, two load balancing algorithms were implemented, referred to in this thesis as the original load balancing algorithm \cite{mastersthesis,mc2017} and the load balancing by dimension algorithm.
+To combat imbalanced partitions, two load balancing algorithms were implemented, referred to in this thesis as the original load-balancing algorithm \cite{mastersthesis,mc2017} and the load-balancing-by-dimension algorithm.
 
 Before detailing the two load balancing algorithms PDT employs, a quick review of partitioning unstructured meshes in PDT is necessary:
-\begin{itemize}\itemsep 1pt \parskip 0pt \parsep 0pt
+\begin{itemize}
 \item ``Cut lines'' in 2D (``cut planes'' in 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
 \item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
 \item Discontinuities along subset boundaries are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries.
@@ -27,30 +27,41 @@ Before detailing the two load balancing algorithms PDT employs, a quick review o
 \end{itemize}
 Using cut lines/cut planes to partition unstructured meshes preserved the provably optimal sweep partitioning \cite{mpadams2013,mpadams2015} of logically Cartesian grids. 
 Subsets, rather than the cells, have $(i,j,k)$ indices and will become the base unit when aggregating spatial parameters. That is, $A_x$ and $A_y$ will now represent the number of subsets in $x$ and $y$ aggregated into a task. 
+Figure \ref{partitioning_example} shows an example of an unstructured mesh partitioned into 100 subsets in PDT. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.2]{../figures/spiderweb_10x10_sparse.png}
+\caption{An unstructured mesh partitioned into 100 subsets with cut lines at 1 cm intervals in both dimensions}
+\label{partitioning_example}
+\end{figure}
 
 Upon creation, the subsets may have geometric discontinuities as a result of slicing through the mesh. 
 Figure \ref{hanging_node} shows an example of a hanging node across a subset boundary. 
 This node is stitched across the boundary to preserve geometric continuity, forming a degenerate polygon \cite{degenerate}(in Fig. \ref{hanging_node}, a degenerate square). 
-PDT uses Piece-Wise Linear Discontinuous (PWLD) finite-element basis functions \cite{pwld_ragusa,pwld_teresa} that allow for solutions on degenerate polyhedra. 
+PDT uses Piece-Wise Linear Discontinuous (PWLD) finite-element basis functions \cite{pwld_ragusa,pwld_teresa} that allow for solutions on arbitrary and degenerate polyhedra. 
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.2]{../../figures/hanging_node_spiderweb_example.png}
    \caption{A hanging node (circled in black) on a subset boundary (highlighted in blue).}
    \label{hanging_node}
 \end{figure}
-Figure \ref{partitioning_example} shows an example of an unstructured mesh partitioned into four subsets in PDT. 
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.4,trim={0.95in 0.64in 0.35in 0.44in},clip]{../figures/partitioning_example.pdf}
-\caption{An unstructured mesh partitioned into four subsets with cut planes at $\bm{x,y = 10}$ cm.}
-\label{partitioning_example}
-\end{figure}
-Both approaches to load balancing move these cut planes in order to redistribute cells more evenly throughout subsets. We define a metric describing how imbalanced our problem is:
+
+Both approaches to load balancing move cut lines in order to redistribute cells more evenly throughout subsets. We define a metric describing how imbalanced our problem is:
 \begin{equation}
 f =\frac{\underset{ijk}{\text{max}}(N_{ijk})}{\frac{N_{tot}}{I\cdot J\cdot K}},
 \label{metric_def}
 \end{equation}
-where $f$ is the load balance metric, $N_{ijk}$ is the number of cells in subset $(i,j,k)$, $N_{tot}$ is the global number of cells in the problem, and $I$, $J$, and $K$ are the total number of subsets in the $x$, $y$, and $z$ direction, respectively. The metric is a measure of the maximum number of cells per subset divided by the average number of cells per subset. For a perfectly balanced problem, $f = 1$.
+where $f$ is the load balance metric, $N_{ijk}$ is the number of cells in subset $(i,j,k)$, $N_{tot}$ is the global number of cells in the problem, and $I$, $J$, and $K$ are the total number of subsets in the $x$, $y$, and $z$ directions, respectively. The metric is a measure of the maximum number of cells per subset divided by the average number of cells per subset. For a perfectly balanced problem, $f = 1$.
+
+Figure \ref{redistribute} illustrates an example of redistributing the cut planes in $x$ to balance the cells per column.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{../figures/spiderweb_redistribute_before_sparse.pdf}
+\includegraphics[scale=0.4]{../figures/spiderweb_redistribute_after_sparse.pdf}
+\caption{The use of the CDF of cells per column to redistribute the cut lines in X.}
+\label{redistribute}
+\end{figure}
+The image on the left side of Fig. \ref{redistribute} shows the CDF of the triangles per column. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut planes are redistributed to. 
 
 Dimensional sub-metrics are defined to assist with the movement of the partitions:
 \begin{equation}
@@ -58,24 +69,14 @@ f_{D} = \underset{d}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D}.
 \label{f_d}
 \end{equation}
 $f_{D}$ is calculated by taking the maximum number of cells per row, column, or plane and dividing it by the average number of cells per the corresponding dimension. If this number is greater than predefined tolerances, the cut planes in the respective dimension are redistributed. 
-
-Figure \ref{redistribute} illustrates an example of redistributing the cut planes in $x$ to balance the cells per column.
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.4]{../figures/redistribute_before.pdf}
-\includegraphics[scale=0.4]{../figures/redistribute_after.pdf}
-\caption{The use of the CDF of triangles per column to redistribute the cut planes in X.}
-\label{redistribute}
-\end{figure}
-The image on the left side of Fig. \ref{redistribute} shows the CDF of the triangles per column. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut planes are redistributed to. 
  
-\section{Original Load Balancing Algorithm}
+\section{Original load-balancing Algorithm}
 \label{sec:og_lb}
 
 The initial approach to load balancing was implemented on 2D extruded meshes, meaning the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. Algorithm \ref{initial_algorithm} summarizes the initial approach to load balancing meshes in PDT.
 
 \begin{algorithm}[H]
-\caption{The original load balancing algorithm.}
+\caption{The original load-balancing algorithm.}
 \label{initial_algorithm}
 \begin{algorithmic}
 
@@ -92,7 +93,7 @@ The initial approach to load balancing was implemented on 2D extruded meshes, me
 While the problem is not balanced, we check if the cells per column and cells per row, represented by $f_I$ and $f_J$ (defined by Eq. (\ref{f_d})), are balanced. If they are not, we redistribute the corresponding cut planes.
 %\vspace{-3.5cm}
 
-The original load balancing algorithm placed cut lines in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches with $N$ cells each.
+The original load-balancing algorithm placed cut lines in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches with $N$ cells each.
 
 \begin{figure}[H]
 \centering
@@ -105,12 +106,12 @@ The subset layout is $M^2$, but only $M$ subset have significant work, leading t
 f= \frac{N}{(MN+C)/M^2} \xrightarrow{N\to \infty} \frac{N}{N/M} = M
 \end{equation}
 
-Due to this theoretical limit, the load balancing by dimension algorithm was developed.
+Due to this theoretical limit, the load-balancing-by-dimension algorithm was developed.
 
-\section{Load Balancing by Dimension Algorithm}
+\section{Load-Balancing-by-Dimension Algorithm}
 \label{sec:lbd}
 
-The load balancing by dimension algorithm, like the original load balancing algorithm, relies on the movement of cut planes to redistribute mesh cells in a more balanced manner. However rather than moving all cut planes in all dimensions in one iteration, one dimension is balanced first for all iterations, and then the cut planes that yield the best metric for that dimension are chosen. Then the next dimensions is balanced within the first dimension. For example, if the $x$ cut planes are balanced first, the $y$ cut planes are balanced \textit{within} each column.
+The load-balancing-by-dimension by dimension algorithm, like the original load balancing algorithm, relies on the movement of cut planes to redistribute mesh cells in a more balanced manner. However rather than moving all cut planes in all dimensions in one iteration, one dimension is balanced first for all iterations, and then the cut planes that yield the best metric for that dimension are chosen. Then the next dimensions is balanced within the first dimension. For example, if the $x$ cut planes are balanced first, the $y$ cut planes are balanced \textit{within} each column.
 We slightly alter the definition for our dimensional sub-metrics (Eq. (\ref{f_d})) accordingly:
 \begin{align}
 f_{D1} &= \underset{d1}{\text{max}}[\sum_{d2,d3} N_{ijk}]/\frac{N_{tot}}{D1}, \label{f_d1} \\
@@ -121,10 +122,10 @@ Equation (\ref{f_d1}) represents the sub-metric for the first dimension we load 
 
 Once the z planes are balanced according to $f_{D1}$, we balance the second dimension (in this example, the columns, or $x$ cut planes) \textit{within} each $z$ plane. $f_{D2,d1}$ represents the column-wise sub-metrics for each $z$ plane. In other words, there are $D1$ column-wise sub-metrics, one for each plane. These column-wise sub-metrics are calculated by dividing the maximum number of cells per column divided by the average number cells per column \textit{in each plane}. 
 
-Once the columns within each z-plane are balanced, we balance the rows $within$ the columns $within$ each plane. The row-wise sub-metrics for each plane for each column, $f_{D3,d2,d1}$, are calculated by dividing the maximum number of cells per row per column by the average number of cells per row per column in each plane. Algorithm \ref{lbd} summarizes the load balancing by dimension process described. 
+Once the columns within each z-plane are balanced, we balance the rows $within$ the columns $within$ each plane. The row-wise sub-metrics for each plane for each column, $f_{D3,d2,d1}$, are calculated by dividing the maximum number of cells per row per column by the average number of cells per row per column in each plane. Algorithm \ref{lbd} summarizes the load-balancing-by-dimension process described. 
 
 \begin{algorithm}[H]
-\caption{The load balancing by dimension algorithm.}
+\caption{The load-balancing-by-dimension algorithm.}
 \label{lbd}
 \begin{algorithmic}
 
@@ -156,19 +157,19 @@ Figure \ref{alg_illustration} illustrates the behavior of both algorithms. In th
 \centering
 \includegraphics[scale=0.45,trim={0.95in 0.64in 0.35in 0.44in},clip]{../figures/og_lb_example.pdf}
 \includegraphics[scale=0.45,trim={0.95in 0.64in 0.35in 0.44in},clip]{../figures/lbd_example.pdf}
-\caption{The partitions of a problem after the original load balancing (left) and the load balancing by dimension (right) algorithms.}
+\caption{The partitions of a problem after the original load balancing (left) and the load-balancing-by-dimension (right) algorithms.}
 \label{alg_illustration}
 \end{figure}
 
 
 \section{RESULTS}
 
-To show the behavior of the original load balancing algorithm and the load balancing by dimension algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area, with the minimum allowable angle per triangle was kept constant at \ang{20}. We varied the number of subsets in $x$ and $y$ from 2 to 10 (with the total number of subsets varying from 4 to 100). The problem illustrated by Fig. \ref{partitioning_example} was chosen because it has two dense features in opposing corners with no features in between, lending itself to being an imbalanced mesh. Table \ref{og_table} shows the results of this parametric study using the original load balancing algorithm vs. using the load balancing by dimension algorithm. Table \ref{all_improvements} shows the percent improvements for both algorithms from no load balancing to running both load balancing algorithm, while Table \ref{method_improvement} shows the improvement of the load balancing by dimension algorithm relative to the original load balancing algorithm.
+To show the behavior of the original load balancing algorithm and the load-balancing-by-dimension algorithm, the problem shown in Fig. \ref{partitioning_example} was run with a varying number of subsets and with a varying maximum triangle area, with the minimum allowable angle per triangle was kept constant at \ang{20}. We varied the number of subsets in $x$ and $y$ from 2 to 10 (with the total number of subsets varying from 4 to 100). The problem illustrated by Fig. \ref{partitioning_example} was chosen because it has two dense features in opposing corners with no features in between, lending itself to being an imbalanced mesh. Table \ref{og_table} shows the results of this parametric study using the original load balancing algorithm vs. using the load-balancing-by-dimension algorithm. Table \ref{all_improvements} shows the percent improvements for both algorithms from no load balancing to running both load balancing algorithm, while Table \ref{method_improvement} shows the improvement of the load-balancing-by-dimension algorithm relative to the original load balancing algorithm.
 
 %\vspace{-1cm}
 \begin{table}[H]
 \centering
-  \caption{\bf The results of the parametric study using the original load balancing algorithm (left) and the load balancing by dimension algorithm (right).}
+  \caption{\bf The results of the parametric study using the original load balancing algorithm (left) and the load-balancing-by-dimension algorithm (right).}
   \scalebox{0.5}{
   \begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
   \bf Area, $N^{1/2}$ & \bf  2 &  \bf 3    &  \bf  4   &  \bf  5   &  \bf  6   &  \bf  7   & \bf   8   &  \bf 9    &  \bf 10   \\ \hline \hline
@@ -219,7 +220,7 @@ To show the behavior of the original load balancing algorithm and the load balan
 
 \begin{table}[H]
 \centering
-\caption{\bf The percent improvement of the original load balancing algorithm (left) and the load balancing by dimension algorithm (right).}
+\caption{\bf The percent improvement of the original load balancing algorithm (left) and the load-balancing-by-dimension algorithm (right).}
 \scalebox{0.5}{
 \begin{tabular}{c|c|c|c|c|c|c|c|c|c} 
 
