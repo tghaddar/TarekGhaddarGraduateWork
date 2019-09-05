@@ -124,7 +124,7 @@ Due to this theoretical limit, the load-balancing-by-dimension algorithm was dev
 
 The load-balancing-by-dimension by dimension (LBD) algorithm, similar to the original load-balancing algorithm, relies on the movement of cut lines/planes to redistribute mesh cells in a more balanced manner.
 However, cut lines are no longer required to go all the way through the mesh, and the load-balancing-by-dimension algorithm is fully extensible to 3 dimensions. 
-The load-balancing-by-dimension algorithm balances by:
+The load-balancing-by-dimension algorithm is summarized by:
 \begin{enumerate}
   \item Slice the mesh in $z$ and redistribute cut planes until each plane has approximately an equivalent number of cells.
   \item For each $z$ layer, slice the layer in columns and redistribute the $x$ cut lines until each column has an approximately equivalent number of cells.
@@ -145,6 +145,7 @@ f_{Y,k,i} = \frac{\underset{j}{\text{max}} N_{ijk} } {\frac{N_{tot,k,i}}{J}}.
 \end{equation}
 Equation \ref{lbd_y_metric} defines the row-wise metric for layer $k$ in column $i$, or the maximum number of cells per row in column $i$ in layer $k$ divided by the average number of cells per row in column $i$ in layer $k$. 
 
+Algorithm \ref{lbd} details the load-balancing-by-dimension algorithm. 
 \begin{algorithm}[H]
 \caption{The load-balancing-by-dimension algorithm.}
 \label{lbd}
