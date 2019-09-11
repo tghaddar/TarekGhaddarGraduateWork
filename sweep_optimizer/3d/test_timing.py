@@ -53,6 +53,6 @@ params = create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane)
 num_params = len(params)
 
 start = time.time()
-max_time = optimized_tts_3d(params,f,global_xmin,global_xmax,global_ymin,global_ymax,global_zmin,global_zmax,numrow,numcol,numplane,machine_parameters,num_angles,Am,Az,unweighted,True)
+max_time = optimized_tts_3d(params,f,global_xmin,global_xmax,global_ymin,global_ymax,global_zmin,global_zmax,numrow,numcol,numplane,machine_parameters,num_angles,Am,Az,unweighted,False)
 end = time.time()
 print(end-start)

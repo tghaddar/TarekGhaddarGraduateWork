@@ -37,7 +37,7 @@ Figure \ref{partitioning_example} shows an example of an unstructured mesh parti
 
 Upon creation, the subsets may have geometric discontinuities as a result of slicing through the mesh. 
 Figure \ref{hanging_node} shows an example of a hanging node across a subset boundary. 
-This node is stitched across the boundary to preserve geometric continuity, forming a degenerate polygon \cite{degenerate}(in Fig. \ref{hanging_node}, a degenerate square). 
+This node is stitched across the boundary to preserve geometric continuity, forming a degenerate polygon \cite{degenerate} (in Fig. \ref{hanging_node}, a degenerate square). 
 PDT uses Piece-Wise Linear Discontinuous (PWLD) finite-element basis functions \cite{pwld_ragusa,pwld_teresa} that allow for solutions on arbitrary and degenerate polyhedra. 
 \begin{figure}[H]
   \centering
@@ -90,22 +90,24 @@ Equation \ref{og_metric} mirrors Eq. \ref{metric_def} for 2 dimensions, and Eqs.
 
 \WHILE{$f > 1 + \text{tol}_{\text{subset}}$}
   \IF {$f_X > 1 + \text{tol}_{\text{col}}$}
-    \STATE Redistribute the X cut planes.
+    \STATE Redistribute the X cut lines.
   \ENDIF
   \IF {$f_Y > 1 + \text{tol}_{\text{row}}$}
-  	\STATE Redistribute the Y cut planes.
+  	\STATE Redistribute the Y cut lines.
   \ENDIF
 \ENDWHILE
 \end{algorithmic}
 \end{algorithm}
 While the problem is not balanced:
 \begin{itemize}
-  \item Check if the columns are balanced, and if not redistribute the X cut planes.
+  \item Check if the columns are balanced, and if not redistribute the X cut lines.
   \item Check if the rows are balanced, and if not redistribute the Y cut lines.
   \item Repeat until the mesh is balanced or until a maximum number of iterations is reached.
 \end{itemize}
 
-The original load-balancing algorithm placed cut lines in all dimensions all the way through the mesh. This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the optimal sweep partitioning described by Adams et. al \cite{mpadams2013,mpadams2015}. However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches with $N$ cells each.
+The original load-balancing algorithm placed cut lines in all dimensions all the way through the mesh. 
+This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the provably optimal sweep partitioning described by Adams et. al \cite{mpadams2013,mpadams2015}. 
+However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches with $N$ cells each.
 
 \begin{figure}[H]
 \centering
@@ -115,7 +117,7 @@ The original load-balancing algorithm placed cut lines in all dimensions all the
 \end{figure}
 The subset layout is $M^2$, but only $M$ subset have significant work, leading to a theoretical limit for the load imbalance factor:
 \begin{equation}
-f= \frac{N}{(MN+C)/M^2} \xrightarrow{N\to \infty} \frac{N}{N/M} = M
+f= \frac{N}{(MN+C)/M^2} \xrightarrow{N\to \infty} \frac{N}{N/M} = M.
 \end{equation}
 Due to this theoretical limit, the load-balancing-by-dimension algorithm was developed.
 

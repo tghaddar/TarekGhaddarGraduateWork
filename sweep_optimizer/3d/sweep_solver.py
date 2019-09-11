@@ -439,7 +439,7 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
 #          cost = Az
         cost = 1
       else:
-        cost = 16.0*mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*Am*upbc + num_cells*(Tc + Am*(Tm + Tg)))
+        cost = mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*Am*upbc + num_cells*(Tc + Am*(Tm + Tg)))
       graph[e[0]][e[1]]['weight'] = cost
 
     for ig in range(0,num_graphs):

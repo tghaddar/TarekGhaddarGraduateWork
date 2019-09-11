@@ -41,7 +41,7 @@ The adjacency matrix proves connectivity information for each subset to its neig
 The adjacency building process relies on a major assumption: The z dimension has partitions all the way across the domain, then the x dimension has partitions per plane, then the y dimension has partitions per plane per column. 
 In future work, these three dimensions will be interchangeable, but for now, this ordering must be preserved. 
 
-Figure \ref{25basematrix} shows a partitioning scheme for 5 subsets each in the x and y dimensions with its corresponding adjacency matrix.
+Figure \ref{25basematrix} shows a partitioning scheme for 3 subsets each in the x and y dimensions with its corresponding adjacency matrix.
 
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
@@ -52,34 +52,18 @@ Figure \ref{25basematrix} shows a partitioning scheme for 5 subsets each in the 
 \raggedright
 \scalebox{0.5}{
 $\begin{pmatrix}
-0&1&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-1&0&1&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&1&0&1&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&1&0&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&1&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-1&1&1&1&1&0&1&0&0&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&1&1&0&1&0&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&1&0&1&0&1&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&1&0&0&1&0&1&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&1&0&0&0&1&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&0&0&0&0&0&1&0&0&0&1&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&0&0&0&0&1&0&1&0&0&1&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&0&0&0&0&0&1&0&1&0&1&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&0&0&0&0&0&0&1&0&1&1&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&1&1&1&1&0&0&0&1&0&1&1&1&1&1&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&1&0&0&0&1&1&1&1&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&0&1&0&0&0&0&0&0&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&1&0&1&0&0&0&0&0&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&1&0&1&0&0&0&0&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&1&0&0&0&0&0&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&1&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&1&0&1&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&1&0&1&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&0&1&0&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&0&0&1&0\\ 
+0&1&0&1&0&0&0&0&0\\ 
+1&0&1&1&0&0&0&0&0\\ 
+0&1&0&1&1&1&0&0&0\\ 
+1&1&1&0&1&0&1&1&1\\ 
+0&0&1&1&0&1&0&0&1\\ 
+0&0&1&0&1&0&0&0&1\\ 
+0&0&0&1&0&0&0&1&0\\ 
+0&0&0&1&0&0&1&0&1\\ 
+0&0&0&1&1&1&0&1&0\\ 
 \end{pmatrix}$}
 \end{minipage}
-\caption{A 5x5 subset partitioning scheme and its corresponding adjacency matrix.}
+\caption{A 3x3 subset partitioning scheme and its corresponding adjacency matrix.}
 \label{25basematrix}
 \end{figure}
 
@@ -110,61 +94,29 @@ Utilizing the same partitioning scheme shown in Fig. \ref{25basematrix}, pull th
 \begin{minipage}[c]{0.5\textwidth}
 \scalebox{0.5}{
 $\begin{pmatrix}
-0&1&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&1&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&1&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&1&0&0&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&1&0&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&1&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&1&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&1&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&1&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&1&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&1&1&1&1&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&0&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
+0&1&0&1&0&0&0&0&0\\ 
+0&0&1&1&0&0&0&0&0\\ 
+0&0&0&1&1&1&0&0&0\\ 
+0&0&0&0&1&0&1&1&1\\ 
+0&0&0&0&0&1&0&0&1\\ 
+0&0&0&0&0&0&0&0&1\\ 
+0&0&0&0&0&0&0&1&0\\ 
+0&0&0&0&0&0&0&0&1\\ 
+0&0&0&0&0&0&0&0&0\\ 
 \end{pmatrix}$}
 \end{minipage}
 \begin{minipage}[c]{0.5\textwidth}
 \scalebox{0.5}{
 $\begin{pmatrix}
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-1&1&1&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&1&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&1&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&1&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&0&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&1&1&1&1&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&1&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&1&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&1&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&1&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&1&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&0&1&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&0&0&1&0\\ 
+0&0&0&0&0&0&0&0&0\\ 
+1&0&0&0&0&0&0&0&0\\ 
+0&1&0&0&0&0&0&0&0\\ 
+1&1&1&0&0&0&0&0&0\\ 
+0&0&1&1&0&0&0&0&0\\ 
+0&0&1&0&1&0&0&0&0\\ 
+0&0&0&1&0&0&0&0&0\\ 
+0&0&0&1&0&0&1&0&0\\ 
+0&0&0&1&1&1&0&1&0\\ 
 \end{pmatrix}$}
 \end{minipage}
 \caption{The upper triangular (left) and lower triangular(right) portions of the adjacency matrix in Fig. \ref{25basematrix}.}
@@ -176,16 +128,16 @@ Figure \ref{25_q0q3graphs} shows the the DAGS associated with quadrants 0 and 3,
 
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
-\includegraphics[scale=0.55]{../../figures/25_graph0.pdf}
+\includegraphics[scale=0.55]{../../figures/9_graph0.pdf}
 \end{minipage}
 \begin{minipage}[c]{0.5\textwidth}
-\includegraphics[scale=0.55]{../../figures/25_graph3.pdf}
+\includegraphics[scale=0.55]{../../figures/9_graph3.pdf}
 \end{minipage}
 \caption{The quadrant 0 DAG (left) and the quadrant 3 DAG(right).}
 \label{25_q0q3graphs}
 \end{figure}
 Upon inspection of these two DAGs, we see that they show the correct connectivity, dependency, and expected opposing sweep ordering. 
-Quadrant 0 starts its sweep from subset 0, finishing at subset 24, and quadrant 3 starts its sweep from subset 24, finishing at subset 0.
+Quadrant 0 starts its sweep from subset 0, finishing at subset 8, and quadrant 3 starts its sweep from subset 8, finishing at subset 0.
 
 To obtain the graphs for quadrants 1 and 2, a ``flipped'' version of the adjacency matrix is necessary. 
 We temporarily renumber the subsets starting from the top left corner, and increasing down each column, as shown in Fig. \ref{25flippedmatrix}.
@@ -197,31 +149,15 @@ We temporarily renumber the subsets starting from the top left corner, and incre
 \begin{minipage}[c]{0.5\textwidth}
 \scalebox{0.5}{
 $\begin{pmatrix}
-0&1&0&0&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-1&0&1&0&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&1&0&1&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&1&0&1&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&1&0&0&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-1&0&0&0&0&0&1&0&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-1&0&0&0&0&1&0&1&0&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-1&0&0&0&0&0&1&0&1&0&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-1&0&0&0&0&0&0&1&0&1&1&0&0&0&0&0&0&0&0&0&0&0&0&0&0\\ 
-1&1&1&1&1&0&0&0&1&0&1&1&1&1&1&0&0&0&0&0&0&0&0&0&0\\ 
-0&0&0&0&0&1&1&1&1&1&0&1&0&0&0&1&1&1&1&1&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&1&1&0&1&0&0&0&0&0&0&1&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&1&0&1&0&1&0&0&0&0&0&1&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&1&0&0&1&0&1&0&0&0&0&1&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&1&0&0&0&1&0&0&0&0&0&1&0&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&1&0&0&0&1&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&1&0&1&0&0&1&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&1&0&1&0&1&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&1&0&0&0&0&0&0&1&0&1&1&0&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&0&0&1&0&1&1&1&1&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&1&1&1&0&1&0&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&1&0&1&0&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&1&0&1&0\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&1&0&1\\ 
-0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&0&1&0&0&0&1&0\\ 
+0&1&0&1&1&1&0&0&0\\ 
+1&0&1&0&0&1&0&0&0\\ 
+0&1&0&0&0&1&0&0&0\\ 
+1&0&0&0&1&0&1&0&0\\ 
+1&0&0&1&0&1&1&0&0\\ 
+1&1&1&0&1&0&1&1&1\\ 
+0&0&0&1&1&1&0&1&0\\ 
+0&0&0&0&0&1&1&0&1\\ 
+0&0&0&0&0&1&0&1&0\\ 
 \end{pmatrix}$}
 \end{minipage}
 \caption{The flipped subset ordering and corresponding flipped adjacency matrix for the partitioning scheme in Fig. \ref{25basematrix}.}
@@ -231,16 +167,16 @@ We then get the upper triangular and lower triangular portions of the flipped ad
 We feed the triangular matrices into networkx's DiGraph function, along with a mapping of the flipped subset ids to the original subset ids (shown in Fig. \ref{25basematrix}). Figure \ref{25_q1q2graphs} shows the DAGs for quadrants 1 and 2.
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
-\includegraphics[scale=0.55]{../../figures/25_graph1.pdf}
+\includegraphics[scale=0.55]{../../figures/9_graph1.pdf}
 \end{minipage}
 \begin{minipage}[c]{0.5\textwidth}
-\includegraphics[scale=0.55]{../../figures/25_graph2.pdf}
+\includegraphics[scale=0.55]{../../figures/9_graph2.pdf}
 \end{minipage}
 \caption{The quadrant 1 DAG (left) and the quadrant 2 DAG(right).}
 \label{25_q1q2graphs}
 \end{figure}
 Upon inspection of these two DAGs, we see that they show the correct connectivity, dependency, and expected opposing sweep ordering. 
-Quadrant 1 starts its sweep from subset 4, finishing at subset 20, and quadrant 3 starts its sweep from subset 20, finishing at subset 4.
+Quadrant 1 starts its sweep from subset 2, finishing at subset 6, and quadrant 2 starts its sweep from subset 6, finishing at subset 2.
 
 %Weighting the TDGS
 \subsection{Weighting the task dependence graphs}
