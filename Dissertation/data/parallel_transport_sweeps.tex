@@ -64,13 +64,13 @@ T_{\text{task}} = A_x A_y A_z A_m A_g T_{\text{grind}},
 \end{equation}
 where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. Note that Eq. \ref{Ttask} is idealized as it does not take into account overhead in various parts of the sweep implementation.
 
-Before expanding on the proposed method of partitioning and scheduling for parallel transport sweeps, a quick review of some transport sweep algorithms is necessary. Our method will expand on PDT's sweep algorithm\cite{mpadams2013}, which is an extension of the popular KBA algorithm\cite{KBA}.
+Before expanding on the proposed method of partitioning and scheduling for parallel transport sweeps, a quick review of some transport sweep algorithms is necessary. Our method will expand on PDT's sweep algorithm \cite{mpadams2013}, which is an extension of the popular KBA algorithm \cite{KBA}.
 
 \section{The KBA Algorithm}
 
 Several parallel transport sweep codes use KBA partitioning in their sweeping, such as Denovo \cite{denovo} and PARTISN \cite{partisn}. The KBA partitioning scheme and algorithm was developed by Koch, Baker, and Alcouffe \cite{KBA}.
 
-The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. This partitions the domain into longer, thin columns. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. KBA uses a ``pipelining" or assembly line approach where new work is started before old work is fully completed. Figure \ref{pipeline_example} shows an example of pipelining the angular work of a quadrant.
+The KBA algorithm traditionally chooses $P_z = 1, A_m = 1 \text{ (or 1 angle per angleset)}, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. This partitions the domain into long, thin columns. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. The KBA algorithm traditionally solves a problem one energy group at a time, and uses a ``pipelining'' or assembly line approach. This allows for new angles in an octant to begin sweeping before old angles have fully swept across the spatial domain. Figure \ref{pipeline_example} shows an example of pipelining the angular work of a quadrant.
 
 \begin{figure}[H]
 \centering
@@ -79,24 +79,28 @@ The KBA algorithm traditionally chooses $P_z = 1, A_m = 1, G = A_g = 1, A_x = N_
 \label{pipeline_example}
 \end{figure}
 
-In Fig. \ref{pipeline_example}, we see that as soon as a processor is free to solve the next angle with the same sweep ordering, it begins immediately. KBA introduced pipelining in order to combat the inherent inefficiencies of waiting for all processors to complete a sweep in a direction before starting the next angle. 
+In Fig. \ref{pipeline_example}, each square represents a processor that owns a group of $AxAy$ cells. We see that as soon as a processor is free to solve the next angle with the same sweep ordering, it begins immediately. KBA introduced pipelining in order to combat the inherent inefficiencies of waiting for all processors to complete a sweep in a direction before starting the next angle. 
 
-There are two variants to the KBA algorithm, ``successive in angle, successive in quadrant", and ``simultaneous in angle, successive in quadrant".  With ``successive in angle, successive in quadrant", an octant pipelines its angular work, and once all directions are complete the opposing octant pipelines them back. This is then done for the remaining octant pairs. With ``simultaneous in angle, successive in quadrant", all angles from one octant are simultaneously solved, and upon completion the opposing octant solves them. This is then done for the remaining octant pairs. The KBA parallel efficiency\cite{mpadams2013} for ``successive in angle, successive in quadrant" is:
+There are two variants to the KBA algorithm, ``successive in angle, successive in quadrant", and ``simultaneous in angle, successive in quadrant".  With ``successive in angle, successive in quadrant", an octant pipelines its angular work, and once all directions are complete the opposing octant pipelines them back. This is then done for the remaining octant pairs. With ``simultaneous in angle, successive in quadrant", all angles from one octant are simultaneously solved, and upon completion the opposing octant solves them. This is then done for the remaining octant pairs. The KBA parallel efficiency \cite{mpadams2013} for ``successive in angle, successive in quadrant" is:
 \begin{equation}
   \epsilon_{KBA} \approx \frac{1}{[1 + \frac{4(P_x+P_y-2)}{8MN_k}][1 + \frac{T_{\text{comm}}}{T_{\text{{task}}}}]}.
+  \label{eps_kba}
 \end{equation}
 
 \section{PDT's extension of KBA}\label {pdt_extension}
 
-PDT's extension of KBA does not limit $P_z, A_m, G,$ or $A_g$. In addition, all 8 octants (4 quadrants in 2D) begin work immediately. Unlike KBA, PDT's scheduling requires conflict resolution in its algorithm, as the pipelines from all octants will end up intersecting toward the middle of the processor domain.
+PDT's extension of KBA does not limit $P_z, A_m, G,$ or $A_g$. In addition, all 8 octants (4 quadrants in 2D) begin work immediately. Unlike KBA, PDT's scheduling requires conflict resolution in its algorithm, as the pipelines from all octants will end up colliding toward the middle of the processor domain.
 
 If two or more tasks reach a processor at the same time, PDT employs a tie breaking strategy:
 
 \begin{enumerate}
 	\item The task with the greater depth-of-graph remaining (simply, more work remaining) goes first.
-	\item If the depth-of-graph remaining is tied, the task with $\Omega_x > 0$ wins.
-	\item If multiple tasks have $\Omega_x > 0$, then the task with $\Omega_y > 0$ wins.
-	\item If multiple tasks have $\Omega_y > 0$, then the task with $\Omega_z > 0$ wins.
+	\item If the depth-of-graph remaining is tied, then octant-priority tie-breaking is used:
+	\begin{enumerate}
+	  \item The task with $\Omega_x > 0$ wins.
+	  \item If multiple tasks have $\Omega_x > 0$, then the task with $\Omega_y > 0$ wins.
+	  \item If multiple tasks have $\Omega_y > 0$, then the task with $\Omega_z > 0$ wins.
+	\end{enumerate}
 \end{enumerate}
 
 Given these conflict resolution techniques, the minimum possible number of stages for given partitioning parameters $P_i$ and $A_j$ is $2N_{\text{fill}} + N_{\text{tasks}}$. $N_{\text{fill}}$ is both the minimum number of stages before a sweepfront can reach the center-most processors and the number needed to finish a direction's sweep after the center-most processors have finished. Equations \ref{nfill}, \ref{nidle}, and \ref{ntasks} define $N_{\text{fill}}, N_{\text{idle}}$, and $N_{\text{tasks}}$:
@@ -116,5 +120,35 @@ N_\text{tasks} = 8N_mN_gN_k
 
 Plugging these definitions into Eq. \ref{paralleleff}, the PDT optimal parallel efficiency\cite{mpadams2013} is:
 \begin{equation}
-	\epsilon \approx \frac{1}{ [1 + \frac{P_x + P_y - 4 + N_k(P_z -2)}{8MGN_k/(A_m A_G)} ]  [ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}} ]}
+	\epsilon_{opt} \approx \frac{1}{ [1 + \frac{P_x + P_y - 4 + N_k(P_z -2)}{8MGN_k/(A_m A_G)} ]  [ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}} ]}
+	\label{eps_opt}
 \end{equation}
+
+In the limit of a large number of processors $P$, the optimal algorithm yields the same efficiency as KBA with 32 times as many processors \cite{mpadams2013, mpadams2015}. 
+
+\section{PDT's Performance Model}
+
+To aid in the selection of optimal processor and aggregation parameters, PDT uses a performance model to estimate the sweep time.
+This performance model is the basis for the cost function described in Chapter \ref{cha:tts}. 
+Equation \ref{sweep_time} calculates the sweep time by multiplying the time it takes to solve each stage by the number of stages. This is then multiplied by a multi-core fudge factor that estimates the performance drop-off from 1 to 8 cores.
+\begin{equation}
+\text{Sweep Time} = \text{mcff}\cdot[\text{num stages}\cdot(T_{wu} + 3\cdot \text{latency}\cdot M_L + T_{\text{byte}}\cdot N_{\text{bytes}} + N_{\text{cells}}\cdot ( T_c +  A_m\cdot (T_m + T_g)))],
+\label{sweep_time}
+\end{equation}
+where:
+\begin{itemize}
+  \item mcff = the Multi-Core Fudge Factor, a corrective factor that accounts for performance drop-off from 1 to 8 cores,
+  \item num stages = tasks per processor + $2N_{\text{idle}}$,
+  \item tasks per processor = $\frac{N_x}{P_x A_x} \frac{N_y}{P_y A_y} \frac{N_z}{P_z A_z} \frac{N_m}{A_m} \frac{N_g}{A_g}$,
+  \item $T_{wu}$ = the time to get into the sweep operator,
+  \item latency = the machine specific communication latency,
+  \item $M_L$ = the machine specific latency multiplier,
+  \item $T_{\text{byte}}$ = the communication time per double,
+  \item $N_{\text{byte}}$ = the bytes per 3 communications (assuming 3 neighbors) = $(A_x A_y + A_x A_z + A_y A_z)A_g A_m upbc $,
+  \item $upbc$ = unknowns per boundary cell (4 for 3d, 2 for 2d),
+  \item $N_{\text{cells}}$ = the number of cells per task, $A_x A_y A_z$,
+  \item $T_c$ = the time spent solving cell-specific work,
+  \item $T_m$ = the time spent solving angle-specific work,
+  \item $T_g$ = the time spent solving group-specific work.
+\end{itemize}
+
