@@ -433,11 +433,12 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
         boundary_cells = 0.0
         latency  = 0.0
       if test:
-#        if (k == k_n):
-#          cost = 1
-#        else:
-#          cost = Az
-        cost = 1
+        if (neighbor == -1):
+          cost = Az
+        elif (k == k_n):
+          cost = 1
+        else:
+          cost = Az
       else:
         cost = mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*Am*upbc + num_cells*(Tc + Am*(Tm + Tg)))
       graph[e[0]][e[1]]['weight'] = cost
@@ -450,8 +451,12 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
         out_edges = [out_edges_list[i][2] for i in range(num_edges)]
         time_to_solve[ig][n] = max(out_edges)
         neighbors = list(graph.successors(n))
-        for i in neighbors:
-          graph[n][i]['weight'] = max(out_edges)
+        if (Az == 1):
+          for i in neighbors:
+            graph[n][i]['weight'] = max(out_edges)
+#        else:
+#          for i in neighbors:
+#            graph[n][i]['weight'] = max(out_edges)
   
   return graphs,time_to_solve
       
@@ -1253,8 +1258,8 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
   counter = 0
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-#    if (t == 0.119972786724):
-#      print("debug stop")
+    if (t == 4.0):
+      print("debug stop")
 
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
