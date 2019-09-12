@@ -736,7 +736,6 @@ def find_next_interaction(graphs,prev_nodes,start_time,time_to_solve):
 
 def find_next_interaction_simple(graphs,prev_nodes,start_time,time_to_solve):  
   num_graphs = len(graphs)
-  
   next_time = float("inf")
   for g in range(0,num_graphs):
     
@@ -746,6 +745,13 @@ def find_next_interaction_simple(graphs,prev_nodes,start_time,time_to_solve):
     
     for node in start_nodes:
       successors = list(graph.successors(node))
+      #Get incoming edge weights to this node. 
+      in_edges_list = list(graph.in_edges(node,'weight'))
+      num_in_edges = len(in_edges_list)
+      in_edges = [in_edges_list[i][2] for i in range(num_in_edges)]
+      rts = min(in_edges)
+      if rts > start_time and rts < next_time:
+        next_time = rts
       for s in successors:
         #Getting the time the next node is ready to solve.
         next_node_solve = graph[node][s]['weight']
@@ -1258,7 +1264,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
   counter = 0
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if (t == 4.0):
+    if (t == 5.0):
       print("debug stop")
 
     #Getting the nodes that are being solved at time t for all graphs.
