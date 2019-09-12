@@ -1264,7 +1264,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
   counter = 0
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if (t == 5.0):
+    if (t == 9.0):
       print("debug stop")
 
     #Getting the nodes that are being solved at time t for all graphs.
