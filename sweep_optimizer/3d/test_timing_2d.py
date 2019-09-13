@@ -48,9 +48,10 @@ for i in range(0,len(num_rows)):
   num_col = num_cols[i]
   xmax = xmaxs[i]
   ymax = ymaxs[i]
+  Ay = 2
 
   x_cuts,y_cuts = create_2d_cuts(xmin,xmax,num_col,ymin,ymax,num_row)
   params = create_parameter_space(x_cuts,y_cuts,num_row,num_col)
   
-  max_time_reg = optimized_tts(params, f,xmin,xmax,ymin,ymax,num_row,num_col,machine_parameters,num_angles,Am,unweighted)
+  max_time_reg = optimized_tts(params, f,xmin,xmax,ymin,ymax,num_row,num_col,machine_parameters,num_angles,Am,Ay,unweighted)
   times[i] = max_time_reg

@@ -24,7 +24,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 #The communication time per byte. 
 
 #Plots graphs at a specific time. Will help with debugging.
-def plot_graphs(graphs,t,counter,num_angle):
+def plot_graphs(graphs,t,num_angle):
   
   #A dictionary for node positions for quadrant 0.
   Q0 = {}
@@ -71,12 +71,13 @@ def plot_graphs(graphs,t,counter,num_angle):
   
   grange = range(0,4)
   for g in grange:
-    plt.figure(str(g)+str(t) + str(counter))
-    plt.title("Time " + str(t) + " Graph " + str(g))
+    plt.figure(str(g)+str(t))
+    plt.title("Graph " + str(g) + " Time " + str(t))
+    graph_name = "graph_"+str(g)+"_time_"+str(t)+".pdf"
     edge_labels_1 = nx.get_edge_attributes(graphs[g],'weight')
     nx.draw(graphs[g],Q[g],with_labels = True,node_color='red')
     nx.draw_networkx_edge_labels(graphs[g],Q[g],edge_labels=edge_labels_1,font_size=12)
-    plt.savefig("../../figures/graph_"+str(int(t))+ "_" + str(counter)+"_"+str(g)+".pdf")
+    plt.savefig("debug_graph_plots/"+graph_name)
     plt.close()
     
 def debug_plot_graphs(graphs,t):
@@ -450,7 +451,7 @@ def find_shared_bound(node,succ,num_row,num_col,num_plane):
     
   return bounds_check
 
-def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col,Am,test):
+def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col,Am,Ay,test):
   
   num_graphs = len(graphs)
   num_subsets = len(global_subset_boundaries)
@@ -497,6 +498,12 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
         latency  = 0.0
       if test:
         cost = 1.0
+        if neighbor == -1:
+          cost = Ay
+        elif (j_node == j_neighbor):
+          cost = 1.0
+        else:
+          cost = Ay
       else:
         cost = mcff*(Twu + 2*latency*m_l + t_comm*boundary_cells*upbc + num_cells*(Tc + Am*(Tm + Tg)))
       graph[node][neighbor]['weight'] = cost
@@ -507,7 +514,8 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       out_edges = list(graph.out_edges(n,'weight'))
       num_edges = len(out_edges)
       out_edges = [out_edges[i][2] for i in range(num_edges)]
-      time_to_solve[ig][n] = max(out_edges)
+      #time_to_solve[ig][n] = max(out_edges)
+      time_to_solve[ig][n] = Ay
       
   return graphs,time_to_solve
 
@@ -1387,8 +1395,9 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
   counter = 0
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if (t == 1.0):
+    if (t == 0.0):
       #debug_plot_graphs(graphs,t)
+      plot_graphs(graphs,t,num_angles)
       print("debug stop")
 
     #Getting the nodes that are being solved at time t for all graphs.
@@ -1397,7 +1406,6 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
       graph = graphs[g]
       if not prev_nodes[g]:
         prev_nodes[g] = starting_nodes[g]
-      #all_nodes_being_solved[g] = nodes_being_solved_general(graph,t,time_to_solve[g])
       all_nodes_being_solved[g],nodes_already_solved[g] = nodes_being_solved_general_sped_up(graph,t,nodes_already_solved[g],time_to_solve[g])
     prev_nodes = all_nodes_being_solved
     #Finding any nodes in conflict at time t.
@@ -1405,14 +1413,12 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
     num_conflicting_nodes = len(conflicting_nodes)
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
-      #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
       t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
 
     #Otherwise, we address the conflicts between nodes across all graphs.
     else:
       #Find nodes ready to solve at time t that are in conflict.
       first_nodes = find_first_conflict(conflicting_nodes,graphs)        
-      #graphs = modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,first_nodes,time_to_solve,num_angles,unweighted,nodes_already_solved)
       graphs = modify_secondary_graphs_mult_node_faster(graphs,conflicting_nodes,first_nodes,time_to_solve,num_angles,unweighted,nodes_already_solved)
       #To update our march through, we need to update t here, with a find_next_interaction.
       if (num_conflicting_nodes == len(first_nodes)):
@@ -1652,7 +1658,7 @@ def time_to_solution_numerical(points,x_cuts,y_cuts,machine_params,num_col,num_r
 
 
 #The time to solution function that is fed into the optimizer.
-def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,machine_params,num_angles,Am,unweighted):
+def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,machine_params,num_angles,Am,Ay,unweighted):
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   #Building subset boundaries.
@@ -1665,7 +1671,7 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   #Building the graphs.
   graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
-  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,Am,False)
+  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,Am,Ay,True)
   graphs = pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
