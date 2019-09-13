@@ -69,7 +69,6 @@ def plot_graphs(graphs,t,counter,num_angle):
     Q.append(copy(Q2))
     Q.append(copy(Q3))
   
-  num_graphs = len(graphs)
   grange = range(0,4)
   for g in grange:
     plt.figure(str(g)+str(t) + str(counter))
@@ -80,6 +79,130 @@ def plot_graphs(graphs,t,counter,num_angle):
     plt.savefig("../../figures/graph_"+str(int(t))+ "_" + str(counter)+"_"+str(g)+".pdf")
     plt.close()
     
+def debug_plot_graphs(graphs,t):
+  
+  Q0 = {}
+  Q0[-2] = [-1,0]
+  Q0[0] = [0,0]
+  Q0[1] = [2,1]
+  Q0[2] = [2,0]
+  Q0[4] = [2,-1]
+  Q0[3] = [6,1]
+  Q0[5] = [6,0]
+  Q0[6] = [6,-1]
+  Q0[7] = [8,0]
+  Q0[-1] = [9.5,0]
+  
+  Q1 = {}
+  Q1[-2] = [-1,0]
+  Q1[1] = [0,0]
+  Q1[3] = [2,1]
+  Q1[0] = [2,0]
+  Q1[5] = [2,-1]
+  Q1[2] = [6,1]
+  Q1[4] = [6,0]
+  Q1[7] = [6,-1]
+  Q1[6] = [8,0]
+  Q1[-1] = [9.5,0]
+ 
+  Q2 = {}
+  Q2[-2] = [-1,0]
+  Q2[2] = [0,0]
+  Q2[3] = [2,1]
+  Q2[0] = [2,0]
+  Q2[6] = [2,-1]
+  Q2[4] = [6,1]
+  Q2[7] = [6,0]
+  Q2[1] = [6,-1]
+  Q2[5] = [8,0]
+  Q2[-1] = [9.5,0]
+
+  Q3 = {}
+  Q3[-2] = [-1,0]
+  Q3[3] = [0,0]
+  Q3[1] = [2,1]
+  Q3[2] = [2,0]
+  Q3[7] = [2,-1]
+  Q3[5] = [6,1]
+  Q3[6] = [6,0]
+  Q3[0] = [6,-1]
+  Q3[4] = [8,0]
+  Q3[-1] = [9.5,0]
+ 
+  Q4 = {}
+  Q4[-2] = [-1,0]
+  Q4[4] = [0,0]
+  Q4[5] = [2,1]
+  Q4[6] = [2,0]
+  Q4[0] = [2,-1]
+  Q4[1] = [6,1]
+  Q4[2] = [6,0]
+  Q4[7] = [6,-1]
+  Q4[3] = [8,0]
+  Q4[-1] = [9.5,0]
+
+  Q5 = {}
+  Q5[-2] = [-1,0]
+  Q5[5] = [0,0]
+  Q5[4] = [2,1]
+  Q5[7] = [2,0]
+  Q5[1] = [2,-1]
+  Q5[6] = [6,1]
+  Q5[0] = [6,0]
+  Q5[3] = [6,-1]
+  Q5[2] = [8,0]
+  Q5[-1] = [9.5,0]
+
+  Q6 = {}
+  Q6[-2] = [-1,0]
+  Q6[6] = [0,0]
+  Q6[4] = [2,1]
+  Q6[7] = [2,0]
+  Q6[2] = [2,-1]
+  Q6[0] = [6,1]
+  Q6[3] = [6,0]
+  Q6[5] = [6,-1]
+  Q6[1] = [8,0]
+  Q6[-1] = [9.5,0]
+
+  Q7 = {}
+  Q7[-2] = [-1,0]
+  Q7[7] = [0,0]
+  Q7[5] = [2,1]
+  Q7[6] = [2,0]
+  Q7[3] = [2,-1]
+  Q7[1] = [6,1]
+  Q7[2] = [6,0]
+  Q7[4] = [6,-1]
+  Q7[0] = [8,0]
+  Q7[-1] = [9.5,0]
+
+
+
+  Q = [Q0,Q1,Q2,Q3,Q4,Q5,Q6,Q7]
+  
+  num_graphs = len(graphs)
+  for g in range(0,num_graphs):
+    graph = graphs[g]
+    plt.figure()
+    graph_name = "Graph " + str(g) + " Time " + str(t)
+    graph_file_name = "graph_"+str(g)+"time"+str(t)+".pdf"
+    plt.title(graph_name)
+    edge_labels = (nx.get_edge_attributes(graph,'weight'))
+    nx.draw(graph,Q[g],with_labels = True,node_color='red')
+    nx.draw_networkx_edge_labels(graph,Q[g],edge_labels=edge_labels,font_size=4)
+    plt.savefig("debug_graph_plots/"+graph_file_name)
+    plt.close()
+    
+
+def print_edges(graphs):
+  file = open("graph_output.txt","w")
+  num_graphs = len(graphs)
+  for g in range(0,num_graphs):
+    graph = graphs[g]
+    print("Graph " + str(g), file=open("graph_output.txt","a"))
+    print(graph.edges(data=True), file = open("graph_output.txt","a"))
+    print("\n",file=open("graph_output.txt","a"))
 
 #A modified version of networkx simple paths algorithm. This behaves as a weight based depth traversal algorithm.
 def all_simple_paths_modified(G, source, target, time_to_solve_graph, cutoff=None):
@@ -1264,7 +1387,8 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
   counter = 0
   while num_finished_graphs < num_graphs:
     print('Time t = ', t)
-    if (t == 9.0):
+    if (t == 1.0):
+      #debug_plot_graphs(graphs,t)
       print("debug stop")
 
     #Getting the nodes that are being solved at time t for all graphs.
@@ -1276,14 +1400,9 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
       #all_nodes_being_solved[g] = nodes_being_solved_general(graph,t,time_to_solve[g])
       all_nodes_being_solved[g],nodes_already_solved[g] = nodes_being_solved_general_sped_up(graph,t,nodes_already_solved[g],time_to_solve[g])
     prev_nodes = all_nodes_being_solved
-#    print("Nodes being solved in each graph")
-#    print(all_nodes_being_solved)
     #Finding any nodes in conflict at time t.
     conflicting_nodes = find_conflicts(all_nodes_being_solved)
     num_conflicting_nodes = len(conflicting_nodes)
-    
-#    print("The graphs in conflict for each node")
-#    print(conflicting_nodes)
     #If no nodes are in conflict, we continue to the next interaction.
     if bool(conflicting_nodes) == False:
       #t = find_next_interaction(graphs,prev_nodes,t,time_to_solve)
