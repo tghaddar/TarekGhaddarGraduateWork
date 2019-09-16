@@ -49,8 +49,8 @@ In this dissertation, we only use Directed Acyclic Graphs (DAGs), or a graph tha
 \caption{A directed graph with a cycle between nodes 1 and 3.}
 \label{cycle_example}
 \end{figure}
-We notice the edge connected nodes 1 and 3 has a double headed arrow. Our partitioning scheme cuts subsets in a fashion that doesn't allow for cycles in our graphs. 
-Graphs with cycles can be solved for a variety of applications through the use of cycle detection and breaking algorithms. 
+We notice the edge connecting nodes 1 and 3 has a double headed arrow, representing a cycle. Graphs with cycles can be solved for a variety of applications through the use of cycle detection and breaking algorithms, but our partitioning scheme cuts subsets in a fashion that doesn't allow for cyclical graphs.
+
 Graph edges can be weighted based on the need of the application the graph is being used for. Here, we weight the graph edges to represent the time it takes to solve node A plus the communication time to node B. 
 Figure \ref{weighted_directed_graph} shows a weighted directed graph. 
 In the context of the time-to-solution estimator, subset 1 takes 3 seconds to solve and communicate to subset 3. 
@@ -65,7 +65,7 @@ The time-to-solution estimator uses Johnson's algorithm \cite{intro_to_alg,johns
 The weighted shortest path is defined as the path between two nodes that has the smallest weighted sum. 
 For example, the shortest path between nodes 0 and 3 in Fig. \ref{weighted_directed_graph} is $0\rightarrow 2\rightarrow 3$. 
 
-In our application, we use Johnson's algorithm to assist in calculate the longest path between two nodes in a DAG (needed in Section\ref{sec:universal}). 
+In our application, we use Johnson's algorithm to assist in calculate the longest path between two nodes in a DAG (needed in Section \ref{sec:universal}). 
 The longest path is found by:
 \begin{enumerate}
   \item Multiplying all edge weights by -1,
