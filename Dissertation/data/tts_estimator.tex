@@ -82,18 +82,19 @@ Johnson's algorithm is specifically used in this process because it is capable o
 %\caption{The DAG in Fig. \ref{
 %\label{negative_weights}
 %\end{figure}
-
+Now that the applicable graph theory has been reviewed, we detail the methodology of the time-to-solution estimator.
+ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Method}
 The time-to-solution estimator determines the time to sweep across a domain by:
 \begin{enumerate}
-	\item Given a partitioning scheme, build an adjacency matrix.
-	\item Build Directed Acyclic Graphs  (DAGs) from the adjacency matrix, one for each quadrant/octant.
-	\item Weight the edges of each graph based on the solve and communication time of each subset to its neighbors.
-     \item Add and adjust graphs based on how many angles are pipelined.
-	\item Adjust the weights of each graph to operate on the universal timescale.
-	\item Adjust the weights of each graph to reflect sweep conflicts between octants. 
-	\item Calculate the time to solution.
+	\item Given a partitioning scheme, building an adjacency matrix,
+	\item Building Directed Acyclic Graphs (DAGs) from the adjacency matrix, one for each quadrant/octant,
+	\item Weighting the edges of each graph based on the solve time and communication time of each subset to its neighbors,
+     \item Adding and modifying graph weights based on how many anglesets are pipelined,
+	\item Modifying the weights of each graph to operate on the universal timescale,
+	\item Modifying the weights of each graph to reflect sweep conflicts between octants, 
+	\item Calculating the time to solution.
 \end{enumerate}
 
 \subsection{Building the adjacency matrices}
@@ -107,11 +108,11 @@ Figure \ref{25basematrix} shows a partitioning scheme for 3 subsets each in the 
 
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
-\raggedleft
+\centering
 \includegraphics[scale=0.55]{../../figures/boundaries_worst.pdf}
 \end{minipage}
-\begin{minipage}[c]{0.5\textwidth}
-\raggedright
+\begin{minipage}[c]{0.6\textwidth}
+\centering
 \scalebox{0.5}{
 $\begin{pmatrix}
 0&1&0&1&0&0&0&0&0\\ 
@@ -131,7 +132,7 @@ $\begin{pmatrix}
 
 \subsection{Building the directed acyclic graphs (DAGs)}
 
-The adjacency matrix give us crucial connectivity information in order to build our graphs. This process differs slightly from 2D to 3D. Both processes rely on networkx's DiGraph function to build the DAGs.
+The adjacency matrices give us directed connectivity information in order to build our graphs. This process differs slightly from 2D to 3D. Both processes use on networkx's DiGraph function to build the DAGs.
 
 \subsubsection{Building the 2d graphs}
 In two dimensions, we build four graphs corresponding to four quadrants. 
@@ -207,7 +208,7 @@ To obtain the graphs for quadrants 1 and 2, a ``flipped'' version of the adjacen
 We temporarily renumber the subsets starting from the top left corner, and increasing down each column, as shown in Fig. \ref{25flippedmatrix}.
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
-\raggedleft
+\centering
 \includegraphics[scale=0.55]{../../figures/boundaries_worst_flipped.pdf}
 \end{minipage}
 \begin{minipage}[c]{0.5\textwidth}
