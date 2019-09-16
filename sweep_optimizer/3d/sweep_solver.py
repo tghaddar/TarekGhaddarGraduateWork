@@ -248,8 +248,53 @@ def plot_standard_graphs(graphs,boundaries,numrow,numcol):
     nx.draw_networkx_edge_labels(graph,Q[g],edge_labels=edge_labels,font_size=4)
     plt.savefig("standard_graph_plots/"+graph_file_name+".pdf")
     plt.close()
-    
+  
+  return Q
 
+def get_node_positions(boundaries,numrow,numcol):
+  Q_base = {}
+  num_subsets = len(boundaries)
+  for i in range(0,num_subsets):
+    subset_boundary = boundaries[i]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+  
+    center_x = (xmin+xmax)/2
+    center_y = (ymin+ymax)/2
+    Q_base[i] = [center_x,center_y]
+
+  #Quadrant 0.
+  Q0 = copy(Q_base)
+  Q0[-2] = [Q_base[0][0] - 1, Q_base[0][1] - 1]
+  Q0[-1] = [Q_base[num_subsets-1][0] + 1, Q_base[num_subsets-1][1] + 1]
+  
+  #Quadrant 1.
+  Q1 = copy(Q_base)
+  start = numrow-1
+  endi = numcol-1
+  endj = 0
+  end = get_ss_id(endi,endj,numrow)
+  Q1[-2] = [Q_base[start][0] - 1, Q_base[start][1] + 1]
+  Q1[-1] = [Q_base[end][0] + 1, Q_base[end][1] - 1]
+  
+  #Quadrant 2.
+  Q2 = copy(Q_base)
+  start2 = end
+  end2 = numrow - 1
+  Q2[-2] = [Q_base[start2][0] + 1, Q_base[start2][1] - 1]
+  Q2[-1] = [Q_base[end2][0] - 1, Q_base[end2][1] + 1]
+
+  #Quadrant 3.
+  Q3 = copy(Q_base)
+  Q3[-2] = [Q_base[num_subsets-1][0] + 1, Q_base[num_subsets-1][1] + 1]
+  Q3[-1] = [Q_base[0][0] - 1, Q_base[0][1] - 1]
+  
+  Q = [Q0,Q1,Q2,Q3]
+  
+  return Q
+  
 def print_edges(graphs):
   file = open("graph_output.txt","w")
   num_graphs = len(graphs)
