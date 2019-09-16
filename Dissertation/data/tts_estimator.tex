@@ -16,8 +16,9 @@
 
 
 \chapter{TIME-TO-SOLUTION ESTIMATOR \label{cha:tts}}
-
-Before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme. The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This chapter will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies. 
+With the introduction of unstructured meshes and imbalanced partitions in PDT, we need an expansion of the performance model to estimate the sweep time. 
+Before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme. 
+The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This chapter will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies. 
 
 The time to solution estimator is written in Python 3. Python was chosen as the language because of its powerful graph library, networkx. 
 This library gives us a wide variety of graph mathematics and is easy to use. 
