@@ -27,8 +27,8 @@ machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 
 
 #Number of rows and columns and planes.
-numcol = 2
-numrow = 2
+numcol = 8
+numrow = 4
 numplane = 2
 num_angles = 1
 Am = 10
@@ -37,11 +37,11 @@ unweighted=True
 
 #Global boundaries.
 global_xmin = 0.0
-global_xmax = 8.0
+global_xmax = 64.0
 global_ymin = 0.0
-global_ymax = 8.0
+global_ymax = 64.0
 global_zmin = 0.0
-global_zmax = 8.0
+global_zmax = 64.0
 
 #An adjusted Az for regular cases that normalizes the boundary cost for each processor so it matches the performance model.
 Az = global_zmax/2

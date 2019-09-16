@@ -20,7 +20,48 @@
 Before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme. The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This chapter will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies. 
 
 The time to solution estimator is written in Python 3. Python was chosen as the language because of its powerful graph library, networkx. 
-This library gives us a wide variety of graph mathematics that is optimized and easy to use. 
+This library gives us a wide variety of graph mathematics and is easy to use. 
+Before detailing the time-to-solution estimator's methodology, a description of the applicable basic graph theory is necessary. 
+
+\section{Graph Theory Applicable to the Time-to-Solution Estimator}
+
+Graph theory is a subset of mathematics that focuses on graphs, or structures containing a set of objects that are connected in a particular manner \cite{graphtheory}. 
+These objects are called vertices (or nodes), and are connected by edges. 
+Figure \ref{basic_graph} shows an undirected graph of 4 nodes and 4 edges. The nodes are a mathematical abstraction that can be used to represent a variety of concepts. In this dissertation, they are used to represent the subsets described in Chapter \ref{cha:lb}.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{../../figures/undirected_graph.pdf}
+\caption{An undirected graph with 4 nodes and 4 edges. }
+\label{basic_graph}
+\end{figure}
+Figure \ref{basic_graph} is referred to as an undirected because its edges have no directional information. 
+If we add directional information to the edges of the graph in Fig. \ref{basic_graph}, it becomes a directed graph, shown in Fig. \ref{directed_graph}. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{../../figures/directed_graph.pdf}
+\caption{A directed graph with 4 nodes and 4 edges. }
+\label{directed_graph}
+\end{figure}
+In this dissertation, we only use Directed Acyclic Graphs (DAGs), or a graph that has no cycles.  A cycle is defined as a path on a graph that starts and ends at the same vertex. Figure \ref{cycle_example} shows a cycle between nodes 1 and 3. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{../../figures/cycle_example.pdf}
+\caption{A directed graph with a cycle between nodes 1 and 3.}
+\label{cycle_example}
+\end{figure}
+We notice the edge connected nodes 1 and 3 has a double headed arrow. Our partitioning scheme cuts subsets in a fashion that doesn't allow for cycles in our graphs. 
+Graphs with cycles can be solved for a variety of applications through the use of cycle detection and breaking algorithms. 
+Graph edges can be weighted based on the need of the application the graph is being used for. Here, we weight the graph edges to represent the time it takes to solve node A plus the communication time to node B. 
+Figure \ref{weighted_directed_graph} shows a weighted directed graph. 
+In the context of the time-to-solution estimator, subset 1 takes 3 seconds to solve and communicate to subset 3. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{../../figures/weighted_directed_graph.pdf}
+\caption{A weighted directed acyclic graph with 4 nodes and 4 weighted edges.}
+\label{weighted_directed_graph}
+\end{figure}
+
+The time-to-solution estimator uses Johnson's algorithm \cite{intro_to_alg,johnson_nist,johnson_johnson} to find all shortest paths in a weighted directed graph. 
 
 \section{Method}
 The time-to-solution estimator determines the time to sweep across a domain by:

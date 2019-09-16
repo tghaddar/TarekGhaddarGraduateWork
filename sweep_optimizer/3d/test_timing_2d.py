@@ -28,18 +28,18 @@ machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 
 num_rows = [2,4,8,16,32]
 num_cols = [2,4,8,16,32]
-num_rows = [2]
-num_cols=[2]
+num_rows = [4]
+num_cols=[4]
 unweighted = True
 num_angles = 1
 Am = 10
 
 xmin = 0.0
 xmaxs = [32.0,64.0,128.0,256.0,512.0]
-#xmaxs = [32.0]
+xmaxs = [16.0]
 ymin = 0.0
 ymaxs = [32.0,64.0,128.0,256.0,512.0]
-#ymaxs=[32.0]
+ymaxs=[16.0]
 
 times = [None]*len(num_rows)
 
@@ -48,7 +48,7 @@ for i in range(0,len(num_rows)):
   num_col = num_cols[i]
   xmax = xmaxs[i]
   ymax = ymaxs[i]
-  Ay = 2
+  Ay = ymax/num_row
 
   x_cuts,y_cuts = create_2d_cuts(xmin,xmax,num_col,ymin,ymax,num_row)
   params = create_parameter_space(x_cuts,y_cuts,num_row,num_col)

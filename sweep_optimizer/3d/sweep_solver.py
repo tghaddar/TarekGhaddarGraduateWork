@@ -195,6 +195,60 @@ def debug_plot_graphs(graphs,t):
     plt.savefig("debug_graph_plots/"+graph_file_name)
     plt.close()
     
+def plot_standard_graphs(graphs,boundaries,numrow,numcol):
+  
+  Q_base = {}
+  num_subsets = len(boundaries)
+  for i in range(0,num_subsets):
+    subset_boundary = boundaries[i]
+    xmin = subset_boundary[0]
+    xmax = subset_boundary[1]
+    ymin = subset_boundary[2]
+    ymax = subset_boundary[3]
+  
+    center_x = (xmin+xmax)/2
+    center_y = (ymin+ymax)/2
+    Q_base[i] = [center_x,center_y]
+
+  #Quadrant 0.
+  Q0 = copy(Q_base)
+  Q0[-2] = [Q_base[0][0] - 1, Q_base[0][1] - 1]
+  Q0[-1] = [Q_base[num_subsets-1][0] + 1, Q_base[num_subsets-1][1] + 1]
+  
+  #Quadrant 1.
+  Q1 = copy(Q_base)
+  start = numrow-1
+  endi = numcol-1
+  endj = 0
+  end = get_ss_id(endi,endj,numrow)
+  Q1[-2] = [Q_base[start][0] - 1, Q_base[start][1] + 1]
+  Q1[-1] = [Q_base[end][0] + 1, Q_base[end][1] - 1]
+  
+  #Quadrant 2.
+  Q2 = copy(Q_base)
+  start2 = end
+  end2 = numrow - 1
+  Q2[-2] = [Q_base[start2][0] + 1, Q_base[start2][1] - 1]
+  Q2[-1] = [Q_base[end2][0] - 1, Q_base[end2][1] + 1]
+
+  #Quadrant 3.
+  Q3 = copy(Q_base)
+  Q3[-2] = [Q_base[num_subsets-1][0] + 1, Q_base[num_subsets-1][1] + 1]
+  Q3[-1] = [Q_base[0][0] - 1, Q_base[0][1] - 1]
+  
+  Q = [Q0,Q1,Q2,Q3]
+  for g in range(0,len(Q)):
+    graph = graphs[g]
+    graph_name = "Graph " + str(g)
+    graph_file_name = "graph_"+str(g)
+    plt.figure()
+    plt.title(graph_name)
+    edge_labels = (nx.get_edge_attributes(graph,'weight'))
+    nx.draw(graph,Q[g],with_labels = True,node_color='red')
+    nx.draw_networkx_edge_labels(graph,Q[g],edge_labels=edge_labels,font_size=4)
+    plt.savefig("standard_graph_plots/"+graph_file_name+".pdf")
+    plt.close()
+    
 
 def print_edges(graphs):
   file = open("graph_output.txt","w")
@@ -279,7 +333,7 @@ def modify_downstream_edges(G,source,target,modified_edges,delay):
       
   return G
 
-def modify_downstream_edges_faster(G,graph_index,source,time_to_solve,og_delay):
+def modify_downstream_edges_faster(G,graph_index,source,time_to_solve,og_delay,A):
 
   source_ready_to_solve = get_max_incoming_weight(G,source)
   ready_to_solve_all = {source:source_ready_to_solve}
@@ -514,8 +568,9 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       out_edges = list(graph.out_edges(n,'weight'))
       num_edges = len(out_edges)
       out_edges = [out_edges[i][2] for i in range(num_edges)]
-      #time_to_solve[ig][n] = max(out_edges)
-      time_to_solve[ig][n] = Ay
+      time_to_solve[ig][n] = max(out_edges)
+      if Ay > 1:
+        time_to_solve[ig][n] = Ay
       
   return graphs,time_to_solve
 
@@ -581,6 +636,8 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
         num_edges = len(out_edges_list)
         out_edges = [out_edges_list[i][2] for i in range(num_edges)]
         time_to_solve[ig][n] = max(out_edges)
+        if Az > 1:
+          time_to_solve[ig][n] = Az
         neighbors = list(graph.successors(n))
         if (Az == 1):
           for i in neighbors:
@@ -886,7 +943,7 @@ def find_next_interaction_simple(graphs,prev_nodes,start_time,time_to_solve):
       for s in successors:
         #Getting the time the next node is ready to solve.
         next_node_solve = graph[node][s]['weight']
-        if next_node_solve < next_time:
+        if next_node_solve < next_time and next_node_solve > start_time:
           next_time = next_node_solve
   
   return next_time
@@ -1213,7 +1270,7 @@ def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,ti
   return graphs
 
 
-def modify_secondary_graphs_mult_node_faster(graphs,conflicting_nodes,nodes,time_to_solve,num_angles,unweighted,nodes_already_solved):
+def modify_secondary_graphs_mult_node_faster(graphs,conflicting_nodes,nodes,time_to_solve,num_angles,unweighted,nodes_already_solved,A):
   
   #Copying the graphs frozen at time t.
   
@@ -1250,7 +1307,7 @@ def modify_secondary_graphs_mult_node_faster(graphs,conflicting_nodes,nodes,time
           secondary_graph[node1][node2]['weight'] += delay
         
         #secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
-        secondary_graph = modify_downstream_edges_faster(secondary_graph,second_graph,node,time_to_solve,delay)    
+        secondary_graph = modify_downstream_edges_faster(secondary_graph,second_graph,node,time_to_solve,delay,A)    
         graphs[second_graph] = secondary_graph
       
     
@@ -1368,7 +1425,7 @@ def calculate_delay_rebuild_graphs(first_graph,second_graph,all_edges,node,time_
   
   return delay
     
-def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
+def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted,A):
   
   #The number of graphs.
   num_graphs = len(graphs)
@@ -1397,7 +1454,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
     print('Time t = ', t)
     if (t == 0.0):
       #debug_plot_graphs(graphs,t)
-      plot_graphs(graphs,t,num_angles)
+      #plot_graphs(graphs,t,num_angles)
       print("debug stop")
 
     #Getting the nodes that are being solved at time t for all graphs.
@@ -1419,7 +1476,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted):
     else:
       #Find nodes ready to solve at time t that are in conflict.
       first_nodes = find_first_conflict(conflicting_nodes,graphs)        
-      graphs = modify_secondary_graphs_mult_node_faster(graphs,conflicting_nodes,first_nodes,time_to_solve,num_angles,unweighted,nodes_already_solved)
+      graphs = modify_secondary_graphs_mult_node_faster(graphs,conflicting_nodes,first_nodes,time_to_solve,num_angles,unweighted,nodes_already_solved,A)
       #To update our march through, we need to update t here, with a find_next_interaction.
       if (num_conflicting_nodes == len(first_nodes)):
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
@@ -1675,9 +1732,10 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   graphs = pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
+  plot_standard_graphs(graphs,subset_bounds,num_row,num_col)
   
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
+  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted,Ay)
   solve_times,max_time = compute_solve_time(graphs)
   print('{0:1.3e}'.format(max_time))
   return max_time
