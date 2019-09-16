@@ -61,8 +61,29 @@ In the context of the time-to-solution estimator, subset 1 takes 3 seconds to so
 \label{weighted_directed_graph}
 \end{figure}
 
-The time-to-solution estimator uses Johnson's algorithm \cite{intro_to_alg,johnson_nist,johnson_johnson} to find all shortest paths in a weighted directed graph. 
+The time-to-solution estimator uses Johnson's algorithm \cite{intro_to_alg,johnson_nist,johnson_johnson} to find all shortest paths between all pairs in a weighted directed graph. 
+The weighted shortest path is defined as the path between two nodes that has the smallest weighted sum. 
+For example, the shortest path between nodes 0 and 3 in Fig. \ref{weighted_directed_graph} is $0\rightarrow 2\rightarrow 3$. 
 
+In our application, we use Johnson's algorithm to assist in calculate the longest path between two nodes in a DAG (needed in Section\ref{sec:universal}). 
+The longest path is found by:
+\begin{enumerate}
+  \item Multiplying all edge weights by -1,
+  \item Using Johnson's algorithm to find the shortest (in this case the most negative) paths,
+  \item Summing the original weights of this shortest path. 
+\end{enumerate}
+Johnson's algorithm is specifically used in this process because it is capable of finding the shortest path even when edge weights are negative. 
+
+%In addition to longest path length calculation, we use an unweighted shortest path algorithm when calculating the depth-of-graph remaining (needed in Section \ref{sec:conflict}). 
+
+%\begin{figure}[H]
+%\centering
+%\includegraphics[scale=0.5]{../../figures/negative_weighted_directed_graph.pdf}
+%\caption{The DAG in Fig. \ref{
+%\label{negative_weights}
+%\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Method}
 The time-to-solution estimator determines the time to sweep across a domain by:
 \begin{enumerate}
@@ -133,7 +154,8 @@ We feed the upper triangular portion of the adjacency matrix to DiGraph to get t
 Utilizing the same partitioning scheme shown in Fig. \ref{25basematrix}, pull the upper triangular and lower triangular portions of the matrix, shown in Fig. \ref{25baseportionmatrices}.
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
-\scalebox{0.5}{
+\centering
+\scalebox{0.6}{
 $\begin{pmatrix}
 0&1&0&1&0&0&0&0&0\\ 
 0&0&1&1&0&0&0&0&0\\ 
@@ -147,7 +169,8 @@ $\begin{pmatrix}
 \end{pmatrix}$}
 \end{minipage}
 \begin{minipage}[c]{0.5\textwidth}
-\scalebox{0.5}{
+\centering
+\scalebox{0.6}{
 $\begin{pmatrix}
 0&0&0&0&0&0&0&0&0\\ 
 1&0&0&0&0&0&0&0&0\\ 
@@ -188,7 +211,8 @@ We temporarily renumber the subsets starting from the top left corner, and incre
 \includegraphics[scale=0.55]{../../figures/boundaries_worst_flipped.pdf}
 \end{minipage}
 \begin{minipage}[c]{0.5\textwidth}
-\scalebox{0.5}{
+\centering
+\scalebox{0.6}{
 $\begin{pmatrix}
 0&1&0&1&1&1&0&0&0\\ 
 1&0&1&0&0&1&0&0&0\\ 
@@ -268,7 +292,7 @@ where $A$ is the subset area. With this information, we can successfully compute
 
 If there are angles to be pipelined, the time-to-solution estimator adds a new set of graphs for each additional angle to be pipelined. For example, if there are two anglesets per octant, this would results in 16 graphs, or 8 graphs per angleset, or 1 graph per octant per angleset.
 
-\subsection{Adjusting the weights of each graph to reflect a universal timescale}
+\subsection{Adjusting the weights of each graph to reflect a universal timescale}\label{sec:universal}
 
 Once we have our full set of graphs with angular pipelining accounted for, we set up each graph to reflect a universal timescale. For each node in each graph, the following is done:
 \begin{enumerate}
@@ -290,7 +314,7 @@ The incoming edges to each node in each graph now reflect the time at which it i
    \label{universal}
 \end{figure}
 
-\subsection{Adjusting the weights of each graph to detect and resolve conflicts}
+\subsection{Adjusting the weights of each graph to detect and resolve conflicts}\label{sec:conflict}
 
 At this point in the time-to-solution estimation process, we have a graph per octant/quadrant per angleset, each weighted on a universal time scale. The time to solution is best summarized as a ``marching'' process:
 \begin{enumerate}
