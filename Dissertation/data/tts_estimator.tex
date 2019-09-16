@@ -247,7 +247,7 @@ Quadrant 1 starts its sweep from subset 2, finishing at subset 6, and quadrant 2
 %Weighting the TDGS
 \subsection{Weighting the task dependence graphs}
 
-Each graph is weighted to reflect the solve and communication time of each node to its neighbors. Explicitly, the edge weight between node A and node B represents the solve time of node A added to the time it takes to communicate boundary information to node B. Equation \ref{weight_function} shows how the weight is calculated:
+Each graph is weighted to reflect the solve time and communication time of each node to its neighbors. Explicitly, the edge weight between node A and node B represents the solve time of node A added to the time it takes to communicate boundary information from nod A to node B. Equation \ref{weight_function} shows how the weights are calculated:
 \begin{equation}
 \text{weight} = \text{mcff}\cdot [T_{wu} + N_n\cdot \text{latency}\cdot M_L + T_{\text{comm}}\cdot N_b\cdot A_m\cdot upbc + \cdot N_c\cdot (T_c + A_m\cdot (T_m + T_g))],
 \label{weight_function}
@@ -268,7 +268,7 @@ where:
   \item $T_m$ = the time spent solving angle-specific work,
   \item $T_g$ = the time spent solving group-specific work.
 \end{itemize}
-The weighting function is based on PDT's performance model\cite{mpadams15}, which is specific to how PDT solves the transport sweep. The cost function can be modified based on different sweep methodologies if a user desires.
+The weighting function is based on PDT's performance model\cite{mpadams2015}, which is specific to how PDT solves the transport sweep. The cost function can be modified based on different sweep methodologies if a user desires.
 
 As shown in Eq. \ref{weight_function}, a crucial part of determining the weight of each edge is knowing the number of cells each subset has, and the amount of shared boundary cells with each neighbor. Given a mesh density, the number of cells per subset is given by Eq \ref{cellspersubset}:
 \begin{equation}
@@ -277,28 +277,28 @@ As shown in Eq. \ref{weight_function}, a crucial part of determining the weight 
 \end{equation}
 where the integral bounds represent the cut plane coordinates that form the subset. To estimate the boundary cells to each neighbor, we assume that the mesh within each subset is mostly uniform. Equations \ref{nxy}-\ref{nyz} calculate the boundary cells along each face in 3D:
 \begin{align}
-n_{xy} &= \big(\frac{N}{V}\big)^{2/3}\cdot L_x\cdot L_y \label{nxy}, \\
-n_{xz} &= \big(\frac{N}{V}\big)^{2/3}\cdot L_x\cdot L_z \label{nxz}, \\
-n_{yz} &= \big(\frac{N}{V}\big)^{2/3}\cdot L_y\cdot L_z \label{nyz},
+n_{xy} &= \Big(\frac{N_c}{V}\Big)^{2/3}\cdot L_x\cdot L_y \label{nxy}, \\
+n_{xz} &= \Big(\frac{N_c}{V}\Big)^{2/3}\cdot L_x\cdot L_z \label{nxz}, \\
+n_{yz} &= \Big(\frac{N_c}{V}\Big)^{2/3}\cdot L_y\cdot L_z \label{nyz},
 \end{align}
-where $N$ is the number of cells in the subset, $V$ is the subset volume, and $L_d$ is the length of the subset in dimension $d$.
+where $N_c$ is the number of cells in the subset, $V$ is the subset volume, and $L_d$ is the length of the subset in dimension $d$.
 Equations \ref{nx} and \ref{ny} show the 2-dimensional equivalents to \ref{nxy}-\ref{nyz}:
 \begin{align}
-n_x &= \big(\frac{N}{A}\big)\cdot L_x, \label{nx} \\
-n_y &= \big(\frac{N}{A}\big)\cdot L_y, \label{ny}
+n_x &= \Big(\frac{N_c}{A}\Big)\cdot L_x, \label{nx} \\
+n_y &= \Big(\frac{N_c}{A}\Big)\cdot L_y, \label{ny}
 \end{align}
-where $A$ is the subset area. With this information, we can successfully compute all weights in each graph according to Eq. \ref{weight_function}. Once graphs are weighted, we add and adjust graphs for the number of angles pipelined per octant/quadrant.
+where $A$ is the subset area. With this information, we compute all weights in each graph according to Eq. \ref{weight_function}. Once graphs are weighted, we add and modify edge weights for the number of angles pipelined per octant/quadrant.
 
 \subsection{Adding graphs for angular pipelining}
 
 If there are angles to be pipelined, the time-to-solution estimator adds a new set of graphs for each additional angle to be pipelined. For example, if there are two anglesets per octant, this would results in 16 graphs, or 8 graphs per angleset, or 1 graph per octant per angleset.
 
-\subsection{Adjusting the weights of each graph to reflect a universal timescale}\label{sec:universal}
+\subsection{Modifying the weights of each graph to reflect a universal timescale}\label{sec:universal}
 
 Once we have our full set of graphs with angular pipelining accounted for, we set up each graph to reflect a universal timescale. For each node in each graph, the following is done:
 \begin{enumerate}
   \item Get the longest path to the node.
-  \item Sum this longest path.
+  \item Sum the weights of the edges along this longest path.
   \item Set all incoming edge values to the node to the sum of the longest path. 
 \end{enumerate}
 The incoming edges to each node in each graph now reflect the time at which it is ready to solve. This universal edge weighting is crucial for detecting and resolving conflicts during the sweep. Figure \ref{universal} shows a simple example of a TDG before and after this weight adjustment.
@@ -315,7 +315,7 @@ The incoming edges to each node in each graph now reflect the time at which it i
    \label{universal}
 \end{figure}
 
-\subsection{Adjusting the weights of each graph to detect and resolve conflicts}\label{sec:conflict}
+\subsection{Modifying the weights of each graph to detect and resolve conflicts}\label{sec:conflict}
 
 At this point in the time-to-solution estimation process, we have a graph per octant/quadrant per angleset, each weighted on a universal time scale. The time to solution is best summarized as a ``marching'' process:
 \begin{enumerate}
