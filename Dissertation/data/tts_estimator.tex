@@ -295,10 +295,11 @@ If there are angles to be pipelined, the time-to-solution estimator adds a new s
 
 \subsection{Modifying the weights of each graph to reflect a universal timescale}\label{sec:universal}
 
-Once we have our full set of graphs with angular pipelining accounted for, we set up each graph to reflect a universal timescale. For each node in each graph, the following is done:
+Once we have our full set of graphs with angular pipelining accounted for, we set up each graph to reflect a universal timescale, with the goal of knowing when each node in each graph is ready to solve. 
+For each node in each graph, we:
 \begin{enumerate}
-  \item Get the longest path to the node.
-  \item Sum the weights of the edges along this longest path.
+  \item Calculate the longest path to the node,
+  \item Sum the weights of the edges along the longest path,
   \item Set all incoming edge values to the node to the sum of the longest path. 
 \end{enumerate}
 The incoming edges to each node in each graph now reflect the time at which it is ready to solve. This universal edge weighting is crucial for detecting and resolving conflicts during the sweep. Figure \ref{universal} shows a simple example of a TDG before and after this weight adjustment.
