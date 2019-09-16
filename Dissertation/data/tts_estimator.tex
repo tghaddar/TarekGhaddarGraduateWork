@@ -291,7 +291,19 @@ where $A$ is the subset area. With this information, we compute all weights in e
 
 \subsection{Adding graphs for angular pipelining}
 
-If there are angles to be pipelined, the time-to-solution estimator adds a new set of graphs for each additional angle to be pipelined. For example, if there are two anglesets per octant, this would results in 16 graphs, or 8 graphs per angleset, or 1 graph per octant per angleset.
+If there are angles to be pipelined, the time-to-solution estimator adds a new set of graphs for each additional angle to be pipelined. For example, if there are two anglesets per octant, this would results in 16 graphs, or 1 graph per octant per angleset. Figure \ref{angular_pipeline} shows the graphs for two anglesets for a quadrant. A ``dummy'' node with a value of -2 is added in order to have an incoming edge for the first subset's node. The value of this incoming edge represents when that angleset starts its sweep. 
+\begin{figure}[H]
+\begin{minipage}[c]{0.5\textwidth}
+\centering
+\includegraphics[scale=0.6]{../../figures/q0_postpipeline.pdf}
+\end{minipage}
+\begin{minipage}[c]{0.5\textwidth}
+\centering
+\includegraphics[scale=0.6]{../../figures/q4_postpipeline.pdf}
+\end{minipage}
+\caption{The graphs for the first (left) and second (right) anglesets}
+\label{angular_pipeline}
+\end{figure}
 
 \subsection{Modifying the weights of each graph to reflect a universal timescale}\label{sec:universal}
 
@@ -327,9 +339,9 @@ At this point in the time-to-solution estimation process, we have a graph per oc
   \item Repeat steps 3 and 4 until all graphs are finished sweeping.
 \end{enumerate}
 
-When a conflict is detected, the time-to-solution estimator defaults to a first-come-first-serve conflict resolution method. The first graph to arrive to a node will begin solving it, and the remaining graphs that arrive while it is being solved will incur a delay. The delay is reflected in the remaining graphs by adding the delay as a weight to the applicable edge and all downstream edges in the losing graphs. 
+When a conflict is detected, the time-to-solution estimator uses a first-come-first-serve conflict resolution method. The first graph to arrive to a node will begin solving it, and the remaining graphs that arrive while it is being solved will incur a delay. The delay is reflected in the remaining graphs by adding the delay as a weight to the applicable edge and all downstream edges in the losing graphs. 
 
-If two or more graphs arrive to a node at the same time, the octant with the grater remaining depth-of-graph (simply, more work remaining), wins. In the case of a tie in the depth-of-graph, the graph with the priority direction wins according to the following rules:
+If two or more graphs arrive to a node at the same time, the octant with the greater remaining depth-of-graph (simply, more work remaining), wins. In the case of a tie in the depth-of-graph, the graph with the priority direction wins according to the following rules:
 \begin{enumerate}
     \item The graph with $\Omega_x > 0$ wins,
 	\item If multiple graphs have $\Omega_x > 0$, then the task with $\Omega_y > 0$ wins,
