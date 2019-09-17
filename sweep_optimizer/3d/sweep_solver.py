@@ -595,6 +595,7 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
       if (num_col*num_row == 1):
         boundary_cells = 0.0
         latency  = 0.0
+        mcff = 1.0
       if test:
         cost = 1.0
         if neighbor == -1:

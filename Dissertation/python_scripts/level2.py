@@ -17,7 +17,7 @@ gymax = 54.994
 t_comm = 4.47e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
-m_l = 70
+m_l = 40
 latency = 4110.0e-09
 #Solve time per cell..
 Tc = 1208.383e-09
@@ -49,3 +49,6 @@ for col in range(0,42):
   y_cuts_lb.append(y_cuts_lbd_col)
 
 params = create_parameter_space(x_cuts_lb,y_cuts_lb,13,42)
+max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
+
+print(max_time_reg,max_time_lb)
