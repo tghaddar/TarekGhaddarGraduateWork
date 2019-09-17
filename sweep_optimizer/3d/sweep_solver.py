@@ -1497,11 +1497,11 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted,A):
   #Keep iterating until all graphs have finished.
   counter = 0
   while num_finished_graphs < num_graphs:
-    print('Time t = ', t)
-    if (t == 0.0):
+    #print('Time t = ', t)
+    #if (t == 0.0):
       #debug_plot_graphs(graphs,t)
       #plot_graphs(graphs,t,num_angles)
-      print("debug stop")
+      #print("debug stop")
 
     #Getting the nodes that are being solved at time t for all graphs.
     all_nodes_being_solved = [None]*num_graphs
@@ -1810,7 +1810,7 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted,Ay)
   solve_times,max_time = compute_solve_time(graphs)
   end = time.time()
-  print(max_time,end-start)
+  print("Sweep Time: ", max_time)
   return max_time
 
 def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,machine_params,num_angles,Am,Az,unweighted,test):

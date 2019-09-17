@@ -3,7 +3,7 @@ import sys
 sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
 from sweep_solver import optimized_tts_numerical,unpack_parameters
 from mesh_processor import create_2d_cuts
-from optimizer import create_parameter_space,create_bounds
+from optimizer import create_parameter_space,create_bounds,create_constraints
 from scipy.optimize import basinhopping
 import matplotlib.pyplot as plt
 plt.close("all")
@@ -17,7 +17,7 @@ gymax = 54.994
 t_comm = 4.47e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
-m_l = 40
+m_l = 70
 latency = 4110.0e-09
 #Solve time per cell..
 Tc = 1208.383e-09
@@ -39,7 +39,7 @@ points = np.genfromtxt("level2centroids").T
 x_cuts,y_cuts = create_2d_cuts(gxmin,gxmax,42,gymin,gymax,13)
 params = create_parameter_space(x_cuts,y_cuts,13,42)
 
-max_time_reg = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
+#max_time_reg = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
 
 
 x_cuts_lb = [0.0,7.0,14.62,16.1565,17.16,18.1635,19.7,30.5,38.76,47.9,55.52,64.66,67.835,68.47,69.105,69.74,71.53,71.78,72.03,72.28,73.27,74.26,74.92,75.58,76.24,76.9,77.89,78.88,79.13,79.38,79.63,81.42,82.055,82.69,83.325,86.5,95.64,103.26,112.4,120.66,130.88,141.44,gxmax]
@@ -49,6 +49,12 @@ for col in range(0,42):
   y_cuts_lb.append(y_cuts_lbd_col)
 
 params = create_parameter_space(x_cuts_lb,y_cuts_lb,13,42)
-max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
+num_params=len(params)
+#max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
 
-print(max_time_reg,max_time_lb)
+bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,13,42)
+constraints = create_constraints(gxmin,gxmax,gymin,gymax,13,42)
+args = (points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
+max_time = basinhopping(optimized_tts_numerical,params,niter=2,minimizer_kwargs={"method":"Nelder-Mead","bounds":bounds,"constraints":constraints,'args':args})
+#print(max_time_reg,max_time_lb)
+
