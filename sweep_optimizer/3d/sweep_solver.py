@@ -1786,34 +1786,27 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   return max_time
 
 #The time to solution function that is fed into the optimizer.
-def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,machine_params,num_angles,Am,unweighted):
+def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,machine_params,num_angles,Am,Ay,unweighted):
   start = time.time()
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
-  x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
-  
+  #x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
- 
   #Building the adjacency matrix.
   adjacency_matrix = bam.build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
    #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_test(points,subset_bounds,adjacency_matrix,num_row,num_col)  
-  print(cells_per_subset)
-#  cells_per_subset = [96, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 96]
-#  bdy_cells_per_subset = [[9.433981132056603, 9.433981132056603], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4.0, 4.0], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [4, 4], [9.433981132056603, 9.433981132056603]]
-#  print(cells_per_subset)
   #Building the graphs.
   graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
-  
-  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,Am,False)
+  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,Am,Ay,False)
   graphs= pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
   
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
+  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted,Ay)
   solve_times,max_time = compute_solve_time(graphs)
   end = time.time()
   print(max_time,end-start)
