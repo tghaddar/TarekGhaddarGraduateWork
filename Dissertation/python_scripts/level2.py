@@ -55,6 +55,6 @@ num_params=len(params)
 bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,13,42)
 constraints = create_constraints(gxmin,gxmax,gymin,gymax,13,42)
 args = (points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
-max_time = basinhopping(optimized_tts_numerical,params,niter=2,minimizer_kwargs={"method":"Nelder-Mead","bounds":bounds,"constraints":constraints,'args':args})
+max_time = basinhopping(optimized_tts_numerical,params,niter=2,minimizer_kwargs={"method":"Nelder-Mead","bounds":bounds,"constraints":constraints,'args':args,'options':{'maxfev':1,'maxiter':1}})
 #print(max_time_reg,max_time_lb)
 
