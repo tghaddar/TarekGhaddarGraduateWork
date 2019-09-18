@@ -1791,7 +1791,10 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   start = time.time()
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
-  #x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
+#  print("x_cuts: ",x_cuts)
+#  print("y_cuts: ",y_cuts)
+#  
+  x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Building the adjacency matrix.
@@ -1811,6 +1814,7 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   solve_times,max_time = compute_solve_time(graphs)
   end = time.time()
   print("Sweep Time: ", max_time)
+  print("Solve time: ", end - start)
   return max_time
 
 def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,machine_params,num_angles,Am,Az,unweighted,test):

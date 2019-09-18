@@ -3,9 +3,10 @@ import sys
 sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
 from sweep_solver import optimized_tts_numerical,unpack_parameters
 from mesh_processor import create_2d_cuts
-from optimizer import create_parameter_space,create_bounds,create_constraints
-from scipy.optimize import basinhopping
+from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf
+from scipy.optimize import basinhopping, minimize
 import matplotlib.pyplot as plt
+import itertools
 plt.close("all")
 
 gxmin = 0.0
@@ -32,6 +33,8 @@ num_angles = 1
 Am = 36
 unweighted = True
 Ay = 1
+numcol = 42
+numrow = 13
 
 points = np.genfromtxt("level2centroids").T
 
@@ -50,11 +53,23 @@ for col in range(0,42):
 
 params = create_parameter_space(x_cuts_lb,y_cuts_lb,13,42)
 num_params=len(params)
-#max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
+max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
 
-bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,13,42)
-constraints = create_constraints(gxmin,gxmax,gymin,gymax,13,42)
-args = (points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
-max_time = basinhopping(optimized_tts_numerical,params,niter=2,minimizer_kwargs={"method":"Nelder-Mead","bounds":bounds,"constraints":constraints,'args':args,'options':{'maxfev':1,'maxiter':1}})
-#print(max_time_reg,max_time_lb)
+#bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,13,42)
+#constraints = create_constraints(gxmin,gxmax,gymin,gymax,13,42)
+#args = (points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
+##max_time = minimize(optimized_tts_numerical,params,args=args,bounds=bounds,constraints=constraints,method='COBYLA',options={"maxiter":1})
+#max_time = basinhopping(optimized_tts_numerical,params,niter=200,stepsize=0.5,minimizer_kwargs={"method":"COBYLA","bounds":bounds,"constraints":constraints,'args':args,'options':{'maxiter':1}})
+##print(max_time_reg,max_time_lb)
+points = np.genfromtxt("level2_vert_data")
 
+cdf,bin_edges = get_column_cdf(points,gxmin,gxmax,numcol)
+#bin_edges = np.delete(bin_edges,0)
+grad_cdf = np.diff(cdf)/np.diff(bin_edges)
+norm = grad_cdf/max(grad_cdf)
+#Picking the highest 60 jumps. 
+highest_jumps = np.argsort(norm)[-50:]
+x_values = bin_edges[highest_jumps]
+x_values = np.sort(x_values)
+comb = itertools.combinations(x_values,numcol-1)
+#plt.plot(bin_edges[1:],grad_cdf)
