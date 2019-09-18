@@ -18,7 +18,7 @@ gymax = 54.994
 t_comm = 4.47e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
-m_l = 70
+m_l = 35
 latency = 4110.0e-09
 #Solve time per cell..
 Tc = 1208.383e-09
@@ -53,7 +53,7 @@ for col in range(0,42):
 
 params = create_parameter_space(x_cuts_lb,y_cuts_lb,13,42)
 num_params=len(params)
-max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
+#max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
 
 #bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,13,42)
 #constraints = create_constraints(gxmin,gxmax,gymin,gymax,13,42)
@@ -68,8 +68,27 @@ cdf,bin_edges = get_column_cdf(points,gxmin,gxmax,numcol)
 grad_cdf = np.diff(cdf)/np.diff(bin_edges)
 norm = grad_cdf/max(grad_cdf)
 #Picking the highest 60 jumps. 
-highest_jumps = np.argsort(norm)[-50:]
+highest_jumps = np.argsort(norm)[-numcol:]
 x_values = bin_edges[highest_jumps]
 x_values = np.sort(x_values)
 comb = itertools.combinations(x_values,numcol-1)
+all_x_cuts = []
+i = 0
+for combination in comb:
+  print(i)
+  i += 1
+  this_cut = list(combination)
+  this_cut.append(gxmax)
+  this_cut.insert(0,gxmin)
+  all_x_cuts.append(this_cut)
+
+max_times = []
+for i in range(0,len(all_x_cuts)):
+  x_cuts = all_x_cuts[i]
+  y_cuts = y_cuts_lb
+  params = create_parameter_space(x_cuts,y_cuts,13,42)
+  max_times.append(optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted))
+  
+#for i in comb:
+#  print(i)
 #plt.plot(bin_edges[1:],grad_cdf)
