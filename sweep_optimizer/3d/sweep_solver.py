@@ -632,6 +632,7 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
   num_subsets = len(global_subset_boundaries)
   #Storing the time to solve and communicate each subset.
   time_to_solve = [[None]*num_subsets for g in range(num_graphs)]
+  time_to_solve_full = [[None]*num_subsets for g in range(num_graphs)]
   Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l = machine_params
   #Looping over graphs.
   for ig in range(0,num_graphs):
@@ -687,6 +688,12 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
       for n in range(0,num_subsets):
         out_edges_list = list(graph.out_edges(n,'weight'))
         num_edges = len(out_edges_list)
+        if Az > 1:
+          edge_data = {}
+          for e in range(0,num_edges):
+            edge_data[out_edges_list[e][1]] = out_edges_list[e][2]
+          time_to_solve_full[ig][n] = edge_data
+          
         out_edges = [out_edges_list[i][2] for i in range(num_edges)]
         time_to_solve[ig][n] = max(out_edges)
         if Az > 1:
@@ -699,7 +706,7 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
 #          for i in neighbors:
 #            graph[n][i]['weight'] = max(out_edges)
   
-  return graphs,time_to_solve
+  return graphs,time_to_solve,time_to_solve_full
       
 
 #Offsets edge weighting for initial nodes for angular pipelining.
@@ -1836,13 +1843,13 @@ def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_ma
   #Building the graphs.
   graphs = b3a.build_graphs(adjacency_matrix,num_row,num_col,num_plane,num_angles)
   #Weighting the graphs based on cells per subset and boundary cells per subset.
-  graphs,time_to_solve = add_edge_cost_3d(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,Am,Az,test)
+  graphs,time_to_solve,time_to_solve_full = add_edge_cost_3d(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,Am,Az,test)
   #Adjusting the graphs for multiple angles per octant.
   graphs= pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
+  graphs = add_conflict_weights(graphs,time_to_solve,time_to_solve_full,num_angles,unweighted,Az)
   solve_times,max_time = compute_solve_time(graphs)
   print(max_time) 
   return max_time
