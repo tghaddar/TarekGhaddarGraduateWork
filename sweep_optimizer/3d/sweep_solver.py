@@ -409,7 +409,10 @@ def modify_downstream_edges_faster(G,graph_index,source,time_to_solve,time_to_so
     for u,v in out_edges:
       if (v in downstream_nodes):
         #The tts relevant to this direction.
-        delay = time_to_solve_full[graph_index][node][v] + ready_to_solve - G[u][v]['weight']
+        if A > 1:
+          delay = time_to_solve_full[graph_index][node][v] + ready_to_solve - G[u][v]['weight']
+        if A == 1:
+          delay = time_to_solve[graph_index][node] + ready_to_solve - G[u][v]['weight']
         if delay > 0.0:
           G[u][v]['weight'] += delay
           ready_to_solve_all[v] = get_max_incoming_weight(G,v)
@@ -680,7 +683,18 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
         else:
           cost = Az
       else:
-        cost = mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*Am*upbc + num_cells*(Tc + Am*(Tm + Tg)))
+        base_cost = mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*Am*upbc + num_cells*(Tc + Am*(Tm + Tg)))
+        agg_cost = mcff*(Az*Twu + Az*num_neigh*latency*m_l + t_comm*boundary_cells*Am*upbc + Az*num_cells*(Tc + Am*(Tm + Tg)))
+        #The final node has no communication.
+        final_node_cost = mcff*(Twu + Az*num_cells*(Tc + Am*(Tm + Tg)))
+        #final_node_cost = agg_cost
+        
+        if neighbor == -1:
+          cost = final_node_cost
+        if (k == k_n):
+          cost = base_cost
+        else:
+          cost = agg_cost
       graph[e[0]][e[1]]['weight'] = cost
 
     for ig in range(0,num_graphs):
@@ -697,7 +711,7 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
         out_edges = [out_edges_list[i][2] for i in range(num_edges)]
         time_to_solve[ig][n] = max(out_edges)
         if Az > 1:
-          time_to_solve[ig][n] = Az
+          time_to_solve[ig][n] = agg_cost
         neighbors = list(graph.successors(n))
         if (Az == 1):
           for i in neighbors:
@@ -1511,7 +1525,7 @@ def add_conflict_weights(graphs,time_to_solve,time_to_solve_full,num_angles,unwe
   #Keep iterating until all graphs have finished.
   counter = 0
   while num_finished_graphs < num_graphs:
-    #print('Time t = ', t)
+    print('Time t = ', t)
     #if (t == 0.0):
       #debug_plot_graphs(graphs,t)
       #plot_graphs(graphs,t,num_angles)
@@ -1840,15 +1854,19 @@ def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_ma
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_3d(f,subset_bounds)
   #Building the adjacency matrix.
   adjacency_matrix = b3a.build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane)
+  print("Adjacency Matrices Built")
   #Building the graphs.
   graphs = b3a.build_graphs(adjacency_matrix,num_row,num_col,num_plane,num_angles)
+  print("Graphs Built")
   #Weighting the graphs based on cells per subset and boundary cells per subset.
   graphs,time_to_solve,time_to_solve_full = add_edge_cost_3d(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,Am,Az,test)
+  print("Graphs Initially weighted")
   #Adjusting the graphs for multiple angles per octant.
   graphs= pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
   #Adding delay weighting.
+  print("Edges are universal")
   graphs = add_conflict_weights(graphs,time_to_solve,time_to_solve_full,num_angles,unweighted,Az)
   solve_times,max_time = compute_solve_time(graphs)
   print(max_time) 
