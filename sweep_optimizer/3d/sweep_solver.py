@@ -378,7 +378,7 @@ def modify_downstream_edges(G,source,target,modified_edges,delay):
       
   return G
 
-def modify_downstream_edges_faster(G,graph_index,source,time_to_solve,og_delay,A):
+def modify_downstream_edges_faster(G,graph_index,source,time_to_solve,time_to_solve_full,og_delay,A):
 
   source_ready_to_solve = get_max_incoming_weight(G,source)
   ready_to_solve_all = {source:source_ready_to_solve}
@@ -408,7 +408,8 @@ def modify_downstream_edges_faster(G,graph_index,source,time_to_solve,og_delay,A
     out_edges = G.out_edges(node)
     for u,v in out_edges:
       if (v in downstream_nodes):
-        delay = time_to_solve[graph_index][node] + ready_to_solve - G[u][v]['weight']
+        #The tts relevant to this direction.
+        delay = time_to_solve_full[graph_index][node][v] + ready_to_solve - G[u][v]['weight']
         if delay > 0.0:
           G[u][v]['weight'] += delay
           ready_to_solve_all[v] = get_max_incoming_weight(G,v)
@@ -556,6 +557,7 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
   num_subsets = len(global_subset_boundaries)
   #Storing the time to solve and communicate each subset.
   time_to_solve = [[None]*num_subsets for g in range(num_graphs)]
+  time_to_solve_full = [[None]*num_subsets for g in range(num_graphs)]
   Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l = machine_params
   
   for ig in range(0,num_graphs):
@@ -613,12 +615,17 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
     for n in range(0,num_subsets):
       out_edges = list(graph.out_edges(n,'weight'))
       num_edges = len(out_edges)
+      if Ay > 1:
+        edge_data = {}
+        for e in range(0,num_edges):
+          edge_data[out_edges[e][1]] = out_edges[e][2]
+        time_to_solve_full[ig][n] = edge_data
       out_edges = [out_edges[i][2] for i in range(num_edges)]
       time_to_solve[ig][n] = max(out_edges)
       if Ay > 1:
         time_to_solve[ig][n] = Ay
       
-  return graphs,time_to_solve
+  return graphs,time_to_solve,time_to_solve_full
 
 def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,Am,Az,test):
   num_graphs = len(graphs)
@@ -1316,7 +1323,7 @@ def modify_secondary_graphs_mult_node_improved(graphs,conflicting_nodes,nodes,ti
   return graphs
 
 
-def modify_secondary_graphs_mult_node_faster(graphs,conflicting_nodes,nodes,time_to_solve,num_angles,unweighted,nodes_already_solved,A):
+def modify_secondary_graphs_mult_node_faster(graphs,conflicting_nodes,nodes,time_to_solve,time_to_solve_full,num_angles,unweighted,nodes_already_solved,A):
   
   #Copying the graphs frozen at time t.
   
@@ -1353,7 +1360,7 @@ def modify_secondary_graphs_mult_node_faster(graphs,conflicting_nodes,nodes,time
           secondary_graph[node1][node2]['weight'] += delay
         
         #secondary_graph = modify_downstream_edges(secondary_graph,node,-1,modified_edges[second_graph],delay)
-        secondary_graph = modify_downstream_edges_faster(secondary_graph,second_graph,node,time_to_solve,delay,A)    
+        secondary_graph = modify_downstream_edges_faster(secondary_graph,second_graph,node,time_to_solve,time_to_solve_full,delay,A)    
         graphs[second_graph] = secondary_graph
       
     
@@ -1471,7 +1478,7 @@ def calculate_delay_rebuild_graphs(first_graph,second_graph,all_edges,node,time_
   
   return delay
     
-def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted,A):
+def add_conflict_weights(graphs,time_to_solve,time_to_solve_full,num_angles,unweighted,A):
   
   #The number of graphs.
   num_graphs = len(graphs)
@@ -1522,7 +1529,7 @@ def add_conflict_weights(graphs,time_to_solve,num_angles,unweighted,A):
     else:
       #Find nodes ready to solve at time t that are in conflict.
       first_nodes = find_first_conflict(conflicting_nodes,graphs)        
-      graphs = modify_secondary_graphs_mult_node_faster(graphs,conflicting_nodes,first_nodes,time_to_solve,num_angles,unweighted,nodes_already_solved,A)
+      graphs = modify_secondary_graphs_mult_node_faster(graphs,conflicting_nodes,first_nodes,time_to_solve,time_to_solve_full,num_angles,unweighted,nodes_already_solved,A)
       #To update our march through, we need to update t here, with a find_next_interaction.
       if (num_conflicting_nodes == len(first_nodes)):
         t = find_next_interaction_simple(graphs,prev_nodes,t,time_to_solve)
@@ -1774,14 +1781,14 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   #Building the graphs.
   graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
-  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,Am,Ay,True)
+  graphs,time_to_solve,time_to_solve_full = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,Am,Ay,True)
   graphs = pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
-  plot_standard_graphs(graphs,subset_bounds,num_row,num_col)
+  #plot_standard_graphs(graphs,subset_bounds,num_row,num_col)
   
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted,Ay)
+  graphs = add_conflict_weights(graphs,time_to_solve,time_to_solve_full,num_angles,unweighted,Ay)
   solve_times,max_time = compute_solve_time(graphs)
   print('{0:1.3e}'.format(max_time))
   return max_time
