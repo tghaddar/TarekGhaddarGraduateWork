@@ -1525,7 +1525,7 @@ def add_conflict_weights(graphs,time_to_solve,time_to_solve_full,num_angles,unwe
   #Keep iterating until all graphs have finished.
   counter = 0
   while num_finished_graphs < num_graphs:
-    print('Time t = ', t)
+    #print('Time t = ', t)
     #if (t == 0.0):
       #debug_plot_graphs(graphs,t)
       #plot_graphs(graphs,t,num_angles)
