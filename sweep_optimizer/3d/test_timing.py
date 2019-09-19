@@ -27,32 +27,58 @@ machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 
 
 #Number of rows and columns and planes.
-numcol = 8
-numrow = 4
-numplane = 2
+numcols = [1,2,8,16,32,32,64]
+numrows =  [1,2,4,16,16,32,32]
+numplane = 1
 num_angles = 1
 Am = 10
 unweighted=True
+test = False
 
 
 #Global boundaries.
 global_xmin = 0.0
-global_xmax = 64.0
+global_xmaxs = [16.0,32.0,64.0,128.0,128.0,256.0,256.0]
 global_ymin = 0.0
-global_ymax = 64.0
+global_ymaxs = [16.0,32.0,64.0,128.0,128.0,128.0,256.0]
 global_zmin = 0.0
-global_zmax = 64.0
+global_zmaxs = [16.0,32.0,64.0,128.0,256.0,256.0,256.0]
 
-#An adjusted Az for regular cases that normalizes the boundary cost for each processor so it matches the performance model.
-Az = global_zmax/2
-mult = Az/1.939
-#Az = 1
+max_times = []
 
-z_cuts,x_cuts,y_cuts = create_3d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow,global_zmin,global_zmax,numplane)
-params = create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane)
-num_params = len(params)
+for i in range(0,len(numcols)):
+  
+  global_xmax = global_xmaxs[i]
+  global_ymax = global_ymaxs[i]
+  global_zmax = global_zmaxs[i]
+  
+  numcol = 0
+  numrow = 0
+  #An adjusted Az for regular cases that normalizes the boundary cost for each processor so it matches the performance model.
+  Az = global_zmax/2
+  if i == 0:
+    numcol = 1
+    numrow = 1
+    numplane = 1
+    Az = 1
+    mcff = 1
+  else:
+    numcol = numcols[i]
+    numrow = numrows[i]
+    numplane = 2
+    mcff = 1.32
 
-start = time.time()
-max_time = optimized_tts_3d(params,f,global_xmin,global_xmax,global_ymin,global_ymax,global_zmin,global_zmax,numrow,numcol,numplane,machine_parameters,num_angles,Am,Az,unweighted,True)
-end = time.time()
-print(end-start)
+  machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
+  
+  z_cuts,x_cuts,y_cuts = create_3d_cuts(global_xmin,global_xmax,numcol,global_ymin,global_ymax,numrow,global_zmin,global_zmax,numplane)
+  params = create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane)
+  num_params = len(params)
+  
+  start = time.time()
+  max_time = optimized_tts_3d(params,f,global_xmin,global_xmax,global_ymin,global_ymax,global_zmin,global_zmax,numrow,numcol,numplane,machine_parameters,num_angles,Am,Az,unweighted,test)
+  end = time.time()
+  print(end-start)
+  max_times.append(max_time)
+
+
+timing_csv = np.savetxt("3d_timing_runs.csv",max_times,delimiter=',')
