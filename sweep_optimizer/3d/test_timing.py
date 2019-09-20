@@ -29,6 +29,8 @@ machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 #Number of rows and columns and planes.
 numcols = [1,2,8,16,32,32,64]
 numrows =  [1,2,4,16,16,32,32]
+numcols = [1,2,8,16]
+numrows =  [1,2,4,16]
 numplane = 1
 num_angles = 1
 Am = 10
@@ -39,10 +41,14 @@ test = False
 #Global boundaries.
 global_xmin = 0.0
 global_xmaxs = [16.0,32.0,64.0,128.0,128.0,256.0,256.0]
+global_xmaxs = [16.0,32.0,64.0,128.0]
 global_ymin = 0.0
 global_ymaxs = [16.0,32.0,64.0,128.0,128.0,128.0,256.0]
+global_ymaxs = [16.0,32.0,64.0,128.0]
 global_zmin = 0.0
 global_zmaxs = [16.0,32.0,64.0,128.0,256.0,256.0,256.0]
+global_zmaxs = [16.0,32.0,64.0,128.0]
+
 
 max_times = []
 

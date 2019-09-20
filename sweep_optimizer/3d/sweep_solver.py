@@ -711,7 +711,10 @@ def add_edge_cost_3d(graphs,global_subset_boundaries,cells_per_subset, bdy_cells
         out_edges = [out_edges_list[i][2] for i in range(num_edges)]
         time_to_solve[ig][n] = max(out_edges)
         if Az > 1:
-          time_to_solve[ig][n] = agg_cost
+          if test == True:
+            time_to_solve[ig][n] = Az
+          else:
+            time_to_solve[ig][n] = agg_cost
         neighbors = list(graph.successors(n))
         if (Az == 1):
           for i in neighbors:
