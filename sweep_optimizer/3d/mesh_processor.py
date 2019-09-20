@@ -83,8 +83,6 @@ def get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow,numco
   xpoints = points[0,:]
   ypoints = points[1,:]
 
-    
-      
   #Looping through the subsets.
   for s in range(0,num_subsets):
     
