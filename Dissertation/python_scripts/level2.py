@@ -3,7 +3,7 @@ import sys
 sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
 from sweep_solver import optimized_tts_numerical,unpack_parameters
 from mesh_processor import create_2d_cuts
-from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf
+from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite
 from scipy.optimize import basinhopping, minimize
 import matplotlib.pyplot as plt
 import itertools
@@ -62,32 +62,33 @@ num_params=len(params)
 #max_time = basinhopping(optimized_tts_numerical,params,niter=200,stepsize=0.5,minimizer_kwargs={"method":"COBYLA","bounds":bounds,"constraints":constraints,'args':args,'options':{'maxiter':1}})
 ##print(max_time_reg,max_time_lb)
 points = np.genfromtxt("level2_vert_data")
+x_values,all_y_cuts = create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow)
 
-cdf,bin_edges = get_column_cdf(points,gxmin,gxmax,numcol)
-#bin_edges = np.delete(bin_edges,0)
-grad_cdf = np.diff(cdf)/np.diff(bin_edges)
-norm = grad_cdf/max(grad_cdf)
-#Picking the highest 60 jumps. 
-highest_jumps = np.argsort(norm)[-numcol:]
-x_values = bin_edges[highest_jumps]
-x_values = np.sort(x_values)
-comb = itertools.combinations(x_values,numcol-1)
-all_x_cuts = []
-i = 0
-for combination in comb:
-  print(i)
-  i += 1
-  this_cut = list(combination)
-  this_cut.append(gxmax)
-  this_cut.insert(0,gxmin)
-  all_x_cuts.append(this_cut)
-
-max_times = []
-for i in range(0,len(all_x_cuts)):
-  x_cuts = all_x_cuts[i]
-  y_cuts = y_cuts_lb
-  params = create_parameter_space(x_cuts,y_cuts,13,42)
-  max_times.append(optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted))
+#cdf,bin_edges = get_column_cdf(points,gxmin,gxmax,numcol)
+##bin_edges = np.delete(bin_edges,0)
+#grad_cdf = np.diff(cdf)/np.diff(bin_edges)
+#norm = grad_cdf/max(grad_cdf)
+##Picking the highest 60 jumps. 
+#highest_jumps = np.argsort(norm)[-numcol:]
+#x_values = bin_edges[highest_jumps]
+#x_values = np.sort(x_values)
+#comb = itertools.combinations(x_values,numcol-1)
+#all_x_cuts = []
+#i = 0
+#for combination in comb:
+#  print(i)
+#  i += 1
+#  this_cut = list(combination)
+#  this_cut.append(gxmax)
+#  this_cut.insert(0,gxmin)
+#  all_x_cuts.append(this_cut)
+#
+#max_times = []
+#for i in range(0,len(all_x_cuts)):
+#  x_cuts = all_x_cuts[i]
+#  y_cuts = y_cuts_lb
+#  params = create_parameter_space(x_cuts,y_cuts,13,42)
+#  max_times.append(optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted))
   
 #for i in comb:
 #  print(i)

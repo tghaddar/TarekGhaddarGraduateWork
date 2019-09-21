@@ -122,14 +122,56 @@ def get_column_cdf(points,gxmin,gxmax,numcol):
   return cdf,bin_edges
   
 def get_row_cdf(points,gymin,gymax,numrow):
-  y_points = points[:,1]
+  
   num_steps = int((gymax-gymin)/(0.01*(gymax - gymin)/numrow))
    #The number of bins in the CDF.
   hist_range = (gymin,gymax)
   #Building a histogram
-  hist,bin_edges = np.histogram(y_points,bins=num_steps,range=hist_range,normed=False)
+  hist,bin_edges = np.histogram(points,bins=num_steps,range=hist_range,normed=False)
   
   cdf = np.cumsum(hist)
   cdf = cdf/max(cdf)
+  cdf = np.insert(cdf,0,0.0)
   
   return cdf,bin_edges
+
+def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
+  
+  #The columnar cdfs.
+  column_cdf,column_bin_edges = get_column_cdf(points,gxmin,gxmax,numcol)
+  #Getting the gradient to identify the jumps.
+  grad_cdf = np.diff(column_cdf)/np.diff(column_bin_edges)
+  #Normalizing.
+  norm = grad_cdf/max(grad_cdf)
+  #Getting the highest jumps.
+  highest_jumps = np.argsort(norm)[-(numcol-1):]
+  #The x_values corresponding to the highest jumps.
+  x_values = column_bin_edges[highest_jumps]
+  x_values = np.sort(x_values)
+  x_values = np.append(x_values,gxmax)
+  x_values = np.insert(x_values,0,gxmin)
+  
+  #Looping over columns to get the row-wise cdfs in each column.
+  xpoints = points[:,0]
+  ypoints = points[:,1]
+  all_y_cuts = []
+  for col in range(1,numcol+1):
+    xmin = x_values[col-1]
+    xmax = x_values[col]
+    x1 = np.argwhere(np.logical_and(xpoints>=xmin,xpoints<=xmax)).flatten()
+    #Pulling all points that are in this column. 
+    y1 = ypoints[x1]
+    #Getting the row cdf for this column.
+    row_cdf, row_bin_edges = get_row_cdf(y1,gymin,gymax,numrow)
+    grad_row_cdf = np.diff(row_cdf)/np.diff(row_bin_edges)
+    norm_row = grad_row_cdf/max(grad_row_cdf)
+    highest_row_jumps = np.argsort(norm_row)[-(numrow-1):]
+    y_values_col = row_bin_edges[highest_row_jumps]
+    y_values_col = np.sort(y_values_col)
+    y_values_col = np.append(y_values_col,gymax)
+    y_values_col = np.insert(y_values_col,0,gymin)
+    all_y_cuts.append(y_values_col)
+    
+    
+  
+  return x_values,all_y_cuts
