@@ -11,7 +11,7 @@ from copy import deepcopy
 from utilities import get_ijk
 from utilities import get_ij,get_ss_id
 from math import isclose
-from mesh_processor import get_cells_per_subset_2d,get_cells_per_subset_2d_numerical,get_cells_per_subset_3d,get_cells_per_subset_3d_numerical,get_cells_per_subset_3d_numerical_test
+from mesh_processor import get_cells_per_subset_2d,get_cells_per_subset_2d_numerical,get_cells_per_subset_3d,get_cells_per_subset_3d_numerical,get_cells_per_subset_3d_numerical_test2
 from mesh_processor import get_cells_per_subset_2d_test
 import time
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -1818,7 +1818,7 @@ def optimized_tts(params,f,global_xmin,global_xmax,global_ymin,global_ymax,num_r
   return max_time
 
 #The time to solution function that is fed into the optimizer.
-def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,machine_params,num_angles,Am,Ay,unweighted):
+def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,global_ymax,num_row,num_col,machine_params,num_angles,Am,Ay,add_cells,unweighted):
   start = time.time()
   
   x_cuts,y_cuts = unpack_parameters(params,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
@@ -1831,7 +1831,8 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   #Building the adjacency matrix.
   adjacency_matrix = bam.build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
    #Getting mesh information.
-  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_test(points,subset_bounds,adjacency_matrix,num_row,num_col)  
+  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_test(points,subset_bounds,adjacency_matrix,num_row,num_col,add_cells)  
+  print(cells_per_subset)
   #Building the graphs.
   graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
@@ -1885,7 +1886,7 @@ def optimized_tts_3d_numerical(params,points,global_x_min,global_x_max,global_y_
   #Building the subset boundaries.
   subset_bounds = b3a.build_3d_global_subset_boundaries(num_col-1,num_row-1,num_plane-1,x_cuts,y_cuts,z_cuts)
   #Getting mesh information.
-  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_3d_numerical_test(points,subset_bounds)
+  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_3d_numerical_test2(points,subset_bounds)
   #Building the adjacency matrix.
   adjacency_matrix = b3a.build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane)
   #Building the graphs.

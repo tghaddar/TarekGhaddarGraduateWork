@@ -139,7 +139,7 @@ def get_row_cdf(points,gymin,gymax,numrow):
 def get_highest_jumps(points,gmin,gmax,numdim):
   
   #The discrete steps we are using to build the cdf. Equivalent to 1% of column width if using even cuts.
-  num_steps = int((gmax-gmin)/(0.01*(gmax - gmin)/numdim))
+  num_steps = int((gmax-gmin)/(0.005*(gmax - gmin)/numdim))
   #The number of bins in the CDF.
   hist_range = (gmin,gmax)
   #Building a histogram
@@ -211,7 +211,7 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
     
   y_cut_suite.append(all_through_vals)
   
-  while(tree_bottom == False):    
+  while(tree_bottom == False):
     
     x_limits = []
     current_x_limit = int(0)
