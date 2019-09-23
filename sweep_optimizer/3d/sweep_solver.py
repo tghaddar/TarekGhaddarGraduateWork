@@ -1835,13 +1835,13 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
   #Building the graphs.
   graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
-  graphs,time_to_solve = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,Am,Ay,False)
+  graphs,time_to_solve,time_to_solve_full = add_edge_cost(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,Am,Ay,False)
   graphs= pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
   
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted,Ay)
+  graphs = add_conflict_weights(graphs,time_to_solve,time_to_solve_full,num_angles,unweighted,Ay)
   solve_times,max_time = compute_solve_time(graphs)
   end = time.time()
   print("Sweep Time: ", max_time)

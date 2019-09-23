@@ -48,12 +48,12 @@ params = create_parameter_space(x_cuts,y_cuts,13,42)
 x_cuts_lb = [0.0,7.0,14.62,16.1565,17.16,18.1635,19.7,30.5,38.76,47.9,55.52,64.66,67.835,68.47,69.105,69.74,71.53,71.78,72.03,72.28,73.27,74.26,74.92,75.58,76.24,76.9,77.89,78.88,79.13,79.38,79.63,81.42,82.055,82.69,83.325,86.5,95.64,103.26,112.4,120.66,130.88,141.44,gxmax]
 y_cuts_lbd_col = [0.0,19.1775,31.228,43.8345,47.0373,48.0957,48.7307,49.7507,51.194,51.5273,52.024,53.014,54.04,54.994]
 y_cuts_lb = []
-for col in range(0,42):
+for col in range(0,numcol):
   y_cuts_lb.append(y_cuts_lbd_col)
 
-params = create_parameter_space(x_cuts_lb,y_cuts_lb,13,42)
+params = create_parameter_space(x_cuts_lb,y_cuts_lb,numrow,numcol)
 num_params=len(params)
-#max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
+max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,unweighted)
 
 #bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,13,42)
 #constraints = create_constraints(gxmin,gxmax,gymin,gymax,13,42)
@@ -63,33 +63,15 @@ num_params=len(params)
 ##print(max_time_reg,max_time_lb)
 points = np.genfromtxt("level2_vert_data")
 x_values_test = get_highest_jumps(points[:,0],gxmin,gxmax,numcol)
-x_values,all_y_cuts = create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow)
+x_values,y_cut_suite = create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow)
 
-#cdf,bin_edges = get_column_cdf(points,gxmin,gxmax,numcol)
-##bin_edges = np.delete(bin_edges,0)
-#grad_cdf = np.diff(cdf)/np.diff(bin_edges)
-#norm = grad_cdf/max(grad_cdf)
-##Picking the highest 60 jumps. 
-#highest_jumps = np.argsort(norm)[-numcol:]
-#x_values = bin_edges[highest_jumps]
-#x_values = np.sort(x_values)
-#comb = itertools.combinations(x_values,numcol-1)
-#all_x_cuts = []
-#i = 0
-#for combination in comb:
-#  print(i)
-#  i += 1
-#  this_cut = list(combination)
-#  this_cut.append(gxmax)
-#  this_cut.insert(0,gxmin)
-#  all_x_cuts.append(this_cut)
-#
-#max_times = []
-#for i in range(0,len(all_x_cuts)):
-#  x_cuts = all_x_cuts[i]
-#  y_cuts = y_cuts_lb
-#  params = create_parameter_space(x_cuts,y_cuts,13,42)
-#  max_times.append(optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted))
+
+max_times = []
+for i in range(0,len(y_cut_suite)):
+  x_cuts = x_values
+  y_cuts = y_cut_suite[i]
+  params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+  max_times.append(optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,unweighted))
   
 #for i in comb:
 #  print(i)

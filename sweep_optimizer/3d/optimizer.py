@@ -201,6 +201,16 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
   tree_bottom = False
   num_children = 2
   prev_x_limits = [numcol]
+  y_cut_suite = []
+  
+  #Getting all the way through cuts.
+  y_values_all_through = get_highest_jumps(ypoints,gymin,gymax,numrow)
+  all_through_vals = []
+  for i in range(0,numcol):
+    all_through_vals.append(y_values_all_through)
+    
+  y_cut_suite.append(all_through_vals)
+  
   while(tree_bottom == False):    
     
     x_limits = []
@@ -221,7 +231,9 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
       xverts0 = np.argwhere(np.logical_and(xpoints>=xmin,xpoints<=xmax)).flatten()
       y0 = ypoints[xverts0]
       y_values0 = get_highest_jumps(y0,gymin,gymax,numrow)
-      current_y_values[col0:col1] = y_values0
+      for j in range(col0,col1):
+        current_y_values[j] = y_values0
+      #current_y_values[col0:col1] = [y_values0]
       
       xmin2 = xmax
       current_x_limit += x2_limit
@@ -231,9 +243,11 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
       xverts1 = np.argwhere(np.logical_and(xpoints>=xmin2,xpoints<=xmax2)).flatten()
       y1 = ypoints[xverts1]
       y_values1 = get_highest_jumps(y1,gymin,gymax,numrow)
-      current_y_values[col1:col2] = y_values1
-      print(col0,col1,col2)
-      
+      for j in range(col1,col2):
+        current_y_values[j] = y_values1
+      #current_y_values[col1:col2] = [y_values1]
+    
+    y_cut_suite.append(current_y_values)  
     #print(current_y_values)
     print(x_limits)
       
@@ -252,4 +266,5 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
     if (x_limits[0] <= 1.5):
       tree_bottom = True
       
-  return x_values,all_y_cuts
+  y_cut_suite.append(all_y_cuts)
+  return x_values,y_cut_suite
