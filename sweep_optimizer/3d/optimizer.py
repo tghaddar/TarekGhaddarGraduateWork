@@ -136,6 +136,29 @@ def get_row_cdf(points,gymin,gymax,numrow):
   
   return cdf,bin_edges
 
+def get_highest_jumps(points,gmin,gmax,numdim):
+  
+  #The discrete steps we are using to build the cdf. Equivalent to 1% of column width if using even cuts.
+  num_steps = int((gmax-gmin)/(0.01*(gmax - gmin)/numdim))
+  #The number of bins in the CDF.
+  hist_range = (gmin,gmax)
+  #Building a histogram
+  hist,bin_edges = np.histogram(points,bins=num_steps,range=hist_range,normed=False)
+  
+  cdf = np.cumsum(hist)
+  cdf = cdf/max(cdf)
+  cdf = np.insert(cdf,0,0.0)
+  
+  #Getting the derivate to identify the highest jumps.
+  grad_cdf = np.diff(cdf)/np.diff(bin_edges)
+  highest_jumps = np.argsort(grad_cdf)[-(numdim-1):]
+  values = bin_edges[highest_jumps]
+  values = np.sort(values)
+  values = np.append(values,gmax)
+  values = np.insert(values,0,gmin)
+  
+  return values
+
 def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
   
   #The columnar cdfs.
@@ -162,15 +185,16 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
     x1 = np.argwhere(np.logical_and(xpoints>=xmin,xpoints<=xmax)).flatten()
     #Pulling all points that are in this column. 
     y1 = ypoints[x1]
-    #Getting the row cdf for this column.
-    row_cdf, row_bin_edges = get_row_cdf(y1,gymin,gymax,numrow)
-    grad_row_cdf = np.diff(row_cdf)/np.diff(row_bin_edges)
-    norm_row = grad_row_cdf/max(grad_row_cdf)
-    highest_row_jumps = np.argsort(norm_row)[-(numrow-1):]
-    y_values_col = row_bin_edges[highest_row_jumps]
-    y_values_col = np.sort(y_values_col)
-    y_values_col = np.append(y_values_col,gymax)
-    y_values_col = np.insert(y_values_col,0,gymin)
+    #Getting the highest jumps for this column.
+    y_values_col = get_highest_jumps(y1,gymin,gymax,numrow)
+#    row_cdf, row_bin_edges = get_row_cdf(y1,gymin,gymax,numrow)
+#    grad_row_cdf = np.diff(row_cdf)/np.diff(row_bin_edges)
+#    norm_row = grad_row_cdf/max(grad_row_cdf)
+#    highest_row_jumps = np.argsort(norm_row)[-(numrow-1):]
+#    y_values_col = row_bin_edges[highest_row_jumps]
+#    y_values_col = np.sort(y_values_col)
+#    y_values_col = np.append(y_values_col,gymax)
+#    y_values_col = np.insert(y_values_col,0,gymin)
     all_y_cuts.append(y_values_col)
     
   #Doing a binary tree of the columns to get a full cut suite.
@@ -181,19 +205,38 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
     
     x_limits = []
     current_x_limit = int(0)
+    current_y_values = [[] for i in range(0,numcol)]
     for i in range(0,len(prev_x_limits)):
       x1_limit = int(np.floor(prev_x_limits[i]/2))
       x_limits.append(x1_limit)
       x2_limit = int(np.ceil(prev_x_limits[i]/2))
       x_limits.append(x2_limit)
       
-      xmin = x_values[copy(current_x_limit)]
+      col0 = copy(current_x_limit)
+      xmin = x_values[col0]
       current_x_limit += x1_limit
-      xmax = x_values[copy(current_x_limit)]
+      col1 = copy(current_x_limit)
+      xmax = x_values[col1]
+      
+      xverts0 = np.argwhere(np.logical_and(xpoints>=xmin,xpoints<=xmax)).flatten()
+      y0 = ypoints[xverts0]
+      y_values0 = get_highest_jumps(y0,gymin,gymax,numrow)
+      current_y_values[col0:col1] = y_values0
+      
+      xmin2 = xmax
       current_x_limit += x2_limit
-      print(xmin,xmax)
-    
+      col2 = copy(current_x_limit)
+      xmax2 = x_values[col2]
+      
+      xverts1 = np.argwhere(np.logical_and(xpoints>=xmin2,xpoints<=xmax2)).flatten()
+      y1 = ypoints[xverts1]
+      y_values1 = get_highest_jumps(y1,gymin,gymax,numrow)
+      current_y_values[col1:col2] = y_values1
+      print(col0,col1,col2)
+      
+    #print(current_y_values)
     print(x_limits)
+      
 #    for i in range(0,2):
 #      prev_x_limit = current_x_limit
 #      if i%2 == 0:

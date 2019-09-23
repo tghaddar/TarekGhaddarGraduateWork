@@ -3,7 +3,7 @@ import sys
 sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
 from sweep_solver import optimized_tts_numerical,unpack_parameters
 from mesh_processor import create_2d_cuts
-from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite
+from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_highest_jumps
 from scipy.optimize import basinhopping, minimize
 import matplotlib.pyplot as plt
 import itertools
@@ -62,6 +62,7 @@ num_params=len(params)
 #max_time = basinhopping(optimized_tts_numerical,params,niter=200,stepsize=0.5,minimizer_kwargs={"method":"COBYLA","bounds":bounds,"constraints":constraints,'args':args,'options':{'maxiter':1}})
 ##print(max_time_reg,max_time_lb)
 points = np.genfromtxt("level2_vert_data")
+x_values_test = get_highest_jumps(points[:,0],gxmin,gxmax,numcol)
 x_values,all_y_cuts = create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow)
 
 #cdf,bin_edges = get_column_cdf(points,gxmin,gxmax,numcol)
