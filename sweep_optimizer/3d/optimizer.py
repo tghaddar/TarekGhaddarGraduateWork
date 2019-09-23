@@ -10,6 +10,7 @@ from sweep_solver import unpack_parameters,optimized_tts
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import warnings
+from copy import copy
 from scipy.optimize import minimize
 import numpy as np
 warnings.filterwarnings("ignore")
@@ -172,6 +173,40 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
     y_values_col = np.insert(y_values_col,0,gymin)
     all_y_cuts.append(y_values_col)
     
+  #Doing a binary tree of the columns to get a full cut suite.
+  tree_bottom = False
+  num_children = 2
+  prev_x_limits = [numcol]
+  while(tree_bottom == False):    
     
-  
+    x_limits = []
+    current_x_limit = int(0)
+    for i in range(0,len(prev_x_limits)):
+      x1_limit = int(np.floor(prev_x_limits[i]/2))
+      x_limits.append(x1_limit)
+      x2_limit = int(np.ceil(prev_x_limits[i]/2))
+      x_limits.append(x2_limit)
+      
+      xmin = x_values[copy(current_x_limit)]
+      current_x_limit += x1_limit
+      xmax = x_values[copy(current_x_limit)]
+      current_x_limit += x2_limit
+      print(xmin,xmax)
+    
+    print(x_limits)
+#    for i in range(0,2):
+#      prev_x_limit = current_x_limit
+#      if i%2 == 0:
+#        current_x_limit += x1_limit
+#      else:
+#        current_x_limit += x2_limit
+#      print(num_children,current_x_limit)
+#      xmin = x_values[prev_x_limit]
+#      xmax = x_values[current_x_limit]
+      
+    num_children *= 2
+    prev_x_limits = x_limits
+    if (x_limits[0] <= 1.5):
+      tree_bottom = True
+      
   return x_values,all_y_cuts
