@@ -33,9 +33,26 @@ With confidence in the time-to-solution estimator, it is used as the objective f
  \begin{figure}[H]
 \centering
 \includegraphics[scale=0.2]{../figures/spiderweb_10x10_sparse.png}
-\caption{An unstructured mesh partitioned into 100 subsets with cut lines at 1 cm intervals in both dimensions}
+\caption{An unstructured mesh with natural boundaries at 1 cm intervals in both dimensions.}
 \label{partitioning_example}
 \end{figure}
+
+In order to identify these natural boundaries, we analyze the detailed cumulative distribution function (CDF) of the vertices in each dimension. The jumps in the CDF correspond to natural boundaries. Figure \ref{vert_cdf} shows the x-vertex CDF of the mesh in Fig. \ref{partitioning_example}. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.75]{../figures/xvertexcdf.pdf}
+\caption{The x-vertex CDF of the mesh shown in Fig. \ref{partitioning_example}}.
+\label{vert_cdf}
+\end{figure}
+To identify where the jumps in the CDF occur, we take the gradient of the CDF and isolate the largest discontinuities in it. Figure \ref{gradcdf} plots the gradient of the CDF shown in Fig. \ref{vert_cdf}.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.75]{../figures/gradcdf.pdf}
+\caption{The gradient of the CDF shown in Fig. \ref{vert_cdf}}.
+\label{gradcdf}
+\end{figure}
+The largest discontinuities in Fig. \ref{gradcdf} occur at the instances where there are natural boundaries all the way through the mesh, or at 1 cm intervals. 
+
 
 \section{Analytical Mesh Results}
 Analytical mesh density results will go here.

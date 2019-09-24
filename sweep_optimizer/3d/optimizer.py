@@ -147,13 +147,26 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   cdf = np.cumsum(hist)
   #cdf = cdf/max(cdf)
   cdf = np.insert(cdf,0,0.0)
+  plt.figure()
+  plt.title("The vertex CDF in the x dimension")
+  plt.xlabel("x (cm)")
+  plt.ylabel("x-vertex CDF")
+  plt.plot(bin_edges,cdf)
+  plt.savefig("../../figures/xvertexcdf.pdf")
+  
   
   #Getting the derivate to identify the highest jumps.
   grad_cdf = np.diff(cdf)/np.diff(bin_edges)
   #grad_cdf = np.gradient(cdf,bin_edges)
-#  bin_edges_plot = np.delete(bin_edges,0)
-#  plt.figure()
-#  plt.plot(bin_edges_plot,grad_cdf)
+  bin_edges_plot = np.delete(bin_edges,0)
+  plt.figure()
+  plt.plot(bin_edges_plot,grad_cdf)
+  plt.title("Gradient of the CDF in the x Dimension")
+  plt.xlabel("x (cm)")
+  plt.ylabel("y (cm)")
+  plt.plot(bin_edges_plot,grad_cdf)
+  plt.savefig("../../figures/gradcdf.pdf")
+  
   #Finding the discontinuities in the gradient of the cdf. This corresponds to jumps in the cdf.
   c_max_index = argrelextrema(grad_cdf,np.greater,order = 5)[0]
   bin_edges_jumps = bin_edges[c_max_index]
