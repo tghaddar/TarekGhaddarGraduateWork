@@ -54,7 +54,7 @@ for col in range(0,numcol):
 params = create_parameter_space(x_cuts_lb,y_cuts_lb,numrow,numcol)
 num_params=len(params)
 add_cells = True
-max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
+#max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
 
 #bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,13,42)
 #constraints = create_constraints(gxmin,gxmax,gymin,gymax,13,42)
@@ -63,40 +63,42 @@ max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numr
 #max_time = basinhopping(optimized_tts_numerical,params,niter=200,stepsize=0.5,minimizer_kwargs={"method":"COBYLA","bounds":bounds,"constraints":constraints,'args':args,'options':{'maxiter':1}})
 ##print(max_time_reg,max_time_lb)
 verts = np.genfromtxt("level2_vert_data")
-x_values_test = get_highest_jumps(verts[:,0],gxmin,gxmax,numcol)
-x_values,y_cut_suite = create_opt_cut_suite(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
+x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,numcol)
 
 
-max_times = []
-add_cells = False
-for i in range(0,len(y_cut_suite)):
-  x_cuts = x_values
-  y_cuts = y_cut_suite[i]
-  params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-  max_times.append(optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+#x_values,y_cut_suite = create_opt_cut_suite(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
 
-min_index = max_times.index(min(max_times))
-y_cuts_min = y_cut_suite[min_index]
-x_cuts_min = x_values
 
-#Writing the xml portions.
-f = open("level2_opt_cuts.xml",'w')
-f.write("<x_cuts>")
-for x in range(1,numcol):
-  f.write(str(x_cuts_min[x])+" ")
-
-f.write("</x_cuts>\n")
-
-f.write("<y_cuts_by_column>\n")
-for col in range(0,numcol):
-  f.write("  <column>")
-  for y in range(1,numrow):
-    f.write(str(y_cuts_min[col][y])+ " ")
-  
-  f.write("</column>\n")
-
-f.write("</y_cuts_by_column>\n")
-f.close()
+#max_times = []
+#add_cells = False
+#for i in range(0,len(y_cut_suite)):
+#  x_cuts = x_values
+#  y_cuts = y_cut_suite[i]
+#  params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+#  max_times.append(optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+#
+#min_index = max_times.index(min(max_times))
+#y_cuts_min = y_cut_suite[min_index]
+#x_cuts_min = x_values
+#
+##Writing the xml portions.
+#f = open("level2_opt_cuts.xml",'w')
+#f.write("<x_cuts>")
+#for x in range(1,numcol):
+#  f.write(str(x_cuts_min[x])+" ")
+#
+#f.write("</x_cuts>\n")
+#
+#f.write("<y_cuts_by_column>\n")
+#for col in range(0,numcol):
+#  f.write("  <column>")
+#  for y in range(1,numrow):
+#    f.write(str(y_cuts_min[col][y])+ " ")
+#  
+#  f.write("</column>\n")
+#
+#f.write("</y_cuts_by_column>\n")
+#f.close()
 
 #for i in comb:
 #  print(i)

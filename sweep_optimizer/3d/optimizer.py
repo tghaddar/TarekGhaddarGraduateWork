@@ -138,7 +138,7 @@ def get_row_cdf(points,gymin,gymax,numrow):
 def get_highest_jumps(points,gmin,gmax,numdim):
   
   #The discrete steps we are using to build the cdf. Equivalent to 1% of column width if using even cuts.
-  num_steps = int((gmax-gmin)/(0.001*(gmax - gmin)/numdim))
+  num_steps = int((gmax-gmin)/(0.0001*(gmax - gmin)/numdim))
   #The number of bins in the CDF.
   hist_range = (gmin,gmax)
   #Building a histogram
@@ -150,6 +150,10 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   
   #Getting the derivate to identify the highest jumps.
   grad_cdf = np.diff(cdf)/np.diff(bin_edges)
+  #grad_cdf = np.gradient(cdf,bin_edges)
+  #bin_edges_plot = np.delete(bin_edges,0)
+  #plt.figure()
+  #plt.plot(bin_edges_plot,grad_cdf)
   #Finding the discontinuities in the gradient of the cdf. This corresponds to jumps in the cdf.
   c_max_index = argrelextrema(grad_cdf,np.greater,order = 5)[0]
   bin_edges_jumps = bin_edges[c_max_index]
@@ -161,26 +165,15 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   values = np.append(values,gmax)
   values = np.insert(values,0,gmin)
   
-  return values,cdf_jumps
+  return np.around(values,3)
 
 def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
-  
-  #The columnar cdfs.
-  column_cdf,column_bin_edges = get_column_cdf(points,gxmin,gxmax,numcol)
-  #Getting the gradient to identify the jumps.
-  grad_cdf = np.diff(column_cdf)/np.diff(column_bin_edges)
-  #Normalizing.
-  norm = grad_cdf/max(grad_cdf)
-  #Getting the highest jumps.
-  highest_jumps = np.argsort(norm)[-(numcol-1):]
-  #The x_values corresponding to the highest jumps.
-  x_values = column_bin_edges[highest_jumps]
-  x_values = np.sort(x_values)
-  x_values = np.append(x_values,gxmax)
-  x_values = np.insert(x_values,0,gxmin)
+ 
   
   #Looping over columns to get the row-wise cdfs in each column.
   xpoints = points[:,0]
+  x_values = get_highest_jumps(xpoints,gxmin,gxmax,numcol)
+  
   ypoints = points[:,1]
   all_y_cuts = []
   for col in range(1,numcol+1):
