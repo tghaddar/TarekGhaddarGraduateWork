@@ -72,7 +72,7 @@ def get_cells_per_subset_2d_numerical(points,boundaries,adjacency_matrix,numrow,
     
   return cells_per_subset,bdy_cells_per_subset
 
-def get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow,numcol):
+def get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow,numcol,add_cells):
   num_points = len(points[0])
   #Number of subsets.
   num_subsets = len(boundaries)
@@ -120,25 +120,26 @@ def get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow,numco
     bdy_cells_per_subset[s] = [nx,ny]
   
   #Time to adjust the number of cells to take into account cell creation from cuts.
-  for s in range(0,num_subsets):
-    neighbors = [n for n in range(0,num_subsets) if adjacency_matrix[s][n]==1]
-    i_s,j_s = get_ij(s,numrow,numcol)
-    #Adding cells where needed based on cut lines.
-    for n in neighbors:
-      Ly_neighbor = boundaries[n][3] - boundaries[n][2]
-      i_n,j_n = get_ij(n,numrow,numcol)
-      boundary = 'x'
-      if i_s == i_n:
-        boundary == 'y'
-      
-      if boundary == 'y':
-        bdy_cells = bdy_cells_per_subset[n][0]
-        cells_per_subset[s] += int(bdy_cells/2.0)
-      
-      if boundary == 'x':
-        overlap = get_overlap(boundaries[s][2],boundaries[s][3],boundaries[n][2],boundaries[n][3])
-        bdy_cells = bdy_cells_per_subset[n][1]*overlap/Ly_neighbor
-        cells_per_subset[s]+= int(bdy_cells/2.0)
+  if (add_cells):
+    for s in range(0,num_subsets):
+      neighbors = [n for n in range(0,num_subsets) if adjacency_matrix[s][n]==1]
+      i_s,j_s = get_ij(s,numrow,numcol)
+      #Adding cells where needed based on cut lines.
+      for n in neighbors:
+        Ly_neighbor = boundaries[n][3] - boundaries[n][2]
+        i_n,j_n = get_ij(n,numrow,numcol)
+        boundary = 'x'
+        if i_s == i_n:
+          boundary == 'y'
+        
+        if boundary == 'y':
+          bdy_cells = bdy_cells_per_subset[n][0]
+          cells_per_subset[s] += int(bdy_cells/2.0)
+        
+        if boundary == 'x':
+          overlap = get_overlap(boundaries[s][2],boundaries[s][3],boundaries[n][2],boundaries[n][3])
+          bdy_cells = bdy_cells_per_subset[n][1]*overlap/Ly_neighbor
+          cells_per_subset[s]+= int(bdy_cells/2.0)
       
   return cells_per_subset,bdy_cells_per_subset
 
@@ -195,7 +196,7 @@ def get_cells_per_subset_3d_numerical(points,boundaries):
   
   return cells_per_subset,bdy_cells_per_subset
   
-def get_cells_per_subset_3d_numerical_test2(points,boundaries):
+def get_cells_per_subset_3d_numerical_test2(points,boundaries,add_cells):
   #Number of points in the domain.
   num_points = len(points[0])
   #The total number of subsets.

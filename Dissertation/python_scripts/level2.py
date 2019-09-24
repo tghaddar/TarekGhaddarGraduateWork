@@ -1,11 +1,12 @@
 import numpy as np
 import sys
 sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
-from sweep_solver import optimized_tts_numerical,unpack_parameters
+from sweep_solver import optimized_tts_numerical,unpack_parameters,plot_subset_boundaries_2d
 from mesh_processor import create_2d_cuts
-from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf
+from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_highest_jumps
 from scipy.optimize import basinhopping, minimize
 import matplotlib.pyplot as plt
+from build_global_subset_boundaries import build_global_subset_boundaries
 import itertools
 plt.close("all")
 
@@ -48,12 +49,13 @@ params = create_parameter_space(x_cuts,y_cuts,13,42)
 x_cuts_lb = [0.0,7.0,14.62,16.1565,17.16,18.1635,19.7,30.5,38.76,47.9,55.52,64.66,67.835,68.47,69.105,69.74,71.53,71.78,72.03,72.28,73.27,74.26,74.92,75.58,76.24,76.9,77.89,78.88,79.13,79.38,79.63,81.42,82.055,82.69,83.325,86.5,95.64,103.26,112.4,120.66,130.88,141.44,gxmax]
 y_cuts_lbd_col = [0.0,19.1775,31.228,43.8345,47.0373,48.0957,48.7307,49.7507,51.194,51.5273,52.024,53.014,54.04,54.994]
 y_cuts_lb = []
-for col in range(0,42):
+for col in range(0,numcol):
   y_cuts_lb.append(y_cuts_lbd_col)
 
-params = create_parameter_space(x_cuts_lb,y_cuts_lb,13,42)
+params = create_parameter_space(x_cuts_lb,y_cuts_lb,numrow,numcol)
 num_params=len(params)
-#max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted)
+add_cells = True
+#max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
 
 #bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,13,42)
 #constraints = create_constraints(gxmin,gxmax,gymin,gymax,13,42)
@@ -61,34 +63,46 @@ num_params=len(params)
 ##max_time = minimize(optimized_tts_numerical,params,args=args,bounds=bounds,constraints=constraints,method='COBYLA',options={"maxiter":1})
 #max_time = basinhopping(optimized_tts_numerical,params,niter=200,stepsize=0.5,minimizer_kwargs={"method":"COBYLA","bounds":bounds,"constraints":constraints,'args':args,'options':{'maxiter':1}})
 ##print(max_time_reg,max_time_lb)
-points = np.genfromtxt("level2_vert_data")
+verts = np.genfromtxt("level2_vert_data")
+x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,numcol)
 
-cdf,bin_edges = get_column_cdf(points,gxmin,gxmax,numcol)
-#bin_edges = np.delete(bin_edges,0)
-grad_cdf = np.diff(cdf)/np.diff(bin_edges)
-norm = grad_cdf/max(grad_cdf)
-#Picking the highest 60 jumps. 
-highest_jumps = np.argsort(norm)[-numcol:]
-x_values = bin_edges[highest_jumps]
-x_values = np.sort(x_values)
-comb = itertools.combinations(x_values,numcol-1)
-all_x_cuts = []
-i = 0
-for combination in comb:
-  print(i)
-  i += 1
-  this_cut = list(combination)
-  this_cut.append(gxmax)
-  this_cut.insert(0,gxmin)
-  all_x_cuts.append(this_cut)
 
-max_times = []
-for i in range(0,len(all_x_cuts)):
-  x_cuts = all_x_cuts[i]
-  y_cuts = y_cuts_lb
-  params = create_parameter_space(x_cuts,y_cuts,13,42)
-  max_times.append(optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,13,42,machine_parameters,num_angles,Am,Ay,unweighted))
-  
-#for i in comb:
-#  print(i)
-#plt.plot(bin_edges[1:],grad_cdf)
+x_values,y_cut_suite = create_opt_cut_suite(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
+
+for i in range(0,len(y_cut_suite)):
+  x_cuts = x_values
+  y_cuts = y_cut_suite[i]
+  boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
+  fname = "../../figures/lvl2_suite_"+str(i)+".pdf"
+  plot_subset_boundaries_2d(boundaries,numcol*numrow,[],fname)
+
+#max_times = []
+#add_cells = False
+#for i in range(0,len(y_cut_suite)):
+#  x_cuts = x_values
+#  y_cuts = y_cut_suite[i]
+#  params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+#  max_times.append(optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+#
+#min_index = max_times.index(min(max_times))
+#y_cuts_min = y_cut_suite[min_index]
+#x_cuts_min = x_values
+#
+##Writing the xml portions.
+#f = open("level2_opt_cuts.xml",'w')
+#f.write("<x_cuts>")
+#for x in range(1,numcol):
+#  f.write(str(x_cuts_min[x])+" ")
+#
+#f.write("</x_cuts>\n")
+#
+#f.write("<y_cuts_by_column>\n")
+#for col in range(0,numcol):
+#  f.write("  <column>")
+#  for y in range(1,numrow):
+#    f.write(str(y_cuts_min[col][y])+ " ")
+#  
+#  f.write("</column>\n")
+#
+#f.write("</y_cuts_by_column>\n")
+#f.close()

@@ -27,10 +27,74 @@ With confidence in the time-to-solution estimator, it is used as the objective f
   
 \subsection{human optimization}
   
-  The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers is functional for small parameter spaces. However, with large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing. This lead to the development of an alternative method.  
+  The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers is functional for small parameter spaces. However, even with modestly large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing. This lead to the development of an alternative method.  
 
-  The cdf based optimization method.
+  The ``human optimization'' method utilizes the geometrical information of the problem to attempt to find optimal cuts. This method prioritizes finding cut line locations that cut along a ``natural boundary''. A natural boundary is a subset boundary that coincides with the geometrical features of the mesh. In Fig. \ref{partitioning_example}, we notice natural boundaries every centimeter in each dimension. 
+ \begin{figure}[h]
+\centering
+\includegraphics[scale=0.2]{../figures/spiderweb_10x10_sparse.png}
+\caption{An unstructured mesh with natural boundaries at 1 cm intervals in both dimensions.}
+\label{partitioning_example}
+\end{figure}
 
+This optimization method:
+\begin{enumerate}
+  \item Find the most suitable natural boundaries in the $x$ dimension.
+  \item For each set of columns, find the most suitable natural boundaries in the $y$ dimension.
+  \item Run all iterations of cut lines selected. 
+\end{enumerate}
+
+\subsubsection{Finding natural boundaries}
+
+In order to identify natural boundaries, we analyze the detailed cumulative distribution function (CDF) of the vertices in each dimension. The jumps in the CDF correspond to natural boundaries. Figure \ref{vert_cdf} shows the x-vertex CDF of the mesh in Fig. \ref{partitioning_example}. 
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.75]{../figures/xvertexcdf.pdf}
+\caption{The x-vertex CDF of the mesh shown in Fig. \ref{partitioning_example}}.
+\label{vert_cdf}
+\end{figure}
+
+To identify where the jumps in the CDF occur, we take the gradient of the CDF and isolate the largest discontinuities in it. Figure \ref{gradcdf} plots the gradient of the CDF shown in Fig. \ref{vert_cdf}.
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.75]{../figures/gradcdf.pdf}
+\caption{The gradient of the CDF shown in Fig. \ref{vert_cdf}}.
+\label{gradcdf}
+\end{figure}
+The largest discontinuities in Fig. \ref{gradcdf} occur at the instances where there are natural boundaries all the way through the mesh, or at 1 cm intervals. 
+
+
+\FloatBarrier
+\subsubsection{Finding natural boundaries for sets of columns}
+In order to globalize the optimization of the cut lines per column, we set up a binary tree of test cases, such as the one shown in Fig. \ref{binary_tree}. Each layer in the tree represents one set of $y$ cut lines. The first layer, or the root of the tree, represents the case where we try and find the natural boundaries in $y$ throughout all columns, in this case 4 columns. The next layer tries to find two sets of natural boundaries, one set of natural $y$ boundaries through the first two columns, and another set through the final 2 columns. Finally, the last case finds a set of natural $y$ boundaries in each individual column. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.75]{../figures/binary_tree.pdf}
+\label{binary_tree}
+\caption{A binary tree where each node represents the number of columns we are trying to find a natural boundary through.}
+\end{figure}
+
+Let's consider the mesh of the Level 2 experiment shown in Fig. \ref{level2_nocut}. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.3]{../../figures/level2_nocut.png}
+\label{level2_nocut}
+\caption{The mesh for the Level 2 experiment.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.55]{../../figures/lvl2_suite_0.pdf}
+\includegraphics[scale=0.55]{../../figures/lvl2_suite_1.pdf}
+\includegraphics[scale=0.55]{../../figures/lvl2_suite_2.pdf}
+\end{figure}
+
+\tcr{Use level 2 mesh to show how the cut lines differ}
+
+
+\FloatBarrier
 \section{Analytical Mesh Results}
 Analytical mesh density results will go here.
 

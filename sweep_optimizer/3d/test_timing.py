@@ -12,7 +12,7 @@ f = lambda x,y,z: 1
 t_comm = 4.47e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
-m_l = 1
+m_l = 2.5
 latency = 4110.0e-09
 #Solve time per cell.
 Tc = 2683.769129e-09
@@ -28,9 +28,10 @@ machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 
 #Number of rows and columns and planes.
 numcols = [1,2,8,16,32,32,64]
+numcols = [128]
 numrows =  [1,2,4,16,16,32,32]
-numcols = [1,2,8,16]
 numrows =  [1,2,4,16]
+numrows = [64]
 numplane = 1
 num_angles = 1
 Am = 10
@@ -42,13 +43,15 @@ test = False
 global_xmin = 0.0
 global_xmaxs = [16.0,32.0,64.0,128.0,128.0,256.0,256.0]
 global_xmaxs = [16.0,32.0,64.0,128.0]
+global_xmaxs = [512.0]
 global_ymin = 0.0
 global_ymaxs = [16.0,32.0,64.0,128.0,128.0,128.0,256.0]
 global_ymaxs = [16.0,32.0,64.0,128.0]
+global_ymaxs = [256.0]
 global_zmin = 0.0
 global_zmaxs = [16.0,32.0,64.0,128.0,256.0,256.0,256.0]
 global_zmaxs = [16.0,32.0,64.0,128.0]
-
+global_zmaxs = [512.0]
 
 max_times = []
 
@@ -62,17 +65,17 @@ for i in range(0,len(numcols)):
   numrow = 0
   #An adjusted Az for regular cases that normalizes the boundary cost for each processor so it matches the performance model.
   Az = global_zmax/2
-  if i == 0:
-    numcol = 1
-    numrow = 1
-    numplane = 1
-    Az = 1
-    mcff = 1
-  else:
-    numcol = numcols[i]
-    numrow = numrows[i]
-    numplane = 2
-    mcff = 1.32
+#  #if i == 0:
+#    numcol = 1
+#    numrow = 1
+#    numplane = 1
+#    Az = 1
+#    mcff = 1
+  #else:
+  numcol = numcols[i]
+  numrow = numrows[i]
+  numplane = 2
+  mcff = 1.32
 
   machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
   
@@ -87,4 +90,4 @@ for i in range(0,len(numcols)):
   max_times.append(max_time)
 
 
-timing_csv = np.savetxt("3d_timing_runs.csv",max_times,delimiter=',')
+#timing_csv = np.savetxt("3d_timing_runs.csv",max_times,delimiter=',')
