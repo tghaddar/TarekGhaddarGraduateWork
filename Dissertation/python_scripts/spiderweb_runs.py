@@ -52,7 +52,7 @@ plt.plot(bin_edges_plot,grad_cdf)
 plt.scatter(bin_edges_plot[c_max_index[0]],grad_cdf[c_max_index[0]],linewidth=0.3, s=50, c='r')
 
 temp_values = bin_edges[c_max_index[0]]
-temp_values_grad = bin_edges_plot[c_max_index[0]]
+#temp_values_grad = bin_edges_plot[c_max_index[0]]
 grad_cdf_distilled = grad_cdf[c_max_index[0]]
 highest_jumps =np.argsort(grad_cdf_distilled)[-(numcol-1):]
 x_values = temp_values[highest_jumps]
@@ -63,4 +63,4 @@ x_values = np.append(x_values,gxmax)
 #temp_grad_values = 
 
 
-#x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,numcol)
+x_values_func,cdf_jumps = get_highest_jumps(verts[:,0],gxmin,gxmax,numcol)

@@ -13,6 +13,7 @@ import warnings
 from copy import copy
 from scipy.optimize import minimize
 import numpy as np
+from scipy.signal import argrelextrema
 warnings.filterwarnings("ignore")
 
 plt.close("all")
@@ -108,7 +109,7 @@ def create_bounds_3d(num_params,global_xmin,global_xmax,global_ymin,global_ymax,
 def get_column_cdf(points,gxmin,gxmax,numcol):
   
   #The discrete x_steps we are using to build the cdf. Equivalent to 1% of column width if using even cuts.
-  num_steps = int((gxmax-gxmin)/(0.01*(gxmax - gxmin)/numcol))
+  num_steps = int((gxmax-gxmin)/(0.001*(gxmax - gxmin)/numcol))
   #The number of bins in the CDF.
   hist_range = (gxmin,gxmax)
   #Building a histogram
@@ -149,13 +150,18 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   
   #Getting the derivate to identify the highest jumps.
   grad_cdf = np.diff(cdf)/np.diff(bin_edges)
-  highest_jumps = np.argsort(grad_cdf)[-(numdim-1):]
-  values = bin_edges[highest_jumps]
+  #Finding the discontinuities in the gradient of the cdf. This corresponds to jumps in the cdf.
+  c_max_index = argrelextrema(grad_cdf,np.greater,order = 5)[0]
+  bin_edges_jumps = bin_edges[c_max_index]
+  cdf_jumps = grad_cdf[c_max_index]
+  #The highest numdim jumps.
+  highest_jumps = np.argsort(cdf_jumps)[-(numdim-1):]
+  values = bin_edges_jumps[highest_jumps]
   values = np.sort(values)
   values = np.append(values,gmax)
   values = np.insert(values,0,gmin)
   
-  return values
+  return values,cdf_jumps
 
 def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
   
