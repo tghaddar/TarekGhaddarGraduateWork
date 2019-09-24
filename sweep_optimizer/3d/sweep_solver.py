@@ -530,7 +530,7 @@ def plot_subset_boundaries_2d(global_3d_subset_boundaries,num_subsets,id_map,fna
     y = [ymin, ymin, ymax, ymax,ymin]
   
     plt.plot(x,y,'b')
-    plt.text(center_x,center_y,str(id_map[i]))
+    #plt.text(center_x,center_y,str(id_map[i]))
   
   plt.savefig(fname)
   plt.close()

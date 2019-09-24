@@ -66,7 +66,7 @@ The largest discontinuities in Fig. \ref{gradcdf} occur at the instances where t
 
 \FloatBarrier
 \subsubsection{Finding natural boundaries for sets of columns}
-In order to globalize the optimization of the cut lines per column, we set up a binary tree of test cases. 
+In order to globalize the optimization of the cut lines per column, we set up a binary tree of test cases, such as the one shown in Fig. \ref{binary_tree}. Each layer in the tree represents one set of $y$ cut lines. The first layer, or the root of the tree, represents the case where we try and find the natural boundaries in $y$ throughout all columns, in this case 4 columns. The next layer tries to find two sets of natural boundaries, one set of natural $y$ boundaries through the first two columns, and another set through the final 2 columns. Finally, the last case finds a set of natural $y$ boundaries in each individual column. 
 
 \begin{figure}[h]
 \centering
@@ -75,7 +75,21 @@ In order to globalize the optimization of the cut lines per column, we set up a 
 \caption{A binary tree where each node represents the number of columns we are trying to find a natural boundary through.}
 \end{figure}
 
-\tcr{binary tree}
+Let's consider the mesh of the Level 2 experiment shown in Fig. \ref{level2_nocut}. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.3]{../../figures/level2_nocut.png}
+\label{level2_nocut}
+\caption{The mesh for the Level 2 experiment.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.55]{../../figures/lvl2_suite_0.pdf}
+\includegraphics[scale=0.55]{../../figures/lvl2_suite_1.pdf}
+\end{figure}
+
 \tcr{Use level 2 mesh to show how the cut lines differ}
 
 
