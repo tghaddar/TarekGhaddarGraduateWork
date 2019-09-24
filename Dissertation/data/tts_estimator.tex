@@ -539,6 +539,20 @@ PDT's performance model was used to verify stage counts for 3D problems with reg
 
 \section{PDT performance model vs. TTS}
 
+\begin{table}[H]
+  \centering
+  \begin{tabular}{c|c|c|c|c|c|c|c|c|c}
+    \textbf{Cores} & 1 & 8 & 64 & 512 & 1,204 & 2,048 & 4,096 & 8,192 & 16,384 \\ \hline
+    \textbf{Nx} & 16 & 32 & 64 & 128 & 128 & 256 & 256 & 256 & 512 \\ \hline
+    \textbf{Ny} & 16 & 32 & 64 & 128 & 128 & 128 & 128 & 256 & 256 \\ \hline
+    \textbf{Nz} & 16 & 32 & 64 & 128 & 256 & 256 & 256 & 512 & 512 \\ \hline
+    \textbf{Px} & 1  & 2  & 8  & 16  & 32  & 32  & 64  & 64  & 128 \\ \hline
+    \textbf{Py} & 1  & 2  & 4  & 16  & 16  & 32  & 32  & 64  & 64  \\ \hline
+    \textbf{Pz} & 1  & 2  & 2  & 2   & 2   & 2   & 2   & 2   & 2   \\ 
+  \end{tabular}
+  \label{
+\end{table}
+
 \begin{figure}[H]
 \centering
 \includegraphics{../../figures/scaling_tts.pdf}
