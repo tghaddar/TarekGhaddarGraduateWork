@@ -107,14 +107,12 @@ def create_bounds_3d(num_params,global_xmin,global_xmax,global_ymin,global_ymax,
 
 def get_column_cdf(points,gxmin,gxmax,numcol):
   
-  #x coordinates of the centroid distribution.
-  x_points = points[:,0]
   #The discrete x_steps we are using to build the cdf. Equivalent to 1% of column width if using even cuts.
   num_steps = int((gxmax-gxmin)/(0.01*(gxmax - gxmin)/numcol))
   #The number of bins in the CDF.
   hist_range = (gxmin,gxmax)
   #Building a histogram
-  hist,bin_edges = np.histogram(x_points,bins=num_steps,range=hist_range,normed=False)
+  hist,bin_edges = np.histogram(points,bins=num_steps,range=hist_range,normed=False)
   
   cdf = np.cumsum(hist)
   cdf = cdf/max(cdf)
@@ -124,7 +122,7 @@ def get_column_cdf(points,gxmin,gxmax,numcol):
   
 def get_row_cdf(points,gymin,gymax,numrow):
   
-  num_steps = int((gymax-gymin)/(0.01*(gymax - gymin)/numrow))
+  num_steps = int((gymax-gymin)/(0.001*(gymax - gymin)/numrow))
    #The number of bins in the CDF.
   hist_range = (gymin,gymax)
   #Building a histogram
@@ -139,7 +137,7 @@ def get_row_cdf(points,gymin,gymax,numrow):
 def get_highest_jumps(points,gmin,gmax,numdim):
   
   #The discrete steps we are using to build the cdf. Equivalent to 1% of column width if using even cuts.
-  num_steps = int((gmax-gmin)/(0.005*(gmax - gmin)/numdim))
+  num_steps = int((gmax-gmin)/(0.001*(gmax - gmin)/numdim))
   #The number of bins in the CDF.
   hist_range = (gmin,gmax)
   #Building a histogram
