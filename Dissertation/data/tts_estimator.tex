@@ -541,6 +541,18 @@ PDT's performance model was used to verify stage counts for 3D problems with reg
 
 PDT has run a scaling suite out to 90,112 cores on the Quartz supercomputer \cite{quartz} at Lawrence Livermore National Lab (LLNL). 
 A smaller scaling suite, described in Table \ref{scaling_suite} were the first benchmark case run for the time-to-solution estimator. 
+The suite was run with 1 energy group, 80 directions, and $A_m = 10$. 
+The following machine parameters were generated and used for 1 group problems:
+\begin{itemize}
+  \item $T_c = 2683.769$ ns
+  \item $T_m = 111.972$ ns
+  \item $T_g = 559.127$ ns
+  \item $T_\text{byte} = 4.47$ ns
+  \item $latency = 4110$ ns
+  \item $M_L = 2.5$
+  \item $T_wu = 5779.929$ ns
+  \item mcff = 1.32
+\end{itemize}
 
 \begin{table}[H]
   \centering
@@ -553,22 +565,22 @@ A smaller scaling suite, described in Table \ref{scaling_suite} were the first b
     \textbf{Py} & 1  & 2  & 4  & 16  & 16  & 32  & 32  & 64  & 64  \\ \hline
     \textbf{Pz} & 1  & 2  & 2  & 2   & 2   & 2   & 2   & 2   & 2   \\ 
   \end{tabular}
-  \label{scaling_suite}
   \caption{The scaling suite parameters ran with 1 energy group, 80 directions, and $A_m = 10$.}
+  \label{scaling_suite}
 \end{table}
 
 \begin{figure}[H]
 \centering
 \includegraphics{../../figures/scaling_tts.pdf}
-\label{weak_scaling_tts}
 \caption{The parallel efficiency relative to 8 cores of PDT, the PDT performance model, and the time-to-solution estimator.}
+\label{weak_scaling_tts}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics{../../figures/scaling_tts_sweep_times.pdf}
-\label{weak_scaling_tts_sweep}
 \caption{The time per sweep of PDT, the PDT performance model, and the time-to-solution estimator.}
+\label{weak_scaling_tts_sweep}
 \end{figure}
 
 \tcr{Add table of percent differences here between PDT and TTS, and Perf. Model and TTS}
@@ -579,15 +591,15 @@ A smaller scaling suite, described in Table \ref{scaling_suite} were the first b
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.3]{../../figures/level2_nocut.png}
-\label{level2_nocut}
 \caption{The mesh for the Level 2 experiment.}
+\label{level2_nocut}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.3]{../../figures/level2_42x13.png}
-\label{level2_42x13}
 \caption{The Level 2 experiment mesh evenly partitioned into 42 subsets in x and 13 subsets in y. $f = 32.616$.}
+\label{level2_42x13}
 \end{figure}
 
 \begin{figure}[H]
@@ -600,20 +612,20 @@ A smaller scaling suite, described in Table \ref{scaling_suite} were the first b
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.15]{../../figures/level2_nocut_zoom.png}
-\label{level2_nocut_zoom}
 \caption{The detector region of the Level 2 experiment mesh.}
+\label{level2_nocut_zoom}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.15]{../../figures/level2_42x13_zoom.png}
-\label{level2_42x13_zoom}
 \caption{The detector region of the Level 2 experiment when partitioned into 42 subsets in x and 13 subsets in y.}
+\label{level2_42x13_zoom}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.15]{../../figures/level2_42x13_balanced_zoom.png}
-\label{level2_42x13_balanced_zoom}
 \caption{The detector region of the Level 2 experiment when partitioned and balanced with 42 subsets in x and 13 subsets in y.}
+\label{level2_42x13_balanced_zoom}
 \end{figure}
