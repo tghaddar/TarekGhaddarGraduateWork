@@ -1825,7 +1825,7 @@ def optimized_tts_numerical(params, points,global_xmin,global_xmax,global_ymin,g
 #  print("x_cuts: ",x_cuts)
 #  print("y_cuts: ",y_cuts)
 #  
-  x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
+  #x_cuts,y_cuts = tweak_parameters(x_cuts,y_cuts,global_xmin,global_xmax,global_ymin,global_ymax,num_col,num_row)
   #Building subset boundaries.
   subset_bounds = build_global_subset_boundaries(num_col-1,num_row-1,x_cuts,y_cuts)
   #Building the adjacency matrix.

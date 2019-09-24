@@ -27,9 +27,15 @@ With confidence in the time-to-solution estimator, it is used as the objective f
   
 \subsection{human optimization}
   
-  The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers is functional for small parameter spaces. However, with large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing. This lead to the development of an alternative method.  
+  The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers is functional for small parameter spaces. However, even with modestly large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing. This lead to the development of an alternative method.  
 
-  The cdf based optimization method.
+  The ``human optimization'' method utilizes the geometrical information of the problem to attempt to find optimal cuts. This method prioritizes finding cut line locations that cut along a ``natural boundary''. A natural boundary is a subset boundary that coincides with the geometrical features of the mesh. In Fig. \ref{partitioning_example}, we notice natural boundaries every centimeter in each dimension. 
+ \begin{figure}[H]
+\centering
+\includegraphics[scale=0.2]{../figures/spiderweb_10x10_sparse.png}
+\caption{An unstructured mesh partitioned into 100 subsets with cut lines at 1 cm intervals in both dimensions}
+\label{partitioning_example}
+\end{figure}
 
 \section{Analytical Mesh Results}
 Analytical mesh density results will go here.

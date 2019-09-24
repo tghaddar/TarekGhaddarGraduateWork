@@ -145,15 +145,15 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   hist,bin_edges = np.histogram(points,bins=num_steps,range=hist_range,normed=False)
   
   cdf = np.cumsum(hist)
-  cdf = cdf/max(cdf)
+  #cdf = cdf/max(cdf)
   cdf = np.insert(cdf,0,0.0)
   
   #Getting the derivate to identify the highest jumps.
   grad_cdf = np.diff(cdf)/np.diff(bin_edges)
   #grad_cdf = np.gradient(cdf,bin_edges)
-  #bin_edges_plot = np.delete(bin_edges,0)
-  #plt.figure()
-  #plt.plot(bin_edges_plot,grad_cdf)
+#  bin_edges_plot = np.delete(bin_edges,0)
+#  plt.figure()
+#  plt.plot(bin_edges_plot,grad_cdf)
   #Finding the discontinuities in the gradient of the cdf. This corresponds to jumps in the cdf.
   c_max_index = argrelextrema(grad_cdf,np.greater,order = 5)[0]
   bin_edges_jumps = bin_edges[c_max_index]
@@ -165,7 +165,7 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   values = np.append(values,gmax)
   values = np.insert(values,0,gmin)
   
-  return np.around(values,3)
+  return values
 
 def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
  
@@ -184,14 +184,6 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
     y1 = ypoints[x1]
     #Getting the highest jumps for this column.
     y_values_col = get_highest_jumps(y1,gymin,gymax,numrow)
-#    row_cdf, row_bin_edges = get_row_cdf(y1,gymin,gymax,numrow)
-#    grad_row_cdf = np.diff(row_cdf)/np.diff(row_bin_edges)
-#    norm_row = grad_row_cdf/max(grad_row_cdf)
-#    highest_row_jumps = np.argsort(norm_row)[-(numrow-1):]
-#    y_values_col = row_bin_edges[highest_row_jumps]
-#    y_values_col = np.sort(y_values_col)
-#    y_values_col = np.append(y_values_col,gymax)
-#    y_values_col = np.insert(y_values_col,0,gymin)
     all_y_cuts.append(y_values_col)
     
   #Doing a binary tree of the columns to get a full cut suite.
@@ -243,10 +235,9 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
       for j in range(col1,col2):
         current_y_values[j] = y_values1
       #current_y_values[col1:col2] = [y_values1]
-    
+      
     y_cut_suite.append(current_y_values)  
     #print(current_y_values)
-    print(x_limits)
       
 #    for i in range(0,2):
 #      prev_x_limit = current_x_limit
