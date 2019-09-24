@@ -539,6 +539,9 @@ PDT's performance model was used to verify stage counts for 3D problems with reg
 
 \section{PDT performance model vs. TTS}
 
+PDT has run a scaling suite out to 90,112 cores on the Quartz supercomputer \cite{quartz} at Lawrence Livermore National Lab (LLNL). 
+A smaller scaling suite, described in Table \ref{scaling_suite} were the first benchmark case run for the time-to-solution estimator. 
+
 \begin{table}[H]
   \centering
   \begin{tabular}{c|c|c|c|c|c|c|c|c|c}
@@ -550,7 +553,8 @@ PDT's performance model was used to verify stage counts for 3D problems with reg
     \textbf{Py} & 1  & 2  & 4  & 16  & 16  & 32  & 32  & 64  & 64  \\ \hline
     \textbf{Pz} & 1  & 2  & 2  & 2   & 2   & 2   & 2   & 2   & 2   \\ 
   \end{tabular}
-  \label{
+  \label{scaling_suite}
+  \caption{The scaling suite parameters ran with 1 energy group, 80 directions, and $A_m = 10$.}
 \end{table}
 
 \begin{figure}[H]
