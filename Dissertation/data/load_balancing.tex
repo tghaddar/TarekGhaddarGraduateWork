@@ -175,7 +175,7 @@ Algorithm \ref{lbd} details the load-balancing-by-dimension algorithm.
 \end{algorithmic}
 \end{algorithm}
 
-Figure \ref{alg_illustration} illustrates the behavior of both algorithms after 5 iterations. In Fig. \ref{3x3_lb}, we see the partitions cutting across the entire domain, with the left-most $x$ cut lines moving into the denser geometric features in the corners to more evenly distribute cells. In Fig. \ref{3x3_lbd}, we see the $x$ partitions cutting across the entire domain, but the $y$ partitions being redistributed by column. The $y$ partitions are moved into the respective geometric features in the appropriate columns in order to better balance the problem.
+Figure \ref{alg_illustration} illustrates the behavior of both algorithms after 5 iterations. In Fig. \ref{3x3_lb}, we see the partitions cutting across the entire domain, with the $x$ and $y$ cut lines moving into the denser geometric features in the corners to more evenly distribute cells. In Fig. \ref{3x3_lbd}, we see the $x$ partitions cutting across the entire domain, but the $y$ partitions being redistributed by column. The $y$ partitions are moved into the respective geometric features in the appropriate columns in order to better balance the problem.
 
 \begin{figure}[H]
 \centering
@@ -208,15 +208,30 @@ This mesh was chosen because it is inherently imbalanced as there are two dense 
 The study calculates $f$ for the mesh with no load balancing iterations, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations. 
 The mesh is partitioned into 2 to 10 subsets in each dimension for all load balancing formats. 
 Figure \ref{metric_study} shows the results of this parametric study. 
+The results are tabulated in Table \ref{metric_study_table}.
+
+With regular cut lines going through the mesh, $f_\text{reg}$ generally increases as the number of subsets increases. 
+As the number of cut lines increases, the number of cells added may also increase, driving up the maximum number of cells in each subset. It is important to note that in Eq. \ref{metric_def}, the average number of cells per subset used to calculate $f$ is the average number of cells per subset \textit{before} slicing through the mesh. 
+With more cut lines, the maximum number of cells per subset will increase while the average number of cells per subset will decrease, leading to an increase in $f$. There can be exceptions to this trend, as seen by ${f_\text{reg}}$ for 8 and 10 subsets in each dimension. 
+The cut lines with 10 subsets in each dimension lie on natural boundaries when evenly distributed. 
+A natural boundary is a mesh boundary that coincides with a subset boundary, adding no cells to the mesh. 
+Because no cells are added in the 10x10 case, $f_{\text{reg}}$ with 10 subsets in each dimension is lower than $f_{\text{reg}}$ with 8 subsets in each dimension. 
+
+For the load balanced and load-balanced-by-dimension cases, we see a similar increasing trend for $f$, although it is not quite as consistent for hte load-balance-by-dimension cases. 
+This is lack of consistency can be attributed to $y$ cut lines not going all the way through the mess, and adding cells in a less consistent way throughout the mesh. 
+
+
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.75]{../figures/metric_study.pdf}
+\includegraphics[scale=0.7]{../figures/metric_study.pdf}
 \caption{The results of the parametric study with no load balancing, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations.}
 \label{metric_study}
 \end{figure}
-
 \begin{table}[H]
 \centering
+\caption{The tabulated results of the parametric study shown in Fig. \ref{metric_study} with no load balancing, 5 original load balancing iterations (LB), and 5 load-balancing-by-dimension (LBD) iterations.}
+\label{metric_study_table}
+\scalebox{0.8}{
 \begin{tabular}{c|c|c|c}
 \textbf{$\sqrt{\text{Num Subsets}}$} & \bf $f_{\text{reg}}$ & \bf $f_{\text{LB}}$  & \bf $f_{\text{LBD}}$\\ \hline 
 2&1.76&1.76&1.19\\ \hline 
@@ -228,8 +243,32 @@ Figure \ref{metric_study} shows the results of this parametric study.
 8&12.44&3.59&1.6\\ \hline 
 9&12.03&3.99&1.96\\ \hline 
 10&9.76&5.29&1.5
+\end{tabular}}
+\end{table}
 
+Table \ref{metric_improvement} shows the percent decrease in $f$ with the original load balancing algorithm and the load-balancing-by-dimension algorithm relative to no load balancing, and the percent decrease in $f$ with the load-balancing-by-dimension algorithm relative to the original load balancing algorithm. 
+There is consistent improvement for both algorithms for all cases, and the improvement both load balancing algorithms relative to no algorithm generally increases as the number of subsets increases. The improvement of load-balancing-by-dimension over load balancing is notable, with a minimum improvement of 32.43\% and a maximum improvement of 71.66\%. 
+\begin{table}[H]
+\centering
+\caption{The percent decrease of $f$ with the original load balancing algorithm (LB) and the load-balancing-by-dimension algorithm (LBD) relative to no load balancing, and the percent decrease of $f$ with the load-balancing-by-dimension algorithm relative to the original load balancing algorithm.}
+\label{metric_improvement}
+\begin{tabular}{c|c|c|c}
+\centering
+\textbf{$\sqrt{\text{Num Subsets}}$} & \textbf{LB v. No LB}  & \textbf{LBD v. No LB} & \textbf{LBD v. LB} \\ \hline 
+2&0.0\%&32.43\%&32.43\%\\ \hline 
+3&24.38\%&56.38\%&42.33\%\\ \hline 
+4&59.21\%&77.9\%&45.82\%\\ \hline 
+5&56.48\%&78.17\%&49.83\%\\ \hline 
+6&69.05\%&86.7\%&57.01\%\\ \hline 
+7&65.06\%&86.66\%&61.83\%\\ \hline 
+8&71.17\%&87.1\%&55.27\%\\ \hline 
+9&66.84\%&83.69\%&50.81\%\\ \hline 
+10&45.85\%&84.65\%&71.66\%
 \end{tabular}
 \end{table}
+
+\section{Outlook}
+The unstructured meshing capability in PDT allows the user to solve a wider variety of problems, without the need to conform a geometry to a logically Cartesian mesh. 
+The original load balancing and load-balancing-by-dimension algorithms allowed 
 
 

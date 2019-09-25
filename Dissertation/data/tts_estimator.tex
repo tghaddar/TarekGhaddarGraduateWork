@@ -20,7 +20,7 @@ With the introduction of unstructured meshes and imbalanced partitions in PDT, w
 In addition, before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme. 
 The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This chapter will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies. 
 
-The time to solution estimator is written in Python 3. Python was chosen as the language because of its powerful graph library, networkx. 
+The time to solution estimator is written in Python 3. Python was chosen as the language because of its powerful graph library, networkx \cite{networkx}. 
 This library gives us a wide variety of graph mathematics and is easy to use. 
 Before detailing the time-to-solution estimator's methodology, a description of the applicable basic graph theory is necessary. 
 
@@ -35,7 +35,7 @@ Figure \ref{basic_graph} shows an undirected graph of 4 nodes and 4 edges. The n
 \caption{An undirected graph with 4 nodes and 4 edges. }
 \label{basic_graph}
 \end{figure}
-Figure \ref{basic_graph} is referred to as an undirected because its edges have no directional information. 
+Figure \ref{basic_graph} is referred to as an undirected graph because its edges have no directional information. 
 If we add directional information to the edges of the graph in Fig. \ref{basic_graph}, it becomes a directed graph, shown in Fig. \ref{directed_graph}. 
 \begin{figure}[H]
 \centering
@@ -609,11 +609,6 @@ Figure \ref{scaling_stagecount} shows the stage counts of the scaling suite for 
 16384&9.68\%&2.7\%&12.11\%
 \end{tabular}
 \end{table}
-
-
-
-\tcr{Add table of percent differences here between PDT and TTS, and Perf. Model and TTS}
-
 
 \section{PDT vs. TTS}
 
