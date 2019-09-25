@@ -175,7 +175,7 @@ Algorithm \ref{lbd} details the load-balancing-by-dimension algorithm.
 \end{algorithmic}
 \end{algorithm}
 
-Figure \ref{alg_illustration} illustrates the behavior of both algorithms. In Fig. \ref{3x3_lb}, we see the partitions cutting across the entire domain, with the left-most $x$ cut line moved into the denser geometric feature in the bottom left corner to more evenly distribute cells. In Fig. \ref{3x3_lbd}, we see the $x$ partitions cutting across the entire domain, but the $y$ partitions being redistributed by column. The $y$ partitions are moved into the respective geometric features in the appropriate columns in order to better balance the problem.
+Figure \ref{alg_illustration} illustrates the behavior of both algorithms after 5 iterations. In Fig. \ref{3x3_lb}, we see the partitions cutting across the entire domain, with the left-most $x$ cut lines moving into the denser geometric features in the corners to more evenly distribute cells. In Fig. \ref{3x3_lbd}, we see the $x$ partitions cutting across the entire domain, but the $y$ partitions being redistributed by column. The $y$ partitions are moved into the respective geometric features in the appropriate columns in order to better balance the problem.
 
 \begin{figure}[H]
 \centering
@@ -201,5 +201,35 @@ Figure \ref{alg_illustration} illustrates the behavior of both algorithms. In Fi
 \label{alg_illustration}
 \end{figure}
 
+\section{Parametric Study of the Original Load Balancing and the Load-Balancing-by-Dimension Algorithms}
+To study the behavior and effectiveness of both the original load balancing and the load-balancing-by-dimension algorithm, a parametric study was run on the mesh shown in Fig. \ref{partitioning_example}. 
+This mesh was chosen because it is inherently imbalanced as there are two dense geometric features in opposing corners with a sparse region in between. 
 
-\section{Results}
+The study calculates $f$ for the mesh with no load balancing iterations, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations. 
+The mesh is partitioned into 2 to 10 subsets in each dimension for all load balancing formats. 
+Figure \ref{metric_study} shows the results of this parametric study. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.75]{../figures/metric_study.pdf}
+\caption{The results of the parametric study with no load balancing, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations.}
+\label{metric_study}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c|c|c}
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf $f_{\text{reg}}$ & \bf $f_{\text{LB}}$  & \bf $f_{\text{LBD}}$\\ \hline 
+2&1.76&1.76&1.19\\ \hline 
+3&3.41&2.58&1.49\\ \hline 
+4&5.83&2.38&1.29\\ \hline 
+5&9.76&4.25&2.13\\ \hline 
+6&10.02&3.1&1.33\\ \hline 
+7&11.17&3.9&1.49\\ \hline 
+8&12.44&3.59&1.6\\ \hline 
+9&12.03&3.99&1.96\\ \hline 
+10&9.76&5.29&1.5
+
+\end{tabular}
+\end{table}
+
+
