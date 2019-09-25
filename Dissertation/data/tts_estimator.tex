@@ -17,7 +17,7 @@
 
 \chapter{TIME-TO-SOLUTION ESTIMATOR \label{cha:tts}}
 With the introduction of unstructured meshes and imbalanced partitions in PDT, we need an expansion of the performance model to estimate the sweep time. 
-Before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme. 
+In addition, before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme. 
 The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This chapter will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies. 
 
 The time to solution estimator is written in Python 3. Python was chosen as the language because of its powerful graph library, networkx. 
@@ -540,7 +540,7 @@ PDT's performance model was used to verify stage counts for 3D problems with reg
 \section{PDT performance model vs. TTS}
 
 PDT has run a scaling suite out to 90,112 cores on the Quartz supercomputer \cite{quartz} at Lawrence Livermore National Lab (LLNL). 
-A smaller scaling suite, described in Table \ref{scaling_suite} were the first benchmark case run for the time-to-solution estimator. 
+A smaller scaling suite, described in Table \ref{scaling_suite} was the first benchmark case run for the time-to-solution estimator. 
 The suite was run with 1 energy group, 80 directions, and $A_m = 10$. 
 The following machine parameters were generated and used for 1 group problems:
 \begin{itemize}
@@ -550,7 +550,7 @@ The following machine parameters were generated and used for 1 group problems:
   \item $T_\text{byte} = 4.47$ ns
   \item $latency = 4110$ ns
   \item $M_L = 2.5$
-  \item $T_wu = 5779.929$ ns
+  \item $T_{wu} = 5779.929$ ns
   \item mcff = 1.32
 \end{itemize}
 
@@ -569,11 +569,13 @@ The following machine parameters were generated and used for 1 group problems:
   \label{scaling_suite}
 \end{table}
 
+Figure \ref{scaling_stagecount} shows the stage counts of the scaling suite for PDT's performance model and the time-to-solution estimator are in perfect agreement. 
+
 \begin{figure}[H]
 \centering
-\includegraphics{../../figures/scaling_tts.pdf}
-\caption{The parallel efficiency relative to 8 cores of PDT, the PDT performance model, and the time-to-solution estimator.}
-\label{weak_scaling_tts}
+\includegraphics{../../figures/scaling_stagecount.pdf}
+\caption{The stage counts of PDT's performance model and the time-to-solution estimator for the scaling suite in Table \ref{scaling_suite}}.
+\label{scaling_stagecount}
 \end{figure}
 
 \begin{figure}[H]
@@ -582,6 +584,33 @@ The following machine parameters were generated and used for 1 group problems:
 \caption{The time per sweep of PDT, the PDT performance model, and the time-to-solution estimator.}
 \label{weak_scaling_tts_sweep}
 \end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics{../../figures/scaling_tts.pdf}
+\caption{The parallel efficiency relative to 8 cores of PDT, the PDT performance model, and the time-to-solution estimator.}
+\label{weak_scaling_tts}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{The percent difference between PDT and its performance model, PDT's performance model and the time-to-solution estimator, and PDT and the time-to-solution estimator.}
+\label{scaling_percent_diff}
+\begin{tabular}{c|c|c|c}
+\textbf{Cores} & \textbf{PDT v. Perf.} & \textbf{Perf. v. TTS} & \textbf{PDT v. TTS} \\ \hline
+1&8.82\%&0.68\%&9.44\% \\ \hline
+8&6.67\%&1.86\%&8.4\% \\ \hline
+64&2.22\%&2.04\%&4.22\% \\ \hline
+512&8.0\%&1.52\%&9.4\% \\ \hline
+1024&2.0\%&3.67\%&5.6\% \\ \hline
+2048&2.0\%&2.21\%&4.17\% \\ \hline
+4096&3.77\%&3.24\%&6.89\% \\ \hline
+8192&8.33\%&3.8\%&11.82\% \\ \hline
+16384&9.68\%&2.7\%&12.11\%
+\end{tabular}
+\end{table}
+
+
 
 \tcr{Add table of percent differences here between PDT and TTS, and Perf. Model and TTS}
 
