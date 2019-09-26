@@ -610,7 +610,7 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
         else:
           cost = Ay
       else:
-        cost = mcff*(Twu + 2*latency*m_l + t_comm*boundary_cells*upbc + num_cells*(Tc + Am*(Tm + Tg)))
+        cost = mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*upbc + num_cells*(Tc + Am*(Tm + Tg)))
       graph[node][neighbor]['weight'] = cost
     
   for ig in range(0,num_graphs):

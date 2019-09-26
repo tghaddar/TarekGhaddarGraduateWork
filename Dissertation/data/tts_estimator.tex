@@ -315,7 +315,7 @@ For each node in each graph, we:
   \item Sum the weights of the edges along the longest path,
   \item Set all incoming edge values to the node to the sum of the longest path. 
 \end{enumerate}
-The incoming edges to each node in each graph now reflect the time at which it is ready to solve. This universal edge weighting is crucial for detecting and resolving conflicts during the sweep. Figure \ref{universal} shows a simple example of a TDG before and after this weight adjustment.
+The incoming edges to each node in each graph now reflect the time at which a node is ready to solve. This universal edge weighting is crucial for detecting and resolving conflicts during the sweep. Figure \ref{universal} shows a simple example of a TDG before and after this weight adjustment.
 \begin{figure}[H]
   \begin{minipage}[c]{0.5\textwidth}
     \centering
@@ -331,13 +331,13 @@ The incoming edges to each node in each graph now reflect the time at which it i
 
 \subsection{Modifying the weights of each graph to detect and resolve conflicts}\label{sec:conflict}
 
-At this point in the time-to-solution estimation process, we have a graph per octant/quadrant per angleset, each weighted on a universal time scale. The time to solution is best summarized as a ``marching'' process:
+At this point in the time-to-solution estimation process, we have a graph per octant/quadrant per angleset, with each graph weighted on a universal time scale. For each node in every graph, the incoming edges to the node represent the time $t$ that it is ready to solve at. The time to solution is best summarized as a ``marching'' process:
 \begin{enumerate}
-  \item Starting at time $t=0$, we find the first interaction across all graphs. 
-  \item If at that time, multiple graphs are solving the same node, we have a conflict. 
-  \item The graph that ``wins'' the conflict does not have its weights modified, while the graph that lose the conflict modify their downstream weights according to how long they are delayed. 
+  \item Starting at time $t=0$, find the nodes that are ready to solve or already solving across all graphs. 
+  \item If at that time, multiple graphs are solving the same node, they are in conflict. 
+  \item The graph that ``wins'' the conflict does not have its weights modified, while the graph(s) that lose the conflict modify their downstream weights according to how long they are delayed. 
   \item Update $t$ to the next interaction across all graphs. 
-  \item Repeat steps 3 and 4 until all graphs are finished sweeping.
+  \item Repeat steps 2, 3, and 4 until all graphs are finished sweeping.
 \end{enumerate}
 
 When a conflict is detected, the time-to-solution estimator uses a first-come-first-serve conflict resolution method. The first graph to arrive to a node will begin solving it, and the remaining graphs that arrive while it is being solved will incur a delay. The delay is reflected in the remaining graphs by adding the delay as a weight to the applicable edge and all downstream edges in the losing graphs. 
@@ -352,19 +352,19 @@ The delay is once again added to the applicable edge's weight and all downstream
 
 \subsection{Estimating the final time-to-solution}
 
-Once all graphs have had their weights adjusted for conflicts, the graphs now reflect a schedule. The incoming edges to each node in each graph represent what time they are ready to solve. The final weight in each graph represents the time it takes for that graph to sweep across its domain. The maximum final weight across all graphs represents the estimate for the time-to-solution for the problem.
+Once all graphs have had their weights modified for conflicts, the graphs now reflect a schedule. The incoming edges to each node in each graph represent what time they are ready to solve. The final weight in each graph represents the time it takes for that graph to sweep across its domain. The maximum final weight across all graphs represents the estimate for the time-to-solution for the problem.
 
 \section{2D Verification}
 
-A verification study in 2D was run to verify the time-to-solution estimator for 2D partitioning schemes with perfectly balanced partitions. The test problems were verified against a code written by Jean Ragusa that mimics PDT's scheduler in two dimensions. For consistency, the time-to-solution estimator utilized an unweighted depth-of-graph algorithm during the verification study to match PDT's scheduling. The verification study consists of the following problems:
+A theoretical study in 2D was run to verify the time-to-solution estimator for 2D partitioning schemes with perfectly balanced partitions. The test problems were verified against a code written by Jean Ragusa that uses a depth-of-graph with an octant priority tie breaker scheduler in two dimensions. The verification study consists of the following problems:
 \begin{enumerate}
-	\item 2x2 to 10x10 subsets in x and y with regular partitions and 1 to 6 angles per quadrant.
-	\item 2x2 to 10x10 subsets in x and y with mildly random partitions and 1 to 6 angles per quadrant.
-	\item  2x2 to 10x10 subsets in x and y with random partitions and 1 to 6 angles per quadrant.
-	\item  2x2 to 10x10 subsets in x and y with probable worst-case partitions and 1 to 6 angles per quadrant.
+	\item 2x2 to 10x10 subsets in x and y with regular partitions and 1 to 6 anglesets per quadrant.
+	\item 2x2 to 10x10 subsets in x and y with ``mildly random'' partitions and 1 to 6 anglesets per quadrant.
+	\item  2x2 to 10x10 subsets in x and y with ``random'' partitions and 1 to 6 anglesets per quadrant.
+	\item  2x2 to 10x10 subsets in x and y with probable worst-case partitions and 1 to 6 anglesets per quadrant.
 \end{enumerate}
 
-"Mildly random" partitions keep the cut lines uniformly distributed in x, while the y cut lines vary slightly around the uniformly distributed cut lines of the regular partitions. Figure \ref{mild_random_partitions} shows examples of this partitioning style. "Random" partitions possesses no such limitations on either set of cut lines, as shown by Fig. \ref{random_partitions}. 
+"Mildly random" partitions keep the cut lines uniformly distributed in x, while the y cut lines vary slightly around the uniformly distributed cut lines of the regular partitions. Figure \ref{mild_random_partitions} shows examples of this partitioning style. "Random" partitions possesses no such limitations on either set of cut lines, as shown by Fig. \ref{random_partitions}. The ``mildly random'' and ``random'' partition styles mimic likely partitioning schemes we can expect from load-balancing-by-dimension.
 
 Figures \ref{regular_partitions}, \ref{mild_random_partitions}, \ref{random_partitions}, \ref{worst_partitions} show the four partitioning schemes and Figs. \ref{regular_verification}, \ref{mild_random_verification}, \ref{random_verification}, \ref{worst_verification} show the results of the verification study for each partitioning scheme. In the results, a stage is defined as the time it takes to solve all cells in a subset for an angle.  
 
@@ -400,92 +400,92 @@ Figure \ref{regular_partitions} shows four examples of the regular partitioning 
 \label{regular_partitions}
 \end{figure}
 
-Using regular partitions as shown in Fig. \ref{regular_partitions}, the first portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{regular_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator verifies perfectly on regular partitions with multiple angles per quadrant. 
+Using regular partitions as shown in Fig. \ref{regular_partitions}, the first portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{regular_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for regular partitions with multiple angles per quadrant. 
 
 %Verification plots.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{../figures/regular_verification.pdf}
-\caption{A 2D verification suite with regular partitions run from 2x2 to 10x10 subsets with each case being run from 1 to 6 angles per quadrant.}
+\caption{A 2D verification suite with regular partitions run from 2x2 to 10x10 subsets with each case being run from 1 to 6 anglesets per quadrant.}
 \label{regular_verification}
 \end{figure}
 
-\subsection{Mildly Random Partitions}
-Figure \ref{mild_random_partitions} shows four examples of the mildly random partitioning scheme used for the second part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
+\subsection{``Mildly Random'' Partitions}
+Figure \ref{mild_random_partitions} shows four examples of the``mildly random'' partitioning scheme used for the second part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 
 %Mild random partitions
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/4_mild_random.pdf}
-  \caption{4x4 subsets with mildly random partitions.}
+  \caption{4x4 subsets with``mildly random'' partitions.}
   \label{4mildrandom}
 \end{subfigure}
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/6_mild_random.pdf}
-  \caption{6x6 subsets with mildly random partitions.}
+  \caption{6x6 subsets with``mildly random'' partitions.}
   \label{6mildrandom}
 \end{subfigure}
 
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/8_mild_random.pdf}
-  \caption{8x8 subsets with mildly random partitions.}
+  \caption{8x8 subsets with``mildly random'' partitions.}
   \label{8mildrandom}
 \end{subfigure}
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/10_mild_random.pdf}
-  \caption{10x10 subsets with mildly random partitions.}
+  \caption{10x10 subsets with``mildly random'' partitions.}
   \label{10mildrandom}
 \end{subfigure}
-\caption{Examples of mildly random partitioning.}
+\caption{Examples of``mildly random'' partitioning.}
 \label{mild_random_partitions}
 \end{figure}
 
-Using mildly random partitions as shown in Fig. \ref{mild_random_partitions}, the second portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{mild_random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator verifies perfectly on mildly random partitions with multiple angles per quadrant. 
+Using``mildly random'' partitions as shown in Fig. \ref{mild_random_partitions}, the second portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{mild_random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for``mildly random'' partitions with multiple angles per quadrant. 
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{../figures/mild_random_verification.pdf}
-\caption{A 2D verification suite with mildly random partitions run from 2x2 to 10x10 subsets with each case being run from 1 to 6 angles per quadrant.}
+\caption{A 2D verification suite with``mildly random'' partitions run from 2x2 to 10x10 subsets with each case being run from 1 to 6 anglesets per quadrant.}
 \label{mild_random_verification}
 \end{figure}
 
 \subsection{Random Partitions}
 %Random partitions
-Figure \ref{random_partitions} shows four examples of the random partitioning scheme used for the third part of the verification study. Cut lines in the x dimension go all the way across the domain, but are not necessarily uniformly distributed. The cut lines in y are randomly distributed in each column.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
+Figure \ref{random_partitions} shows four examples of the``random''partitioning scheme used for the third part of the verification study. Cut lines in the x dimension go all the way across the domain, but are not necessarily uniformly distributed. The cut lines in y are randomly distributed in each column.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/4_random.pdf}
-  \caption{4x4 subsets with random partitions.}
+  \caption{4x4 subsets with``random''partitions.}
   \label{4random}
 \end{subfigure}
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/6_random.pdf}
-  \caption{6x6 subsets with random partitions.}
+  \caption{6x6 subsets with``random''partitions.}
   \label{6random}
 \end{subfigure}
 
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/8_random.pdf}
-  \caption{8x8 subsets with random partitions.}
+  \caption{8x8 subsets with``random''partitions.}
   \label{8random}
 \end{subfigure}
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/10_random.pdf}
-  \caption{10x10 subsets with random partitions.}
+  \caption{10x10 subsets with``random''partitions.}
   \label{10random}
 \end{subfigure}
-\caption{Examples of random partitioning.}
+\caption{Examples of``random''partitioning.}
 \label{random_partitions}
 \end{figure}
 
-Using random partitions as shown in Fig. \ref{random_partitions}, the third portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator verifies perfectly on random partitions with multiple angles per quadrant. 
+Using``random''partitions as shown in Fig. \ref{random_partitions}, the third portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for``random''partitions with multiple angles per quadrant. 
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{../figures/random_verification.pdf}
-\caption{A 2D verification suite with random partitions run from 2x2 to 10x10 subsets with each case being run from 1 to 6 angles per quadrant.}
+\caption{A 2D verification suite with``random'' partitions run from 2x2 to 10x10 subsets with each case being run from 1 to 6 anglesets per quadrant.}
 \label{random_verification}
 \end{figure}
 
@@ -517,7 +517,7 @@ Figure \ref{worst_partitions} shows four examples of the probable worst-case par
 \caption{Examples of probable worst-case partitioning.}
 \label{worst_partitions}
 \end{figure}
-Using probable worst-case partitions as shown in Fig. \ref{random_partitions}, the final portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{worst_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator verifies perfectly on probable worst-case partitions with multiple angles per quadrant. 
+Using probable worst-case partitions as shown in Fig. \ref{worst_partitions}, the final portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{worst_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for probable worst-case partitions with multiple angles per quadrant. 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{../figures/worst_verification.pdf}
@@ -574,7 +574,7 @@ Figure \ref{scaling_stagecount} shows the stage counts of the scaling suite for 
 \begin{figure}[H]
 \centering
 \includegraphics{../../figures/scaling_stagecount.pdf}
-\caption{The stage counts of PDT's performance model and the time-to-solution estimator for the scaling suite in Table \ref{scaling_suite}}.
+\caption{The stage counts of PDT's performance model and the time-to-solution estimator for the scaling suite in Table \ref{scaling_suite}.}
 \label{scaling_stagecount}
 \end{figure}
 
