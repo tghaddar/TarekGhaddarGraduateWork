@@ -29,12 +29,12 @@ With confidence in the time-to-solution estimator, it is used as the objective f
   
   The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers is functional for small parameter spaces. However, even with modestly large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing. This lead to the development of an alternative method.  
 
-  The ``human optimization'' method utilizes the geometrical information of the problem to attempt to find optimal cuts. This method prioritizes finding cut line locations that cut along a ``natural boundary''. A natural boundary is a subset boundary that coincides with the geometrical features of the mesh. In Fig. \ref{partitioning_example}, we notice natural boundaries every centimeter in each dimension. 
+  The ``human optimization'' method utilizes the geometrical information of the problem to attempt to find optimal cuts. This method prioritizes finding cut line locations that cut along a ``natural boundary''. A natural boundary is a subset boundary that coincides with the geometrical features of the mesh. In Fig. \ref{natural_boundary_example}, we notice natural boundaries every centimeter in each dimension. 
  \begin{figure}[h]
 \centering
 \includegraphics[scale=0.2]{../figures/spiderweb_10x10_sparse.png}
 \caption{An unstructured mesh with natural boundaries at 1 cm intervals in both dimensions.}
-\label{partitioning_example}
+\label{natural_boundary_example}
 \end{figure}
 
 This optimization method:
@@ -46,11 +46,11 @@ This optimization method:
 
 \subsubsection{Finding natural boundaries}
 
-In order to identify natural boundaries, we analyze the detailed cumulative distribution function (CDF) of the vertices in each dimension. The jumps in the CDF correspond to natural boundaries. Figure \ref{vert_cdf} shows the x-vertex CDF of the mesh in Fig. \ref{partitioning_example}. 
+In order to identify natural boundaries, we analyze the detailed cumulative distribution function (CDF) of the vertices in each dimension. The jumps in the CDF correspond to natural boundaries. Figure \ref{vert_cdf} shows the x-vertex CDF of the mesh in Fig. \ref{natural_boundary_example}. 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.75]{../figures/xvertexcdf.pdf}
-\caption{The x-vertex CDF of the mesh shown in Fig. \ref{partitioning_example}}.
+\caption{The x-vertex CDF of the mesh shown in Fig. \ref{natural_boundary_example}}.
 \label{vert_cdf}
 \end{figure}
 
@@ -90,9 +90,6 @@ Let's consider the mesh of the Level 2 experiment shown in Fig. \ref{level2_nocu
 \includegraphics[scale=0.55]{../../figures/lvl2_suite_1.pdf}
 \includegraphics[scale=0.55]{../../figures/lvl2_suite_2.pdf}
 \end{figure}
-
-\tcr{Use level 2 mesh to show how the cut lines differ}
-
 
 \FloatBarrier
 \section{Analytical Mesh Results}

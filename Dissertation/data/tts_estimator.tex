@@ -352,7 +352,7 @@ The delay is once again added to the applicable edge's weight and all downstream
 
 \subsection{Estimating the final time-to-solution}
 
-Once all graphs have had their weights modified for conflicts, the graphs now reflect a schedule. The incoming edges to each node in each graph represent what time they are ready to solve. The final weight in each graph represents the time it takes for that graph to sweep across its domain. The maximum final weight across all graphs represents the estimate for the time-to-solution for the problem.
+Once all graphs have had their weights modified for conflicts, the graphs now reflect a schedule. The incoming edges to each node in each graph represent what time they are ready to solve. The final weight (the outgoing edge of the final subset) in each graph represents the time it takes for that graph to sweep across its domain. The maximum final weight across all graphs represents the estimate for the time-to-solution for the problem.
 
 \section{2D Verification}
 
@@ -540,9 +540,9 @@ PDT's performance model was used to verify stage counts for 3D problems with reg
 \section{PDT performance model vs. TTS}
 
 PDT has run a scaling suite out to 90,112 cores on the Quartz supercomputer \cite{quartz} at Lawrence Livermore National Lab (LLNL). 
-A smaller scaling suite, described in Table \ref{scaling_suite} was the first benchmark case run for the time-to-solution estimator. 
-The suite was run with 1 energy group, 80 directions, and $A_m = 10$. 
-The following machine parameters were generated and used for 1 group problems:
+A smaller scaling suite, tabulated in Table \ref{scaling_suite} was the first benchmark case run for the time-to-solution estimator. 
+The suite was run with 1 energy group, 80 directions, $A_m = 10$, and $A_z = 1$.
+The following machine parameters were generated and used for the 1 group suite:
 \begin{itemize}
   \item $T_c = 2683.769$ ns
   \item $T_m = 111.972$ ns
@@ -569,25 +569,32 @@ The following machine parameters were generated and used for 1 group problems:
   \label{scaling_suite}
 \end{table}
 
-Figure \ref{scaling_stagecount} shows the stage counts of the scaling suite for PDT's performance model and the time-to-solution estimator are in perfect agreement. 
+Figure \ref{scaling_stagecount} shows the stage counts of the scaling suite for PDT's performance model and the time-to-solution estimator are in perfect agreement.
+Figures \ref{weak_scaling_tts_sweep} and \ref{weak_scaling_tts} show the time per sweep and parallel efficiency for PDT, the PDT performance model, and the time-to-solution estimator, and Table \ref{scaling_percent_diff} tabulates the percent differences for PDT and the performance model, the performance model and the time-to-solution estimator, and PDT and the time-to-solution estimator. 
+
+It is noticeable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is due to the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D). In reality, this is not the case, as processors in the corners of the domain will communicate to less neighbors for certain directions, and the final processor for a direction does not communicate to any neighbors (as it has no neighbors). 
+Even given these differences, the time-to-solution estimator is consistently within 4\% of the performance model. 
+
+The performance model's slightly better accuracy in predicting PDT's sweep time is likely due to processor noise and slight variations in latency on Quartz driving up PDT's sweep time. 
+
 
 \begin{figure}[H]
 \centering
-\includegraphics{../../figures/scaling_stagecount.pdf}
+\includegraphics[scale=0.8]{../../figures/scaling_stagecount.pdf}
 \caption{The stage counts of PDT's performance model and the time-to-solution estimator for the scaling suite in Table \ref{scaling_suite}.}
 \label{scaling_stagecount}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics{../../figures/scaling_tts_sweep_times.pdf}
+\includegraphics[scale=0.8]{../../figures/scaling_tts_sweep_times.pdf}
 \caption{The time per sweep of PDT, the PDT performance model, and the time-to-solution estimator.}
 \label{weak_scaling_tts_sweep}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics{../../figures/scaling_tts.pdf}
+\includegraphics[scale=0.8]{../../figures/scaling_tts.pdf}
 \caption{The parallel efficiency relative to 8 cores of PDT, the PDT performance model, and the time-to-solution estimator.}
 \label{weak_scaling_tts}
 \end{figure}
@@ -610,7 +617,33 @@ Figure \ref{scaling_stagecount} shows the stage counts of the scaling suite for 
 \end{tabular}
 \end{table}
 
-\section{PDT vs. TTS}
+\section{PDT vs. Time-to-Solution Estimator for Unstructured Meshes}
+
+To test how the time-to-solutions estimator performs on unstructured problems, we use the meshes from our load balancing parametric study (Fig. \ref{partitioning_example}) and the level Level 2 experiment (Fig. \ref{level2_nocut}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.75]{../../figures/spiderweb_reg_pdtvtts.pdf}
+\caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension.}
+\label{comp_reg_spiderweb}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig. \ref{comp_reg_spiderweb}.}
+\begin{tabular}{c|c}
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline 
+2&24.13\%\\ \hline 
+3&11.84\%\\ \hline 
+4&1.46\%\\ \hline 
+5&10.08\%\\ \hline 
+6&2.76\%\\ \hline 
+7&7.76\%\\ \hline 
+8&5.12\%\\ \hline 
+9&3.68\%\\ \hline 
+10&0.93\%
+\end{tabular}
+\end{table}
 
 \begin{figure}[H]
 \centering
