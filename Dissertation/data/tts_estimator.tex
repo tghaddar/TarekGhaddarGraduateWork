@@ -537,7 +537,7 @@ PDT's performance model was used to verify stage counts for 3D problems with reg
 \end{figure}
 
 
-\section{PDT performance model vs. TTS}
+\section{PDT's Performance Model vs. Time-to-Solution Estimator}
 
 PDT has run a scaling suite out to 90,112 cores on the Quartz supercomputer \cite{quartz} at Lawrence Livermore National Lab (LLNL). 
 A smaller scaling suite, tabulated in Table \ref{scaling_suite} was the first benchmark case run for the time-to-solution estimator. 
@@ -619,16 +619,17 @@ The performance model's slightly better accuracy in predicting PDT's sweep time 
 
 \section{PDT vs. Time-to-Solution Estimator for Unstructured Meshes}
 
+The motivation to develop the time-to-solution estimator was born out of the desire to predict sweep time for unstructured meshes. 
 To test how the time-to-solutions estimator performs on unstructured problems, we use the meshes from our load balancing parametric study (Fig. \ref{partitioning_example}) and the level Level 2 experiment (Fig. \ref{level2_nocut}).
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.75]{../../figures/spiderweb_reg_pdtvtts.pdf}
 \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension.}
 \label{comp_reg_spiderweb}
 \end{figure}
 
-\begin{table}[H]
+\begin{table}[ht]
 \centering
 \caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig. \ref{comp_reg_spiderweb}.}
 \begin{tabular}{c|c}
@@ -645,42 +646,42 @@ To test how the time-to-solutions estimator performs on unstructured problems, w
 \end{tabular}
 \end{table}
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.3]{../../figures/level2_nocut.png}
 \caption{The mesh for the Level 2 experiment.}
 \label{level2_nocut}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.3]{../../figures/level2_42x13.png}
 \caption{The Level 2 experiment mesh evenly partitioned into 42 subsets in x and 13 subsets in y. $f = 32.616$.}
 \label{level2_42x13}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.3]{../../figures/level2_42x13_balanced.png}
 \caption{The Level 2 experiment mesh partitioned and load balanced with 42 subsets in x and 13 subsets in y. $f = 2.386$.}
 \label{level2_42x13_balanced}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.15]{../../figures/level2_nocut_zoom.png}
 \caption{The detector region of the Level 2 experiment mesh.}
 \label{level2_nocut_zoom}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.15]{../../figures/level2_42x13_zoom.png}
 \caption{The detector region of the Level 2 experiment when partitioned into 42 subsets in x and 13 subsets in y.}
 \label{level2_42x13_zoom}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.15]{../../figures/level2_42x13_balanced_zoom.png}
 \caption{The detector region of the Level 2 experiment when partitioned and balanced with 42 subsets in x and 13 subsets in y.}

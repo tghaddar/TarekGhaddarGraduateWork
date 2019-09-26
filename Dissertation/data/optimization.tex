@@ -19,12 +19,8 @@
 With confidence in the time-to-solution estimator, it is used as the objective function in two optimization methods. The first optimization method utilizes scipy's optimize library, and the second method utilizes knowledge of a problem's mesh layout to assist in partition placement.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Scipy optimize}
-  The scipy optimize library \cite{scipy} provides many tools for optimizing an input function with local and global minimization techniques. Our usage of the optimize library relies on the minimize function, using the basinhopping method as the global optimizer, and the constrained Nelder-Mead method as the local optimizer.
-  
-\subsubsection{Basinhopping\cite{basinhoppingwales}}
-  
-\subsubsection{Constrained Nelder-Mead}
-  
+  The scipy optimize library \cite{scipy} provides many tools for optimizing an input function with local and global minimization techniques. Our usage of the optimize library relies on the minimize function, using the basinhopping \cite{basinhoppingwales} method as the global optimizer, and the constrained Nelder-Mead method as the local optimizer.
+    
 \subsection{``Human'' Optimization}
   
   The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers is functional for small parameter spaces. However, even with modestly large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing. This lead to the development of an alternative method.  
@@ -63,7 +59,6 @@ To identify where the jumps in the CDF occur, we take the gradient of the CDF an
 \end{figure}
 The largest discontinuities in Fig. \ref{gradcdf} occur at the instances where there are natural boundaries all the way through the mesh, or at 1 cm intervals. 
 
-
 \FloatBarrier
 \subsubsection{Finding natural boundaries for sets of columns}
 In order to globalize the optimization of the cut lines per column, we set up a binary tree of test cases, such as the one shown in Fig. \ref{binary_tree}. Each layer in the tree represents one set of $y$ cut lines. The first layer, or the root of the tree, represents the case where we try and find the natural boundaries in $y$ throughout all columns, in this case 4 columns. The next layer tries to find two sets of natural boundaries, one set of natural $y$ boundaries through the first two columns, and another set through the final 2 columns. Finally, the last case finds a set of natural $y$ boundaries in each individual column. 
@@ -92,12 +87,6 @@ Let's consider the mesh of the Level 2 experiment shown in Fig. \ref{level2_nocu
 \end{figure}
 
 \FloatBarrier
-\section{Analytical Mesh Results}
-Analytical mesh density results will go here.
-
-\section{Centroid-Mesh Results}
-
-PDT mesh results will go here.
 
 \section{PDT Comparison Results}
 

@@ -85,26 +85,26 @@ After the angular and energy dependences have been accounted for, Eq.~\eqref{ite
 \end{figure}
 
 The number in each cell represents the order in which the cells are solved.
-Obtaining the solution for current cells in the sweep is dependent on the solution of downwind cells.The base concept of solving the transport equation via the transport sweep is expanded on by four chapters in this dissertation.
+Obtaining the solution for current cells in the sweep is dependent on the solution of downwind cells. We expand on the transport sweep in the following four chapters of this dissertation.
 
-\section{Parallel Transport Sweeps}
+\section*{Parallel Transport Sweeps}
 
 Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids. 
 This chapter describes the basics of a parallel sweep algorithm, and specifically describes the KBA algorithm and PDT's extension of the KBA algorithm.
 This chapter also describes PDT's performance model, which is the precursor to the time-to-solution estimator described in Chapter \ref{cha:tts}.
 
-\section{Unstructured Meshing and Load Balancing in PDT}
+\section*{Unstructured Meshing and Load Balancing in PDT}
 
-In order to solve a wider set of problems, and unstructured meshing capability was implemented in PDT. 
-This chapter describes how unstructured meshes are described in PDT. Unstructured meshes may lead to imbalanced partitions, or different numbers of mesh cells per processor. 
-To address this, two two load-balancing algorithms were implemented in PDT, the original load-balancing algorithm and the load-balancing-by-dimension algorithm, described in this chapter.
+In order to solve a wider set of problems, an unstructured meshing capability was implemented in PDT. 
+However, unstructured meshes may lead to imbalanced partitions, or different numbers of mesh cells per processor. 
+To address this, two two load-balancing algorithms were implemented in PDT, the original load-balancing algorithm and the load-balancing-by-dimension algorithm.
 
-\section{Time-to-Solution Estimator}
+\section*{Time-to-Solution Estimator}
 
 PDT's existing performance model does not account for unstructured meshes and imbalanced partitions. 
-This chapter describes the time-to-solution estimator, a graph-based method that estimates the time it takes to sweep a problem given a mesh, partitioning scheme, and machine-specific parameters. 
+This chapter describes the time-to-solution estimator, a graph-based method that estimates the time it takes to sweep across a problem given a mesh, partitioning scheme, and machine-specific parameters. 
 
-\section{Partitioning Optimization}
+\section*{Partitioning Optimization}
 
 The time-to-solution estimator described in Chapter \ref{cha:tts} is used to optimize the partitioning scheme. 
 This chapter details two optimization methods: a ``black box'' method that uses Python's scipy.optimize library and a ``human-intelligence'' method prioritizes partition placement in locations that don't add cells to a mesh. 
