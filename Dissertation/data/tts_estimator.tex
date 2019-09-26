@@ -575,31 +575,31 @@ Figures \ref{weak_scaling_tts_sweep} and \ref{weak_scaling_tts} show the time pe
 It is noticeable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is due to the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D). In reality, this is not the case, as processors in the corners of the domain will communicate to less neighbors for certain directions, and the final processor for a direction does not communicate to any neighbors (as it has no neighbors). 
 Even given these differences, the time-to-solution estimator is consistently within 4\% of the performance model. 
 
-The performance model's slightly better accuracy in predicting PDT's sweep time is likely due to processor noise and slight variations in latency on Quartz driving up PDT's sweep time. 
+The performance model's slightly better accuracy in predicting PDT's sweep time is likely due to processor noise and slight variations in latency on Quartz driving up PDT's sweep time. This masks the performance model's overestimation of the sweep time.
 
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.8]{../../figures/scaling_stagecount.pdf}
 \caption{The stage counts of PDT's performance model and the time-to-solution estimator for the scaling suite in Table \ref{scaling_suite}.}
 \label{scaling_stagecount}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.8]{../../figures/scaling_tts_sweep_times.pdf}
 \caption{The time per sweep of PDT, the PDT performance model, and the time-to-solution estimator.}
 \label{weak_scaling_tts_sweep}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.8]{../../figures/scaling_tts.pdf}
 \caption{The parallel efficiency relative to 8 cores of PDT, the PDT performance model, and the time-to-solution estimator.}
 \label{weak_scaling_tts}
 \end{figure}
 
-\begin{table}[H]
+\begin{table}[ht]
 \centering
 \caption{The percent difference between PDT and its performance model, PDT's performance model and the time-to-solution estimator, and PDT and the time-to-solution estimator.}
 \label{scaling_percent_diff}
