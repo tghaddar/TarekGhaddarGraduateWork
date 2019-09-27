@@ -134,12 +134,86 @@ def get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow,numco
         
         if boundary == 'y':
           bdy_cells = bdy_cells_per_subset[n][0]
-          cells_per_subset[s] += int(bdy_cells/2.0)
+          cells_per_subset[s] += int(np.ceil(bdy_cells/2.0))
         
         if boundary == 'x':
           overlap = get_overlap(boundaries[s][2],boundaries[s][3],boundaries[n][2],boundaries[n][3])
           bdy_cells = bdy_cells_per_subset[n][1]*overlap/Ly_neighbor
-          cells_per_subset[s]+= int(bdy_cells/2.0)
+          cells_per_subset[s]+= int(np.ceil(bdy_cells/2.0))
+      
+  return cells_per_subset,bdy_cells_per_subset
+
+def get_cells_per_subset_2d_robust(points,cell_verts,vert_data,boundaries,adjacency_matrix,numrow,numcol):
+  #Number of subsets.
+  num_subsets = len(boundaries)
+  #Stores the number of cells per subset.
+  cells_per_subset = [0]*num_subsets
+  #Stores the number of boundary cells per subset.
+  bdy_cells_per_subset = [0.0]*num_subsets  
+  xpoints = points[0,:]
+  ypoints = points[1,:]
+
+  #Looping through the subsets.
+  for s in range(0,num_subsets):
+    
+    subset_bounds = boundaries[s]
+    xmin = subset_bounds[0]
+    xmax = subset_bounds[1]
+    ymin = subset_bounds[2]
+    ymax = subset_bounds[3]
+    
+    #The x length of the subset.
+    Lx = xmax - xmin
+    #The y length of the subset.
+    Ly = ymax - ymin
+    #The area of the subset.
+    subset_area = Lx*Ly
+    
+    #Looping through the points and assigning them to the subset if they fit.
+    x1 = np.argwhere(np.logical_and(xpoints >= xmin, xpoints <= xmax)).flatten()
+    y1 = ypoints[x1]
+    y2 = np.argwhere(np.logical_and(y1 >= ymin, y1 <= ymax)).flatten()
+    current_cells = cell_verts[y2]
+    num_cells = len(y2)
+    cells_per_subset[s] = num_cells
+    if cells_per_subset[s] == 0:
+      cells_per_subset[s] = 1
+      bdy_cells_per_subset[s] = [1,1]
+    
+    N = cells_per_subset[s]
+    
+    f
+    
+#    #Computing the boundary cells along x and y.
+#    nx = math.sqrt(N/subset_area)*Lx
+#    ny =  math.sqrt(N/subset_area)*Ly
+#    if nx < 1:
+#      nx = 1
+#    if ny < 1:
+#      ny = 1
+#    bdy_cells_per_subset[s] = [nx,ny]
+#  
+#  #Time to adjust the number of cells to take into account cell creation from cuts.
+#  if (add_cells):
+#    for s in range(0,num_subsets):
+#      neighbors = [n for n in range(0,num_subsets) if adjacency_matrix[s][n]==1]
+#      i_s,j_s = get_ij(s,numrow,numcol)
+#      #Adding cells where needed based on cut lines.
+#      for n in neighbors:
+#        Ly_neighbor = boundaries[n][3] - boundaries[n][2]
+#        i_n,j_n = get_ij(n,numrow,numcol)
+#        boundary = 'x'
+#        if i_s == i_n:
+#          boundary == 'y'
+#        
+#        if boundary == 'y':
+#          bdy_cells = bdy_cells_per_subset[n][0]
+#          cells_per_subset[s] += int(np.ceil(bdy_cells/2.0))
+#        
+#        if boundary == 'x':
+#          overlap = get_overlap(boundaries[s][2],boundaries[s][3],boundaries[n][2],boundaries[n][3])
+#          bdy_cells = bdy_cells_per_subset[n][1]*overlap/Ly_neighbor
+#          cells_per_subset[s]+= int(np.ceil(bdy_cells/2.0))
       
   return cells_per_subset,bdy_cells_per_subset
 
