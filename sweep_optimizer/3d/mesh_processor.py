@@ -255,7 +255,8 @@ def get_cells_per_subset_2d_robust(points,cell_verts,vert_data,boundaries,adjace
     Ly = ymax - ymin
     #The area of the subset.
     subset_area = Lx*Ly
-    
+    if s == 14:
+      print("debug stop")
     #Looping through the points and assigning them to the subset if they fit.
     x1 = np.argwhere(np.logical_and(xpoints >= xmin, xpoints <= xmax)).flatten()
     y1 = ypoints[x1]
@@ -269,73 +270,118 @@ def get_cells_per_subset_2d_robust(points,cell_verts,vert_data,boundaries,adjace
       bdy_cells_per_subset[s] = [1,1,1,1]
     
     if add_cells:
-      if cells_per_subset[s] > 1:
-        for cell in range(0,num_cells):
-          current_cell = current_cells[cell]
-          #numpts = len(current_cell)
-          current_verts = []
-          for p in current_cell:
-            #current point
-            cp = (vert_data[p][0],vert_data[p][1])
-            if (s == 2):
-              if (ymax > vert_data[p][1]):
-                print("debug stop")
-            current_verts.append(cp)
+      #if cells_per_subset[s] > 1:
+      for cell in range(0,num_cells):
+        current_cell = current_cells[cell]
+        #numpts = len(current_cell)
+        current_verts = []
+        for p in current_cell:
+          #current point
+          cp = (vert_data[p][0],vert_data[p][1])
+          current_verts.append(cp)
+        
+        polygon = MultiPoint(current_verts).convex_hull
+        #Check for intersections of this polygon and the subset.
+        if polygon.intersects(subset):
+          intersect = polygon.intersection(subset)
+          try:
+            intersection_coords = intersect.exterior.coords[:]
+          except:
+            intersection_coords = intersect.coords[:]
+          num_intersections = len(intersection_coords)
+          int_bounds = []
+          if num_intersections > 1:
+            int_bounds = which_bounds(intersect,bounds)
+            add_cell,add_bdy_cell = check_add_cell(polygon,int_bounds,bounds)
           
-          polygon = MultiPoint(current_verts).convex_hull
-          #Check for intersections of this polygon and the subset.
-          if polygon.intersects(subset):
-            intersect = polygon.intersection(subset)
-            try:
-              intersection_coords = intersect.exterior.coords[:]
-            except:
-              intersection_coords = intersect.coords[:]
-            num_intersections = len(intersection_coords)
-            int_bounds = []
-            if num_intersections > 1:
-              int_bounds = which_bounds(intersect,bounds)
-              add_cell,add_bdy_cell = check_add_cell(polygon,int_bounds,bounds)
-            
-            #Does the cell truly intersect the xmin boundary?
-            if add_bdy_cell[0]:
-              bdy_cells_per_subset[s][0] += 1
-            if add_cell[0]:
-              #Get the xmin neighbors of the subset.
-              xmin_neighbors = [n for n in neighbors if get_ij(n,numrow,numcol)[0] < get_ij(s,numrow,numcol)[0]]
-              #Approximating that we add a cell to every neighbor of the boundary.
-              for n in xmin_neighbors:
-                cells_per_subset[n] += 1
-            
-            #Check the xmax bound.
-            if add_bdy_cell[1]:
-              bdy_cells_per_subset[s][1] += 1
-            if add_cell[1]:
-              #Get the xmax neighbors of the subset.
-              xmax_neighbors = [n for n in neighbors if get_ij(n,numrow,numcol)[0] > get_ij(s,numrow,numcol)[0]]
-              #Approximating that we add a cell to every neighbor of the boundary.
-              for n in xmax_neighbors:
-                cells_per_subset[n] += 1
-            
-            #Checking the ymin bound.
-            if add_bdy_cell[2]:
-              bdy_cells_per_subset[s][2] += 1
-            if add_cell[2]:
-              #Get the ymin neighbors of the subset.
-              ymin_neighbors = [n for n in neighbors if ((get_ij(n,numrow,numcol)[0] == get_ij(s,numrow,numcol)[0]) and (get_ij(n,numrow,numcol)[1] < get_ij(s,numrow,numcol)[1]))]
-              for n in ymin_neighbors:
-                cells_per_subset[n] += 1
-            
-            #Checking the ymax bound.
-            if add_bdy_cell[3]:
-              bdy_cells_per_subset[s][3] += 1
-            if add_cell[3]:
-              #Get the ymin neighbors of the subset.
-              ymax_neighbors = [n for n in neighbors if ((get_ij(n,numrow,numcol)[0] == get_ij(s,numrow,numcol)[0]) and (get_ij(n,numrow,numcol)[1] > get_ij(s,numrow,numcol)[1]))]
-              for n in ymax_neighbors:
-                cells_per_subset[n] += 1
+          #Does the cell truly intersect the xmin boundary?
+          if add_bdy_cell[0]:
+            bdy_cells_per_subset[s][0] += 1
+          if add_cell[0]:
+            #Get the xmin neighbors of the subset.
+            xmin_neighbors = [n for n in neighbors if get_ij(n,numrow,numcol)[0] < get_ij(s,numrow,numcol)[0]]
+            #Approximating that we add a cell to every neighbor of the boundary.
+            for n in xmin_neighbors:
+              cells_per_subset[n] += 1
+          
+          #Check the xmax bound.
+          if add_bdy_cell[1]:
+            bdy_cells_per_subset[s][1] += 1
+          if add_cell[1]:
+            #Get the xmax neighbors of the subset.
+            xmax_neighbors = [n for n in neighbors if get_ij(n,numrow,numcol)[0] > get_ij(s,numrow,numcol)[0]]
+            #Approximating that we add a cell to every neighbor of the boundary.
+            for n in xmax_neighbors:
+              cells_per_subset[n] += 1
+          
+          #Checking the ymin bound.
+          if add_bdy_cell[2]:
+            bdy_cells_per_subset[s][2] += 1
+          if add_cell[2]:
+            #Get the ymin neighbors of the subset.
+            ymin_neighbors = [n for n in neighbors if ((get_ij(n,numrow,numcol)[0] == get_ij(s,numrow,numcol)[0]) and (get_ij(n,numrow,numcol)[1] < get_ij(s,numrow,numcol)[1]))]
+            for n in ymin_neighbors:
+              cells_per_subset[n] += 1
+          
+          #Checking the ymax bound.
+          if add_bdy_cell[3]:
+            bdy_cells_per_subset[s][3] += 1
+          if add_cell[3]:
+            #Get the ymin neighbors of the subset.
+            ymax_neighbors = [n for n in neighbors if ((get_ij(n,numrow,numcol)[0] == get_ij(s,numrow,numcol)[0]) and (get_ij(n,numrow,numcol)[1] > get_ij(s,numrow,numcol)[1]))]
+            for n in ymax_neighbors:
+              cells_per_subset[n] += 1
              
           
       
+  return cells_per_subset,bdy_cells_per_subset
+
+def get_cells_per_subset_2d_more_robust(points,cell_verts,vert_data,boundaries,adjacency_matrix,numrow,numcol,add_cells):
+  #Number of subsets.
+  num_subsets = len(boundaries)
+  #Stores the number of cells per subset.
+  cells_per_subset = [0]*num_subsets
+  #Stores the number of boundary cells per boundary per subset.
+  bdy_cells_per_subset = [[0,0]]*num_subsets  
+  xpoints = points[0,:]
+  ypoints = points[1,:]
+  
+  numcells = len(cell_verts)
+  polygons = [None]*numcells
+  
+  #Building the cells.
+  for i in range(0,numcells):
+    current_cell = cell_verts[i]
+    current_verts = []
+    for p in current_cell:
+      #current point
+      cp = (vert_data[p][0],vert_data[p][1])
+      current_verts.append(cp)
+    
+    polygons[i] = MultiPoint(current_verts).convex_hull
+  
+  #Looping through the subsets.
+  for s in range(0,num_subsets):
+    
+    subset_bounds = boundaries[s]
+    #neighbors = [n for n in range(0,num_subsets) if adjacency_matrix[s][n]==1]
+    xmin = subset_bounds[0]
+    xmax = subset_bounds[1]
+    ymin = subset_bounds[2]
+    ymax = subset_bounds[3]
+    
+    xmin_bound = LineString([(xmin,ymin), (xmin,ymax)])
+    xmax_bound = LineString([(xmax,ymin), (xmax,ymax)])
+    ymin_bound = LineString([(xmin,ymin), (xmax,ymin)])
+    ymax_bound = LineString([(xmin,ymax), (xmax,ymax)])
+    bounds = [xmin_bound,xmax_bound,ymin_bound,ymax_bound]
+    add_cell = [False,False,False,False]
+    subset = MultiPoint([(xmin,ymin),(xmax,ymin),(xmax,ymax),(xmin,ymax)]).convex_hull
+    
+    for polygon in polygons:
+      if polygon.intersects(subset):
+        cells_per_subset[s] += 1
+    
   return cells_per_subset,bdy_cells_per_subset
 
 def get_cells_per_subset_3d_numerical(points,boundaries):
