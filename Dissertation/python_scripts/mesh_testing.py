@@ -29,7 +29,7 @@ boundaries = build_global_subset_boundaries(41,12,x_cuts,y_cuts)
 adjacency_matrix = build_adjacency(boundaries,41,12,y_cuts)
 level2_reg_cut_cell_data = np.genfromtxt("level2_reg_cut_cell_data.txt")
 cells_per_subset,bcps = get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,13,42,True)
-cells_per_subset,bcps = get_cells_per_subset_2d_robust(points,level2_cell_data,vert_data,boundaries,adjacency_matrix,13,42)
+cells_per_subset,bcps = get_cells_per_subset_2d_robust(points,level2_cell_data,verts,boundaries,adjacency_matrix,13,42)
 
 num_cell_pdt = sum(level2_reg_cut_cell_data)
 num_cell = sum(cells_per_subset)

@@ -3,6 +3,7 @@ import numpy as np
 import math
 from scipy import integrate
 from utilities import get_ij
+from shapely.geometry import Polygon,Point,MultiPoint
 
 #Get overlap of line segment
 def get_overlap(min1, max1, min2, max2):
@@ -173,16 +174,24 @@ def get_cells_per_subset_2d_robust(points,cell_verts,vert_data,boundaries,adjace
     x1 = np.argwhere(np.logical_and(xpoints >= xmin, xpoints <= xmax)).flatten()
     y1 = ypoints[x1]
     y2 = np.argwhere(np.logical_and(y1 >= ymin, y1 <= ymax)).flatten()
-    current_cells = cell_verts[y2]
+    current_cells = [cell_verts[x] for x in y2]
     num_cells = len(y2)
     cells_per_subset[s] = num_cells
     if cells_per_subset[s] == 0:
       cells_per_subset[s] = 1
       bdy_cells_per_subset[s] = [1,1]
     
+    
     N = cells_per_subset[s]
     
-    f
+    for cell in range(0,num_cells):
+      current_cell = current_cells[cell]
+      numpts = len(current_cell)
+      current_verts = []
+      for p in range(0,numpts):
+        
+        
+      
     
 #    #Computing the boundary cells along x and y.
 #    nx = math.sqrt(N/subset_area)*Lx
