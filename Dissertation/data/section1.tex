@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  New template code for TAMU Theses and Dissertations starting Fall 2016.  
+%  New template code for TAMU Theses and Dissertations starting Fall 2016.
 %
 %
 %  Author: Sean Zachary Roberson
@@ -24,16 +24,28 @@
 The steady-state neutron transport equation describes the behavior of neutrons in a medium and is given by Eq.~\eqref{continuous transport}:
 \begin{equation}
 \vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  =
-\int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo') 
+\int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')
 + S_{ext}(\vr,E,\vo) ,
 \label{continuous transport}
 \end{equation}
 where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption, outscatter, and within group scattering). These represent the loss terms of the neutron transport equation. The right hand side of Eq.~\eqref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into $dE$ about energy $E$ and $d\Omega$ about direction $\vo$.
 
-Without loss of generality for the problem at hand, we assume isotropic scattering for simplicity. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, has its angular dependence present in the integral, and is divided by $4\pi$ to reflect isotropic behavior. This yields:
+Without loss of generality for the problem at hand\jcr{that's the issue. we have no clue what the problem at hand is. as I stated, you need an additional -and earlier- introduction just to discuss the big picture. I am giving here a rough outline of what the big-picture chapter that should BEFORE this one could look like:
+\begin{itemize}
+  \item what is radiation transport, where is it used?
+  \item in layman terms, what are the general approaches to solve it (MC, deterministic; what do these means)?
+  \item how big is the space-phase, why? why is it challenging?
+  \item then say your work focuses on a particular subset of deterministic approaches, one that avoids building the full phase-space linear system.
+  \item in particular, explain that it is often desirable to split the full system for memory cost reasons and solve it iterative. in that case, the more amenable linear system matrix often exhibit a lower block triangular structure whose solution is easy to obtain.
+  \item each block here can be thought of as a cell, so the solution physically proceeds with marching down the computational in a given direction, following the flow of radiation
+  \item now, yuo start to talk about modern issues: marching down a mesh, or sweeping it as is referred to in the field, is more complicated for unstructured and distributed meshes because of the following issues: (1) creating partitions that allow to build on current state of the art of massivelely parallel structured grid sweeps. (2) balancing work across these partitions and (3) maintaining massively paralle sweep performance.
+  \item now you are ready to introduce the various chapters. chapter 2 deal with transport equation, its DFEM-SN (don't name drop if not introduce prior) discretization, trnasport sweeps. Next chapter deals with massively paralle sweeps in structured grids (don't sya Next but use label to refer to each chapter by its number). Next chapter deals with  .... Conclusions are gathered in chapter xxx.
+  \item I see you have done some of it in this chapter, but I still feel that the general, high-level intro is missing. Here, you jump in an equation at the seocnd line. Maybe you can follow my rough outline as a preamble in this chapter, instead of creating a new one, but don't jump in right away so abruptly.
+\end{itemize}
+  }, we assume isotropic scattering for simplicity. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, has its angular dependence present in the integral, and is divided by $4\pi$ to reflect isotropic behavior. This yields:
 \begin{align}
 \label{isotropic}
-\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  
+\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)
 & = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \int_{4\pi}d\Omega' \psi(\vr,E',\vo')  + S_{ext}(\vr,E,\vo) \nonumber \\
 & = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \phi(\vr,E')  + S_{ext}(\vr,E,\vo) ,
 \end{align}
@@ -47,7 +59,7 @@ The next step to solving the transport equation is to discretize in energy, yiel
 \vo \cdot \vec \nabla \psi_g(\vr,\vo) +\Sigma_{t,g}(\vr) \psi_g(\vr,\vo) = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g}(\vr,\vo), \quad \text{for } 1 \le g \le G
 \label{multigroup}
 \end{equation}
-where the multigroup transport equations now form a system of coupled equations. 
+where the multigroup transport equations now form a system of coupled equations.
 
 Next, we discretize in angle using the discrete ordinates method\cite{denovo}, whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of directions $\vo_m$:
 \begin{equation}
@@ -89,26 +101,26 @@ Obtaining the solution for current cells in the sweep is dependent on the soluti
 
 \section*{Parallel Transport Sweeps}
 
-Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids. 
+Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids.
 This chapter describes the basics of a parallel sweep algorithm, and specifically describes the KBA algorithm and PDT's extension of the KBA algorithm.
 This chapter also describes PDT's performance model, which is the precursor to the time-to-solution estimator described in Chapter \ref{cha:tts}.
+\jcr{awkward. you are referencing chapter 4. what about the ones before? this reads like they are not important. everything must be introduced and int he proper order, otherwise they will think this is not well organized...}\\
+\jcr{too many opportunities for references missed. Adams' papers, KBA, etc... or are the refenreces coming in the subsequent chapters? Usually, went you read a paper, don't you notice that the first 1-3 pages are just a lit review with the majority of citations found there? A dissertation is a bit like that, but more detailled. Here, you seem to refuse to do it that way, which just means that the paper will take more time because you will have to do it for the paper.}
 
 \section*{Unstructured Meshing and Load Balancing in PDT}
 
-In order to solve a wider set of problems, an unstructured meshing capability was implemented in PDT. 
-However, unstructured meshes may lead to imbalanced partitions, or different numbers of mesh cells per processor. 
-To address this, two two load-balancing algorithms were implemented in PDT, the original load-balancing algorithm and the load-balancing-by-dimension algorithm.
+In order to solve a wider set of problems, an unstructured meshing capability was implemented in PDT.
+However, unstructured meshes may lead to imbalanced partitions, or different numbers of mesh cells per processor.
+To address this, two two\jcr{repeated word} load-balancing algorithms were\jcr{you usage of tenses will make reading this quite awkward. I recommend have been and not were. You must check out document for this throughout. I will likely not pick every instance ...} implemented in PDT, the original load-balancing algorithm and the load-balancing-by-dimension algorithm.
 
 \section*{Time-to-Solution Estimator}
 
-PDT's existing performance model does not account for unstructured meshes and imbalanced partitions. 
-This chapter describes the time-to-solution estimator, a graph-based method that estimates the time it takes to sweep across a problem given a mesh, partitioning scheme, and machine-specific parameters. 
+PDT's existing performance model does not account for unstructured meshes and imbalanced partitions.
+This chapter describes the time-to-solution estimator, a graph-based method that estimates the time it takes to sweep across a problem given a mesh, partitioning scheme, and machine-specific parameters.
 
 \section*{Partitioning Optimization}
 
-The time-to-solution estimator described in Chapter \ref{cha:tts} is used to optimize the partitioning scheme. 
-This chapter details two optimization methods: a ``black box'' method that uses Python's scipy.optimize library and a ``human-intelligence'' method prioritizes partition placement in locations that don't add cells to a mesh. 
+The time-to-solution estimator described in Chapter \ref{cha:tts} is used to optimize the partitioning scheme.
+This \jcr{you must give numbers} chapter details two optimization methods: a ``black box'' method that uses Python's scipy.optimize library and a ``human-intelligence'' method prioritizes partition placement in locations that don't add cells to a mesh.
 
 %Massively parallel transport sweeps have been shown to scale up to 750,000 cores on logically Cartesian grids. However, structured meshes are somewhat limiting when  simulating more complex problems and experiments, requiring the use of unstructured meshes in transport sweeps. While unstructured meshes provide the ability to simulate realistic problems, they introduce some challenges like unbalanced partitions, which can increase the time to solution. To combat this, PDT, Texas A\&M University's massively parallel deterministic transport code, introduced two load balancing algorithms that rely on moving the spatial partition boundaries, or cut planes (cut lines in 2D), throughout the mesh in order to obtain a roughly equivalent amount of cells (and therefore work) per processor. However, this sacrifices the optimal partitioning scheme\cite{mpadams2013} in favor of balance. We propose a method that weighs ideal load balancing against the consequences to the transport sweep in order to achieve the best possible time to solution.
-
-
