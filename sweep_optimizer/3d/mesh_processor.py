@@ -3,7 +3,7 @@ import numpy as np
 import math
 from scipy import integrate
 from utilities import get_ij
-from shapely.geometry import Polygon,Point,MultiPoint
+from shapely.geometry import Polygon,Point,MultiPoint,LineString
 
 #Get overlap of line segment
 def get_overlap(min1, max1, min2, max2):
@@ -163,6 +163,11 @@ def get_cells_per_subset_2d_robust(points,cell_verts,vert_data,boundaries,adjace
     ymin = subset_bounds[2]
     ymax = subset_bounds[3]
     
+    xmin_bound = LineString([(xmin,ymin), (xmin,ymax)])
+    xmax_bound = LineString([(xmax,ymin), (xmax,ymax)])
+    ymin_bound = LineString([(xmin,ymin), (xmax,ymin)])
+    ymax_bound = LineString([(xmin,ymax), (xmax,ymax)])
+    
     #The x length of the subset.
     Lx = xmax - xmin
     #The y length of the subset.
@@ -182,15 +187,24 @@ def get_cells_per_subset_2d_robust(points,cell_verts,vert_data,boundaries,adjace
       bdy_cells_per_subset[s] = [1,1]
     
     
-    N = cells_per_subset[s]
     
-    for cell in range(0,num_cells):
-      current_cell = current_cells[cell]
-      numpts = len(current_cell)
-      current_verts = []
-      for p in range(0,numpts):
+    if cells_per_subset[s] > 1:
+      for cell in range(0,num_cells):
+        current_cell = current_cells[cell]
+        numpts = len(current_cell)
+        current_verts = []
+        for p in range(0,numpts):
+          #current point
+          cp = (vert_data[0],vert_data[1])
+          current_verts.append(cp)
         
-        
+        #Creating the polygon.
+        polygon = MultiPoint(cp).convex_hull
+        #Checking if it intersects with the xmin segment.
+        if xmin_bound.intersects(polygon):
+          #If there is more than one intersection point. But what if there is a natural boundary? Then the whole line would intersect...
+          if len(xmin_bound.intersection(polygon).coords[:]) > 1:
+            print("here")
       
     
 #    #Computing the boundary cells along x and y.
