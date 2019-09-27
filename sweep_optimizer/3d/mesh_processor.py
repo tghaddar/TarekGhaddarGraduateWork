@@ -259,8 +259,9 @@ def get_cells_per_subset_2d_robust(points,cell_verts,vert_data,boundaries,adjace
     #Looping through the points and assigning them to the subset if they fit.
     x1 = np.argwhere(np.logical_and(xpoints >= xmin, xpoints <= xmax)).flatten()
     y1 = ypoints[x1]
+    current_cells1 = [cell_verts[x] for x in x1]
     y2 = np.argwhere(np.logical_and(y1 >= ymin, y1 <= ymax)).flatten()
-    current_cells = [cell_verts[x] for x in y2]
+    current_cells = [current_cells1[x] for x in y2]
     num_cells = len(y2)
     cells_per_subset[s] += num_cells
     if num_cells == 0:
@@ -276,10 +277,11 @@ def get_cells_per_subset_2d_robust(points,cell_verts,vert_data,boundaries,adjace
           for p in current_cell:
             #current point
             cp = (vert_data[p][0],vert_data[p][1])
+            if (s == 2):
+              if (ymax > vert_data[p][1]):
+                print("debug stop")
             current_verts.append(cp)
           
-          if cell == 8:
-            print("debug stop")
           polygon = MultiPoint(current_verts).convex_hull
           #Check for intersections of this polygon and the subset.
           if polygon.intersects(subset):
