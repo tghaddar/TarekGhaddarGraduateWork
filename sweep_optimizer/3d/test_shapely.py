@@ -62,9 +62,11 @@ def check_nat_boundary(polygon,bound):
 def check_add_cell(polygon,int_bounds,bounds):
   
   add_cell = [False,False,False,False]
+  add_bdy_cell = [False,False,False,False]
   #Checking for a natural boundary for the polygon.
   for i in int_bounds:
     bound = bounds[i]
+    add_bdy_cell[i] = True
     #Checking if this boundary intersection is a natural boundary. 
     is_nat_boundary = check_nat_boundary(polygon,bound)
     if is_nat_boundary == False:
@@ -72,7 +74,7 @@ def check_add_cell(polygon,int_bounds,bounds):
      
     
     
-  return add_cell
+  return add_cell,add_bdy_cell
 
 xmin = 0.0
 xmax = 1.0
@@ -86,9 +88,6 @@ ymax_bound = LineString([(xmin,ymax), (xmax,ymax)])
 
 bounds = [xmin_bound,xmax_bound,ymin_bound,ymax_bound]
 add_cell = [False,False,False,False]
-
-    
-
 subset = MultiPoint([(xmin,ymin),(xmax,ymin),(xmax,ymax),(xmin,ymax)]).convex_hull
 
 bound = LineString([(0,0),(0,1)])
@@ -102,7 +101,7 @@ num_intersections = len(intersection_coords)
 int_bounds = []
 if num_intersections > 1:
   int_bounds = which_bounds(intersect,bounds)
-  add_cell = check_add_cell(polygon,int_bounds,bounds)
+  add_cell,add_bdy_cell = check_add_cell(polygon,int_bounds,bounds)
 
 #is_nat_boundary = False
 #ctr = 0
