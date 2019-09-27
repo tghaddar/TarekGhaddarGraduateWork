@@ -16,8 +16,8 @@ gxmin = 0.0
 gxmax = 152.0
 gymin = 0.0
 gymax = 54.994
-numrow = 13
-numcol = 42
+numrow = 2
+numcol = 2
 add_cells = True
 points = np.genfromtxt("level2centroids").T
 verts = np.genfromtxt("level2_vert_data")
@@ -30,18 +30,18 @@ for i in range(0,len(level2_cell_data)):
 x_cuts,y_cuts = create_2d_cuts(gxmin,gxmax,numcol,gymin,gymax,numrow)
 boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
 adjacency_matrix = build_adjacency(boundaries,numcol-1,numrow-1,y_cuts)
-#level2_reg_cut_cell_data = np.genfromtxt("level2_reg_cut_cell_data.txt")
-cells_per_subset,bcps = get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow-1,numcol-1,True)
-cells_per_subset,bcps = get_cells_per_subset_2d_robust(points,level2_cell_data,verts,boundaries,adjacency_matrix,numrow-1,numcol-1)
+level2_reg_cut_cell_data = np.genfromtxt("level2_reg_cut_cell_data.txt")
+cells_per_subset,bcps = get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow,numcol,True)
+cells_per_subset,bcps = get_cells_per_subset_2d_robust(points,level2_cell_data,verts,boundaries,adjacency_matrix,numrow,numcol,True)
 
-#num_cell_pdt = sum(level2_reg_cut_cell_data)
+num_cell_pdt = sum(level2_reg_cut_cell_data)
 num_cell = sum(cells_per_subset)
 
-#percent_diff = []
-#subsets = []
-#for i in range(0,len(cells_per_subset)):
-#  subsets.append(i)
-#  percent_diff.append(abs(cells_per_subset[i] - level2_reg_cut_cell_data[i])/level2_reg_cut_cell_data[i]*100)
+percent_diff = []
+subsets = []
+for i in range(0,len(cells_per_subset)):
+  subsets.append(i)
+  percent_diff.append(abs(cells_per_subset[i] - level2_reg_cut_cell_data[i])/level2_reg_cut_cell_data[i]*100)
   
 
 #Get cells in the subset. Grab centroids in the cell. grab vert data for the cell. If cut line coordinate is in the cell, then you add that to the number of boundary cells. Add a cell to the appropriate neighboring subset.
