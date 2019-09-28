@@ -183,7 +183,12 @@ def check_nat_boundary(polygon,bound):
   intersect_coords = bound_intersections.coords[:]
   num_intersections = len(bound_intersections.coords[:])
   if (num_intersections == 1):
-    return is_nat_boundary
+    if intersect_coords[0] in polygon.exterior.coords[:]:
+      return True
+    elif intersect_coords[0] in bound.coords[:]:
+      return True
+    else:
+      return is_nat_boundary
   elif (num_intersections < 1):
     raise Exception("Less than one intersection. Shouldn't be possible at this point.")
   else:
@@ -200,8 +205,6 @@ def check_nat_boundary(polygon,bound):
     else:
       return is_nat_boundary
 
-      
-  
   return is_nat_boundary
 
 
@@ -375,12 +378,21 @@ def get_cells_per_subset_2d_more_robust(points,cell_verts,vert_data,boundaries,a
     ymin_bound = LineString([(xmin,ymin), (xmax,ymin)])
     ymax_bound = LineString([(xmin,ymax), (xmax,ymax)])
     bounds = [xmin_bound,xmax_bound,ymin_bound,ymax_bound]
-    add_cell = [False,False,False,False]
     subset = MultiPoint([(xmin,ymin),(xmax,ymin),(xmax,ymax),(xmin,ymax)]).convex_hull
-    
+
     for polygon in polygons:
-      if polygon.intersects(subset):
+      if polygon.within(subset):
         cells_per_subset[s] += 1
+        continue
+      elif polygon.intersects(subset):
+        intersect = polygon.intersection(subset)
+        int_bounds = which_bounds(intersect,bounds)
+        for i in int_bounds:
+          is_nat_boundary = check_nat_boundary(polygon,bounds[i])
+          if is_nat_boundary == False:
+            break
+        if is_nat_boundary == False:
+          cells_per_subset[s] += 1
     
   return cells_per_subset,bdy_cells_per_subset
 

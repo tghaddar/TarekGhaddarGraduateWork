@@ -1,7 +1,7 @@
 import numpy as np
 import sys
-sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
-#sys.path.append(r'C:\Users\tghad\Documents\GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
+#sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
+sys.path.append(r'C:\Users\tghad\Documents\GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
 from sweep_solver import optimized_tts_numerical,unpack_parameters,plot_subset_boundaries_2d
 from mesh_processor import create_2d_cuts,get_cells_per_subset_2d_test,get_cells_per_subset_2d_robust,get_cells_per_subset_2d_more_robust
 from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_highest_jumps
@@ -50,5 +50,5 @@ for i in range(0,len(cells_per_subset)):
   subsets.append(i)
   percent_diff.append(abs(cells_per_subset[i] - level2_reg_cut_cell_data[i])/level2_reg_cut_cell_data[i]*100)
   
-
+pdiff = np.array(percent_diff)
 #Get cells in the subset. Grab centroids in the cell. grab vert data for the cell. If cut line coordinate is in the cell, then you add that to the number of boundary cells. Add a cell to the appropriate neighboring subset.
