@@ -231,8 +231,6 @@ def get_cells_per_subset_2d_robust(points,cell_verts,vert_data,boundaries,adjace
   cells_per_subset = [0]*num_subsets
   #Stores the number of boundary cells per boundary per subset.
   bdy_cells_per_subset = [[0,0]]*num_subsets  
-  xpoints = points[0,:]
-  ypoints = points[1,:]
   
   numcells = len(cell_verts)
   polygons = [None]*numcells
@@ -278,6 +276,22 @@ def get_cells_per_subset_2d_robust(points,cell_verts,vert_data,boundaries,adjace
             break
         if is_nat_boundary == False:
           cells_per_subset[s] += 1
+    
+    #The x length of the subset.
+    Lx = xmax - xmin
+    #The y length of the subset.
+    Ly = ymax - ymin
+    #The area of the subset.
+    subset_area = Lx*Ly
+    N = cells_per_subset[s]
+    #Computing the boundary cells along x and y.
+    nx = math.sqrt(N/subset_area)*Lx
+    ny =  math.sqrt(N/subset_area)*Ly
+    if nx < 1:
+      nx = 1
+    if ny < 1:
+      ny = 1
+    bdy_cells_per_subset[s] = [nx,ny]
     
   return cells_per_subset,bdy_cells_per_subset
 
