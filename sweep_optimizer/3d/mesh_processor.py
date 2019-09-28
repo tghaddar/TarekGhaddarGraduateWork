@@ -224,7 +224,7 @@ def check_add_cell(polygon,int_bounds,bounds):
   return add_cell,add_bdy_cell
 
 
-def get_cells_per_subset_2d_robust(points,cell_verts,vert_data,boundaries,adjacency_matrix,numrow,numcol,add_cells):
+def get_cells_per_subset_2d_robust(cell_verts,vert_data,boundaries,adjacency_matrix,numrow,numcol,add_cells):
   #Number of subsets.
   num_subsets = len(boundaries)
   #Stores the number of cells per subset.
