@@ -25,7 +25,7 @@ Before detailing the two load balancing algorithms PDT employs, a quick review o
 \item Discontinuities along subset boundaries are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries.
 \item The subsets are distributed amongst the processor domain.
 \end{itemize}
-Using cut lines/cut planes to partition unstructured meshes preserved\jcr{? and I would not put it in the present either. maybe may preserve but you need to explain the conditions under which something like this can be achieved.... this is missing} the provably optimal sweep partitioning \cite{mpadams2013,mpadams2015} of logically Cartesian grids.
+Using cut lines/cut planes to partition unstructured meshes may preserve \jcr{? and I would not put it in the present either. maybe may preserve but you need to explain the conditions under which something like this can be achieved.... this is missing} the provably optimal sweep partitioning \cite{mpadams2013,mpadams2015} of logically Cartesian grids if each partition has an equivalent number of cells.
 Subsets, rather than the cells, have $(i,j,k)$ indices and will become the base unit when aggregating spatial parameters. That is, $A_x$ and $A_y$ will now represent the number of subsets in $x$ and $y$ aggregated into a task.
 Figure \ref{partitioning_example} shows an example of an unstructured mesh partitioned into 100 subsets in PDT.
 \begin{figure}[H]
