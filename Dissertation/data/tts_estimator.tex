@@ -66,7 +66,7 @@ The time-to-solution estimator uses Johnson's algorithm \cite{intro_to_alg,johns
 The weighted shortest path is defined as the path between two nodes that has the smallest weighted sum.
 For example, the shortest path between nodes 0 and 3 in Fig. \ref{weighted_directed_graph} is $0\rightarrow 2\rightarrow 3$.
 
-In our application, we use Johnson's algorithm to assist in calculate\jcr{ing} the longest path between two nodes in a DAG (needed in Section \ref{sec:universal}).
+In our application, we use Johnson's algorithm to assist in calculating the longest path between two nodes in a DAG (needed in Section \ref{sec:universal}).
 The longest path is found by:
 \begin{enumerate}
   \item Multiplying all edge weights by -1,
@@ -286,10 +286,9 @@ n_{yz} &= \Big(\frac{N_c}{V}\Big)^{2/3}\cdot L_y\cdot L_z \label{nyz},
 where $N_c$ is the number of cells in the subset, $V$ is the subset volume, and $L_d$ is the length of the subset in dimension $d$.
 Equations \ref{nx} and \ref{ny} show the 2-dimensional equivalents to \ref{nxy}-\ref{nyz}:
 \begin{align}
-n_x &= \Big(\frac{N_c}{A}\Big)\cdot L_x, \label{nx} \\
-n_y &= \Big(\frac{N_c}{A}\Big)\cdot L_y, \label{ny}
+n_x &= \Big(\frac{N_c}{A}\Big)^{1/2}\cdot L_x, \label{nx} \\
+n_y &= \Big(\frac{N_c}{A}\Big)^{1/2}\cdot L_y, \label{ny}
 \end{align}
-\jcr{are you missing a $1/2$ exponent on ($N_c/A$)????}
 where $A$ is the subset area. With this information, we compute all weights in each graph according to Eq. \ref{weight_function}. Once graphs are weighted, we add and modify edge weights for the number of angles pipelined per octant/quadrant.
 
 \subsection{Adding graphs for angular pipelining}
@@ -631,7 +630,7 @@ To test how the time-to-solutions estimator performs on unstructured problems, w
 
 \jcr{each figure and table needs to be discussed in the text}\\
 
-jcr{I do not understand the LBD meshes for level-2. the x-cuts go all the way across. fine. however, this is actually not true. so x-cut do not go all the way, around x=18 and y=53 in the supposedly evenly partitioned case. what's going on with the level-2 mesh ???}
+\jcr{I do not understand the LBD meshes for level-2. the x-cuts go all the way across. fine. however, this is actually not true. so x-cut do not go all the way, around x=18 and y=53 in the supposedly evenly partitioned case. what's going on with the level-2 mesh ???}
 
 \begin{figure}[ht]
 \centering
