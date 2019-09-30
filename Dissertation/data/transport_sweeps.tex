@@ -72,9 +72,9 @@ In order to obtain the solution for this discrete form of the transport equation
 \vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
 \label{iteration}
 \end{equation}
-where the right hand side terms of Eq.~\eqref{angle} have been combined into one general source term, $q_m$. The angular flux of iteration $(l+1)$ is calculated using the $(l^{th})$ value of the scalar flux.
+where the right hand side terms of Eq.~\eqref{angle} have been combined into one general source term, $q_m$. The angular flux of iteration $(l+1)$ is calculated using the $(l^{th})$ value of the total source.
 
-After the angular and energy dependences have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. This is done by meshing the domain and utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}, allowing one cell at a time to be solved. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Figure \ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
+After the angular and energy dependencies have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. This is done by meshing the domain and utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}, allowing one cell at a time to be solved. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Figure \ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
 
 \begin{figure}[H]
 \centering
@@ -85,5 +85,8 @@ After the angular and energy dependences have been accounted for, Eq.~\eqref{ite
 \end{figure}
 
 The number in each cell represents the order in which the cells are solved.
-Obtaining the solution for current cells in the sweep is dependent on the solution of downwind cells.
+All cells must receive the solution from downwind cells before their solution can be obtained. 
+
+The transport sweep can be parallelized in order to mitigate memory costs and obtain solutions in a reasonable time for large problems. Chapter \ref{cha:parallel_transport} describes the basics of a parallel sweep algorithm and details two algorithms: The KBA algorithm \cite{KBA} and PDT's extension of the KBA algorithm \cite{mpadams2013, mpadams2015}.
+
 

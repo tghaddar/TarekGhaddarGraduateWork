@@ -36,7 +36,7 @@ It is often desirable to split the full system so that the memory cost can be di
 The smaller linear system matrices often exhibit a lower block triangular structure whose solutions are easy to obtain.
 With each block being thought of as a cell, the solution is obtained by following the flow of radiation, or ``marching'' through a mesh.
 
-This ``marching'' or ``sweeping'' through a mesh gains complexity for unstructured and/or distributed meshes. Partitioning meshes in a balanced (near equivalent amount of work per processor) fashion that preserves mesh integrity can present challenges.
+This ``marching'' or ``sweeping'' through a mesh gains complexity for unstructured and/or distributed meshes. Partitioning meshes in a balanced (or near equivalent amount of work per processor) fashion that preserves mesh integrity can present challenges.
 In addition, maintaining sweep performance for massively parallel simulations has and continues to be a thriving research topic.
 The following dissertation chapters will discuss a brief history of the transport sweep, parallel transport sweeps, load balancing unstructured meshes for transport, a time-to-solution estimator, and optimizing partitions for parallel transport. 
 
