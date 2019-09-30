@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  New template code for TAMU Theses and Dissertations starting Fall 2016.  
+%  New template code for TAMU Theses and Dissertations starting Fall 2016.
 %
 %
 %  Author: Sean Zachary Roberson
@@ -21,13 +21,13 @@ To combat imbalanced partitions, two load balancing algorithms were implemented,
 Before detailing the two load balancing algorithms PDT employs, a quick review of partitioning unstructured meshes in PDT is necessary:
 \begin{itemize}
 \item ``Cut lines'' in 2D (``cut planes'' in 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
-\item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
+\item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them.
 \item Discontinuities along subset boundaries are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries.
 \item The subsets are distributed amongst the processor domain.
 \end{itemize}
-Using cut lines/cut planes to partition unstructured meshes preserved the provably optimal sweep partitioning \cite{mpadams2013,mpadams2015} of logically Cartesian grids. 
-Subsets, rather than the cells, have $(i,j,k)$ indices and will become the base unit when aggregating spatial parameters. That is, $A_x$ and $A_y$ will now represent the number of subsets in $x$ and $y$ aggregated into a task. 
-Figure \ref{partitioning_example} shows an example of an unstructured mesh partitioned into 100 subsets in PDT. 
+Using cut lines/cut planes to partition unstructured meshes preserved\jcr{? and I would not put it in the present either. maybe may preserve but you need to explain the conditions under which something like this can be achieved.... this is missing} the provably optimal sweep partitioning \cite{mpadams2013,mpadams2015} of logically Cartesian grids.
+Subsets, rather than the cells, have $(i,j,k)$ indices and will become the base unit when aggregating spatial parameters. That is, $A_x$ and $A_y$ will now represent the number of subsets in $x$ and $y$ aggregated into a task.
+Figure \ref{partitioning_example} shows an example of an unstructured mesh partitioned into 100 subsets in PDT.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.2]{../figures/spiderweb_10x10_sparse.png}
@@ -35,10 +35,10 @@ Figure \ref{partitioning_example} shows an example of an unstructured mesh parti
 \label{partitioning_example}
 \end{figure}
 
-Upon creation, the subsets may have geometric discontinuities as a result of slicing through the mesh. 
-Figure \ref{hanging_node} shows an example of a hanging node across a subset boundary. 
-This node is stitched across the boundary to preserve geometric continuity, forming a degenerate polygon \cite{degenerate} (in Fig. \ref{hanging_node}, a degenerate square). 
-PDT uses Piece-Wise Linear Discontinuous (PWLD) finite-element basis functions \cite{pwld_ragusa,pwld_teresa} that allow for solutions on arbitrary and degenerate polyhedra. 
+Upon creation, the subsets may have geometric discontinuities as a result of slicing through the mesh.
+Figure \ref{hanging_node} shows an example of a hanging node across a subset boundary.
+This node is stitched across the boundary to preserve geometric continuity, forming a degenerate polygon \cite{degenerate} (in Fig. \ref{hanging_node}, a degenerate square).
+PDT uses Piece-Wise Linear Discontinuous (PWLD) finite-element basis functions \cite{pwld_ragusa,pwld_teresa} that allow for solutions on arbitrary and degenerate polyhedra.
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.2]{../../figures/hanging_node_spiderweb_example.png}
@@ -61,16 +61,16 @@ Figure \ref{redistribute} illustrates an example of redistributing the cut plane
 \caption{The use of the CDF of cells per column to redistribute the cut lines in X.}
 \label{redistribute}
 \end{figure}
-The image on the left side of Fig. \ref{redistribute} shows the CDF of the cells per column in Fig. \ref{partitioning_example}. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut lines are redistributed to. 
+The image on the left side of Fig. \ref{redistribute} shows the CDF of the cells per column in Fig. \ref{partitioning_example}. The red lines on the right side of Fig. \ref{redistribute} show the ideal equal number of cells per column. The x-value of the intersection of these red lines and the CDF are where the cut lines are redistributed to.
 
 In order to decide the necessity of redistributing a dimension's cut lines/planes, we use dimensional sub-metrics of the following form:
 \begin{equation}
 f_{Z} = \frac{\underset{k}{\text{max}}[\sum_{i,j} N_{ijk}]}{\frac{N_{tot}}{K}},
 \label{f_z}
 \end{equation}
-where $K$ is the total number of z-planes. 
-Equation \ref{f_z} is a metric defining how imbalanced the problem's planes are. It calculates the maximum cells per plane divided by the average cells per plane. If $f_K$ is greater than a predefined tolerance, the z cut planes are redistributed using the process in Fig. \ref{redistribute}. 
- 
+where $K$ is the total number of z-planes.
+Equation \ref{f_z} is a metric defining how imbalanced the problem's planes are. It calculates the maximum cells per plane divided by the average cells per plane. If $f_K$ is greater than a predefined tolerance, the z cut planes are redistributed using the process in Fig. \ref{redistribute}.
+
 \section{Original Load-Balancing Algorithm}
 \label{sec:og_lb}
 
@@ -80,7 +80,7 @@ f &= \frac{\underset{ij}{\text{max}}(N_{ij})}{\frac{N_{tot}}{I\cdot J}}  \label{
 f_X &= \frac{\underset{i}{\text{max}}[\sum_{j} N_{ij}] } {\frac{N_{tot}}{I}} \label{og_i_metric} \\
 f_Y &= \frac{\underset{j}{\text{max}}[\sum_{i} N_{ij}] } {\frac{N_{tot}}{J}} \label{og_j_metric}
 \end{align}
-Equation \ref{og_metric} mirrors Eq. \ref{metric_def} for 2 dimensions, and Eqs. \ref{og_i_metric} and \ref{og_j_metric} define the column and row-wise metrics respectively. 
+Equation \ref{og_metric} mirrors Eq. \ref{metric_def} for 2 dimensions, and Eqs. \ref{og_i_metric} and \ref{og_j_metric} define the column and row-wise metrics respectively.
 
  Algorithm \ref{initial_algorithm} summarizes the original approach to load balancing meshes in PDT.
 \begin{algorithm}[H]
@@ -105,8 +105,8 @@ While the problem is not balanced:
   \item Repeat until the mesh is balanced or until a maximum number of iterations is reached.
 \end{itemize}
 
-The original load-balancing algorithm placed cut lines in all dimensions all the way through the mesh. 
-This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the provably optimal sweep partitioning described by Adams et. al \cite{mpadams2013,mpadams2015}. 
+The original load-balancing algorithm placed cut lines in all dimensions all the way through the mesh.
+This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the provably optimal sweep partitioning described by Adams et. al \cite{mpadams2013,mpadams2015}.
 However, there are theoretical limits to load balancing in this fashion. Figure \ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches with $N$ cells each.
 
 \begin{figure}[H]
@@ -125,7 +125,7 @@ Due to this theoretical limit, the load-balancing-by-dimension algorithm was dev
 \label{sec:lbd}
 
 The load-balancing-by-dimension by dimension (LBD) algorithm, similar to the original load-balancing algorithm, relies on the movement of cut lines/planes to redistribute mesh cells in a more balanced manner.
-However, cut lines are no longer required to go all the way through the mesh, and the load-balancing-by-dimension algorithm is fully extensible to 3 dimensions. 
+However, cut lines are no longer required to go all the way through the mesh, and the load-balancing-by-dimension algorithm is fully extensible to 3 dimensions.
 The load-balancing-by-dimension algorithm is summarized by:
 \begin{enumerate}
   \item Slice the mesh in $z$ and redistribute cut planes until each plane has approximately an equivalent number of cells.
@@ -138,16 +138,16 @@ We once again use dimensional sub-metrics to determine whether or not a dimensio
 f_{X,k} = \frac{ \underset{i}{\text{max}}[ \sum_{j} N_{ijk}]  }  {\frac{N_{tot,k}}{I}}.
 \label{lbd_x_metric}
 \end{equation}
-Equation \ref{lbd_x_metric} defines the column-wise metric for layer $k$, or the maximum number of cells per column in layer $k$ divided by the average number of cells per column in layer $k$. 
+Equation \ref{lbd_x_metric} defines the column-wise metric for layer $k$, or the maximum number of cells per column in layer $k$ divided by the average number of cells per column in layer $k$.\jcr{you should say what $N_{tot,k}$ is}
 
 For the LBD algorithm, there are $K\cdot I$ row-wise metrics, one for each column in each $z$ layer:
 \begin{equation}
 f_{Y,k,i} = \frac{\underset{j}{\text{max}} N_{ijk} } {\frac{N_{tot,k,i}}{J}}.
 \label{lbd_y_metric}
 \end{equation}
-Equation \ref{lbd_y_metric} defines the row-wise metric for layer $k$ in column $i$, or the maximum number of cells per row in column $i$ in layer $k$ divided by the average number of cells per row in column $i$ in layer $k$. 
+Equation \ref{lbd_y_metric} defines the row-wise metric for layer $k$ in column $i$, or the maximum number of cells per row in column $i$ in layer $k$ divided by the average number of cells per row in column $i$ in layer $k$. jcr{you should say what $N_{tot,k,i}$ is}
 
-Algorithm \ref{lbd} details the load-balancing-by-dimension algorithm. 
+Algorithm \ref{lbd} details the load-balancing-by-dimension algorithm.
 \begin{algorithm}[H]
 \caption{The load-balancing-by-dimension algorithm.}
 \label{lbd}
@@ -155,25 +155,26 @@ Algorithm \ref{lbd} details the load-balancing-by-dimension algorithm.
 
   \WHILE {$f_{Z} > 1 + \text{tol}_{\text{K}}$}
     \STATE Redistribute the Z cut planes.
-  \ENDWHILE  
-  
+  \ENDWHILE
+
   \FOR {$k$ in $K$}
     \WHILE {$f_{X,k} > 1 + \text{tol}_{\text{I}}$}
-      \STATE Redistribute the X cut lines within layer $k$. 
+      \STATE Redistribute the X cut lines within layer $k$.
     \ENDWHILE
   \ENDFOR
-  
+
   \FOR{$k$ in $K$}
     \FOR{$i$ in $I$}
       \WHILE {$f_{Y,k,i} > 1 +  \text{tol}_{\text{J}}$ }
-        \STATE Redistribute the Y cut lines in column $i$ in layer $k$. 
+        \STATE Redistribute the Y cut lines in column $i$ in layer $k$.
       \ENDWHILE
     \ENDFOR
   \ENDFOR
-  
+
   \STATE Calculate $f$.
 \end{algorithmic}
 \end{algorithm}
+\jcr{what's the connection with the processor layout. at some point, it is good to loop back on that notion that was heavily present before and now has disappeared}
 
 Figure \ref{alg_illustration} illustrates the behavior of both algorithms after 5 iterations. In Fig. \ref{3x3_lb}, we see the partitions cutting across the entire domain, with the $x$ and $y$ cut lines moving into the denser geometric features in the corners to more evenly distribute cells. In Fig. \ref{3x3_lbd}, we see the $x$ partitions cutting across the entire domain, but the $y$ partitions being redistributed by column. The $y$ partitions are moved into the respective geometric features in the appropriate columns in order to better balance the problem.
 
@@ -202,20 +203,20 @@ Figure \ref{alg_illustration} illustrates the behavior of both algorithms after 
 \end{figure}
 
 \section{Parametric Study of the Original Load Balancing and the Load-Balancing-by-Dimension Algorithms}
-To study the behavior and effectiveness of both the original load balancing and the load-balancing-by-dimension algorithm, a parametric study was run on the mesh shown in Fig. \ref{partitioning_example}. 
-This mesh was chosen because it is inherently imbalanced as there are two dense geometric features in opposing corners with a sparse region in between. 
+To study the behavior and effectiveness of both the original load balancing and the load-balancing-by-dimension algorithm, a parametric study was run on the mesh shown in Fig. \ref{partitioning_example}.
+This mesh was chosen because it is inherently imbalanced as there are two dense geometric features in opposing corners with a sparse region in between.
 
-The study calculates $f$ for the mesh with no load balancing iterations, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations. 
-The mesh is partitioned into 2 to 10 subsets in each dimension for all load balancing formats. 
-Figure \ref{metric_study} shows the results of this parametric study. 
+The study calculates $f$ for the mesh with no load balancing iterations, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations.
+The mesh is partitioned into 2 to 10 subsets in each dimension for all load balancing formats.
+Figure \ref{metric_study} shows the results of this parametric study.
 The results are tabulated in Table \ref{metric_study_table}.
 
-With regular cut lines going through the mesh, $f_\text{reg}$ generally increases as the number of subsets increases. 
-As the number of cut lines increases, the number of cells added may also increase, driving up the maximum number of cells in each subset. It is important to note that in Eq. \ref{metric_def}, the average number of cells per subset used to calculate $f$ is the average number of cells per subset \textit{before} slicing through the mesh. 
-With more cut lines, the maximum number of cells per subset will increase while the average number of cells per subset will decrease, leading to an increase in $f$. There can be exceptions to this trend, as seen by ${f_\text{reg}}$ for 8 and 10 subsets in each dimension. 
-The cut lines with 10 subsets in each dimension lie on natural boundaries when evenly distributed. 
-A natural boundary is a mesh boundary that coincides with a subset boundary, adding no cells to the mesh. 
-Because no cells are added in the 10x10 case, $f_{\text{reg}}$ with 10 subsets in each dimension is lower than $f_{\text{reg}}$ with 8 subsets in each dimension. 
+With regular cut lines going through the mesh, $f_\text{reg}$ generally increases as the number of subsets increases.
+As the number of cut lines increases, the number of cells added may also increase, driving up the maximum number of cells in each subset. It is important to note that in Eq. \ref{metric_def}, the average number of cells per subset used to calculate $f$ is the average number of cells per subset \textit{before} slicing through the mesh.
+With more cut lines, the maximum number of cells per subset will increase while the average number of cells per subset will decrease, leading to an increase in $f$. There can be exceptions to this trend, as seen by ${f_\text{reg}}$ for 8 and 10 subsets in each dimension.
+The cut lines with 10 subsets in each dimension lie on natural boundaries when evenly distributed.
+A natural boundary is a mesh boundary that coincides with a subset boundary, adding no cells to the mesh.
+Because no cells are added in the 10x10 case, $f_{\text{reg}}$ with 10 subsets in each dimension is lower than $f_{\text{reg}}$ with 8 subsets in each dimension.
 
 For the load balanced and load-balanced-by-dimension cases, we see a similar increasing trend for $f$, although it is not quite as consistent for the
 \begin{figure}[H]
@@ -230,44 +231,45 @@ For the load balanced and load-balanced-by-dimension cases, we see a similar inc
 \label{metric_study_table}
 \scalebox{0.8}{
 \begin{tabular}{c|c|c|c}
-\textbf{$\sqrt{\text{Num Subsets}}$} & \bf $f_{\text{reg}}$ & \bf $f_{\text{LB}}$  & \bf $f_{\text{LBD}}$\\ \hline 
-2&1.76&1.76&1.19\\ \hline 
-3&3.41&2.58&1.49\\ \hline 
-4&5.83&2.38&1.29\\ \hline 
-5&9.76&4.25&2.13\\ \hline 
-6&10.02&3.1&1.33\\ \hline 
-7&11.17&3.9&1.49\\ \hline 
-8&12.44&3.59&1.6\\ \hline 
-9&12.03&3.99&1.96\\ \hline 
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf $f_{\text{reg}}$ & \bf $f_{\text{LB}}$  & \bf $f_{\text{LBD}}$\\ \hline
+2&1.76&1.76&1.19\\ \hline
+3&3.41&2.58&1.49\\ \hline
+4&5.83&2.38&1.29\\ \hline
+5&9.76&4.25&2.13\\ \hline
+6&10.02&3.1&1.33\\ \hline
+7&11.17&3.9&1.49\\ \hline
+8&12.44&3.59&1.6\\ \hline
+9&12.03&3.99&1.96\\ \hline
 10&9.76&5.29&1.5
 \end{tabular}}
 \end{table}
 
-Table \ref{metric_improvement} shows the percent decrease in $f$ with the original load balancing algorithm and the load-balancing-by-dimension algorithm relative to no load balancing, and the percent decrease in $f$ with the load-balancing-by-dimension algorithm relative to the original load balancing algorithm. 
-There is consistent improvement for both algorithms for all cases, and the improvement both load balancing algorithms relative to no algorithm generally increases as the number of subsets increases. The improvement of load-balancing-by-dimension over load balancing is notable, with a minimum improvement of 32.43\% and a maximum improvement of 71.66\%. 
+Table \ref{metric_improvement} shows the percent decrease in $f$ with the original load balancing algorithm and the load-balancing-by-dimension algorithm relative to no load balancing, and the percent decrease in $f$ with the load-balancing-by-dimension algorithm relative to the original load balancing algorithm.
+There is consistent improvement for both algorithms for all cases, and the improvement both load balancing algorithms relative to no algorithm generally increases as the number of subsets increases. The improvement of load-balancing-by-dimension over load balancing is notable, with a minimum improvement of 32.43\% and a maximum improvement of 71.66\%.
 \begin{table}[H]
 \centering
 \caption{The percent decrease of $f$ with the original load balancing algorithm (LB) and the load-balancing-by-dimension algorithm (LBD) relative to no load balancing, and the percent decrease of $f$ with the load-balancing-by-dimension algorithm relative to the original load balancing algorithm.}
 \label{metric_improvement}
 \begin{tabular}{c|c|c|c}
 \centering
-\textbf{$\sqrt{\text{Num Subsets}}$} & \textbf{LB v. No LB}  & \textbf{LBD v. No LB} & \textbf{LBD v. LB} \\ \hline 
-2&0.0\%&32.43\%&32.43\%\\ \hline 
-3&24.38\%&56.38\%&42.33\%\\ \hline 
-4&59.21\%&77.9\%&45.82\%\\ \hline 
-5&56.48\%&78.17\%&49.83\%\\ \hline 
-6&69.05\%&86.7\%&57.01\%\\ \hline 
-7&65.06\%&86.66\%&61.83\%\\ \hline 
-8&71.17\%&87.1\%&55.27\%\\ \hline 
-9&66.84\%&83.69\%&50.81\%\\ \hline 
+\textbf{$\sqrt{\text{Num Subsets}}$} & \textbf{LB v. No LB}  & \textbf{LBD v. No LB} & \textbf{LBD v. LB} \\ \hline
+2&0.0\%&32.43\%&32.43\%\\ \hline
+3&24.38\%&56.38\%&42.33\%\\ \hline
+4&59.21\%&77.9\%&45.82\%\\ \hline
+5&56.48\%&78.17\%&49.83\%\\ \hline
+6&69.05\%&86.7\%&57.01\%\\ \hline
+7&65.06\%&86.66\%&61.83\%\\ \hline
+8&71.17\%&87.1\%&55.27\%\\ \hline
+9&66.84\%&83.69\%&50.81\%\\ \hline
 10&45.85\%&84.65\%&71.66\%
 \end{tabular}
 \end{table}
 
-The unstructured meshing capability in PDT allows the user to solve a wider variety of problems, without the need to conform a geometry to a logically Cartesian mesh. 
-The original load balancing and load-balancing-by-dimension algorithms allowed for these unstructured problems to be run more efficiently on large numbers of processors. 
-However, PDT's performance model does not account for unstructured meshes or imbalanced partitions, but rather assumes a structured grid with an equivalent amount of cells per processor. 
+The unstructured meshing capability in PDT allows the user to solve a wider variety of problems, without the need to conform a geometry to a logically Cartesian mesh.
+The original load balancing and load-balancing-by-dimension algorithms allowed for these unstructured problems to be run more efficiently on large numbers of processors.
+However, PDT's performance model does not account for unstructured meshes or imbalanced partitions, but rather assumes a structured grid with an equivalent amount of cells per processor.
 In addition, theoretical studies showed that well balanced partitions when using the load-balancing-by-dimension algorithm did not always translate to a better sweep time.
 These two reasons motivated the development of a time-to-solution estimator that can estimate the sweep time for a problem given a partitioning scheme ($P_i, A_i$) regardless of mesh type. The time-to-solution estimator is described in Chapter \ref{cha:tts}.
 
 
+\jcr{why didn't you do the same with the level-2 mesh? this would have been great here, too.}

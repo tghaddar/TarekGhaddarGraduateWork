@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  New template code for TAMU Theses and Dissertations starting Fall 2016.  
+%  New template code for TAMU Theses and Dissertations starting Fall 2016.
 %
 %
 %  Author: Sean Zachary Roberson
@@ -15,9 +15,9 @@
 
 
 \chapter{PARALLEL TRANSPORT SWEEPS}
-As mentioned in the previous chapter, a transport sweep is set up by overlaying a domain with a finite element mesh and solving the transport equation cell by cell using a discontinuous finite element approach. A transport sweep can be solved in parallel in order to obtain the solution faster, as well as distribute the problem across many processors for memory intensive problems. 
+As mentioned in the previous chapter\jcr{I prefer to give its number}, a transport sweep is set up by overlaying a domain with a finite element mesh and solving the transport equation cell by cell using a discontinuous finite element approach. A transport sweep can be solved in parallel in order to obtain the solution faster, as well as distribute the problem across many processors for memory intensive problems.
 
-In PDT, a transport sweep can be performed on a structured Cartesian or arbitrary polyhedral mesh. Sweeping on an unstructured mesh presents two challenges: maintaining sweep efficiency on a massively parallel scale and keeping non-concave sub-domains to avoid cycles. PDT has already proven the ability to perform massively parallel transport sweeps on structured meshes. As part of previous efforts in PDT, researchers have outlined three important properties for parallel sweeps. 
+In PDT, a transport sweep can be performed on a structured Cartesian or arbitrary polyhedral mesh. Sweeping on an unstructured mesh presents two challenges: maintaining sweep efficiency on a massively parallel scale and keeping non-concave sub-domains to avoid cycles. PDT has already proven the ability to perform massively parallel transport sweeps on structured meshes. As part of previous efforts in PDT, researchers have outlined three important properties for parallel sweeps.
 
 A parallel sweep algorithm is defined by three properties \cite{mpadams2013} :
 \begin{itemize}
@@ -43,9 +43,9 @@ Fine-grain work units are aggregated into coarser-grained units called \textit{t
 
 It follows that each process owns $N_k$ cellsets (each of which is $A_z$ planes of $A_x A_y$ cells), $8N_m$ angle-sets, and $N_g$ group-sets for a total of $8N_m N_g N_k$ tasks.
 
-One task contains $A_x A_y A_z$ cells, $A_m$ directions, and $A_g$ groups. Equivalently, a task is the computation of one cellset, one groupset, and one angleset, with the completion of one task defined as a stage.  The stage is particularly important when assessing sweeps against analytical performance models. 
-
-Equation ~\eqref{paralleleff} approximately defines parallel sweep efficiency:
+One task contains $A_x A_y A_z$ cells, $A_m$ directions, and $A_g$ groups. Equivalently, a task is the computation of one cellset, one groupset, and one angleset, with the completion of one task defined as a stage.  The stage is particularly important when assessing sweeps against analytical performance models.
+jcr{where are octant pairs defined?}\\
+Equation ~\eqref{paralleleff} approximately\jcr{I am still complaining about this. What is approximate about it?} defines parallel sweep efficiency:
 \begin{equation}\label{paralleleff}
 \begin{split}
 \epsilon &\approx \frac{T_{\text{task}} N_{\text{tasks}}}{[N_{\text{stages}}] [T_{\text{task}} + T_{\text{comm}}]} \\
@@ -65,12 +65,14 @@ T_{\text{task}} = A_x A_y A_z A_m A_g T_{\text{grind}},
 where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. Note that Eq. \ref{Ttask} is idealized as it does not take into account overhead in various parts of the sweep implementation.
 
 Before expanding on the proposed method of partitioning and scheduling for parallel transport sweeps, a quick review of some transport sweep algorithms is necessary. Our method will expand on PDT's sweep algorithm \cite{mpadams2013}, which is an extension of the popular KBA algorithm \cite{KBA}.
+\jcr{I don't see my comments addressed. Talk to me and explain.}
 
 \section{The KBA Algorithm}
 
 Several parallel transport sweep codes use KBA partitioning in their sweeping, such as Denovo \cite{denovo} and PARTISN \cite{partisn}. The KBA partitioning scheme and algorithm was developed by Koch, Baker, and Alcouffe \cite{KBA}.
 
 The KBA algorithm traditionally chooses $P_z = 1, A_m = 1 \text{ (or 1 angle per angleset)}, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. This partitions the domain into long, thin columns. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. The KBA algorithm traditionally solves a problem one energy group at a time, and uses a ``pipelining'' or assembly line approach. This allows for new angles in an octant to begin sweeping before old angles have fully swept across the spatial domain. Figure \ref{pipeline_example} shows an example of pipelining the angular work of a quadrant.
+\jcr{sounds strange that G=1? I am pretty sure PARTISN stacks some groups ... maybe more lit review is needed ...}
 
 \begin{figure}[H]
 \centering
@@ -79,13 +81,14 @@ The KBA algorithm traditionally chooses $P_z = 1, A_m = 1 \text{ (or 1 angle per
 \label{pipeline_example}
 \end{figure}
 
-In Fig. \ref{pipeline_example}, each square represents a processor that owns a group of $AxAy$ cells. We see that as soon as a processor is free to solve the next angle with the same sweep ordering, it begins immediately. KBA introduced pipelining in order to combat the inherent inefficiencies of waiting for all processors to complete a sweep in a direction before starting the next angle. 
+In Fig. \ref{pipeline_example}, each square represents a processor that owns a group of $AxAy$ cells. We see that as soon as a processor is free to solve the next angle with the same sweep ordering, it begins immediately. KBA introduced pipelining in order to combat the inherent inefficiencies of waiting for all processors to complete a sweep in a direction before starting the next angle.
 
 There are two variants to the KBA algorithm, ``successive in angle, successive in quadrant", and ``simultaneous in angle, successive in quadrant".  With ``successive in angle, successive in quadrant", an octant pipelines its angular work, and once all directions are complete the opposing octant pipelines them back. This is then done for the remaining octant pairs. With ``simultaneous in angle, successive in quadrant", all angles from one octant are simultaneously solved, and upon completion the opposing octant solves them. This is then done for the remaining octant pairs. The KBA parallel efficiency \cite{mpadams2013} for ``successive in angle, successive in quadrant" is:
 \begin{equation}
   \epsilon_{KBA} \approx \frac{1}{[1 + \frac{4(P_x+P_y-2)}{8MN_k}][1 + \frac{T_{\text{comm}}}{T_{\text{{task}}}}]}.
   \label{eps_kba}
 \end{equation}
+\jcr{is this easy to demonstrate, explain? That would be nice. Also, how about the other variant of KBA? what's its formula?}
 
 \section{PDT's extension of KBA}\label {pdt_extension}
 
@@ -117,6 +120,7 @@ N_\text{idle} = 2N_{\text{fill}}
 N_\text{tasks} = 8N_mN_gN_k
 \label{ntasks}
 \end{equation}
+\jcr{Commnet not addressed}
 
 Plugging these definitions into Eq. \ref{paralleleff}, the PDT optimal parallel efficiency\cite{mpadams2013} is:
 \begin{equation}
@@ -124,12 +128,13 @@ Plugging these definitions into Eq. \ref{paralleleff}, the PDT optimal parallel 
 	\label{eps_opt}
 \end{equation}
 
-In the limit of a large number of processors $P$, the optimal algorithm yields the same efficiency as KBA with 32 times as many processors \cite{mpadams2013, mpadams2015}. 
+In the limit of a large number of processors $P$, the optimal algorithm yields the same efficiency as KBA with 32 times as many processors \cite{mpadams2013, mpadams2015}.
+\jcr{true. can you show it quickly? not needed on a paper, but it's nice to show tidbits of understanding of lit review in a dissertation}
 
 \section{PDT's Performance Model}
 
 To aid in the selection of optimal processor and aggregation parameters, PDT uses a performance model to estimate the sweep time.
-This performance model is the basis for the cost function described in Chapter \ref{cha:tts}. 
+This performance model is the basis for the cost function described in Chapter \ref{cha:tts}.
 Equation \ref{sweep_time} calculates the sweep time by multiplying the time it takes to solve each stage by the number of stages. This is then multiplied by a multi-core fudge factor that estimates the performance drop-off from 1 to 8 cores.
 \begin{equation}
 \text{Sweep Time} = \text{mcff}\cdot[\text{num stages}\cdot(T_{wu} + 3\cdot \text{latency}\cdot M_L + T_{\text{byte}}\cdot N_{\text{bytes}} + N_{\text{cells}}\cdot ( T_c +  A_m\cdot (T_m + T_g)))],
@@ -154,3 +159,4 @@ where:
 
 A comparison between this performance model and the time-to-solution estimator will be shown in Chapter \ref{cha:tts}.
 
+\jcr{any hope to compare PDT's performance model with KBA, for the aggregation params of the excel sheet???}
