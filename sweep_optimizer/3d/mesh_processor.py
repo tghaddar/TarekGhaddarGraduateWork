@@ -224,7 +224,7 @@ def check_add_cell(polygon,int_bounds,bounds):
   return add_cell,add_bdy_cell
 
 
-def get_cells_per_subset_2d_robust(cell_verts,vert_data,boundaries,adjacency_matrix,numrow,numcol,add_cells):
+def get_cells_per_subset_2d_robust(cell_verts,vert_data,boundaries,adjacency_matrix,numrow,numcol):
   #Number of subsets.
   num_subsets = len(boundaries)
   #Stores the number of cells per subset.
@@ -266,16 +266,21 @@ def get_cells_per_subset_2d_robust(cell_verts,vert_data,boundaries,adjacency_mat
     for polygon in polygons:
       if polygon.within(subset):
         cells_per_subset[s] += 1
-        continue
+        #polygons.remove(polygon)
       elif polygon.intersects(subset):
-        intersect = polygon.intersection(subset)
-        int_bounds = which_bounds(intersect,bounds)
-        for i in int_bounds:
-          is_nat_boundary = check_nat_boundary(polygon,bounds[i])
-          if is_nat_boundary == False:
-            break
-        if is_nat_boundary == False:
+        #Checking for natural boundaries. If the only intersection is a natural boundary on the exterior of the subset, then we don't add the cell to this subset.
+        if polygon.touches(subset):
+          continue
+        else:
           cells_per_subset[s] += 1
+        #intersect = polygon.intersection(subset)
+        #int_bounds = which_bounds(intersect,bounds)
+        #for i in int_bounds:
+        #  is_nat_boundary = check_nat_boundary(polygon,bounds[i])
+        #  if is_nat_boundary == False:
+        #    break
+        #if is_nat_boundary == False:
+        #  cells_per_subset[s] += 1
     
     #The x length of the subset.
     Lx = xmax - xmin

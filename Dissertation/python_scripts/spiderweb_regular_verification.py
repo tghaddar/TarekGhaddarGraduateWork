@@ -28,8 +28,16 @@ Am = 36
 unweighted = True
 Ay = 1
 
-points = np.genfromtxt("unbalanced_pins_sparse_centroid_data").T
 verts = np.genfromtxt("unbalanced_pins_sparse_vert_data")
+f = open("lvl2_cell_verts",'r')
+level2_cell_data = [line.split() for line in f]
+for i in range(0,len(level2_cell_data)):
+  level2_cell_data[i] = [int(x) for x in level2_cell_data[i]]
+  
+f = open("sparse_pins_cell_verts",'r')
+sparse_pins_cell_data = [line.split() for line in f]
+for i in range(0,len(sparse_pins_cell_data)):
+  sparse_pins_cell_data[i] = [int(x) for x in sparse_pins_cell_data[i]]
 
 gxmin = 0.0
 gxmax = 10.0
@@ -48,7 +56,7 @@ for i in range(0,len(numrows)):
   params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
   add_cells = True
   
-  max_times.append( optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+  max_times.append( optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
 
 pdt_data = np.genfromtxt("spiderweb_regular_sweep_data.txt")
 pdt_data = np.reshape(pdt_data,(9,10))
