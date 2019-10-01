@@ -139,8 +139,20 @@ Plugging these definitions into Eq. \ref{paralleleff}, the PDT optimal parallel 
 	\label{eps_opt}
 \end{equation}
 
-In the limit of a large number of processors $P$, the optimal algorithm yields the same efficiency as KBA with 32 times as many processors \cite{mpadams2013, mpadams2015}.
-\jcr{true. can you show it quickly? not needed on a paper, but it's nice to show tidbits of understanding of lit review in a dissertation}
+Let's consider how many more processors the hybrid partitioning with optimal scheduling ($P_z = 2$) can use while yielding the same efficiency as KBA.
+Let's consider the limit of a large number of processors for both KBA and hybrid partioning with an optimal schedule.
+Equation \ref{large_p_kba} shows the KBA efficiency in the large-P limit with $P_x + P_y \approx 2P^{1/2}$.
+Setting $A_m = A_g = 1$ to match traditional KBA aggregation parameters, Eq. \ref{large_p_opt} shows the hybrid optimal efficiency in the large-P limit with $P_z = 2$ and $P_x + P_y \approx 2P^{1/2}$.  
+\begin{equation}
+  \epsilon_{KBA} \xrightarrow{\text{large P}} \frac{1}{[1 + \frac{(4P^{1/2})}{8MN_k}][ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}}]}
+  \label{large_p_kba}
+\end{equation}
+\begin{equation}
+  \epsilon_{opt,hybrid} \xrightarrow{\text{large P}} \frac{1}{[1 + \frac{\sqrt{2}P^{1/2}}{8MN_k}][ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}} ]}
+  \label{large_p_opt}
+\end{equation}
+
+If we set Eq. \ref{large_p_kba} equal to Eq. \ref{large_p_opt}, we see that in the limit of a large number of processors $P$, the optimal algorithm yields the same efficiency as KBA with 32 times as many processors \cite{mpadams2013, mpadams2015}.
 
 \section{PDT's Performance Model}
 
@@ -169,5 +181,3 @@ where:
 \end{itemize}
 
 A comparison between this performance model and the time-to-solution estimator will be shown in Chapter \ref{cha:tts}.
-
-\jcr{any hope to compare PDT's performance model with KBA, for the aggregation params of the excel sheet???}
