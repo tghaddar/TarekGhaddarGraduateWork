@@ -44,7 +44,6 @@ Fine-grain work units are aggregated into coarser-grained units called \textit{t
 It follows that each process owns $N_k$ cellsets (each of which is $A_z$ planes of $A_x A_y$ cells), $8N_m$ angle-sets, and $N_g$ group-sets for a total of $8N_m N_g N_k$ tasks.
 
 One task contains $A_x A_y A_z$ cells, $A_m$ directions, and $A_g$ groups. Equivalently, a task is the computation of one cellset, one groupset, and one angleset, with the completion of one task defined as a stage.  The stage is particularly important when assessing sweeps against analytical performance models. 
-\jcr{where are octant pairs defined?}\\
 Equation ~\eqref{paralleleff} defines parallel sweep efficiency:
 \begin{equation}\label{paralleleff}
 \begin{split}
@@ -54,19 +53,18 @@ Equation ~\eqref{paralleleff} defines parallel sweep efficiency:
 \end{equation}
 where $N_\text{idle}$ is the number of idle stages per processor, $N_\text{tasks}$ is the number of tasks each processor performs, $T_\text{comm}$ is the time to communicate after completion of a task, and $T_\text{task}$ is the time it takes to compute one task.
 Equations ~\eqref{Tcomm} and ~\eqref{Ttask} show how $T_{\text{comm}}$ and $T_{\text{task}}$ are calculated:
-\begin{equation}
-T_{\text{comm}} = M_L T_{\text{latency}} + T_{\text{byte}} N_{\text{bytes}},
-\label{Tcomm}
-\end{equation}
 \begin{align}
-T_{\text{task}} &= A_x A_y A_z A_m A_g T_{\text{grind}}, \\
-N_{\text{bytes}} &= (A_x A_y + A_x A_z + A_y A_z)A_g A_m upbc, 
-\label{Ttask}
+T_{\text{comm}} &= M_L T_{\text{latency}} + T_{\text{byte}} N_{\text{bytes}}, \\
+N_{\text{bytes}} &= (A_x A_y + A_x A_z + A_y A_z)A_g A_m upbc,
+\label{Tcomm}
 \end{align}
+\begin{equation}
+T_{\text{task}} = A_x A_y A_z A_m A_g T_{\text{grind}},
+\label{Ttask}
+\end{equation}
 where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, $upbc$ is the unknowns per boundary cell (generally 2 for 2D and 4 for 3D) and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. Note that Eq. \ref{Ttask} is idealized as it does not take into account overhead in various parts of the sweep implementation.
 
 Before expanding on the proposed method of partitioning and scheduling for parallel transport sweeps, a quick review of two parallel transport sweep algorithms is necessary. This dissertation's method will expand on PDT's sweep algorithm \cite{mpadams2013,mpadams2015}, which is an extension of the popular KBA algorithm \cite{KBA}.
-\jcr{I don't see my comments addressed. Talk to me and explain.}
 
 \section{The KBA Algorithm}\label{sec:KBA}
 
@@ -75,16 +73,15 @@ Several parallel transport sweep codes use KBA partitioning in their sweeping, s
 The KBA algorithm traditionally chooses $P_z = 1, A_m = 1 \text{ (or 1 angle per angleset)}, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. This partitions the domain into long, thin columns. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. The KBA algorithm traditionally solves a problem one energy group at a time, and uses a ``pipelining'' or assembly line approach. This allows for new angles in an octant to begin sweeping before old angles have fully swept across the spatial domain. Figure \ref{pipeline_example} shows an example of pipelining the angular work of a quadrant.
 Figure \ref{pipeline_example_3d} shows pipelining in the X-Z plane with $A_z = 1$. 
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
-\includegraphics[scale=0.75]{../figures/pipeline_example.pdf}
+\includegraphics[scale=0.7]{../figures/pipeline_example.pdf}
 \caption{An example showing the pipelining of angular work from the lower left quadrant.}
 \label{pipeline_example}
 \end{figure}
-
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
-\includegraphics[scale=0.75,trim={0cm 1cm 0cm 0cm},clip]{../figures/pipeline_example_3d.pdf}
+\includegraphics[scale=0.7,trim={0cm 1cm 0cm 0cm},clip]{../figures/pipeline_example_3d.pdf}
 \caption{An example showing pipelining in the X-Z plane with $A_z = 1$, $P_x = 2$ and $P_z = 1$.}
 \label{pipeline_example_3d}
 \end{figure}
@@ -93,13 +90,17 @@ In Fig. \ref{pipeline_example}, each square represents a processor that owns a g
 Figure \ref{pipeline_example_3d} shows us the X-Z plane of a processor layout with $P_x = 2$ and $P_z = 1$. We see $N_k=\frac{N_z = 5}{A_z = 1}=5$ planes in Z, and three angles pipelined. We notice as soon as a cellset of $A_xA_yA_z$ cells is free to solve the next angle with the same sweep ordering, it begins immediately.
 KBA introduced pipelining in order to combat the inherent inefficiencies of waiting for all processors to complete a sweep in a direction before starting the next angle.
 
-There are two variants to the KBA algorithm, ``successive in angle, successive in quadrant", and ``simultaneous in angle, successive in quadrant".  With ``successive in angle, successive in quadrant", an octant pipelines its angular work, and once all directions are complete the opposing octant pipelines them back. This is then done for the remaining octant pairs. With ``simultaneous in angle, successive in quadrant", all angles from one octant are simultaneously solved, and upon completion the opposing octant solves them. This is then done for the remaining octant pairs. The KBA parallel efficiency \cite{mpadams2013} for ``successive in angle, successive in quadrant" is:
+There are two variants to the KBA algorithm, ``successive in angle, successive in quadrant", and ``simultaneous in angle, successive in quadrant".  With ``successive in angle, successive in quadrant", an octant pipelines its angular work, and once all directions are complete the opposing octant pipelines them back. This is then done for the remaining octant pairs. With ``simultaneous in angle, successive in quadrant", all angles from one octant are aggregated and solved rather than pipelined, and upon completion the opposing octant solves them. This is done either by aggregating angles, This is then done for the remaining octant pairs. The KBA parallel efficiency \cite{mpadams2013} for ``successive in angle, successive in quadrant" is:
 \begin{equation}
   \epsilon_{KBA} = \frac{1}{[1 + \frac{4(P_x+P_y-2)}{8MN_k}][1 + \frac{T_{\text{comm}}}{T_{\text{{task}}}}]}.
   \label{eps_kba}
 \end{equation}
+The KBA parallel efficiency for ``simultaneous in angle, successive in quadrant'' is:
+\begin{equation}
+   \epsilon_{KBA} = \frac{1}{[1 + \frac{4(P_x+P_y-2)}{8MN_k/(A_m)}][1 + \frac{T_{\text{comm}}}{T_{\text{{task}}}}]}.
+   \label{eps_kba_simul}
+\end{equation}
 For each octant-pair, the idle time is $P_x + P_y - 2$, and if the successive octant-pairs don't start until the previous octant pair finishes, then the total idle time is $4(P_x + P_y - 2)$. 
-\jcr{Also, how about the other variant of KBA? what's its formula?}
 
 \section{PDT's extension of KBA}\label {pdt_extension}
 
@@ -131,9 +132,7 @@ N_\text{idle} = 2N_{\text{fill}}
 N_\text{tasks} = 8N_mN_gN_k
 \label{ntasks}
 \end{equation}
-\jcr{Commnet not addressed}
-
-Plugging these definitions into Eq. \ref{paralleleff}, the PDT optimal parallel efficiency\cite{mpadams2013} is:
+Plugging these definitions into Eq. \ref{paralleleff}, the PDT optimal parallel efficiency \cite{mpadams2013} for $P_u$ even is:
 \begin{equation}
 	\epsilon_{opt} = \frac{1}{ [1 + \frac{P_x + P_y - 4 + N_k(P_z -2)}{8MGN_k/(A_m A_G)} ]  [ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}} ]}
 	\label{eps_opt}
@@ -180,4 +179,4 @@ where:
   \item $T_g$ = the time spent solving group-specific work.
 \end{itemize}
 
-A comparison between this performance model and the time-to-solution estimator will be shown in Chapter \ref{cha:tts}.
+A comparison between this performance model and the time-to-solution estimator will be shown in Chapter \ref{cha:tts}. Before this, we motivate the need for the time-to-solution estimator in Chapter \ref{cha:lb} by describing unstructured meshes in PDT and how we load balance them.
