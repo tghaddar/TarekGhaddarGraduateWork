@@ -1,6 +1,7 @@
 import numpy as np
 import sys
-sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
+#sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
+sys.path.append(r'C:\Users\tghad\Documents\GitHub\TarekGhaddarGraduateWork\sweep_optimizer\3d')
 from sweep_solver import optimized_tts_numerical,unpack_parameters,plot_subset_boundaries_2d
 from mesh_processor import create_2d_cuts
 from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_highest_jumps
@@ -19,7 +20,7 @@ gymax = 54.994
 t_comm = 4.47e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
-m_l = 50
+m_l = 85
 latency = 4110.0e-09
 #Solve time per cell..
 Tc = 1208.383e-09
@@ -28,7 +29,7 @@ upbc = 2.0
 Twu = 147.0754e-09
 Tm = 65.54614e-09
 Tg = 175.0272e-09
-mcff = 1.32
+mcff = 1.181
 machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 num_angles = 1
 Am = 36
