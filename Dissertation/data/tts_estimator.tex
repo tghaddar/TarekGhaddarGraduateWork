@@ -20,7 +20,7 @@ With the introduction of unstructured meshes and imbalanced partitions in PDT, w
 In addition, before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme.
 The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This chapter will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies.
 
-The time-to-solution estimator \jcr{hyphens missing. check throughout. do note that this comment was in my first set of comments. it feels like you did not religiously go through 100\% of those comments} is written in Python 3. Python was chosen as the language because of its powerful graph library, {\tt networkx} \cite{networkx}.
+The time-to-solution estimator is written in Python 3. Python was chosen as the language for its powerful graph library, {\tt networkx} \cite{networkx}.
 This library gives us a wide variety of graph mathematics and is easy to use.
 Before detailing the time-to-solution estimator's methodology, a description of the applicable basic graph theory is necessary.
 
@@ -50,7 +50,7 @@ In this dissertation, we only use Directed Acyclic Graphs (DAGs), or a graph tha
 \caption{A directed graph with a cycle between nodes 1 and 3.}
 \label{cycle_example}
 \end{figure}
-We notice the edge connecting nodes 1 and 3 has a double headed arrow, representing a cycle. Graphs with cycles can be solved for a variety of applications through the use of cycle detection and breaking algorithms, but our partitioning scheme cuts subsets in a fashion that doesn't \jcr{no abbrev. check throughout} allow for cyclical graphs.
+We notice the edge connecting nodes 1 and 3 has a double headed arrow, representing a cycle. Graphs with cycles can be solved for a variety of applications through the use of cycle detection and breaking algorithms, but our partitioning scheme cuts subsets in a fashion that does not \jcr{no abbrev. check throughout} allow for cyclical graphs.
 
 Graph edges can be weighted based on the need of the application the graph is being used for. Here, we weight the graph edges to represent the time it takes to solve node A plus the communication time to node B.
 Figure \ref{weighted_directed_graph} shows a weighted directed graph.
@@ -87,9 +87,9 @@ Now that the applicable graph theory has been reviewed, we detail the methodolog
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Method}
-The time-to-solution estimator determines the time to sweep across a domain by:
+The time-to-solution estimator determines the time to sweep across a domain for a given partitioning scheme by:
 \begin{enumerate}
-	\item Given a partitioning scheme, building an adjacency matrix,
+	\item Building an adjacency matrix,
 	\item Building Directed Acyclic Graphs (DAGs) from the adjacency matrix, one for each quadrant/octant,
 	\item Weighting the edges of each graph based on the solve time and communication time of each subset to its neighbors,
      \item Adding and modifying graph weights based on how many anglesets are pipelined,
@@ -100,21 +100,21 @@ The time-to-solution estimator determines the time to sweep across a domain by:
 
 \subsection{Building the adjacency matrices}
 
-Before building the graph for each quadrant/octant, an adjacency matrix must be built for the given partitioning scheme.
-The adjacency matrix proves\jcr{? provides? another comment that was already present before ... will there be more many more?} connectivity information for each subset to its neighboring subset.
-The adjacency building process relies on a major assumption: The z dimension has partitions all the way across the domain, then the x dimension has partitions per plane, then the y dimension has partitions per plane per column.
-In future work, these three dimensions can be made interchangeable, but in the present work, this ordering is fixed. \jcr{I fixed the previous sentence. I had put wiggles under it. It looks like most of my comments on the first draft have not been addressed so I am going to stop here. I will just look at the results if they are different but I expect you to go back to the first set of comments are implement them before I read in detail more of this. VERY IMPORTANT. Put a new version before this Saturday, 10pm TX time. Again, subsequent comments will only be about resuts as I expect you to go back and finish work on the text, per initial review.}
+Before building the graph for each quadrant/octant, an adjacency matrix must be built for a given partitioning scheme. The partitioning scheme is the cut lines/planes that partition the mesh into subsets, which correspond to the processor layout.
+The adjacency matrix provides connectivity information for each subset to its neighboring subset.
+The adjacency building process relies on a major assumption: the z dimension has partitions all the way across the domain, then the x dimension has partitions per plane, then the y dimension has partitions per plane per column.
+In future work, these three dimensions can be made interchangeable, but in the present work, this ordering is fixed.
 
 Figure \ref{25basematrix} shows a partitioning scheme for 3 subsets each in the x and y dimensions with its corresponding adjacency matrix.
 
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
 \centering
-\includegraphics[scale=0.55]{../../figures/boundaries_worst.pdf}
+\includegraphics[scale=0.7]{../../figures/boundaries_worst.pdf}
 \end{minipage}
 \begin{minipage}[c]{0.6\textwidth}
 \centering
-\scalebox{0.5}{
+\scalebox{0.75}{
 $\begin{pmatrix}
 0&1&0&1&0&0&0&0&0\\
 1&0&1&1&0&0&0&0&0\\
@@ -135,7 +135,7 @@ $\begin{pmatrix}
 
 The adjacency matrices give us directed connectivity information in order to build our graphs. This process differs slightly from 2D to 3D. Both processes use on networkx's DiGraph function to build the DAGs.
 
-\subsubsection{Building the 2d graphs}
+\subsubsection{Building the 2D graphs}
 In two dimensions, we build four graphs corresponding to four quadrants.
 We define the quadrants in the following manner:
 \begin{itemize}
@@ -151,13 +151,13 @@ Figure \ref{quadrant_layout} illustrates this numbering.
 \caption{The quadrant layout for 2D problems.}
 \label{quadrant_layout}
 \end{figure}
-The initial adjacency matrix we obtain can be immediately used to build the graphs for quadrants 0 and 3 by using networkx's DiGraph function.
+The initial adjacency matrix we obtain can be immediately used to build the graphs for quadrants 0 and 3 by using {\tt networkx's} DiGraph function.
 We feed the upper triangular portion of the adjacency matrix to DiGraph to get the quadrant 0 graph, and the lower triangular portion to get the quadrant 3 graph.
 Utilizing the same partitioning scheme shown in Fig. \ref{25basematrix}, pull the upper triangular and lower triangular portions of the matrix, shown in Fig. \ref{25baseportionmatrices}.
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
 \centering
-\scalebox{0.6}{
+\scalebox{0.75}{
 $\begin{pmatrix}
 0&1&0&1&0&0&0&0&0\\
 0&0&1&1&0&0&0&0&0\\
@@ -172,7 +172,7 @@ $\begin{pmatrix}
 \end{minipage}
 \begin{minipage}[c]{0.5\textwidth}
 \centering
-\scalebox{0.6}{
+\scalebox{0.75}{
 $\begin{pmatrix}
 0&0&0&0&0&0&0&0&0\\
 1&0&0&0&0&0&0&0&0\\
@@ -188,10 +188,7 @@ $\begin{pmatrix}
 \caption{The upper triangular (left) and lower triangular (right) portions of the adjacency matrix in Fig. \ref{25basematrix}.}
 \label{25baseportionmatrices}
 \end{figure}
-These matrix portions provide connectivity \textit{and} dependency information for quadrants 0 and 3.
-With this information, network's DiGraph function is able to construct the DAGs for these quadrants.
 Figure \ref{25_q0q3graphs} shows the the DAGS associated with quadrants 0 and 3, built from the adjacency matrices in Fig. \ref{25baseportionmatrices}.
-
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
 \includegraphics[scale=0.5]{../../figures/9_graph0.pdf}
@@ -199,11 +196,11 @@ Figure \ref{25_q0q3graphs} shows the the DAGS associated with quadrants 0 and 3,
 \begin{minipage}[c]{0.5\textwidth}
 \includegraphics[scale=0.5]{../../figures/9_graph3.pdf}
 \end{minipage}
-\caption{The quadrant 0 DAG (left) and the quadrant 3 DAG(right).}
+\caption{The quadrant 0 DAG (left) and the quadrant 3 DAG (right).}
 \label{25_q0q3graphs}
 \end{figure}
 \jcr{arrows are too small in the figures}\\
-Upon inspection of these two DAGs, we see that they show the correct connectivity, dependency, and expected opposing sweep ordering.
+Upon inspection of these two DAGs, we see that they show the expected connectivity, dependency, and opposing sweep ordering.
 Quadrant 0 starts its sweep from subset 0, finishing at subset 8, and quadrant 3 starts its sweep from subset 8, finishing at subset 0.
 
 To obtain the graphs for quadrants 1 and 2, a ``flipped'' version of the adjacency matrix is necessary.
@@ -211,11 +208,11 @@ We temporarily renumber the subsets starting from the top left corner, and incre
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
 \centering
-\includegraphics[scale=0.55]{../../figures/boundaries_worst_flipped.pdf}
+\includegraphics[scale=0.7]{../../figures/boundaries_worst_flipped.pdf}
 \end{minipage}
 \begin{minipage}[c]{0.5\textwidth}
 \centering
-\scalebox{0.6}{
+\scalebox{0.75}{
 $\begin{pmatrix}
 0&1&0&1&1&1&0&0&0\\
 1&0&1&0&0&1&0&0&0\\
@@ -243,7 +240,7 @@ We feed the triangular matrices into networkx's DiGraph function, along with a m
 \caption{The quadrant 1 DAG (left) and the quadrant 2 DAG(right).}
 \label{25_q1q2graphs}
 \end{figure}
-Upon inspection of these two DAGs, we see that they show the correct connectivity, dependency, and expected opposing sweep ordering.
+Upon inspection of these two DAGs, we see that they show the expected connectivity, dependency, and opposing sweep ordering.
 Quadrant 1 starts its sweep from subset 2, finishing at subset 6, and quadrant 2 starts its sweep from subset 6, finishing at subset 2.
 
 %Weighting the TDGS
@@ -270,7 +267,7 @@ where:
   \item $T_m$ = the time spent solving angle-specific work,
   \item $T_g$ = the time spent solving group-specific work.
 \end{itemize}
-The weighting function is based on PDT's performance model\cite{mpadams2015}, which is specific to how PDT solves the transport sweep. The cost function can be modified based on different sweep methodologies if a user desires.
+The weighting function is based on PDT's performance model \cite{mpadams2013,mpadams2015}, which is specific to how PDT solves the transport sweep. The cost function can be modified based on different sweep methodologies if a user desires.
 
 As shown in Eq. \ref{weight_function}, a crucial part of determining the weight of each edge is knowing the number of cells each subset has, and the amount of shared boundary cells with each neighbor. Given a mesh density, the number of cells per subset is given by Eq \ref{cellspersubset}:
 \begin{equation}
@@ -316,7 +313,7 @@ For each node in each graph, we:
   \item Sum the weights of the edges along the longest path,
   \item Set all incoming edge values to the node to the sum of the longest path.
 \end{enumerate}
-The incoming edges to each node in each graph now reflect the time at which a node is ready to solve. This universal edge weighting is crucial for detecting and resolving conflicts during the sweep. Figure \ref{universal} shows a simple example of a TDG before and after this weight adjustment.
+The incoming edges to each node in each graph now reflect the time at which a node is ready to solve. This universal edge weighting is used for detecting and resolving conflicts during the sweep. It is important to note that our DAGs are now task dependence graphs (TDGs). We now know which node is ready to solve at each time $t$, which provides us with a schedule. Figure \ref{universal} shows a simple example of a DAG becoming a TDG.
 \begin{figure}[H]
   \begin{minipage}[c]{0.5\textwidth}
     \centering
@@ -330,11 +327,12 @@ The incoming edges to each node in each graph now reflect the time at which a no
    \label{universal}
 \end{figure}
 
-\subsection{Modifying the weights of each graph to detect and resolve conflicts}\label{sec:conflict}
+\subsection{Modifying the weights of each graph to reflect conflict resolution}\label{sec:conflict}
 
 At this point in the time-to-solution estimation process, we have a graph per octant/quadrant per angleset, with each graph weighted on a universal time scale.
 For each node in every graph, the incoming edges to the node represent the time $t$ that it is ready to solve at.
 The time to solution is best summarized as a ``marching'' process:
+\jcr{FROM TAREK: You seem to really dislike when I say a graph is solving a node. While I understand that this physically might not make sense, I believe it is the best way to get the point across in our abstraction of the sweep process.}
 \begin{enumerate}
   \item Starting at time $t=0$, find the nodes that are ready to solve or already solving across all graphs.
   \item If at that time, multiple graphs are solving the same node, they are in conflict.
@@ -348,7 +346,7 @@ The first graph to arrive to a node will begin solving it, and the remaining gra
 The delay is reflected in the remaining graphs by adding the delay as a weight to the applicable edge and all downstream edges in the losing graphs.
 
 If two or more graphs arrive to a node at the same time, the octant with the greater remaining depth-of-graph (simply, more work remaining), wins.
-In the case of a tie in the depth-of-graph, the graph with the priority direction wins according to the following rules:
+In the case of a tie in the depth-of-graph remaining, the graph with the priority direction wins according to the following rules:
 \begin{enumerate}
     \item The graph with $\Omega_x > 0$ wins,
 	\item If multiple graphs have $\Omega_x > 0$, then the task with $\Omega_y > 0$ wins,
@@ -362,7 +360,7 @@ Once all graphs have had their weights modified for conflicts, the graphs now re
 
 \section{2D Verification}
 
-A theoretical study in 2D was run to verify the time-to-solution estimator for 2D partitioning schemes with perfectly balanced partitions. The test problems were verified against a code written by Jean Ragusa that uses a depth-of-graph with an octant priority tie breaker scheduler in two dimensions. The verification study consists of the following problems:
+A theoretical study in 2D is run to verify the time-to-solution estimator for 2D partitioning schemes with perfectly balanced partitions. The test problems are verified against a code written by Jean Ragusa that uses a depth-of-graph with an octant priority tie breaker scheduler in two dimensions. The verification study consists of the following problems:
 \begin{enumerate}
 	\item 2x2 to 10x10 subsets in x and y with regular partitions and 1 to 6 anglesets per quadrant.
 	\item 2x2 to 10x10 subsets in x and y with ``mildly random'' partitions and 1 to 6 anglesets per quadrant.
@@ -370,9 +368,9 @@ A theoretical study in 2D was run to verify the time-to-solution estimator for 2
 	\item  2x2 to 10x10 subsets in x and y with probable worst-case partitions and 1 to 6 anglesets per quadrant.
 \end{enumerate}
 
-"Mildly random" partitions keep the cut lines uniformly distributed in x, while the y cut lines vary slightly around the uniformly distributed cut lines of the regular partitions. Figure \ref{mild_random_partitions} shows examples of this partitioning style. "Random" partitions possesses no such limitations on either set of cut lines, as shown by Fig. \ref{random_partitions}. The ``mildly random'' and ``random'' partition styles mimic likely partitioning schemes we can expect from load-balancing-by-dimension.
+``Mildly random'' partitions keep the cut lines uniformly distributed in x, while the y cut lines vary slightly around the uniformly distributed cut lines of the regular partitions. Figure \ref{mild_random_partitions} shows examples of this partitioning style. ``Random'' partitions possesses no such limitations on either set of cut lines, as shown by Fig. \ref{random_partitions}. The ``mildly random'' and ``random'' partition styles mimic likely partitioning schemes we can expect from load-balancing-by-dimension.
 
-Figures \ref{regular_partitions}, \ref{mild_random_partitions}, \ref{random_partitions}, \ref{worst_partitions} show the four partitioning schemes and Figs. \ref{regular_verification}, \ref{mild_random_verification}, \ref{random_verification}, \ref{worst_verification} show the results of the verification study for each partitioning scheme. In the results, a stage is defined as the time it takes to solve all cells in a subset for an angle.
+Figures \ref{regular_partitions}, \ref{mild_random_partitions}, \ref{random_partitions}, \ref{worst_partitions} show the four partitioning schemes and Figs. \ref{regular_verification}, \ref{mild_random_verification}, \ref{random_verification}, \ref{worst_verification} show the results of the verification study for each partitioning scheme. In the results, a stage is defined as the time it takes to solve all cells in a subset for an angle, and communicate the boundary information to neighboring subsets.
 
 \subsection{Regular Partitions}
 
@@ -424,26 +422,26 @@ Figure \ref{mild_random_partitions} shows four examples of the``mildly random'' 
 \centering
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/4_mild_random.pdf}
-  \caption{4x4 subsets with``mildly random'' partitions.}
+  \caption{4x4 subsets with ``mildly random'' partitions.}
   \label{4mildrandom}
 \end{subfigure}
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/6_mild_random.pdf}
-  \caption{6x6 subsets with``mildly random'' partitions.}
+  \caption{6x6 subsets with ``mildly random'' partitions.}
   \label{6mildrandom}
 \end{subfigure}
 
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/8_mild_random.pdf}
-  \caption{8x8 subsets with``mildly random'' partitions.}
+  \caption{8x8 subsets with ``mildly random'' partitions.}
   \label{8mildrandom}
 \end{subfigure}
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/10_mild_random.pdf}
-  \caption{10x10 subsets with``mildly random'' partitions.}
+  \caption{10x10 subsets with ``mildly random'' partitions.}
   \label{10mildrandom}
 \end{subfigure}
-\caption{Examples of``mildly random'' partitioning.}
+\caption{Examples of ``mildly random'' partitioning.}
 \label{mild_random_partitions}
 \end{figure}
 
@@ -452,7 +450,7 @@ Using``mildly random'' partitions as shown in Fig. \ref{mild_random_partitions},
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{../figures/mild_random_verification.pdf}
-\caption{A 2D verification suite with``mildly random'' partitions run from 2x2 to 10x10 subsets with each case being run from 1 to 6 anglesets per quadrant.}
+\caption{A 2D verification suite with ``mildly random'' partitions run from 2x2 to 10x10 subsets with each case being run from 1 to 6 anglesets per quadrant.}
 \label{mild_random_verification}
 \end{figure}
 
@@ -463,26 +461,26 @@ Figure \ref{random_partitions} shows four examples of the``random''partitioning 
 \centering
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/4_random.pdf}
-  \caption{4x4 subsets with``random''partitions.}
+  \caption{4x4 subsets with ``random'' partitions.}
   \label{4random}
 \end{subfigure}
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/6_random.pdf}
-  \caption{6x6 subsets with``random''partitions.}
+  \caption{6x6 subsets with ``random'' partitions.}
   \label{6random}
 \end{subfigure}
 
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/8_random.pdf}
-  \caption{8x8 subsets with``random''partitions.}
+  \caption{8x8 subsets with ``random'' partitions.}
   \label{8random}
 \end{subfigure}
 \begin{subfigure}[b]{0.45\textwidth}
   \includegraphics[width=\textwidth]{../cut_line_files/10_random.pdf}
-  \caption{10x10 subsets with``random''partitions.}
+  \caption{10x10 subsets with ``random''partitions.}
   \label{10random}
 \end{subfigure}
-\caption{Examples of``random''partitioning.}
+\caption{Examples of ``random'' partitioning.}
 \label{random_partitions}
 \end{figure}
 
@@ -535,7 +533,7 @@ Using probable worst-case partitions as shown in Fig. \ref{worst_partitions}, th
 \jcr{ok. I am actually resuming from here because everything below is actually NEW!}
 
 PDT's performance model is used to verify stage counts for 3D problems with regular grids.
-Figure \ref{3d_verification} shows PDT's performance model stage counts matching perfectly with the time-to-solution estimator's stage counts for 2\textsuperscript{3} to 10\textsuperscript{3} subsets and from 1 to 6 angles per octant.
+Figure \ref{3d_verification} shows PDT's performance model stage counts are in perfect agreement with the time-to-solution estimator's stage counts for 2\textsuperscript{3} to 10\textsuperscript{3} subsets and from 1 to 6 angles per octant.
 
 \begin{figure}[H]
 \centering
