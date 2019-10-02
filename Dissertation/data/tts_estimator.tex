@@ -20,7 +20,7 @@ With the introduction of unstructured meshes and imbalanced partitions in PDT, w
 In addition, before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme.
 The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This chapter will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies.
 
-The time to solution estimator \jcr{hyphens missing. check throughout. do note that this comment was in my first set of comments. it feels like you did not religiously go through 100\% of those comments} is written in Python 3. Python was chosen as the language because of its powerful graph library, {\tt networkx} \cite{networkx}.
+The time-to-solution estimator \jcr{hyphens missing. check throughout. do note that this comment was in my first set of comments. it feels like you did not religiously go through 100\% of those comments} is written in Python 3. Python was chosen as the language because of its powerful graph library, {\tt networkx} \cite{networkx}.
 This library gives us a wide variety of graph mathematics and is easy to use.
 Before detailing the time-to-solution estimator's methodology, a description of the applicable basic graph theory is necessary.
 
@@ -332,7 +332,9 @@ The incoming edges to each node in each graph now reflect the time at which a no
 
 \subsection{Modifying the weights of each graph to detect and resolve conflicts}\label{sec:conflict}
 
-At this point in the time-to-solution estimation process, we have a graph per octant/quadrant per angleset, with each graph weighted on a universal time scale. For each node in every graph, the incoming edges to the node represent the time $t$ that it is ready to solve at. The time to solution is best summarized as a ``marching'' process:
+At this point in the time-to-solution estimation process, we have a graph per octant/quadrant per angleset, with each graph weighted on a universal time scale.
+For each node in every graph, the incoming edges to the node represent the time $t$ that it is ready to solve at.
+The time to solution is best summarized as a ``marching'' process:
 \begin{enumerate}
   \item Starting at time $t=0$, find the nodes that are ready to solve or already solving across all graphs.
   \item If at that time, multiple graphs are solving the same node, they are in conflict.
@@ -341,9 +343,12 @@ At this point in the time-to-solution estimation process, we have a graph per oc
   \item Repeat steps 2, 3, and 4 until all graphs are finished sweeping.
 \end{enumerate}
 
-When a conflict is detected, the time-to-solution estimator uses a first-come-first-serve conflict resolution method. The first graph to arrive to a node will begin solving it, and the remaining graphs that arrive while it is being solved will incur a delay. The delay is reflected in the remaining graphs by adding the delay as a weight to the applicable edge and all downstream edges in the losing graphs.
+When a conflict is detected, the time-to-solution estimator uses a first-come-first-serve conflict resolution method.
+The first graph to arrive to a node will begin solving it, and the remaining graphs that arrive while it is being solved will incur a delay.
+The delay is reflected in the remaining graphs by adding the delay as a weight to the applicable edge and all downstream edges in the losing graphs.
 
-If two or more graphs arrive to a node at the same time, the octant with the greater remaining depth-of-graph (simply, more work remaining), wins. In the case of a tie in the depth-of-graph, the graph with the priority direction wins according to the following rules:
+If two or more graphs arrive to a node at the same time, the octant with the greater remaining depth-of-graph (simply, more work remaining), wins.
+In the case of a tie in the depth-of-graph, the graph with the priority direction wins according to the following rules:
 \begin{enumerate}
     \item The graph with $\Omega_x > 0$ wins,
 	\item If multiple graphs have $\Omega_x > 0$, then the task with $\Omega_y > 0$ wins,
@@ -529,7 +534,7 @@ Using probable worst-case partitions as shown in Fig. \ref{worst_partitions}, th
 \section{3D Verification}
 \jcr{ok. I am actually resuming from here because everything below is actually NEW!}
 
-PDT's performance model was used to verify stage counts for 3D problems with regular grids. \jcr{as before, I have any issue with your choice of tense.}
+PDT's performance model is used to verify stage counts for 3D problems with regular grids.
 Figure \ref{3d_verification} shows PDT's performance model stage counts matching perfectly with the time-to-solution estimator's stage counts for 2\textsuperscript{3} to 10\textsuperscript{3} subsets and from 1 to 6 angles per octant.
 
 \begin{figure}[H]
@@ -635,7 +640,7 @@ To test how the time-to-solutions estimator performs on unstructured problems, w
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.75]{../../figures/spiderweb_reg_pdtvtts.pdf}
-\caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension.}
+\caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension with regular cuts.}
 \label{comp_reg_spiderweb}
 \end{figure}
 
@@ -655,6 +660,20 @@ To test how the time-to-solutions estimator performs on unstructured problems, w
 10&0.93\%
 \end{tabular}
 \end{table}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[scale=0.75]{../../figures/spiderweb_lb_pdtvtts.pdf}
+  \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension with load-balanced cuts.}
+\label{comp_lb_spiderweb}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[scale=0.75]{../../figures/spiderweb_lbd_pdtvtts.pdf}
+  \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension with load-balanced-by-dimension cuts.}
+\label{comp_lb_spiderweb}
+\end{figure}
 
 \begin{figure}[ht]
 \centering
