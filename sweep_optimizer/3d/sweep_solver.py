@@ -610,7 +610,11 @@ def add_edge_cost(graphs,global_subset_boundaries,cells_per_subset, bdy_cells_pe
         else:
           cost = Ay
       else:
-        cost = mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*upbc + num_cells*(Tc + Am*(Tm + Tg)))
+        #If we are the final subset, we don't communicate.
+        if neighbor == -1:
+          cost = mcff*(Twu + num_cells*(Tc + Am*(Tm + Tg)))
+        else:
+          cost = mcff*(Twu + num_neigh*latency*m_l + t_comm*boundary_cells*upbc + num_cells*(Tc + Am*(Tm + Tg)))
       graph[node][neighbor]['weight'] = cost
     
   for ig in range(0,num_graphs):
@@ -1829,6 +1833,7 @@ def optimized_tts_numerical(params,cell_verts,vert_data,global_xmin,global_xmax,
    #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_robust(cell_verts,vert_data,subset_bounds,adjacency_matrix,num_row,num_col) 
   print(cells_per_subset)
+  print(bdy_cells_per_subset)
   #Building the graphs.
   graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.

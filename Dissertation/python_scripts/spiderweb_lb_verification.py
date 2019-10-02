@@ -40,8 +40,8 @@ gxmax = 10.0
 gymin = 0.0
 gymax = 10.0
 
-numrows = [2,3,4,5,6,7,8,9,10]
-numcols = [2,3,4,5,6,7,8,9,10]
+numrows = [2,3,4,5,6,7,9,10]
+numcols = [2,3,4,5,6,7,9,10]
 max_times = []
 
 for i in range(0,len(numrows)):
@@ -55,3 +55,31 @@ for i in range(0,len(numrows)):
   add_cells = True
   
   max_times.append( optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+  
+pdt_data = np.genfromtxt("spiderweb_lb_sweep_data.txt")
+pdt_data = np.reshape(pdt_data,(8,10))
+pdt_data_median = np.empty(8)
+percent_diff = np.empty(8)
+for i in range(0,8):
+  median = np.median(pdt_data[i])
+  tts = max_times[i]
+  pdt_data_median[i] = median
+  percent_diff[i] = abs(tts-median)/median*100
+  
+plt.figure()
+plt.xlabel(r'$\sqrt{\rm{Number\ of\ Subsets}}$')
+plt.ylabel("Sweep Time (s)")
+plt.plot(numrows,pdt_data_median,'-o',label="PDT")
+plt.plot(numrows,max_times,'-o',label="TTS")
+plt.legend(loc="best")
+plt.savefig("../../figures/spiderweb_lb_pdtvtts.pdf")
+
+f = open("spiderweb_lb_percent_diff.txt",'w')
+f.write("\\textbf{$\sqrt{\\text{Num Subsets}}$} & \\bf PDT vs. TTS \\\ \hline \n")
+for i in range(0,len(numrows)):
+  f.write( str(numrows[i])+'&'+str(np.round(percent_diff[i],2))+'\%')
+  if i < len(numrows)-1:
+    f.write("\\\ \hline \n")
+  else:
+    f.write("\n")
+f.close()

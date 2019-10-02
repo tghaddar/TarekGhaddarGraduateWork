@@ -256,11 +256,6 @@ def get_cells_per_subset_2d_robust(cell_verts,vert_data,boundaries,adjacency_mat
     ymin = subset_bounds[2]
     ymax = subset_bounds[3]
     
-    xmin_bound = LineString([(xmin,ymin), (xmin,ymax)])
-    xmax_bound = LineString([(xmax,ymin), (xmax,ymax)])
-    ymin_bound = LineString([(xmin,ymin), (xmax,ymin)])
-    ymax_bound = LineString([(xmin,ymax), (xmax,ymax)])
-    bounds = [xmin_bound,xmax_bound,ymin_bound,ymax_bound]
     subset = MultiPoint([(xmin,ymin),(xmax,ymin),(xmax,ymax),(xmin,ymax)]).convex_hull
 
     for polygon in polygons:
@@ -273,14 +268,6 @@ def get_cells_per_subset_2d_robust(cell_verts,vert_data,boundaries,adjacency_mat
           continue
         else:
           cells_per_subset[s] += 1
-        #intersect = polygon.intersection(subset)
-        #int_bounds = which_bounds(intersect,bounds)
-        #for i in int_bounds:
-        #  is_nat_boundary = check_nat_boundary(polygon,bounds[i])
-        #  if is_nat_boundary == False:
-        #    break
-        #if is_nat_boundary == False:
-        #  cells_per_subset[s] += 1
     
     #The x length of the subset.
     Lx = xmax - xmin
