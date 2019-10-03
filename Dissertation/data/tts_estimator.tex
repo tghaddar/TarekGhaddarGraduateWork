@@ -672,7 +672,7 @@ Figure \ref{weak_scaling_tts} shows PDT's performance model and the time-to-solu
 The motivation to develop the time-to-solution estimator was born out of the desire to predict sweep time for unstructured meshes.
 To test how the time-to-solution estimator performs on unstructured problems, we use the meshes from our load balancing parametric study: the unbalanced pin mesh(Fig. \ref{partitioning_example}) and the Level 2 experiment mesh (Fig. \ref{level2_nocut_lbchapter}).
 
-The machine parameters used for all problems are:
+All problems were run with one energy group, one subset per processor, and 144 angles with $A_m = 36$, or 36 angles per angleset. The machine parameters used for all problems are:
 \begin{itemize}
   \item $T_c = 1208.383$ ns
   \item $T_m = 65.54614$ ns
@@ -832,7 +832,10 @@ The difference in schedule in addition to latency instabilities at 546 cores are
 In the future, the schedule from the time-to-solution estimator should be fed into PDT and see if the agreement improves.
 In addition, the latency on a machine like Quartz is easy to mischaracterize.
 A supercomputer of that size and in constant use can have differing latencies depending on how many nodes are in use and which particular nodes are in use.
-The data generated for the scaling suite was done during dedicated access time, when latencies are much easier to characterize with only one user using the entire machine.
+The data generated for the scaling suite was done during dedicated access time, when latencies are much easier to characterize with only one user using the entire machine, explaining the good agreement out to 16,000 cores.
+
+Additionally, the machine parameters were generated empirically using a serial suite of structured mesh problems.
+In the future, obtaining machine parameters should be attempted using unstructured meshes, and agreement between PDT and the time-to-solution estimator restudied.
 
 
 
