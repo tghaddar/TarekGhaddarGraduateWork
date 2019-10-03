@@ -671,42 +671,65 @@ Figure \ref{weak_scaling_tts} shows PDT's performance model and the time-to-solu
 \section{PDT vs. Time-to-Solution Estimator for Unstructured Meshes}
 
 The motivation to develop the time-to-solution estimator was born out of the desire to predict sweep time for unstructured meshes.
-To test how the time-to-solution estimator performs on unstructured problems, we use the meshes from our load balancing parametric study: the unbalanced pins (Fig. \ref{partitioning_example}) and the Level 2 experiment (Fig. \ref{level2_nocut_lbchapter}).
+To test how the time-to-solution estimator performs on unstructured problems, we use the meshes from our load balancing parametric study: the unbalanced pin mesh(Fig. \ref{partitioning_example}) and the Level 2 experiment mesh (Fig. \ref{level2_nocut_lbchapter}).
 
-Figure \ref{comp_reg_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for 2 to 10 subsets in each dimension with regular cuts. 
+For each result presented, the problem was run through PDT 10 times on the Quartz supercomputer.
+This allows us to filter out outlying values due to supercomputer noise by taking the median solve time per sweep for each problem.
+For each result in PDT, the median sweep time value, the maximum sweep time value, and the minimum sweep time value are plotted to showcase the outlying values that can occur. 
+In order to minimize the effects of the sweep overhead on the timing statistics, the solve time per sweep is calculated from the mean time of ten transport sweeps for each case.
+
+\subsection{PDT vs. the Time-to-Solution Estimator for the Unbalanced Pin Mesh}
+Figure \ref{comp_reg_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for the unbalanced pin mesh with 2 to 10 subsets in each dimension with regular cuts.
+Table \ref{diff_reg_spiderweb} tabulates the percent difference between PDT and the time-to-solution estimator for each of the regular test cases run.
+We notice that there is better agreement for cases where there are more unknowns. 
+These cases for the the unbalanced pin mesh with regular cuts are cases with 3, 4, 6, 7, 8, and 9 subsets in each dimension, with cut lines cutting through cells and increasing the total number of cells throughout the mesh. 
+Cases with 2, 5, and 10 subsets in each dimension have cuts coinciding with natural boundaries, adding no unknowns to the mesh.
+More unknowns lead to better timing statistics for PDT, increasing the likelihood of agreement with the time-to-solution estimator. 
 %spiderweb comp for reg
-\begin{figure}[ht]
+\begin{figure}[!ht]
 \centering
 \includegraphics[scale=0.75]{../../figures/spiderweb_reg_pdtvtts.pdf}
-\caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension with regular cuts.}
+\caption{The sweep times of the time-to-solution estimator and PDT for the unbalanced pin mesh for 2 to 10 subsets in each dimension with regular cuts.}
 \label{comp_reg_spiderweb}
 \end{figure}
-\begin{table}[ht]
+\begin{table}[!ht]
 \centering
 \caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig. \ref{comp_reg_spiderweb}.}
 \label{diff_reg_spiderweb}
 \begin{tabular}{c|c}
-\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline
-2&24.13\%\\ \hline
-3&11.84\%\\ \hline
-4&1.46\%\\ \hline
-5&10.08\%\\ \hline
-6&2.76\%\\ \hline
-7&7.76\%\\ \hline
-8&5.12\%\\ \hline
-9&3.68\%\\ \hline
-10&0.93\%
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline 
+2&19.93\%\\ \hline 
+3&12.3\%\\ \hline 
+4&1.75\%\\ \hline 
+5&15.69\%\\ \hline 
+6&2.71\%\\ \hline 
+7&2.61\%\\ \hline 
+8&4.45\%\\ \hline 
+9&3.21\%\\ \hline 
+10&11.38\%
 \end{tabular}
 \end{table}
 
+Figure \ref{comp_lb_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for 2 to 10 subsets in each dimension with load-balanced cuts.
+If we focus on the maximum PDT sweep time in the 5 subset case in Fig. \ref{comp_lb_spiderweb}, we can see that PDT can sometimes produce outliers during runs.
+For that reason, we take the median, not the mean, sweep time value from the ten PDT runs to get the best representation of PDT's solve time per sweep. 
+Table \ref{diff_lb_spiderweb} tabulates the percent difference between PDT and the time-to-solution estimator for each case run.
+We notice that we have poorer agreement with load-balanced cuts than with regular cuts, particularly for lower subset cases.
+This is possibly due to the first-come-first scheduler in PDT and the schedule of the time-to-solution estimator schedule not being in perfect agreement.
+While the time-to-solution estimator's schedule is deterministic, there are no guarantees that PDT's first-come-first-serve schedule is repeatable or that it matches the time-to-solution estimator.
+If there are two tasks that have a similar amount of unknowns, the processor with more unknowns may solve and communicate them faster than the processor with less unknowns.
+This would cause a disagreement between the time-to-solution estimator and PDT.
+The low subset cases happen to be the more balanced cases for the unbalanced pin mesh with load-balanced cuts.
+The 2, 3, and 4 subset cases for the unbalanced pin mesh have load-balance metric values of $f = 1.76, 2.58,$ and $2.38$ respectively.
+With a more even distribution of cells, PDT's first-come-first-serve schedule is likelier to deviate more as certain processors may be faster than their neighboring processors. 
 %spiderweb comp for lb
-\begin{figure}[ht]
+\begin{figure}[!ht]
   \centering
   \includegraphics[scale=0.75]{../../figures/spiderweb_lb_pdtvtts.pdf}
   \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension with load-balanced cuts.}
 \label{comp_lb_spiderweb}
 \end{figure}
-\begin{table}[ht]
+\begin{table}[!ht]
 \centering
 \caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig. \ref{comp_lb_spiderweb}.}
 \label{diff_lb_spiderweb}
@@ -723,14 +746,21 @@ Figure \ref{comp_reg_spiderweb} shows the sweep times for PDT and the time-to-so
 \end{tabular}
 \end{table}
 
+Figure \ref{comp_lbd_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for 2 to 10 subsets in each dimension with load-balanced-by-dimension cuts.
+Table \ref{diff_lbd_spiderweb} tabulates the percent difference between PDT and the time-to-solution estimator for each case run.
+The load-balanced-by-dimension cases for the unbalanced pin mesh have more consistent agreement than the regular cut and load-balanced cut cases.
+With load balancing by dimension, more cells are consistently created by slicing through cells in order to get more balanced partitions. 
+By increasing the number of unknowns, we get better timing statistics for the solve time per sweep. 
+In addition, with load-balanced-by-dimension partitions, PDT's first-come-first-serve scheduler is more likely to agree with the time-to-solution estimators. 
+The communication dependencies inherently created by load-balanced-by-dimension partitions mitigate the likelihood of faster processors disrupting the expected schedule, as seen with the load-balanced cases. 
 %%%spiderweb comp for lbd
-\begin{figure}[ht]
+\begin{figure}[!ht]
   \centering
   \includegraphics[scale=0.75]{../../figures/spiderweb_lbd_pdtvtts.pdf}
   \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension with load-balanced-by-dimension cuts.}
 \label{comp_lbd_spiderweb}
 \end{figure}
-\begin{table}[ht]
+\begin{table}[!ht]
 \centering
 \caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig. \ref{comp_lbd_spiderweb}.}
 \label{diff_lbd_spiderweb}
@@ -745,6 +775,9 @@ Figure \ref{comp_reg_spiderweb} shows the sweep times for PDT and the time-to-so
 10&12.01\%
 \end{tabular}
 \end{table}
+
+\FloatBarrier
+\subsection{PDT vs. the Time-to-Solution Estimator for the Level 2 Experiment Mesh}
 
 \begin{figure}[ht]
 \centering
