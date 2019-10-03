@@ -652,7 +652,7 @@ Figure \ref{weak_scaling_tts} shows PDT's performance model and the time-to-solu
 \end{figure}
 \begin{table}[ht]
 \centering
-\caption{The percent difference between PDT and its performance model, PDT's performance model and the time-to-solution estimator, and PDT and the time-to-solution estimator.}
+\caption{The percent difference between (1) PDT and its performance model, (2) PDT's performance model and the time-to-solution estimator, and (3) PDT and the time-to-solution estimator.}
 \label{scaling_percent_diff}
 \begin{tabular}{c|c|c|c}
 \textbf{Cores} & \textbf{PDT v. Perf.} & \textbf{Perf. v. TTS} & \textbf{PDT v. TTS} \\ \hline
@@ -671,22 +671,20 @@ Figure \ref{weak_scaling_tts} shows PDT's performance model and the time-to-solu
 \section{PDT vs. Time-to-Solution Estimator for Unstructured Meshes}
 
 The motivation to develop the time-to-solution estimator was born out of the desire to predict sweep time for unstructured meshes.
-To test how the time-to-solutions estimator performs on unstructured problems, we use the meshes from our load balancing parametric study: the unbalanced pins (Fig. \ref{partitioning_example}) and the level Level 2 experiment (Fig. \ref{level2_nocut_lbchapter}).
+To test how the time-to-solution estimator performs on unstructured problems, we use the meshes from our load balancing parametric study: the unbalanced pins (Fig. \ref{partitioning_example}) and the Level 2 experiment (Fig. \ref{level2_nocut_lbchapter}).
 
-\jcr{each figure and table needs to be discussed in the text}\\
-
-\jcr{I do not understand the LBD meshes for level-2. the x-cuts go all the way across. fine. however, this is actually not true. so x-cut do not go all the way, around x=18 and y=53 in the supposedly evenly partitioned case. what's going on with the level-2 mesh ???}
-
+Figure \ref{comp_reg_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for 2 to 10 subsets in each dimension with regular cuts. 
+%spiderweb comp for reg
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.75]{../../figures/spiderweb_reg_pdtvtts.pdf}
 \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension with regular cuts.}
 \label{comp_reg_spiderweb}
 \end{figure}
-
 \begin{table}[ht]
 \centering
 \caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig. \ref{comp_reg_spiderweb}.}
+\label{diff_reg_spiderweb}
 \begin{tabular}{c|c}
 \textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline
 2&24.13\%\\ \hline
@@ -701,19 +699,52 @@ To test how the time-to-solutions estimator performs on unstructured problems, w
 \end{tabular}
 \end{table}
 
+%spiderweb comp for lb
 \begin{figure}[ht]
   \centering
   \includegraphics[scale=0.75]{../../figures/spiderweb_lb_pdtvtts.pdf}
   \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension with load-balanced cuts.}
 \label{comp_lb_spiderweb}
 \end{figure}
+\begin{table}[ht]
+\centering
+\caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig. \ref{comp_lb_spiderweb}.}
+\label{diff_lb_spiderweb}
+\begin{tabular}{c|c}
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline 
+2&15.9\%\\ \hline 
+3&23.52\%\\ \hline 
+4&41.83\%\\ \hline 
+5&6.15\%\\ \hline 
+6&10.67\%\\ \hline 
+7&8.43\%\\ \hline 
+9&15.47\%\\ \hline 
+10&7.88\%
+\end{tabular}
+\end{table}
 
+%%%spiderweb comp for lbd
 \begin{figure}[ht]
   \centering
   \includegraphics[scale=0.75]{../../figures/spiderweb_lbd_pdtvtts.pdf}
   \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension with load-balanced-by-dimension cuts.}
-\label{comp_lb_spiderweb}
+\label{comp_lbd_spiderweb}
 \end{figure}
+\begin{table}[ht]
+\centering
+\caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig. \ref{comp_lbd_spiderweb}.}
+\label{diff_lbd_spiderweb}
+\begin{tabular}{c|c}
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline 
+2&6.5\%\\ \hline 
+3&13.49\%\\ \hline 
+4&4.04\%\\ \hline 
+6&2.78\%\\ \hline 
+7&3.5\%\\ \hline 
+9&4.18\%\\ \hline 
+10&12.01\%
+\end{tabular}
+\end{table}
 
 \begin{figure}[ht]
 \centering

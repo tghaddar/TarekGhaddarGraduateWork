@@ -59,11 +59,15 @@ for i in range(0,len(numrows)):
 pdt_data = np.genfromtxt("spiderweb_lbd_sweep_data.txt")
 pdt_data = np.reshape(pdt_data,(7,10))
 pdt_data_median = np.empty(7)
+pdt_data_min = np.empty(7)
+pdt_data_max = np.empty(7)
 percent_diff = np.empty(7)
 for i in range(0,7):
   median = np.median(pdt_data[i])
   tts = max_times[i]
   pdt_data_median[i] = median
+  pdt_data_min[i] = np.min(pdt_data[i])
+  pdt_data_max[i] = np.max(pdt_data[i])
   percent_diff[i] = abs(tts-median)/median*100
   
 plt.figure()
@@ -71,6 +75,8 @@ plt.xlabel(r'$\sqrt{\rm{Number\ of\ Subsets}}$')
 plt.ylabel("Sweep Time (s)")
 plt.plot(numrows,pdt_data_median,'-o',label="PDT")
 plt.plot(numrows,max_times,'-o',label="TTS")
+plt.plot(numrows,pdt_data_min,'x',label="PDT Min")
+plt.plot(numrows,pdt_data_max,'x',label="PDT Max")
 plt.legend(loc="best")
 plt.savefig("../../figures/spiderweb_lbd_pdtvtts.pdf")
 
