@@ -622,9 +622,9 @@ The following machine parameters were generated and used for the 1 group suite:
 \end{table}
 
 Figure \ref{scaling_stagecount} shows the stage counts of the scaling suite for PDT's performance model and the time-to-solution estimator are in perfect agreement.
-Figures \ref{weak_scaling_tts_sweep} and \ref{weak_scaling_tts} show the time per sweep and parallel efficiency for (1) PDT, (2) the PDT performance model, and (3) the time-to-solution estimator. Table \ref{scaling_percent_diff} tabulates the percent differences for (1) PDT and the performance model, (2) the performance model, and (3) the time-to-solution estimator, and PDT and the time-to-solution estimator. \jcr{see my mods. check if you need to do this elsewhere!}
+Figures \ref{weak_scaling_tts_sweep} and \ref{weak_scaling_tts} show the time per sweep and parallel efficiency for (1) PDT, (2) the PDT performance model, and (3) the time-to-solution estimator. Table \ref{scaling_percent_diff} tabulates the percent differences for (1) PDT and the performance model, (2) the performance model, and (3) the time-to-solution estimator, and PDT and the time-to-solution estimator.
 
-It is noticeable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is certainly in part due to the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D). 
+It is noteable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is certainly in part due to the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D). 
 In reality, this is not the case, as processors in the corners of the domain will communicate to fewer neighbors for certain directions, and the final processor for a direction does not communicate to any neighbors (as it has no successors).
 Because the stage counts for the performance model and time-to-solution estimator are in perfect agreement (as shown in Fig. \ref{scaling_stagecount}), we know that this slight overestimation of the performance model is a reason for its consistently higher sweep times.
 Even given these differences, the time-to-solution estimator is consistently within 4\% of the performance model, as tabulated in Table \ref{scaling_percent_diff}.
@@ -778,21 +778,14 @@ The communication dependencies inherently created by load-balanced-by-dimension 
 
 \FloatBarrier
 \subsection{PDT vs. the Time-to-Solution Estimator for the Level 2 Experiment Mesh}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.3]{../../figures/level2_nocut.png}
-\caption{The mesh for the Level 2 experiment.}
-\label{level2_nocut}
-\end{figure}
-
+Figures \ref{level2_42x13} and \ref{level2_42x13_balanced} show the mesh for the Level 2 experiment with 42 subsets in $x$, and 13 subsets in $y$ with evenly spaced cut lines and balanced cut lines.
+The balanced mesh was ``hand-balanced'' by Marvin Adams and Jan Vermaak to achieve better load balancing than the automated load balancing algorithm was able to achieve.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.3]{../../figures/level2_42x13.png}
 \caption{The Level 2 experiment mesh evenly partitioned into 42 subsets in x and 13 subsets in y. $f = 32.616$.}
 \label{level2_42x13}
 \end{figure}
-
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.3]{../../figures/level2_42x13_balanced.png}
@@ -800,23 +793,23 @@ The communication dependencies inherently created by load-balanced-by-dimension 
 \label{level2_42x13_balanced}
 \end{figure}
 
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.15]{../../figures/level2_nocut_zoom.png}
-\caption{The detector region of the Level 2 experiment mesh.}
-\label{level2_nocut_zoom}
-\end{figure}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.15]{../../figures/level2_42x13_zoom.png}
-\caption{The detector region of the Level 2 experiment when partitioned into 42 subsets in x and 13 subsets in y.}
-\label{level2_42x13_zoom}
-\end{figure}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.15]{../../figures/level2_42x13_balanced_zoom.png}
-\caption{The detector region of the Level 2 experiment when partitioned and balanced with 42 subsets in x and 13 subsets in y.}
-\label{level2_42x13_balanced_zoom}
-\end{figure}
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[scale=0.15]{../../figures/level2_nocut_zoom.png}
+%\caption{The detector region of the Level 2 experiment mesh.}
+%\label{level2_nocut_zoom}
+%\end{figure}
+%
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[scale=0.15]{../../figures/level2_42x13_zoom.png}
+%\caption{The detector region of the Level 2 experiment when partitioned into 42 subsets in x and 13 subsets in y.}
+%\label{level2_42x13_zoom}
+%\end{figure}
+%
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[scale=0.15]{../../figures/level2_42x13_balanced_zoom.png}
+%\caption{The detector region of the Level 2 experiment when partitioned and balanced with 42 subsets in x and 13 subsets in y.}
+%\label{level2_42x13_balanced_zoom}
+%\end{figure}

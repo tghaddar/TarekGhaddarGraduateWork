@@ -20,7 +20,7 @@ gymax = 54.994
 t_comm = 4.47e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
-m_l = 85
+m_l = 90
 latency = 4110.0e-09
 #Solve time per cell..
 Tc = 1208.383e-09
