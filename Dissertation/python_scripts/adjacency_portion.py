@@ -73,13 +73,13 @@ Q = get_node_positions(boundaries_lbd,num_row,num_col)
 plt.figure()
 #Time to build the graph for Q0.
 G = nx.DiGraph(adjacency_matrix_0)
-nx.draw(G,Q[0],with_labels=True,node_size=900,font_size=15)
+nx.draw(G,Q[0],with_labels=True,node_size=900,font_size=15,arrowsize=20)
 plt.savefig("../../figures/9_graph0.pdf")
 #
 #
 plt.figure()
 G3 = nx.DiGraph(adjacency_matrix_3)
-nx.draw(G3,Q[3],with_labels=True,node_size=900,font_size=15)
+nx.draw(G3,Q[3],with_labels=True,node_size=900,font_size=15,arrowsize=20)
 plt.savefig("../../figures/9_graph3.pdf")
 #
 #
@@ -108,7 +108,7 @@ adjacency_matrix_1 = np.triu(adjacency_flip)
 G1 = nx.DiGraph(adjacency_matrix_1)
 G1 = nx.relabel_nodes(G1,id_map,copy=True)
 plt.figure()
-nx.draw(G1,Q[1],with_labels=True,node_size=900,font_size=15)
+nx.draw(G1,Q[1],with_labels=True,node_size=900,font_size=15,arrowsize=20)
 plt.savefig("../../figures/9_graph1.pdf")
 plt.close()
 #
@@ -117,7 +117,7 @@ adjacency_matrix_2 = np.tril(adjacency_flip)
 G2 = nx.DiGraph(adjacency_matrix_2)
 G2 = nx.relabel_nodes(G2,id_map,copy=True)
 plt.figure()
-nx.draw(G2,Q[2],with_labels=True,node_size=900,font_size=15)
+nx.draw(G2,Q[2],with_labels=True,node_size=900,font_size=15,arrowsize=20)
 plt.savefig("../../figures/9_graph2.pdf")
 plt.close()
 
