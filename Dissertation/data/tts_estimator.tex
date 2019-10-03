@@ -225,11 +225,11 @@ $\begin{pmatrix}
 0&0&0&0&0&1&0&1&0\\
 \end{pmatrix}$}
 \end{minipage}
-\caption{The flipped subset ordering and corresponding flipped adjacency matrix for the partitioning scheme in Fig. \ref{25basematrix}.}
+\caption{The flipped subset ordering and corresponding ``flipped'' adjacency matrix for the partitioning scheme in Fig. \ref{25basematrix}.}
 \label{25flippedmatrix}
 \end{figure}
 We then get the upper triangular and lower triangular portions of the flipped adjacency matrix to get the connectivity and dependency information for quadrants 1 and 2.
-We feed the triangular matrices into networkx's DiGraph function, along with a mapping of the flipped subset ids to the original subset ids (shown in Fig. \ref{25basematrix}). Figure \ref{25_q1q2graphs} shows the DAGs for quadrants 1 and 2.
+We feed the triangular matrices into {\tt networkx's DiGraph} function, along with a mapping of the flipped subset ids to the original subset ids (shown in Fig. \ref{25basematrix}). Figure \ref{25_q1q2graphs} shows the DAGs for quadrants 1 and 2.
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
 \includegraphics[scale=0.5]{../../figures/9_graph1.pdf}
@@ -288,7 +288,7 @@ n_x &= \Big(\frac{N_c}{A}\Big)^{1/2}\cdot L_x, \label{nx} \\
 n_y &= \Big(\frac{N_c}{A}\Big)^{1/2}\cdot L_y, \label{ny}
 \end{align}
 where $A$ is the subset area. Equations \ref{cellspersubset}-\ref{ny} are exact for structured meshes. 
-However, unstructured meshes do not necessarily have an easily integrable mesh density to calculate the cells per subset. 
+However, unstructured meshes do not necessarily have an easily integrable mesh density function to calculate the cells per subset. 
 
 \subsubsection{Weighting the task dependence graphs for unstructured meshes}
 To get the cells per subset for unstructured meshes we require the vertex data of the mesh, as well as which vertices form each cell in the mesh.
@@ -298,12 +298,42 @@ For each subset we:
   \item Loop over the {\tt Polygons}.
   \item For each polygon, check if the {\tt Polygon} is within the subset. If it is, add it to the cells in that subset.
   \item If it is not within the subset, check if the {\tt Polygon} intersects the subset.
-  \item If it does intersect the subset, check if it merely lies on a natural boundary and is outside the subset.
-  \item If it is not on a natural boundary and intersects the subset, then this {\tt Polygon's} intersection with the subset forms a new cell,  and is added to the total number of cells in that subset.
+  \item If it does intersect the subset, check if it lies on a natural boundary and is outside the subset.
+  \item If it is not on a natural boundary and truly intersects the subset, then this {\tt Polygon's} intersection with the subset forms a new cell,  and is added to the total number of cells in that subset.
 \end{enumerate}
+%%%%%%%%%%Table
+Table \ref{2x2_cellcount} tabulates the cells count per subset for the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} partitioned into 2 subsets in each dimension with regular cuts. 
+\begin{table}[H]
+\centering
+\caption{The cell count per subset for the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} partitioned into 2 subsets in each dimension with regular cuts.}
+\label{2x2_cellcount}
+\begin{tabular}{c|c|c}
+\textbf{Subset} & \textbf{Cell Count TTS} & \textbf{Cell Count PDT} \\ \hline
+0 & 185 & 185 \\ \hline
+1 & 25 & 25 \\ \hline
+2 & 25 & 25 \\ \hline
+3 & 185 & 185
+\end{tabular}
+\end{table}
+
+Figure \ref{ubp_7x7} shows the mesh in Fig. \ref{partitioning_example} partitioned into 7 subsets in each dimension with load-balanced-by-dimension cuts. This mesh has many subsets that slice through cells, creating new cells. Figure \ref{cell_comp} shows the cell counts per subset from PDT and the time-to-solution estimator are in perfect agreement.
+%%%%%%%%%%%%%%%%%
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.15]{../figures/spiderweb_7x7_lbd.png}
+\caption{The mesh in Fig. \ref{partitioning_example} partitioned into 7 subsets in each dimension with load-balanced-by-dimension cuts.}
+\label{ubp_7x7}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.75]{../figures/spiderweb_cell_comp_7x7.pdf}
+\caption{The cell count per subset for the mesh in Fig. \ref{ubp_7x7} from PDT and the time-to-solution estimator.}
+\label{cell_comp}
+\end{figure}
+
+With confidence in the cell count per subset in the time-to-solution estimator matching PDT, we make an assumption that the cells in each subset are close to uniformly distributed. This allows us to continue to use Eqs. \ref{nxy}-\ref{ny} to calculate the boundary cells in each subset.
 
 With this information, we compute all weights in each graph according to Eq. \ref{weight_function}.
-
 Once graphs are weighted, we add and modify edge weights for the number of angles pipelined per octant/quadrant.
 
 \subsection{Adding graphs for angular pipelining}
@@ -433,7 +463,7 @@ Using regular partitions as shown in Fig. \ref{regular_partitions}, the first po
 \end{figure}
 
 \subsection{``Mildly Random'' Partitions}
-Figure \ref{mild_random_partitions} shows four examples of the``mildly random'' partitioning scheme used for the second part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
+Figure \ref{mild_random_partitions} shows four examples of the ``mildly random'' partitioning scheme used for the second part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 
 %Mild random partitions
 \begin{figure}[H]
@@ -474,7 +504,7 @@ Using``mildly random'' partitions as shown in Fig. \ref{mild_random_partitions},
 
 \subsection{Random Partitions}
 %Random partitions
-Figure \ref{random_partitions} shows four examples of the``random''partitioning scheme used for the third part of the verification study. Cut lines in the x dimension go all the way across the domain, but are not necessarily uniformly distributed. The cut lines in y are randomly distributed in each column.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
+Figure \ref{random_partitions} shows four examples of the ``random'' partitioning scheme used for the third part of the verification study. Cut lines in the x dimension go all the way across the domain, but are not necessarily uniformly distributed. The cut lines in y are randomly distributed in each column.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.45\textwidth}
@@ -502,12 +532,12 @@ Figure \ref{random_partitions} shows four examples of the``random''partitioning 
 \label{random_partitions}
 \end{figure}
 
-Using``random''partitions as shown in Fig. \ref{random_partitions}, the third portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for``random''partitions with multiple angles per quadrant.
+Using ``random'' partitions as shown in Fig. \ref{random_partitions}, the third portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for``random''partitions with multiple angles per quadrant.
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{../figures/random_verification.pdf}
-\caption{A 2D verification suite with``random'' partitions run from 2x2 to 10x10 subsets with each case being run from 1 to 6 anglesets per quadrant.}
+\caption{A 2D verification suite with ``random'' partitions run from 2x2 to 10x10 subsets with each case being run from 1 to 6 anglesets per quadrant.}
 \label{random_verification}
 \end{figure}
 
@@ -565,7 +595,7 @@ Figure \ref{3d_verification} shows PDT's performance model stage counts are in p
 
 PDT has run a scaling suite out to 90,112 cores on the Quartz supercomputer \cite{quartz} at Lawrence Livermore National Lab (LLNL).
 A smaller scaling suite, tabulated in Table \ref{scaling_suite} was the first benchmark case run for the time-to-solution estimator.
-The suite was run with 1 energy group, 80 directions, $A_m = 10$, and $A_z = 1$.
+The suite was run with 1 energy group, 80 directions, $A_m = 10$, $A_x=\frac{N_x}{P_x}$, $A_y=\frac{N_y}{P_y}$, and $A_z = 1$.
 The following machine parameters were generated and used for the 1 group suite:
 \begin{itemize}
   \item $T_c = 2683.769$ ns
@@ -592,12 +622,11 @@ The following machine parameters were generated and used for the 1 group suite:
   \caption{The scaling suite parameters ran with 1 energy group, 80 directions, and $A_m = 10$.}
   \label{scaling_suite}
 \end{table}
-\jcr{what are the $A_x$, $A_y$ and values?}
 
 Figure \ref{scaling_stagecount} shows the stage counts of the scaling suite for PDT's performance model and the time-to-solution estimator are in perfect agreement.
 Figures \ref{weak_scaling_tts_sweep} and \ref{weak_scaling_tts} show the time per sweep and parallel efficiency for PDT, the PDT performance model, and the time-to-solution estimator \soutr{, and}\jcr{.} Table \ref{scaling_percent_diff} tabulates the percent differences for \jcr{(1)} PDT and the performance model, \jcr{(2)} the performance model\jcr{,} and \jcr{(3)} the time-to-solution estimator, and PDT and the time-to-solution estimator. \jcr{see my mods. check if you need to do this elsewhere!}
 
-It is noticeable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is due to\jcr{you have no proof of that} the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D). In reality, this is not the case, as processors in the corners of the domain will communicate to less\jcr{fewer} neighbors for certain directions, and the final processor for a direction does not communicate to any neighbors (as it has no neighbors).
+It is noticeable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is due to\jcr{you have no proof of that} the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D). In reality, this is not the case, as processors in the corners of the domain will communicate to fewer neighbors for certain directions, and the final processor for a direction does not communicate to any neighbors (as it has no successors).
 Even given these differences, the time-to-solution estimator is consistently within 4\% of the performance model.
 
 The performance model's slightly better accuracy in predicting PDT's sweep time is likely due to processor noise and slight variations in latency on Quartz driving up PDT's sweep time. This masks the performance model's overestimation of the sweep time.
