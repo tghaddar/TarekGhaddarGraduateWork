@@ -780,18 +780,39 @@ The communication dependencies inherently created by load-balanced-by-dimension 
 \subsection{PDT vs. the Time-to-Solution Estimator for the Level 2 Experiment Mesh}
 Figures \ref{level2_42x13} and \ref{level2_42x13_balanced} show the mesh for the Level 2 experiment with 42 subsets in $x$, and 13 subsets in $y$ with evenly spaced cut lines and balanced cut lines.
 The balanced mesh was ``hand-balanced'' by Marvin Adams and Jan Vermaak to achieve better load balancing than the automated load balancing algorithm was able to achieve.
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
-\includegraphics[scale=0.3]{../../figures/level2_42x13.png}
+\includegraphics[scale=0.28]{../../figures/level2_42x13.png}
 \caption{The Level 2 experiment mesh evenly partitioned into 42 subsets in x and 13 subsets in y. $f = 32.616$.}
 \label{level2_42x13}
 \end{figure}
-\begin{figure}[ht]
+\begin{figure}[H]
 \centering
-\includegraphics[scale=0.3]{../../figures/level2_42x13_balanced.png}
+\includegraphics[scale=0.28]{../../figures/level2_42x13_balanced.png}
 \caption{The Level 2 experiment mesh partitioned and load balanced with 42 subsets in x and 13 subsets in y. $f = 2.386$.}
 \label{level2_42x13_balanced}
 \end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{The sweep times for the regular cut and balanced cut Level 2 problems for PDT and the time-to-solution estimator.}
+\label{level2_sweep_times}
+\begin{tabular}{c|c|c|c|c}
+\bf Case & \bf PDT (s) & \bf TTS (s) & \bf PDT Min (s) & \bf PDT Max (s) \\ \hline
+Regular & 0.07 & 0.0648 & 0.0686 & 0.0889\\ \hline
+Balanced & 0.0531 & 0.0535 & 0.0522 & 0.0638 
+\end{tabular}
+\end{table}
+\begin{table}[ht]
+\centering
+\caption{The percent difference for the regular cut and balanced cut Level 2 problems between PDT and the time-to-solution estimator.}
+\label{level2_percent_diff}
+\begin{tabular}{c|c}
+\textbf{Case} & \bf PDT vs. TTS \\ \hline 
+Regular & 7.52\% \\ \hline
+Balanced & 0.63\%
+\end{tabular}
+\end{table}
 
 %\begin{figure}[ht]
 %\centering
