@@ -199,7 +199,6 @@ Figure \ref{25_q0q3graphs} shows the the DAGS associated with quadrants 0 and 3,
 \caption{The quadrant 0 DAG (left) and the quadrant 3 DAG (right).}
 \label{25_q0q3graphs}
 \end{figure}
-\jcr{arrows are too small in the figures}\\
 Upon inspection of these two DAGs, we see that they show the expected connectivity, dependency, and opposing sweep ordering.
 Quadrant 0 starts its sweep from subset 0, finishing at subset 8, and quadrant 3 starts its sweep from subset 8, finishing at subset 0.
 
@@ -592,7 +591,7 @@ Figure \ref{3d_verification} shows PDT's performance model stage counts are in p
 \section{PDT's Performance Model vs. Time-to-Solution Estimator}
 
 PDT has run a scaling suite out to 90,112 cores on the Quartz supercomputer \cite{quartz} at Lawrence Livermore National Lab (LLNL).
-A smaller scaling suite, tabulated in Table \ref{scaling_suite} was the first benchmark case run for the time-to-solution estimator.
+A smaller scaling suite, tabulated in Table \ref{scaling_suite} is the first benchmark case run for the time-to-solution estimator.
 The suite was run with 1 energy group, 80 directions, $A_m = 10$, $A_x=\frac{N_x}{P_x}$, $A_y=\frac{N_y}{P_y}$, and $A_z = 1$.
 The following machine parameters were generated and used for the 1 group suite:
 \begin{itemize}
@@ -673,7 +672,18 @@ Figure \ref{weak_scaling_tts} shows PDT's performance model and the time-to-solu
 The motivation to develop the time-to-solution estimator was born out of the desire to predict sweep time for unstructured meshes.
 To test how the time-to-solution estimator performs on unstructured problems, we use the meshes from our load balancing parametric study: the unbalanced pin mesh(Fig. \ref{partitioning_example}) and the Level 2 experiment mesh (Fig. \ref{level2_nocut_lbchapter}).
 
-For each result presented, the problem was run through PDT 10 times on the Quartz supercomputer.
+The machine parameters used for all problems are:
+\begin{itemize}
+  \item $T_c = 1208.383$ ns
+  \item $T_m = 65.54614$ ns
+  \item $T_g = 175.0272$ ns
+  \item $T_\text{byte} = 4.47$ ns
+  \item $\text{latency }= 4110$ ns
+  \item $T_{wu} = 147.0754$ ns
+  \item mcff = 1.181
+\end{itemize}
+
+For each result presented, the problem is run through PDT 10 times on the Quartz supercomputer.
 This allows us to filter out outlying values due to supercomputer noise by taking the median solve time per sweep for each problem.
 For each result in PDT, the median sweep time value, the maximum sweep time value, and the minimum sweep time value are plotted to showcase the outlying values that can occur. 
 In order to minimize the effects of the sweep overhead on the timing statistics, the solve time per sweep is calculated from the mean time of ten transport sweeps for each case.
@@ -793,6 +803,8 @@ The balanced mesh was ``hand-balanced'' by Marvin Adams and Jan Vermaak to achie
 \label{level2_42x13_balanced}
 \end{figure}
 
+Table \ref{level2_sweep_times} shows the sweep times for the regular cut and balanced cut Level 2 problems for PDT and the time-to-solution estimator. The minimum and maximum solve time per sweep values are also tabulated.
+Table \ref{level2_percent_diff} shows the percent difference between the PDT sweep time and the time-to-solution estimator sweep time.
 \begin{table}[ht]
 \centering
 \caption{The sweep times for the regular cut and balanced cut Level 2 problems for PDT and the time-to-solution estimator.}
@@ -813,6 +825,16 @@ Regular & 7.52\% \\ \hline
 Balanced & 0.63\%
 \end{tabular}
 \end{table}
+Both the regular and balanced cases have estimated sweep times within 8\% of PDT's sweep times.
+Because both of these problems have around 5,000 cells, the number of unknowns in the problem can mitigate the effects seen in the unbalanced pin cases.
+The difference in schedule in addition to latency instabilities at 546 cores are less significant with larger problems.
+
+In the future, the schedule from the time-to-solution estimator should be fed into PDT and see if the agreement improves.
+In addition, the latency on a machine like Quartz is easy to mischaracterize.
+A supercomputer of that size and in constant use can have differing latencies depending on how many nodes are in use and which particular nodes are in use.
+The data generated for the scaling suite was done during dedicated access time, when latencies are much easier to characterize with only one user using the entire machine.
+
+
 
 %\begin{figure}[ht]
 %\centering
