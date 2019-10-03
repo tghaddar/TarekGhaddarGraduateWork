@@ -274,7 +274,8 @@ As shown in Eq. \ref{weight_function}, a crucial part of determining the weight 
    \text{cells per subset} = \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz,
 \label{cellspersubset}
 \end{equation}
-where the integral bounds represent the cut plane coordinates that form the subset. To estimate the boundary cells to each neighbor, we assume that the mesh within each subset is mostly uniform. Equations \ref{nxy}-\ref{nyz} calculate the boundary cells along each face in 3D:
+where the integral bounds represent the cut plane coordinates that form the subset. 
+Equations \ref{nxy}-\ref{nyz} calculate the boundary cells along each face in 3D:
 \begin{align}
 n_{xy} &= \Big(\frac{N_c}{V}\Big)^{2/3}\cdot L_x\cdot L_y \label{nxy}, \\
 n_{xz} &= \Big(\frac{N_c}{V}\Big)^{2/3}\cdot L_x\cdot L_z \label{nxz}, \\
@@ -286,7 +287,24 @@ Equations \ref{nx} and \ref{ny} show the 2-dimensional equivalents to \ref{nxy}-
 n_x &= \Big(\frac{N_c}{A}\Big)^{1/2}\cdot L_x, \label{nx} \\
 n_y &= \Big(\frac{N_c}{A}\Big)^{1/2}\cdot L_y, \label{ny}
 \end{align}
-where $A$ is the subset area. With this information, we compute all weights in each graph according to Eq. \ref{weight_function}. Once graphs are weighted, we add and modify edge weights for the number of angles pipelined per octant/quadrant.
+where $A$ is the subset area. Equations \ref{cellspersubset}-\ref{ny} are exact for structured meshes. 
+However, unstructured meshes do not necessarily have an easily integrable mesh density to calculate the cells per subset. 
+
+\subsubsection{Weighting the task dependence graphs for unstructured meshes}
+To get the cells per subset for unstructured meshes we require the vertex data of the mesh, as well as which vertices form each cell in the mesh.
+With this data, we take advantage of Python's {\tt shapely} library to determine which cells lie in each subset. From the vertex and cell data of the mesh, we build a lightweight version of each cell as a {\tt shapely Polygon}.
+For each subset we:
+\begin{enumerate}
+  \item Loop over the {\tt Polygons}.
+  \item For each polygon, check if the {\tt Polygon} is within the subset. If it is, add it to the cells in that subset.
+  \item If it is not within the subset, check if the {\tt Polygon} intersects the subset.
+  \item If it does intersect the subset, check if it merely lies on a natural boundary and is outside the subset.
+  \item If it is not on a natural boundary and intersects the subset, then this {\tt Polygon's} intersection with the subset forms a new cell,  and is added to the total number of cells in that subset.
+\end{enumerate}
+
+With this information, we compute all weights in each graph according to Eq. \ref{weight_function}.
+
+Once graphs are weighted, we add and modify edge weights for the number of angles pipelined per octant/quadrant.
 
 \subsection{Adding graphs for angular pipelining}
 
