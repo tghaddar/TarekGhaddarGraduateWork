@@ -578,8 +578,6 @@ Using probable worst-case partitions as shown in Fig. \ref{worst_partitions}, th
 \end{figure}
 
 \section{3D Verification}
-\jcr{ok. I am actually resuming from here because everything below is actually NEW!}
-
 PDT's performance model is used to verify stage counts for 3D problems with regular grids.
 Figure \ref{3d_verification} shows PDT's performance model stage counts are in perfect agreement with the time-to-solution estimator's stage counts for 2\textsuperscript{3} to 10\textsuperscript{3} subsets and from 1 to 6 angles per octant.
 
@@ -624,37 +622,34 @@ The following machine parameters were generated and used for the 1 group suite:
 \end{table}
 
 Figure \ref{scaling_stagecount} shows the stage counts of the scaling suite for PDT's performance model and the time-to-solution estimator are in perfect agreement.
-Figures \ref{weak_scaling_tts_sweep} and \ref{weak_scaling_tts} show the time per sweep and parallel efficiency for PDT, the PDT performance model, and the time-to-solution estimator \soutr{, and}\jcr{.} Table \ref{scaling_percent_diff} tabulates the percent differences for \jcr{(1)} PDT and the performance model, \jcr{(2)} the performance model\jcr{,} and \jcr{(3)} the time-to-solution estimator, and PDT and the time-to-solution estimator. \jcr{see my mods. check if you need to do this elsewhere!}
+Figures \ref{weak_scaling_tts_sweep} and \ref{weak_scaling_tts} show the time per sweep and parallel efficiency for (1) PDT, (2) the PDT performance model, and (3) the time-to-solution estimator. Table \ref{scaling_percent_diff} tabulates the percent differences for (1) PDT and the performance model, (2) the performance model, and (3) the time-to-solution estimator, and PDT and the time-to-solution estimator. \jcr{see my mods. check if you need to do this elsewhere!}
 
-It is noticeable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is due to\jcr{you have no proof of that} the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D). In reality, this is not the case, as processors in the corners of the domain will communicate to fewer neighbors for certain directions, and the final processor for a direction does not communicate to any neighbors (as it has no successors).
-Even given these differences, the time-to-solution estimator is consistently within 4\% of the performance model.
+It is noticeable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is certainly in part due to the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D). 
+In reality, this is not the case, as processors in the corners of the domain will communicate to fewer neighbors for certain directions, and the final processor for a direction does not communicate to any neighbors (as it has no successors).
+Because the stage counts for the performance model and time-to-solution estimator are in perfect agreement (as shown in Fig. \ref{scaling_stagecount}), we know that this slight overestimation of the performance model is a reason for its consistently higher sweep times.
+Even given these differences, the time-to-solution estimator is consistently within 4\% of the performance model, as tabulated in Table \ref{scaling_percent_diff}.
 
-The performance model's slightly better accuracy in predicting PDT's sweep time is likely due to processor noise and slight variations in latency on Quartz driving up PDT's sweep time. This masks the performance model's overestimation of the sweep time.
+The performance model's slightly better accuracy in predicting PDT's sweep time is likely due to processor noise and slight variations in latency on Quartz driving up PDT's sweep time. This masks the performance model's slight overestimation of the sweep time.
 
-
+Figure \ref{weak_scaling_tts} shows PDT's performance model and the time-to-solution estimator scale with near equivalence. The model and the time-to-solution estimator predict PDT's scaling well, although there are slight differences that can be attributed to the differences in sweep times tabulated in Table \ref{scaling_percent_diff}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.8]{../../figures/scaling_stagecount.pdf}
 \caption{The stage counts of PDT's performance model and the time-to-solution estimator for the scaling suite in Table \ref{scaling_suite}.}
 \label{scaling_stagecount}
 \end{figure}
-
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.8]{../../figures/scaling_tts_sweep_times.pdf}
 \caption{The time per sweep of PDT, the PDT performance model, and the time-to-solution estimator.}
 \label{weak_scaling_tts_sweep}
 \end{figure}
-
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.8]{../../figures/scaling_tts.pdf}
 \caption{The parallel efficiency relative to 8 cores of PDT, the PDT performance model, and the time-to-solution estimator.}
 \label{weak_scaling_tts}
 \end{figure}
-\jcr{fig \ref{weak_scaling_tts} is not discussed in the text}
-\jcr{likewise for table\ref{scaling_percent_diff}}
-
 \begin{table}[ht]
 \centering
 \caption{The percent difference between PDT and its performance model, PDT's performance model and the time-to-solution estimator, and PDT and the time-to-solution estimator.}
@@ -676,7 +671,7 @@ The performance model's slightly better accuracy in predicting PDT's sweep time 
 \section{PDT vs. Time-to-Solution Estimator for Unstructured Meshes}
 
 The motivation to develop the time-to-solution estimator was born out of the desire to predict sweep time for unstructured meshes.
-To test how the time-to-solutions estimator performs on unstructured problems, we use the meshes from our load balancing parametric study (Fig. \ref{partitioning_example}) and the level Level 2 experiment (Fig. \ref{level2_nocut}).\jcr{this is later. I think if you do some level-2 earlier, as I recommended somewhere, it will be smoother when you reach this paragraph}
+To test how the time-to-solutions estimator performs on unstructured problems, we use the meshes from our load balancing parametric study: the unbalanced pins (Fig. \ref{partitioning_example}) and the level Level 2 experiment (Fig. \ref{level2_nocut_lbchapter}).
 
 \jcr{each figure and table needs to be discussed in the text}\\
 
