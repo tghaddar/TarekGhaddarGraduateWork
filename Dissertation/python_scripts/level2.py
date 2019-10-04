@@ -28,7 +28,7 @@ upbc = 2.0
 Twu = 147.0754e-09
 Tm = 65.54614e-09
 Tg = 175.0272e-09
-mcff = 1.32
+mcff = 1.181
 machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
 num_angles = 1
 Am = 36
@@ -36,7 +36,7 @@ unweighted = True
 Ay = 1
 numcol = 42
 numrow = 13
-
+verts = np.genfromtxt("level2_vert_data")
 points = np.genfromtxt("level2centroids").T
 f = open("lvl2_cell_verts",'r')
 level2_cell_data = [line.split() for line in f]
@@ -58,7 +58,7 @@ for col in range(0,numcol):
 params = create_parameter_space(x_cuts_lb,y_cuts_lb,numrow,numcol)
 num_params=len(params)
 add_cells = True
-#max_time_lb = optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
+max_time_lb = optimized_tts_numerical(params,level2_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
 
 #bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,13,42)
 #constraints = create_constraints(gxmin,gxmax,gymin,gymax,13,42)
@@ -66,7 +66,7 @@ add_cells = True
 ##max_time = minimize(optimized_tts_numerical,params,args=args,bounds=bounds,constraints=constraints,method='COBYLA',options={"maxiter":1})
 #max_time = basinhopping(optimized_tts_numerical,params,niter=200,stepsize=0.5,minimizer_kwargs={"method":"COBYLA","bounds":bounds,"constraints":constraints,'args':args,'options':{'maxiter':1}})
 ##print(max_time_reg,max_time_lb)
-verts = np.genfromtxt("level2_vert_data")
+
 x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,numcol)
 
 
@@ -81,8 +81,8 @@ x_values,y_cut_suite = create_opt_cut_suite(verts,gxmin,gxmax,gymin,gymax,numcol
 
 max_times = []
 add_cells = False
-#for i in range(0,len(y_cut_suite)):
-for i in range(0,1):
+for i in range(0,len(y_cut_suite)):
+#for i in range(0,1):
   x_cuts = x_values
   y_cuts = y_cut_suite[i]
   params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
