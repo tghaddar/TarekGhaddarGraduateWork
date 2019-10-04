@@ -276,6 +276,8 @@ def get_cells_per_subset_2d_robust(cell_verts,vert_data,boundaries,adjacency_mat
     #The area of the subset.
     subset_area = Lx*Ly
     N = cells_per_subset[s]
+    if N == 0:
+      print(xmin,xmax,ymin,ymax)
     #Computing the boundary cells along x and y.
     nx = math.sqrt(N/subset_area)*Lx
     ny =  math.sqrt(N/subset_area)*Ly

@@ -137,8 +137,9 @@ def get_row_cdf(points,gymin,gymax,numrow):
 
 def get_highest_jumps(points,gmin,gmax,numdim):
   
-  #The discrete steps we are using to build the cdf. Equivalent to 1% of column width if using even cuts.
-  num_steps = int((gmax-gmin)/(0.0001*(gmax - gmin)/numdim))
+  #The discrete steps we are using to build the cdf. Making the step size equivalent to the precision of the problem.
+  #num_steps = int((gmax-gmin)/(0.0001*(gmax - gmin)/numdim))
+  num_steps = int((gmax - gmin)/1e-04)
   #The number of bins in the CDF.
   hist_range = (gmin,gmax)
   #Building a histogram
@@ -177,6 +178,14 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   values = np.sort(values)
   values = np.append(values,gmax)
   values = np.insert(values,0,gmin)
+  for i in range(0,len(values)):
+    value = values[i]
+    if np.round(value,3) in points:
+      values[i] = np.round(value,3)
+    elif np.round(value,4) in points:
+      values[i] = np.round(value,4)
+    elif np.round(value,5) in points:
+      values[i] = np.round(value,5)
   
   return values
 

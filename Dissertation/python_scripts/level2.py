@@ -19,7 +19,7 @@ gymax = 54.994
 t_comm = 4.47e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
-m_l = 35
+m_l = 90
 latency = 4110.0e-09
 #Solve time per cell..
 Tc = 1208.383e-09
@@ -38,7 +38,10 @@ numcol = 42
 numrow = 13
 
 points = np.genfromtxt("level2centroids").T
-
+f = open("lvl2_cell_verts",'r')
+level2_cell_data = [line.split() for line in f]
+for i in range(0,len(level2_cell_data)):
+  level2_cell_data[i] = [int(x) for x in level2_cell_data[i]]
 #Trying optimizing the spiderweb.
 x_cuts,y_cuts = create_2d_cuts(gxmin,gxmax,42,gymin,gymax,13)
 params = create_parameter_space(x_cuts,y_cuts,13,42)
@@ -69,25 +72,26 @@ x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,numcol)
 
 x_values,y_cut_suite = create_opt_cut_suite(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
 
-for i in range(0,len(y_cut_suite)):
-  x_cuts = x_values
-  y_cuts = y_cut_suite[i]
-  boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
-  fname = "../../figures/lvl2_suite_"+str(i)+".pdf"
-  plot_subset_boundaries_2d(boundaries,numcol*numrow,[],fname)
-
-#max_times = []
-#add_cells = False
 #for i in range(0,len(y_cut_suite)):
 #  x_cuts = x_values
 #  y_cuts = y_cut_suite[i]
-#  params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-#  max_times.append(optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+#  boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
+#  fname = "../../figures/lvl2_suite_"+str(i)+".pdf"
+#  plot_subset_boundaries_2d(boundaries,numcol*numrow,[],fname)
+
+max_times = []
+add_cells = False
+#for i in range(0,len(y_cut_suite)):
+for i in range(0,1):
+  x_cuts = x_values
+  y_cuts = y_cut_suite[i]
+  params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+  max_times.append(optimized_tts_numerical(params,level2_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
 #
 #min_index = max_times.index(min(max_times))
 #y_cuts_min = y_cut_suite[min_index]
 #x_cuts_min = x_values
-#
+##
 ##Writing the xml portions.
 #f = open("level2_opt_cuts.xml",'w')
 #f.write("<x_cuts>")

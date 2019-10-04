@@ -12,7 +12,7 @@ plt.close("all")
 t_comm = 4.47e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
-m_l = 1
+m_l = 50
 latency = 4110.0e-09
 #Solve time per cell..
 Tc = 1208.383e-09
@@ -38,31 +38,36 @@ gymax = 10.0
 
 numrows = [1,2,3,4,5,6,7,8,9,10]
 numcols = [1,2,3,4,5,6,7,8,9,10]
+  
+f = open("sparse_pins_cell_verts",'r')
+sparse_pins_cell_data = [line.split() for line in f]
+for i in range(0,len(sparse_pins_cell_data)):
+  sparse_pins_cell_data[i] = [int(x) for x in sparse_pins_cell_data[i]]
 
 x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,10)
 
-#max_times_case = {}
-#
-#for i in range(0,len(numrows)):
-#  numrow = numrows[i]
-#  numcol = numcols[i]
-#  
-#  #y_values_func = get_highest_jumps(verts[:,1],gymin,gymax,numcol)
-#  x_values,y_cut_suite = create_opt_cut_suite(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
-#  
-#  max_times = []
-#  add_cells = False
-#  for j in range(0,len(y_cut_suite)):
-#    x_cuts = x_values
-#    y_cuts = y_cut_suite[j]
-#    params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-#    max_times.append(optimized_tts_numerical(params,points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
-#  
-#  min_index = max_times.index(min(max_times))
-#  y_cuts_min = y_cut_suite[min_index]
-#  x_cuts_min = x_values
-#  
-#  max_times_case[numrow] = (min(max_times),x_cuts_min,y_cuts_min)
+max_times_case = {}
+
+for i in range(0,len(numrows)):
+  numrow = numrows[i]
+  numcol = numcols[i]
+  
+  #y_values_func = get_highest_jumps(verts[:,1],gymin,gymax,numcol)
+  x_values,y_cut_suite = create_opt_cut_suite(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
+  
+  max_times = []
+  add_cells = False
+  for j in range(0,len(y_cut_suite)):
+    x_cuts = x_values
+    y_cuts = y_cut_suite[j]
+    params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+    max_times.append(optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+  
+  min_index = max_times.index(min(max_times))
+  y_cuts_min = y_cut_suite[min_index]
+  x_cuts_min = x_values
+  
+  max_times_case[numrow] = (min(max_times),x_cuts_min,y_cuts_min)
 
 
 
