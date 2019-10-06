@@ -270,7 +270,7 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
 #      print(num_children,current_x_limit)
 #      xmin = x_values[prev_x_limit]
 #      xmax = x_values[current_x_limit]
-      
+    print(x_limits)
     num_children *= 2
     prev_x_limits = x_limits
     if (x_limits[0] <= 1.5):
