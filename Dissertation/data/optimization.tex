@@ -24,11 +24,16 @@ The scipy optimize library \cite{scipy} provides many tools for optimizing an in
 Our usage of the optimize library relies on the minimize function, using the basinhopping \cite{basinhoppingwales} method as the global optimizer, and the constrained Nelder-Mead method as the local optimizer.
 We need a global optimization method for larger problem spaces to ensure that cut planes/lines are getting optimized over the entirety of the problem domain, rather than just moving the cut planes/lines close to our initial guess.
 
+The black box tools of scipy optimize are too dependent on the smoothness of the function being optimized.
+The time-to-solution estimator is not easily differentiable, and therefore not a smooth enough function even for the parameter spaces of a domain decomposed into 3 subsets in each dimension.
+Although utilizing a tested and documented optimizer would have been ideal, it is clear that we need a method more uniquely suited for our problem.
+
 \section{CDF Optimization}
 \jcr{here, I want to use the term CDF used. By the way, you need to make sure the mesh CDF's are defined way earlier, in a previous chapter, as appropriate...}
 
-The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers is functional for very small parameter spaces. However, even with modestly large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing.
-This lead to the development of an alternative method.
+The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers can function for very small parameter spaces. 
+However, even with modestly large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing.
+This lead to the development of an alternative method, the CDF optimization method.
 
 The CDF optimization method utilizes the geometrical information of the problem to attempt to find optimal cuts. This method prioritizes finding cut line locations that cut along a ``natural boundary'', and minimizing the total number of times the time-to-solution estimator needs to be run.
 The time-to-solution estimator for moderately sized problems (such as the Level 2 experiment) can take up to 20 seconds to run for one set of partitions.
@@ -50,7 +55,7 @@ The CDF optimization method will:
   \item Run all iterations of cut lines selected.
 \end{enumerate}
 
-\subsubsection{Finding natural boundaries}
+\subsection{Finding Natural Boundaries}
 
 In order to identify natural boundaries, we analyze the detailed cumulative distribution function (CDF) of the vertices in each dimension. The jumps in the CDF correspond to natural boundaries. Figure \ref{vert_cdf} shows the x-vertex CDF of the mesh in Fig. \ref{natural_boundary_example}.
 \begin{figure}[h]
@@ -70,7 +75,7 @@ To identify where the jumps in the CDF occur, we take the derivative\jcr{I think
 The largest discontinuities in Fig. \ref{gradcdf} occur at the instances where there are natural boundaries all the way through the mesh, or at 1 cm intervals.
 
 \FloatBarrier
-\subsubsection{Finding natural boundaries for sets of columns}
+\subsection{Finding Natural Boundaries for Sets of Columns}
 In order to globalize the optimization of the cut lines per column, we set up a binary tree of test cases, such as the one shown in Fig. \ref{binary_tree}. Each layer in the tree represents one set of $y$ cut lines. The first layer, or the root of the tree, represents the case where we try and find the natural boundaries in $y$ throughout all columns, in this case 4 columns. The next layer tries to find two sets of natural boundaries, one set of natural $y$ boundaries through the first two columns, and another set through the final 2 columns. Finally, the last case finds a set of natural $y$ boundaries in each individual column.
 
 \begin{figure}[h]
