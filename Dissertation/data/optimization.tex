@@ -14,21 +14,28 @@
 
 
 
-\chapter{PARTITIONING OPTMIZIATION \label{cha:optimization}}
-\jcr{definitely needs an introduction to the chapter. by the way, make sure all chapters have a decent introduction ...}\\
-
-\section{Method}
-With confidence in the time-to-solution estimator, it is used as the objective function in two optimization methods. The first optimization method utilizes scipy's optimize library, and the second method utilizes knowledge of a problem's mesh layout to assist in partition placement.
+\chapter{PARTITIONING OPTIMIZATION \label{cha:optimization}}
+In Chapter \ref{cha:tts}, we saw that we can estimate the time-to-solution for a sweep for different partitioning schemes.
+We use the time-to-solution estimator as the objective function in two optimization methods.
+The first optimization method utilizes scipy's optimize library, and the second method utilizes knowledge of a problem's mesh layout to assist in partition placement.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Scipy optimize}
-  The scipy optimize library \cite{scipy} provides many tools for optimizing an input function with local and global minimization techniques. Our usage of the optimize library relies on the minimize function, using the basinhopping \cite{basinhoppingwales} method as the global optimizer, and the constrained Nelder-Mead method as the local optimizer.
+\section{Scipy optimize}
+The scipy optimize library \cite{scipy} provides many tools for optimizing an input function with local and global minimization techniques.
+Our usage of the optimize library relies on the minimize function, using the basinhopping \cite{basinhoppingwales} method as the global optimizer, and the constrained Nelder-Mead method as the local optimizer.
+We need a global optimization method for larger problem spaces to ensure that cut planes/lines are getting optimized over the entirety of the problem domain, rather than just moving the cut planes/lines close to our initial guess.
 
-\subsection{``Human'' Optimization}
+\section{CDF Optimization}
 \jcr{here, I want to use the term CDF used. By the way, you need to make sure the mesh CDF's are defined way earlier, in a previous chapter, as appropriate...}
 
-  The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers is functional for small parameter spaces. However, even with modestly large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing. This lead to the development of an alternative method.
+The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers is functional for very small parameter spaces. However, even with modestly large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing.
+This lead to the development of an alternative method.
 
-  The ``human optimization'' method utilizes the geometrical information of the problem to attempt to find optimal cuts. This method prioritizes finding cut line locations that cut along a ``natural boundary''. A natural boundary is a subset boundary that coincides with the geometrical features of the mesh. In Fig. \ref{natural_boundary_example}, we notice natural boundaries every centimeter in each dimension.
+The CDF optimization method utilizes the geometrical information of the problem to attempt to find optimal cuts. This method prioritizes finding cut line locations that cut along a ``natural boundary'', and minimizing the total number of times the time-to-solution estimator needs to be run.
+The time-to-solution estimator for moderately sized problems (such as the Level 2 experiment) can take up to 20 seconds to run for one set of partitions.
+This rules out a brute force method of running every possible set of partitions. 
+Instead, we select our cut lines from the natural boundaries of the mesh.
+ 
+A natural boundary is a subset boundary that coincides with the geometrical features of the mesh. In Fig. \ref{natural_boundary_example}, we notice natural boundaries every centimeter in each dimension.
  \begin{figure}[h]
 \centering
 \includegraphics[scale=0.2]{../figures/spiderweb_10x10_sparse.png}
@@ -36,10 +43,10 @@ With confidence in the time-to-solution estimator, it is used as the objective f
 \label{natural_boundary_example}
 \end{figure}
 
-This optimization method:
+The CDF optimization method will:
 \begin{enumerate}
-  \item Find the most suitable natural boundaries in the $x$ dimension.
-  \item For each set of columns, find the most suitable natural boundaries in the $y$ dimension.
+  \item Find the most suitable natural boundaries in the $x$ dimension,
+  \item For each set of columns, find the most suitable natural boundaries in the $y$ dimension,
   \item Run all iterations of cut lines selected.
 \end{enumerate}
 
@@ -53,11 +60,11 @@ In order to identify natural boundaries, we analyze the detailed cumulative dist
 \label{vert_cdf}
 \end{figure}
 
-To identify where the jumps in the CDF occur, we take the gradient\jcr{I think your CDF's are functions of 1 variable only, so it's a derivative, no?} of the CDF and isolate the largest discontinuities in it. Figure \ref{gradcdf} plots the gradient of the CDF shown in Fig. \ref{vert_cdf}. \jcr{not sure I understand the jumps in the CDF derivative at the beginning and the end of the x axis. Why is it jumping? Numerical artifact? }
+To identify where the jumps in the CDF occur, we take the derivative\jcr{I think your CDF's are functions of 1 variable only, so it's a derivative, no?} of the CDF and isolate the largest discontinuities in it. Figure \ref{gradcdf} plots the derivative of the CDF shown in Fig. \ref{vert_cdf}. \jcr{not sure I understand the jumps in the CDF derivative at the beginning and the end of the x axis. Why is it jumping? Numerical artifact? }
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.75]{../figures/gradcdf.pdf}
-\caption{The gradient of the CDF shown in Fig. \ref{vert_cdf}}.
+\caption{The derivative of the CDF shown in Fig. \ref{vert_cdf}}.
 \label{gradcdf}
 \end{figure}
 The largest discontinuities in Fig. \ref{gradcdf} occur at the instances where there are natural boundaries all the way through the mesh, or at 1 cm intervals.
