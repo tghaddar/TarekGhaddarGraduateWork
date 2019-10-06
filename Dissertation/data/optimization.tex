@@ -65,7 +65,7 @@ In order to identify natural boundaries, we analyze the detailed cumulative dist
 \label{vert_cdf}
 \end{figure}
 
-To identify where the jumps in the CDF occur, we take the derivative\jcr{I think your CDF's are functions of 1 variable only, so it's a derivative, no?} of the CDF and isolate the largest discontinuities in it. Figure \ref{gradcdf} plots the derivative of the CDF shown in Fig. \ref{vert_cdf}. \jcr{not sure I understand the jumps in the CDF derivative at the beginning and the end of the x axis. Why is it jumping? Numerical artifact? }
+To identify where the jumps in the CDF occur, we take the derivative\jcr{I think your CDF's are functions of 1 variable only, so it's a derivative, no?} of the CDF and isolate the largest discontinuities in it. Figure \ref{gradcdf} plots the derivative of the CDF shown in Fig. \ref{vert_cdf}. \jcr{not sure I understand the jumps in the CDF derivative at the beginning and the end of the x axis. Why is it jumping? Numerical artifact? FROM TAREK: The global bounds of the problem are natural boundaries. In the unbalanced pin mesh, there are quite a few vertices along the global boundaries. }
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.75]{../figures/gradcdf.pdf}
