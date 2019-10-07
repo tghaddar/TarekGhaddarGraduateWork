@@ -144,6 +144,7 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   hist_range = (gmin,gmax)
   #Building a histogram
   hist,bin_edges = np.histogram(points,bins=num_steps,range=hist_range,normed=False)
+  bin_edges = np.round(bin_edges,4)
   
   cdf = np.cumsum(hist)
   #cdf = cdf/max(cdf)
@@ -159,23 +160,31 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   #Getting the derivate to identify the highest jumps.
   grad_cdf = np.diff(cdf)/np.diff(bin_edges)
   #grad_cdf = np.gradient(cdf,bin_edges)
-  bin_edges_plot = np.delete(bin_edges,0)
+#  bin_edges_plot = np.delete(bin_edges,0)
 #  plt.figure()
 #  plt.plot(bin_edges_plot,grad_cdf)
-#  plt.title("Gradient of the CDF in the x Dimension")
+#  plt.title("Derivative of the CDF in the x Dimension")
 #  plt.xlabel("x (cm)")
-#  plt.ylabel("y (cm)")
+#  plt.ylabel("Derivative of the CDF")
 #  plt.plot(bin_edges_plot,grad_cdf)
-#  plt.savefig("../../figures/gradcdf.pdf")
-  
+  #plt.savefig("../../figures/gradcdf.pdf")
   #Finding the discontinuities in the gradient of the cdf. This corresponds to jumps in the cdf.
   c_max_index = argrelextrema(grad_cdf,np.greater,order = 5)[0]
   bin_edges_jumps = bin_edges[c_max_index]
   cdf_jumps = grad_cdf[c_max_index]
   #The highest numdim jumps.
   highest_jumps = np.argsort(cdf_jumps)[-(numdim-1):]
-  values = bin_edges_jumps[highest_jumps]
+  values = bin_edges_jumps[highest_jumps]  
   values = np.sort(values)
+  for i in range(0,len(values)):
+    value = values[i]
+    if value not in points:
+      if np.round(value + 1e-04,4) in points:
+        values[i] = value+1e-04
+      elif np.round(value - 1e-04,4) in points:
+        values[i] = value-1e04
+      else:
+        print("still not catching")
   values = np.append(values,gmax)
   values = np.insert(values,0,gmin)
   for i in range(0,len(values)):

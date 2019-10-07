@@ -38,11 +38,11 @@ for i in range(0,len(sparse_pins_cell_data)):
 
 
 #x_cuts,y_cuts = create_2d_cuts(gxmin,gxmax,numcol,gymin,gymax,numrow)
-x_cuts = np.genfromtxt("lvl2_42_reg_x_cuts")
-y_cuts = np.genfromtxt("lvl2_13_reg_y_cuts")
+x_cuts = np.genfromtxt("opt_lvl2_x_cuts")
+y_cuts = np.genfromtxt("opt_lvl2_y_cuts")
 boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
 adjacency_matrix = build_adjacency(boundaries,numcol-1,numrow-1,y_cuts)
-level2_reg_cut_cell_data = np.genfromtxt("level2_reg_cut_cell_data.txt")
+level2_opt_cut_cell_data = np.genfromtxt("level2_opt_cut_data.txt")
 #cells_per_subset,bcps = get_cells_per_subset_2d_test(points,boundaries,adjacency_matrix,numrow,numcol)
 #cells_per_subset,bcps = get_cells_per_subset_2d_robust(sparse_pins_cell_data,pin_verts,boundaries,adjacency_matrix,numrow,numcol)
 start = time.time()
@@ -60,6 +60,6 @@ percent_diff = []
 subsets = []
 for i in range(0,len(cells_per_subset)):
   subsets.append(i)
-  percent_diff.append(abs(cells_per_subset[i] - level2_reg_cut_cell_data[i])/level2_reg_cut_cell_data[i]*100)
+  percent_diff.append(abs(cells_per_subset[i] - level2_opt_cut_cell_data[i])/level2_opt_cut_cell_data[i]*100)
   
 pdiff = np.array(percent_diff)
