@@ -291,7 +291,7 @@ However, unstructured meshes do not necessarily have an easily integrable mesh d
 
 \subsubsection{Weighting the task dependence graphs for unstructured meshes}
 To get the cells per subset for unstructured meshes we require the vertex data of the mesh, as well as which vertices form each cell in the mesh.
-With this data, we take advantage of Python's {\tt shapely} library to determine which cells lie in each subset. From the vertex and cell data of the mesh, we build a lightweight version of each cell as a {\tt shapely Polygon}.\\
+With this data, we take advantage of Python's {\tt shapely} library \cite{shapely} to determine which cells lie in each subset. From the vertex and cell data of the mesh, we build a lightweight version of each cell as a {\tt shapely Polygon}.\\
 \noindent
 For each subset we:
 \begin{enumerate}

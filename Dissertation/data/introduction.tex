@@ -42,28 +42,28 @@ This ``marching'' or ``sweeping'' through a mesh gains complexity for unstructur
 In addition, maintaining sweep performance for massively parallel simulations has and continues to be a thriving research topic.
 The following dissertation chapters will discuss a brief history of the transport sweep, parallel transport sweeps, load balancing unstructured meshes for transport, a time-to-solution estimator, and optimizing partitions for parallel transport.
 
-\section{The Deterministic Transport Sweep}
-\jcr{you do not want to use sections here, this is silly, they will show up on the TOC for basically the same 2 pages}
+\noindent \textbf{The Deterministic Transport Sweep}
+
 Chapter \ref{cha:transport_sweeps} introduces the steady-state neutron transport equation and the discretization process to obtain the discrete form of the transport equation. Chapter \ref{cha:transport_sweeps} also provides more details on the transport sweep.
 
-\section{Parallel Transport Sweeps}
+\noindent \textbf{Parallel Transport Sweeps}
 
 Massively parallel transport sweeps have been shown to scale up to 1.5 million cores on logically Cartesian grids using Texas A\&M's flagship deterministic transport code, PDT \cite{mpadams2013,mpadams2015}.
 Chapter \ref{cha:parallel_transport} describes the basics of a parallel sweep algorithm, and specifically describes the KBA algorithm \cite{KBA} and PDT's extension of the KBA algorithm.
 This chapter also describes PDT's performance model, which predicts the sweep time given a set of partitioning parameters.
 
-\section{Unstructured Meshing and Load Balancing in PDT}
+\noindent \textbf{Unstructured Meshing and Load Balancing in PDT}
 
 In order to solve a wider set of problems, an unstructured meshing capability was implemented in PDT.
 However, unstructured meshes may lead to imbalanced partitions, or different numbers of mesh cells per processor subdomain.
 To address this, two load-balancing algorithms have been implemented in PDT, the original load-balancing algorithm and the load-balancing-by-dimension algorithm \cite{mastersthesis,mc2017}.
 
-\section{Time-to-Solution Estimator}
+\noindent \textbf{Time-to-Solution Estimator}
 
 PDT's existing performance model does not account for unstructured meshes and imbalanced partitions.
 Chapter \ref{cha:tts} describes the time-to-solution estimator, a graph-based method that estimates the time it takes to sweep across a problem given a mesh, partitioning scheme, and machine-specific parameters.
 
-\section{Partitioning Optimization}
+\noindent \textbf{Partitioning Optimization}
 
 The time-to-solution estimator described in Chapter \ref{cha:tts} is used to optimize the partitioning scheme.
-Chapter \ref{cha:optimization} details two optimization methods: a ``black box'' method that uses Python's scipy.optimize library and a ``human-intelligence'' method that prioritizes partition placement in locations that don't\jcr{no abbreviations!} add cells to a mesh.
+Chapter \ref{cha:optimization} details two optimization methods: a ``black box'' method that uses Python's scipy.optimize library and a ``human-intelligence'' method that prioritizes partition placement in locations that do not add cells to a mesh.
