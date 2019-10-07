@@ -28,22 +28,22 @@ Before detailing the time-to-solution estimator's methodology, a description of 
 
 Graph theory is a subset of mathematics that focuses on graphs, or structures containing a set of objects that are connected in a particular manner \cite{graphtheory}.
 These objects are called vertices (or nodes), and are connected by edges.
-Figure \ref{basic_graph} shows an undirected graph of 4 nodes and 4 edges. The nodes are a mathematical abstraction that can be used to represent a variety of concepts. In this dissertation, they are used to represent the subsets described in Chapter \ref{cha:lb}.
+Figure~\ref{basic_graph} shows an undirected graph of 4 nodes and 4 edges. The nodes are a mathematical abstraction that can be used to represent a variety of concepts. In this dissertation, they are used to represent the subsets described in Chapter \ref{cha:lb}.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{../../figures/undirected_graph.pdf}
 \caption{An undirected graph with 4 nodes and 4 edges. }
 \label{basic_graph}
 \end{figure}
-Figure \ref{basic_graph} is referred to as an undirected graph because its edges have no directional information.
-If we add directional information to the edges of the graph in Fig. \ref{basic_graph}, it becomes a directed graph, shown in Fig. \ref{directed_graph}.
+Figure~\ref{basic_graph} is referred to as an undirected graph because its edges have no directional information.
+If we add directional information to the edges of the graph in Fig.~\ref{basic_graph}, it becomes a directed graph, shown in Fig.~\ref{directed_graph}.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{../../figures/directed_graph.pdf}
 \caption{A directed graph with 4 nodes and 4 edges. }
 \label{directed_graph}
 \end{figure}
-In this dissertation, we only use Directed Acyclic Graphs (DAGs), or a graph that has no cycles.  A cycle is defined as a path on a graph that starts and ends at the same vertex. Figure \ref{cycle_example} shows a cycle between nodes 1 and 3.
+In this dissertation, we only use Directed Acyclic Graphs (DAGs), or a graph that has no cycles.  A cycle is defined as a path on a graph that starts and ends at the same vertex. Figure~\ref{cycle_example} shows a cycle between nodes 1 and 3.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{../../figures/cycle_example.pdf}
@@ -53,7 +53,7 @@ In this dissertation, we only use Directed Acyclic Graphs (DAGs), or a graph tha
 We notice the edge connecting nodes 1 and 3 has a double headed arrow, representing a cycle. Graphs with cycles can be solved for a variety of applications through the use of cycle detection and breaking algorithms, but our partitioning scheme cuts subsets in a fashion that does not \jcr{no abbrev. check throughout} allow for cyclical graphs.
 
 Graph edges can be weighted based on the need of the application the graph is being used for. Here, we weight the graph edges to represent the time it takes to solve node A plus the communication time to node B.
-Figure \ref{weighted_directed_graph} shows a weighted directed graph.
+Figure~\ref{weighted_directed_graph} shows a weighted directed graph.
 In the context of the time-to-solution estimator, subset 1 takes 3 seconds to solve and communicate to subset 3.
 \begin{figure}[H]
 \centering
@@ -64,7 +64,7 @@ In the context of the time-to-solution estimator, subset 1 takes 3 seconds to so
 
 The time-to-solution estimator uses Johnson's algorithm \cite{intro_to_alg,johnson_nist,johnson_johnson} to find all shortest paths between all pairs in a weighted directed graph.
 The weighted shortest path is defined as the path between two nodes that has the smallest weighted sum.
-For example, the shortest path between nodes 0 and 3 in Fig. \ref{weighted_directed_graph} is $0\rightarrow 2\rightarrow 3$.
+For example, the shortest path between nodes 0 and 3 in Fig.~\ref{weighted_directed_graph} is $0\rightarrow 2\rightarrow 3$.
 
 In our application, we use Johnson's algorithm to assist in calculating the longest path between two nodes in a DAG (needed in Section \ref{sec:universal}).
 The longest path is found by:
@@ -80,7 +80,7 @@ Johnson's algorithm is specifically used in this process because it is capable o
 %\begin{figure}[H]
 %\centering
 %\includegraphics[scale=0.5]{../../figures/negative_weighted_directed_graph.pdf}
-%\caption{The DAG in Fig. \ref{
+%\caption{The DAG in Fig.~\ref{
 %\label{negative_weights}
 %\end{figure}
 Now that the applicable graph theory has been reviewed, we detail the methodology of the time-to-solution estimator.
@@ -105,7 +105,7 @@ The adjacency matrix provides connectivity information for each subset to its ne
 The adjacency building process relies on a major assumption: the z dimension has partitions all the way across the domain, then the x dimension has partitions per plane, then the y dimension has partitions per plane per column.
 In future work, these three dimensions can be made interchangeable, but in the present work, this ordering is fixed.
 
-Figure \ref{25basematrix} shows a partitioning scheme for 3 subsets each in the x and y dimensions with its corresponding adjacency matrix.
+Figure~\ref{25basematrix} shows a partitioning scheme for 3 subsets each in the x and y dimensions with its corresponding adjacency matrix.
 
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
@@ -144,7 +144,7 @@ We define the quadrants in the following manner:
   \item Quadrant 2: $\Omega_x < 0$, $\Omega_y > 0$
   \item Quadrant 3: $\Omega_x < 0$, $\Omega_y < 0$
 \end{itemize}
-Figure \ref{quadrant_layout} illustrates this numbering.
+Figure~\ref{quadrant_layout} illustrates this numbering.
 \begin{figure}[H]
 \centering
 \includegraphics{figures/quadrant_layout.pdf}
@@ -153,7 +153,7 @@ Figure \ref{quadrant_layout} illustrates this numbering.
 \end{figure}
 The initial adjacency matrix we obtain can be immediately used to build the graphs for quadrants 0 and 3 by using {\tt networkx's} DiGraph function.
 We feed the upper triangular portion of the adjacency matrix to DiGraph to get the quadrant 0 graph, and the lower triangular portion to get the quadrant 3 graph.
-Utilizing the same partitioning scheme shown in Fig. \ref{25basematrix}, pull the upper triangular and lower triangular portions of the matrix, shown in Fig. \ref{25baseportionmatrices}.
+Utilizing the same partitioning scheme shown in Fig.~\ref{25basematrix}, pull the upper triangular and lower triangular portions of the matrix, shown in Fig.~\ref{25baseportionmatrices}.
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
 \centering
@@ -185,10 +185,10 @@ $\begin{pmatrix}
 0&0&0&1&1&1&0&1&0\\
 \end{pmatrix}$}
 \end{minipage}
-\caption{The upper triangular (left) and lower triangular (right) portions of the adjacency matrix in Fig. \ref{25basematrix}.}
+\caption{The upper triangular (left) and lower triangular (right) portions of the adjacency matrix in Fig.~\ref{25basematrix}.}
 \label{25baseportionmatrices}
 \end{figure}
-Figure \ref{25_q0q3graphs} shows the the DAGS associated with quadrants 0 and 3, built from the adjacency matrices in Fig. \ref{25baseportionmatrices}.
+Figure~\ref{25_q0q3graphs} shows the the DAGS associated with quadrants 0 and 3, built from the adjacency matrices in Fig.~\ref{25baseportionmatrices}.
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
 \includegraphics[scale=0.5]{../../figures/9_graph0.pdf}
@@ -203,7 +203,7 @@ Upon inspection of these two DAGs, we see that they show the expected connectivi
 Quadrant 0 starts its sweep from subset 0, finishing at subset 8, and quadrant 3 starts its sweep from subset 8, finishing at subset 0.
 
 To obtain the graphs for quadrants 1 and 2, a ``flipped'' version of the adjacency matrix is necessary.
-We temporarily renumber the subsets starting from the top left corner, and increasing down each column, as shown in Fig. \ref{25flippedmatrix}.
+We temporarily renumber the subsets starting from the top left corner, and increasing down each column, as shown in Fig.~\ref{25flippedmatrix}.
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
 \centering
@@ -224,11 +224,11 @@ $\begin{pmatrix}
 0&0&0&0&0&1&0&1&0\\
 \end{pmatrix}$}
 \end{minipage}
-\caption{The flipped subset ordering and corresponding ``flipped'' adjacency matrix for the partitioning scheme in Fig. \ref{25basematrix}.}
+\caption{The flipped subset ordering and corresponding ``flipped'' adjacency matrix for the partitioning scheme in Fig.~\ref{25basematrix}.}
 \label{25flippedmatrix}
 \end{figure}
 We then get the upper triangular and lower triangular portions of the flipped adjacency matrix to get the connectivity and dependency information for quadrants 1 and 2.
-We feed the triangular matrices into {\tt networkx's DiGraph} function, along with a mapping of the flipped subset ids to the original subset ids (shown in Fig. \ref{25basematrix}). Figure \ref{25_q1q2graphs} shows the DAGs for quadrants 1 and 2.
+We feed the triangular matrices into {\tt networkx's DiGraph} function, along with a mapping of the flipped subset ids to the original subset ids (shown in Fig.~\ref{25basematrix}). Figure~\ref{25_q1q2graphs} shows the DAGs for quadrants 1 and 2.
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
 \includegraphics[scale=0.5]{../../figures/9_graph1.pdf}
@@ -273,7 +273,7 @@ As shown in Eq. \ref{weight_function}, a crucial part of determining the weight 
    \text{cells per subset} = \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz,
 \label{cellspersubset}
 \end{equation}
-where the integral bounds represent the cut plane coordinates that form the subset. 
+where the integral bounds represent the cut plane coordinates that form the subset.
 Equations \ref{nxy}-\ref{nyz} calculate the boundary cells along each face in 3D:
 \begin{align}
 n_{xy} &= \Big(\frac{N_c}{V}\Big)^{2/3}\cdot L_x\cdot L_y \label{nxy}, \\
@@ -286,12 +286,13 @@ Equations \ref{nx} and \ref{ny} show the 2-dimensional equivalents to \ref{nxy}-
 n_x &= \Big(\frac{N_c}{A}\Big)^{1/2}\cdot L_x, \label{nx} \\
 n_y &= \Big(\frac{N_c}{A}\Big)^{1/2}\cdot L_y, \label{ny}
 \end{align}
-where $A$ is the subset area. Equations \ref{cellspersubset}-\ref{ny} are exact for structured meshes. 
-However, unstructured meshes do not necessarily have an easily integrable mesh density function to calculate the cells per subset. 
+where $A$ is the subset area. Equations \ref{cellspersubset}-\ref{ny} are exact for structured meshes.
+However, unstructured meshes do not necessarily have an easily integrable mesh density function to calculate the cells per subset.
 
 \subsubsection{Weighting the task dependence graphs for unstructured meshes}
 To get the cells per subset for unstructured meshes we require the vertex data of the mesh, as well as which vertices form each cell in the mesh.
-With this data, we take advantage of Python's {\tt shapely} library to determine which cells lie in each subset. From the vertex and cell data of the mesh, we build a lightweight version of each cell as a {\tt shapely Polygon}.
+With this data, we take advantage of Python's {\tt shapely} library to determine which cells lie in each subset. From the vertex and cell data of the mesh, we build a lightweight version of each cell as a {\tt shapely Polygon}.\\
+\noindent
 For each subset we:
 \begin{enumerate}
   \item Loop over the {\tt Polygons}.
@@ -301,10 +302,10 @@ For each subset we:
   \item If it is not on a natural boundary and truly intersects the subset, then this {\tt Polygon's} intersection with the subset forms a new cell,  and is added to the total number of cells in that subset.
 \end{enumerate}
 %%%%%%%%%%Table
-Table \ref{2x2_cellcount} tabulates the cells count per subset for the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} partitioned into 2 subsets in each dimension with regular cuts. 
+Table \ref{2x2_cellcount} tabulates the cells count per subset for the time-to-solution estimator and PDT for the mesh in Fig.~\ref{partitioning_example} partitioned into 2 subsets in each dimension with regular cuts.
 \begin{table}[H]
 \centering
-\caption{The cell count per subset for the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} partitioned into 2 subsets in each dimension with regular cuts.}
+\caption{The cell count per subset for the time-to-solution estimator and PDT for the mesh in Fig.~\ref{partitioning_example} partitioned into 2 subsets in each dimension with regular cuts.}
 \label{2x2_cellcount}
 \begin{tabular}{c|c|c}
 \textbf{Subset} & \textbf{Cell Count TTS} & \textbf{Cell Count PDT} \\ \hline
@@ -315,18 +316,18 @@ Table \ref{2x2_cellcount} tabulates the cells count per subset for the time-to-s
 \end{tabular}
 \end{table}
 
-Figure \ref{ubp_7x7} shows the mesh in Fig. \ref{partitioning_example} partitioned into 7 subsets in each dimension with load-balanced-by-dimension cuts. This mesh has many subsets that slice through cells, creating new cells. Figure \ref{cell_comp} shows the cell counts per subset from PDT and the time-to-solution estimator are in perfect agreement.
+Figure~\ref{ubp_7x7} shows the mesh in Fig.~\ref{partitioning_example} partitioned into 7 subsets in each dimension with load-balanced-by-dimension cuts. This mesh has many subsets that slice through cells, creating new cells. Figure~\ref{cell_comp} shows the cell counts per subset from PDT and the time-to-solution estimator are in perfect agreement.
 %%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.15]{../figures/spiderweb_7x7_lbd.png}
-\caption{The mesh in Fig. \ref{partitioning_example} partitioned into 7 subsets in each dimension with load-balanced-by-dimension cuts.}
+\caption{The mesh in Fig.~\ref{partitioning_example} partitioned into 7 subsets in each dimension with load-balanced-by-dimension cuts.}
 \label{ubp_7x7}
 \end{figure}
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.75]{../figures/spiderweb_cell_comp_7x7.pdf}
-\caption{The cell count per subset for the mesh in Fig. \ref{ubp_7x7} from PDT and the time-to-solution estimator.}
+\caption{The cell count per subset for the mesh in Fig.~\ref{ubp_7x7} from PDT and the time-to-solution estimator.}
 \label{cell_comp}
 \end{figure}
 
@@ -337,7 +338,7 @@ Once graphs are weighted, we add and modify edge weights for the number of angle
 
 \subsection{Adding graphs for angular pipelining}
 
-If there are angles to be pipelined, the time-to-solution estimator adds a new set of graphs for each additional angle to be pipelined. For example, if there are two anglesets per octant, this would results in 16 graphs, or 1 graph per octant per angleset. Figure \ref{angular_pipeline} shows the graphs for two anglesets for a quadrant. A ``dummy'' node with a value of -2 is added in order to have an incoming edge for the first subset's node. The value of this incoming edge represents when that angleset starts its sweep.
+If there are angles to be pipelined, the time-to-solution estimator adds a new set of graphs for each additional angle to be pipelined. For example, if there are two anglesets per octant, this would results in 16 graphs, or 1 graph per octant per angleset. Figure~\ref{angular_pipeline} shows the graphs for two anglesets for a quadrant. A ``dummy'' node with a value of -2 is added in order to have an incoming edge for the first subset's node. The value of this incoming edge represents when that angleset starts its sweep.
 \begin{figure}[H]
 \begin{minipage}[c]{0.5\textwidth}
 \centering
@@ -360,7 +361,7 @@ For each node in each graph, we:
   \item Sum the weights of the edges along the longest path,
   \item Set all incoming edge values to the node to the sum of the longest path.
 \end{enumerate}
-The incoming edges to each node in each graph now reflect the time at which a node is ready to solve. This universal edge weighting is used for detecting and resolving conflicts during the sweep. It is important to note that our DAGs are now task dependence graphs (TDGs). We now know which node is ready to solve at each time $t$, which provides us with a schedule. Figure \ref{universal} shows a simple example of a DAG becoming a TDG.
+The incoming edges to each node in each graph now reflect the time at which a node is ready to solve. This universal edge weighting is used for detecting and resolving conflicts during the sweep. It is important to note that our DAGs are now task dependence graphs (TDGs). We now know which node is ready to solve at each time $t$, which provides us with a schedule. Figure~\ref{universal} shows a simple example of a DAG becoming a TDG.
 \begin{figure}[H]
   \begin{minipage}[c]{0.5\textwidth}
     \centering
@@ -415,13 +416,13 @@ A theoretical study in 2D is run to verify the time-to-solution estimator for 2D
 	\item  2x2 to 10x10 subsets in x and y with probable worst-case partitions and 1 to 6 anglesets per quadrant.
 \end{enumerate}
 
-``Mildly random'' partitions keep the cut lines uniformly distributed in x, while the y cut lines vary slightly around the uniformly distributed cut lines of the regular partitions. Figure \ref{mild_random_partitions} shows examples of this partitioning style. ``Random'' partitions possesses no such limitations on either set of cut lines, as shown by Fig. \ref{random_partitions}. The ``mildly random'' and ``random'' partition styles mimic likely partitioning schemes we can expect from load-balancing-by-dimension.
+``Mildly random'' partitions keep the cut lines uniformly distributed in x, while the y cut lines vary slightly around the uniformly distributed cut lines of the regular partitions. Figure~\ref{mild_random_partitions} shows examples of this partitioning style. ``Random'' partitions possesses no such limitations on either set of cut lines, as shown by Fig.~\ref{random_partitions}. The ``mildly random'' and ``random'' partition styles mimic likely partitioning schemes we can expect from load-balancing-by-dimension.
 
 Figures \ref{regular_partitions}, \ref{mild_random_partitions}, \ref{random_partitions}, \ref{worst_partitions} show the four partitioning schemes and Figs. \ref{regular_verification}, \ref{mild_random_verification}, \ref{random_verification}, \ref{worst_verification} show the results of the verification study for each partitioning scheme. In the results, a stage is defined as the time it takes to solve all cells in a subset for an angle, and communicate the boundary information to neighboring subsets.
 
 \subsection{Regular Partitions}
 
-Figure \ref{regular_partitions} shows four examples of the regular partitioning scheme used for the first part of the verification study. Cut lines in both dimensions go all the way across the domain. This reflects the partitioning scheme after the original load balancing algorithm described in Section \ref{sec:og_lb} is used.
+Figure~\ref{regular_partitions} shows four examples of the regular partitioning scheme used for the first part of the verification study. Cut lines in both dimensions go all the way across the domain. This reflects the partitioning scheme after the original load balancing algorithm described in Section \ref{sec:og_lb} is used.
 
 %Regular partitions
 \begin{figure}[H]
@@ -451,7 +452,7 @@ Figure \ref{regular_partitions} shows four examples of the regular partitioning 
 \label{regular_partitions}
 \end{figure}
 
-Using regular partitions as shown in Fig. \ref{regular_partitions}, the first portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{regular_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for regular partitions with multiple angles per quadrant.
+Using regular partitions as shown in Fig.~\ref{regular_partitions}, the first portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure~\ref{regular_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for regular partitions with multiple angles per quadrant.
 
 %Verification plots.
 \begin{figure}[H]
@@ -462,7 +463,7 @@ Using regular partitions as shown in Fig. \ref{regular_partitions}, the first po
 \end{figure}
 
 \subsection{``Mildly Random'' Partitions}
-Figure \ref{mild_random_partitions} shows four examples of the ``mildly random'' partitioning scheme used for the second part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
+Figure~\ref{mild_random_partitions} shows four examples of the ``mildly random'' partitioning scheme used for the second part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 
 %Mild random partitions
 \begin{figure}[H]
@@ -492,7 +493,7 @@ Figure \ref{mild_random_partitions} shows four examples of the ``mildly random''
 \label{mild_random_partitions}
 \end{figure}
 
-Using``mildly random'' partitions as shown in Fig. \ref{mild_random_partitions}, the second portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{mild_random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for``mildly random'' partitions with multiple angles per quadrant.
+Using``mildly random'' partitions as shown in Fig.~\ref{mild_random_partitions}, the second portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure~\ref{mild_random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for``mildly random'' partitions with multiple angles per quadrant.
 
 \begin{figure}[H]
 \centering
@@ -503,7 +504,7 @@ Using``mildly random'' partitions as shown in Fig. \ref{mild_random_partitions},
 
 \subsection{Random Partitions}
 %Random partitions
-Figure \ref{random_partitions} shows four examples of the ``random'' partitioning scheme used for the third part of the verification study. Cut lines in the x dimension go all the way across the domain, but are not necessarily uniformly distributed. The cut lines in y are randomly distributed in each column.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
+Figure~\ref{random_partitions} shows four examples of the ``random'' partitioning scheme used for the third part of the verification study. Cut lines in the x dimension go all the way across the domain, but are not necessarily uniformly distributed. The cut lines in y are randomly distributed in each column.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.45\textwidth}
@@ -531,7 +532,7 @@ Figure \ref{random_partitions} shows four examples of the ``random'' partitionin
 \label{random_partitions}
 \end{figure}
 
-Using ``random'' partitions as shown in Fig. \ref{random_partitions}, the third portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for``random''partitions with multiple angles per quadrant.
+Using ``random'' partitions as shown in Fig.~\ref{random_partitions}, the third portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure~\ref{random_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for``random''partitions with multiple angles per quadrant.
 
 \begin{figure}[H]
 \centering
@@ -541,7 +542,7 @@ Using ``random'' partitions as shown in Fig. \ref{random_partitions}, the third 
 \end{figure}
 
 \subsection{Probable Worst-Case Partitions}
-Figure \ref{worst_partitions} shows four examples of the probable worst-case partitioning scheme used for the final part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. The cut lines in y are distributed on opposing ends of alternating columns.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
+Figure~\ref{worst_partitions} shows four examples of the probable worst-case partitioning scheme used for the final part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. The cut lines in y are distributed on opposing ends of alternating columns.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.45\textwidth}
@@ -568,7 +569,7 @@ Figure \ref{worst_partitions} shows four examples of the probable worst-case par
 \caption{Examples of probable worst-case partitioning.}
 \label{worst_partitions}
 \end{figure}
-Using probable worst-case partitions as shown in Fig. \ref{worst_partitions}, the final portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure \ref{worst_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for probable worst-case partitions with multiple angles per quadrant.
+Using probable worst-case partitions as shown in Fig.~\ref{worst_partitions}, the final portion of the 2D verification study was run from 2x2 to 10x10 subsets in x and y and 1 to 6 angles per quadrant.  Figure~\ref{worst_verification} shows the results of the time-to-solution estimator (solid line) against Ragusa's code (points) for each test case. The time-to-solution estimator is in perfect agreement for probable worst-case partitions with multiple angles per quadrant.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{../figures/worst_verification.pdf}
@@ -578,7 +579,7 @@ Using probable worst-case partitions as shown in Fig. \ref{worst_partitions}, th
 
 \section{3D Verification}
 PDT's performance model is used to verify stage counts for 3D problems with regular grids.
-Figure \ref{3d_verification} shows PDT's performance model stage counts are in perfect agreement with the time-to-solution estimator's stage counts for 2\textsuperscript{3} to 10\textsuperscript{3} subsets and from 1 to 6 angles per octant.
+Figure~\ref{3d_verification} shows PDT's performance model stage counts are in perfect agreement with the time-to-solution estimator's stage counts for 2\textsuperscript{3} to 10\textsuperscript{3} subsets and from 1 to 6 angles per octant.
 
 \begin{figure}[H]
 \centering
@@ -619,18 +620,19 @@ The following machine parameters were generated and used for the 1 group suite:
   \caption{The scaling suite parameters ran with 1 energy group, 80 directions, and $A_m = 10$.}
   \label{scaling_suite}
 \end{table}
+\jcr{previous comments. no Ax, Ay values?}
 
-Figure \ref{scaling_stagecount} shows the stage counts of the scaling suite for PDT's performance model and the time-to-solution estimator are in perfect agreement.
+Figure~\ref{scaling_stagecount} shows the stage counts of the scaling suite for PDT's performance model and the time-to-solution estimator are in perfect agreement.
 Figures \ref{weak_scaling_tts_sweep} and \ref{weak_scaling_tts} show the time per sweep and parallel efficiency for (1) PDT, (2) the PDT performance model, and (3) the time-to-solution estimator. Table \ref{scaling_percent_diff} tabulates the percent differences for (1) PDT and the performance model, (2) the performance model, and (3) the time-to-solution estimator, and PDT and the time-to-solution estimator.
 
-It is noteable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is certainly in part due to the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D). 
+It is noteable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is certainly in part due to the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D).
 In reality, this is not the case, as processors in the corners of the domain will communicate to fewer neighbors for certain directions, and the final processor for a direction does not communicate to any neighbors (as it has no successors).
-Because the stage counts for the performance model and time-to-solution estimator are in perfect agreement (as shown in Fig. \ref{scaling_stagecount}), we know that this slight overestimation of the performance model is a reason for its consistently higher sweep times.
+Because the stage counts for the performance model and time-to-solution estimator are in perfect agreement (as shown in Fig.~\ref{scaling_stagecount}), we know that this slight overestimation of the performance model is a reason for its consistently higher sweep times.
 Even given these differences, the time-to-solution estimator is consistently within 4\% of the performance model, as tabulated in Table \ref{scaling_percent_diff}.
 
 The performance model's slightly better accuracy in predicting PDT's sweep time is likely due to processor noise and slight variations in latency on Quartz driving up PDT's sweep time. This masks the performance model's slight overestimation of the sweep time.
 
-Figure \ref{weak_scaling_tts} shows PDT's performance model and the time-to-solution estimator scale with near equivalence. The model and the time-to-solution estimator predict PDT's scaling well, although there are slight differences that can be attributed to the differences in sweep times tabulated in Table \ref{scaling_percent_diff}.
+Figure~\ref{weak_scaling_tts} shows PDT's performance model and the time-to-solution estimator scale with near equivalence. The model and the time-to-solution estimator predict PDT's scaling well, although there are slight differences that can be attributed to the differences in sweep times tabulated in Table \ref{scaling_percent_diff}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.8]{../../figures/scaling_stagecount.pdf}
@@ -685,16 +687,16 @@ All problems were run with one energy group, one subset per processor, and 144 a
 
 For each result presented, the problem is run through PDT 10 times on the Quartz supercomputer.
 This allows us to filter out outlying values due to supercomputer noise by taking the median solve time per sweep for each problem.
-For each result in PDT, the median sweep time value, the maximum sweep time value, and the minimum sweep time value are plotted to showcase the outlying values that can occur. 
+For each result in PDT, the median sweep time value, the maximum sweep time value, and the minimum sweep time value are plotted to showcase the outlying values that can occur.
 In order to minimize the effects of the sweep overhead on the timing statistics, the solve time per sweep is calculated from the mean time of ten transport sweeps for each case.
 
 \subsection{PDT vs. the Time-to-Solution Estimator for the Unbalanced Pin Mesh}
-Figure \ref{comp_reg_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for the unbalanced pin mesh with 2 to 10 subsets in each dimension with regular cuts.
+Figure~\ref{comp_reg_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for the unbalanced pin mesh with 2 to 10 subsets in each dimension with regular cuts.
 Table \ref{diff_reg_spiderweb} tabulates the percent difference between PDT and the time-to-solution estimator for each of the regular test cases run.
-We notice that there is better agreement for cases where there are more unknowns. 
-These cases for the the unbalanced pin mesh with regular cuts are cases with 3, 4, 6, 7, 8, and 9 subsets in each dimension, with cut lines cutting through cells and increasing the total number of cells throughout the mesh. 
+We notice that there is better agreement for cases where there are more unknowns.
+These cases for the the unbalanced pin mesh with regular cuts are cases with 3, 4, 6, 7, 8, and 9 subsets in each dimension, with cut lines cutting through cells and increasing the total number of cells throughout the mesh.
 Cases with 2, 5, and 10 subsets in each dimension have cuts coinciding with natural boundaries, adding no unknowns to the mesh.
-More unknowns lead to better timing statistics for PDT, increasing the likelihood of agreement with the time-to-solution estimator. 
+More unknowns lead to better timing statistics for PDT, increasing the likelihood of agreement with the time-to-solution estimator.
 %spiderweb comp for reg
 \begin{figure}[!ht]
 \centering
@@ -702,27 +704,28 @@ More unknowns lead to better timing statistics for PDT, increasing the likelihoo
 \caption{The sweep times of the time-to-solution estimator and PDT for the unbalanced pin mesh for 2 to 10 subsets in each dimension with regular cuts.}
 \label{comp_reg_spiderweb}
 \end{figure}
+\jcr{TTS is a little all over the place. What do you think?}
 \begin{table}[!ht]
 \centering
-\caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig. \ref{comp_reg_spiderweb}.}
+\caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig.~\ref{comp_reg_spiderweb}.}
 \label{diff_reg_spiderweb}
 \begin{tabular}{c|c}
-\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline 
-2&19.93\%\\ \hline 
-3&12.3\%\\ \hline 
-4&1.75\%\\ \hline 
-5&15.69\%\\ \hline 
-6&2.71\%\\ \hline 
-7&2.61\%\\ \hline 
-8&4.45\%\\ \hline 
-9&3.21\%\\ \hline 
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline
+2&19.93\%\\ \hline
+3&12.3\%\\ \hline
+4&1.75\%\\ \hline
+5&15.69\%\\ \hline
+6&2.71\%\\ \hline
+7&2.61\%\\ \hline
+8&4.45\%\\ \hline
+9&3.21\%\\ \hline
 10&11.38\%
 \end{tabular}
 \end{table}
 
-Figure \ref{comp_lb_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for 2 to 10 subsets in each dimension with load-balanced cuts.
-If we focus on the maximum PDT sweep time in the 5 subset case in Fig. \ref{comp_lb_spiderweb}, we can see that PDT can sometimes produce outliers during runs.
-For that reason, we take the median, not the mean, sweep time value from the ten PDT runs to get the best representation of PDT's solve time per sweep. 
+Figure~\ref{comp_lb_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for 2 to 10 subsets in each dimension with load-balanced cuts.
+If we focus on the maximum PDT sweep time in the 5 subset case in Fig.~\ref{comp_lb_spiderweb}, we can see that PDT can sometimes produce outliers during runs.
+For that reason, we take the median, not the mean, sweep time value from the ten PDT runs to get the best representation of PDT's solve time per sweep.
 Table \ref{diff_lb_spiderweb} tabulates the percent difference between PDT and the time-to-solution estimator for each case run.
 We notice that we have poorer agreement with load-balanced cuts than with regular cuts, particularly for lower subset cases.
 This is possibly due to the first-come-first scheduler in PDT and the schedule of the time-to-solution estimator schedule not being in perfect agreement.
@@ -731,57 +734,57 @@ If there are two tasks that have a similar amount of unknowns, the processor wit
 This would cause a disagreement between the time-to-solution estimator and PDT.
 The low subset cases happen to be the more balanced cases for the unbalanced pin mesh with load-balanced cuts.
 The 2, 3, and 4 subset cases for the unbalanced pin mesh have load-balance metric values of $f = 1.76, 2.58,$ and $2.38$ respectively.
-With a more even distribution of cells, PDT's first-come-first-serve schedule is likelier to deviate more as certain processors may be faster than their neighboring processors. 
+With a more even distribution of cells, PDT's first-come-first-serve schedule is likelier to deviate more as certain processors may be faster than their neighboring processors.
 %spiderweb comp for lb
 \begin{figure}[!ht]
   \centering
   \includegraphics[scale=0.75]{../../figures/spiderweb_lb_pdtvtts.pdf}
-  \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension with load-balanced cuts.}
+  \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig.~\ref{partitioning_example} for 2 to 10 subsets in each dimension with load-balanced cuts.}
 \label{comp_lb_spiderweb}
 \end{figure}
 \begin{table}[!ht]
 \centering
-\caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig. \ref{comp_lb_spiderweb}.}
+\caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig.~\ref{comp_lb_spiderweb}.}
 \label{diff_lb_spiderweb}
 \begin{tabular}{c|c}
-\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline 
-2&15.9\%\\ \hline 
-3&23.52\%\\ \hline 
-4&41.83\%\\ \hline 
-5&6.15\%\\ \hline 
-6&10.67\%\\ \hline 
-7&8.43\%\\ \hline 
-9&15.47\%\\ \hline 
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline
+2&15.9\%\\ \hline
+3&23.52\%\\ \hline
+4&41.83\%\\ \hline
+5&6.15\%\\ \hline
+6&10.67\%\\ \hline
+7&8.43\%\\ \hline
+9&15.47\%\\ \hline
 10&7.88\%
 \end{tabular}
 \end{table}
 
-Figure \ref{comp_lbd_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for 2 to 10 subsets in each dimension with load-balanced-by-dimension cuts.
+Figure~\ref{comp_lbd_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for 2 to 10 subsets in each dimension with load-balanced-by-dimension cuts.
 Table \ref{diff_lbd_spiderweb} tabulates the percent difference between PDT and the time-to-solution estimator for each case run.
 The load-balanced-by-dimension cases for the unbalanced pin mesh have more consistent agreement than the regular cut and load-balanced cut cases.
-With load balancing by dimension, more cells are consistently created by slicing through cells in order to get more balanced partitions. 
-By increasing the number of unknowns, we get better timing statistics for the solve time per sweep. 
-In addition, with load-balanced-by-dimension partitions, PDT's first-come-first-serve scheduler is more likely to agree with the time-to-solution estimators. 
-The communication dependencies inherently created by load-balanced-by-dimension partitions mitigate the likelihood of faster processors disrupting the expected schedule, as seen with the load-balanced cases. 
+With load balancing by dimension, more cells are consistently created by slicing through cells in order to get more balanced partitions.
+By increasing the number of unknowns, we get better timing statistics for the solve time per sweep.
+In addition, with load-balanced-by-dimension partitions, PDT's first-come-first-serve scheduler is more likely to agree with the time-to-solution estimators.
+The communication dependencies inherently created by load-balanced-by-dimension partitions mitigate the likelihood of faster processors disrupting the expected schedule, as seen with the load-balanced cases.
 %%%spiderweb comp for lbd
 \begin{figure}[!ht]
   \centering
   \includegraphics[scale=0.75]{../../figures/spiderweb_lbd_pdtvtts.pdf}
-  \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig. \ref{partitioning_example} for 2 to 10 subsets in each dimension with load-balanced-by-dimension cuts.}
+  \caption{The sweep times of the time-to-solution estimator and PDT for the mesh in Fig.~\ref{partitioning_example} for 2 to 10 subsets in each dimension with load-balanced-by-dimension cuts.}
 \label{comp_lbd_spiderweb}
 \end{figure}
 \begin{table}[!ht]
 \centering
-\caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig. \ref{comp_lbd_spiderweb}.}
+\caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig.~\ref{comp_lbd_spiderweb}.}
 \label{diff_lbd_spiderweb}
 \begin{tabular}{c|c}
-\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline 
-2&6.5\%\\ \hline 
-3&13.49\%\\ \hline 
-4&4.04\%\\ \hline 
-6&2.78\%\\ \hline 
-7&3.5\%\\ \hline 
-9&4.18\%\\ \hline 
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline
+2&6.5\%\\ \hline
+3&13.49\%\\ \hline
+4&4.04\%\\ \hline
+6&2.78\%\\ \hline
+7&3.5\%\\ \hline
+9&4.18\%\\ \hline
 10&12.01\%
 \end{tabular}
 \end{table}
@@ -812,7 +815,7 @@ Table \ref{level2_percent_diff} shows the percent difference between the PDT swe
 \begin{tabular}{c|c|c|c|c}
 \bf Case & \bf PDT (s) & \bf TTS (s) & \bf PDT Min (s) & \bf PDT Max (s) \\ \hline
 Regular & 0.07 & 0.0648 & 0.0686 & 0.0889\\ \hline
-Balanced & 0.0531 & 0.0535 & 0.0522 & 0.0638 
+Balanced & 0.0531 & 0.0535 & 0.0522 & 0.0638
 \end{tabular}
 \end{table}
 \begin{table}[ht]
@@ -820,7 +823,7 @@ Balanced & 0.0531 & 0.0535 & 0.0522 & 0.0638
 \caption{The percent difference for the regular cut and balanced cut Level 2 problems between PDT and the time-to-solution estimator.}
 \label{level2_percent_diff}
 \begin{tabular}{c|c}
-\textbf{Case} & \bf PDT vs. TTS \\ \hline 
+\textbf{Case} & \bf PDT vs. TTS \\ \hline
 Regular & 7.52\% \\ \hline
 Balanced & 0.63\%
 \end{tabular}
@@ -837,7 +840,8 @@ The data generated for the scaling suite was done during dedicated access time, 
 Additionally, the machine parameters were generated empirically using a serial suite of structured mesh problems.
 In the future, obtaining machine parameters should be attempted using unstructured meshes, and agreement between PDT and the time-to-solution estimator restudied.
 
-
+\jcr{some zoomed-in figures are gone. Why?}
+\jcr{Some enhancements on some figures to better see cut lines in x/y would be great}
 
 %\begin{figure}[ht]
 %\centering

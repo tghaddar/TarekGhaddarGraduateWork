@@ -21,27 +21,29 @@
 
 \chapter{\uppercase {INTRODUCTION}}\label{cha:introduction}
 
-The field of radiation transport studies the behavior of radiation throughout a six-dimensional phase space of time, space, energy, and direction. 
-Radiation transport is commonly used for radiation shielding and criticality safety applications, as well as the general simulation of radiation in different environments. 
+\jcr{this chapter cold use some TLC to make it more complete and easier to read, and wanting to read the rest of the dissertation}
 
-Radiation transport can be solved stochasticly or deterministicly.
+The field of radiation transport studies the distribution of radiation (particle/energy) throughout a six-dimensional phase-space, consisting of time, space, energy, and direction.
+Radiation transport is commonly used in reactor physics, medicial physics, radiation shielding, criticality safety applications, stellar atomospheres, as well as the general simulation of radiation in different environments.
+
+Radiation transport can be solved stochasticly or deterministically.
 The Monte Carlo method is used for stochastic radiation transport by tracking the behavior of a finite number of particles from their ``birth'' (for example, a neutron source) until their ``death'' (getting absorbed or escaping through a problem boundary), and statistically evaluating relevant quantities of interest (for example, neutron flux in a detector) \cite{shultis_mc}.
-Codes such as MCNP \cite{MCNP} and SHIFT {\cite{shift} utilize the Monte Carlo method to perform high fidelity radiation transport simulations for a variety of experiments and problems. 
+Codes such as MCNP \cite{MCNP} and SHIFT {\cite{shift} utilize the Monte Carlo method to perform high-fidelity radiation transport simulations for a variety of experiments and problems.
 
-Deterministic transport discretizes the time, spatial, energy, and angular variables to obtain a numerical solution to the transport equation.
-There are multiple popular methods to do this such as the method of characteristics and the transport sweeps, implemented by codes such as MPACT \cite{mpact}, Partisn \cite{partisn}, Denovo \cite{denovo}, and PDT \cite{mpadams2013,mpadams2015}. 
+Deterministic transport discretizes the time, spatial, energy, and angular variables, yielding an extremely large system of linear equations. This system is then solved iteratively to obtain a numerical solution to the transport equation.
+There are multiple methods to do this such as the method of characteristics and the transport sweeps, implemented by codes such as MPACT \cite{mpact}, Partisn \cite{partisn}, Denovo \cite{denovo}, and PDT \cite{mpadams2013,mpadams2015}.
 
-The work presented in this dissertation utilizes the transport sweep, a method that discretizes the Boltzmann transport equation \cite{bell_glasstone,zweifel,davison,duderstadt} down to a system of algebraic equations that can then be solved iteratively \cite{adams_larsen}.
-It is often desirable to split the full system so that the memory cost can be distributed across multiple processors. 
-The smaller linear system matrices often exhibit a lower block triangular structure whose solutions are easy to obtain.
+The work presented in this dissertation utilizes the transport sweep, a technique that discretizes\jcr{not true. discretization can be achieved in various ways. however, sweeps rely on a certain type of discretization to be able to solve the problem iteratively IN A MATRIX-FREE FASHION. that's the key concept.} the Boltzmann\jcr{why was B not introduced earlier} transport equation \cite{bell_glasstone,zweifel,davison,duderstadt} down to a system of algebraic equations that can then be solved iteratively \cite{adams_larsen}.
+It is often desirable to split the full system so that the memory cost can be distributed across multiple processors.
+The smaller\jcr{no clue what small linear system you are referring to, from the point of view of a first-time reader. this is not polised} linear system matrices often exhibit a lower block triangular\jcr{not explained. this has to do with ordering of the DFEM+SN discretized equations. impossible to follow if you do not introduced this, in TEXT, not equations, first.} structure whose solutions are easy to obtain.
 With each block being thought of as a cell, the solution is obtained by following the flow of radiation, or ``marching'' through a mesh.
 
 This ``marching'' or ``sweeping'' through a mesh gains complexity for unstructured and/or distributed meshes. Partitioning meshes in a balanced (or near equivalent amount of work per processor) fashion that preserves mesh integrity can present challenges.
 In addition, maintaining sweep performance for massively parallel simulations has and continues to be a thriving research topic.
-The following dissertation chapters will discuss a brief history of the transport sweep, parallel transport sweeps, load balancing unstructured meshes for transport, a time-to-solution estimator, and optimizing partitions for parallel transport. 
+The following dissertation chapters will discuss a brief history of the transport sweep, parallel transport sweeps, load balancing unstructured meshes for transport, a time-to-solution estimator, and optimizing partitions for parallel transport.
 
 \section{The Deterministic Transport Sweep}
-
+\jcr{you do not want to use sections here, this is silly, they will show up on the TOC for basically the same 2 pages}
 Chapter \ref{cha:transport_sweeps} introduces the steady-state neutron transport equation and the discretization process to obtain the discrete form of the transport equation. Chapter \ref{cha:transport_sweeps} also provides more details on the transport sweep.
 
 \section{Parallel Transport Sweeps}
@@ -53,7 +55,7 @@ This chapter also describes PDT's performance model, which predicts the sweep ti
 \section{Unstructured Meshing and Load Balancing in PDT}
 
 In order to solve a wider set of problems, an unstructured meshing capability was implemented in PDT.
-However, unstructured meshes may lead to imbalanced partitions, or different numbers of mesh cells per processor.
+However, unstructured meshes may lead to imbalanced partitions, or different numbers of mesh cells per processor subdomain.
 To address this, two load-balancing algorithms have been implemented in PDT, the original load-balancing algorithm and the load-balancing-by-dimension algorithm \cite{mastersthesis,mc2017}.
 
 \section{Time-to-Solution Estimator}
@@ -64,4 +66,4 @@ Chapter \ref{cha:tts} describes the time-to-solution estimator, a graph-based me
 \section{Partitioning Optimization}
 
 The time-to-solution estimator described in Chapter \ref{cha:tts} is used to optimize the partitioning scheme.
-Chapter \ref{cha:optimization} details two optimization methods: a ``black box'' method that uses Python's scipy.optimize library and a ``human-intelligence'' method that prioritizes partition placement in locations that don't add cells to a mesh.
+Chapter \ref{cha:optimization} details two optimization methods: a ``black box'' method that uses Python's scipy.optimize library and a ``human-intelligence'' method that prioritizes partition placement in locations that don't\jcr{no abbreviations!} add cells to a mesh.
