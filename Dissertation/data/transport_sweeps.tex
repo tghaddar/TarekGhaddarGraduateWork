@@ -43,7 +43,7 @@ The next step to solving the transport equation is to discretize in energy, yiel
 \end{equation}
 where the multigroup transport equations now form a system of coupled equations.
 
-Next, we discretize in angle using the discrete ordinates method\cite{denovo}, whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of directions $\vo_m$:
+Next, we discretize in angle using the discrete ordinates method \cite{denovo}, whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of directions $\vo_m$:
 \begin{equation}
 \vo_m \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr),
 \label{angle}
@@ -68,7 +68,7 @@ In order to obtain the solution for this discrete form of the transport equation
 \end{equation}
 where the right hand side terms of Eq.~\eqref{angle} have been combined into one general source term, $q_m$. The angular flux of iteration $(l+1)$ is calculated using the $(l^{th})$ value of the total source.
 
-After the angular and energy dependencies have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. This is done by meshing the domain and utilizing one of three popular discretization techniques: finite difference\cite{fd}, finite volume\cite{fd}, or discontinuous finite element\cite{Reed}, allowing one cell at a time to be solved. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Figure~\ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
+After the angular and energy dependencies have been accounted for, Eq.~\eqref{iteration} must be discretized in space as well. This is done by meshing the domain and utilizing one of three popular discretization techniques: finite difference \cite{fd}, finite volume \cite{fd}, or discontinuous finite element \cite{Reed}, allowing one cell at a time to be solved. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Figure~\ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
 
 \begin{figure}[H]
 \centering

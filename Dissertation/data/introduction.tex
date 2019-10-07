@@ -23,23 +23,26 @@
 
 \jcr{this chapter cold use some TLC to make it more complete and easier to read, and wanting to read the rest of the dissertation}
 
-The field of radiation transport studies the distribution of radiation (particle/energy) throughout a six-dimensional phase-space, consisting of time, space, energy, and direction.
-Radiation transport is commonly used in reactor physics, medicial physics, radiation shielding, criticality safety applications, stellar atomospheres, as well as the general simulation of radiation in different environments.
+The field of radiation transport studies the distribution of radiation (particle/energy) throughout a six-dimensional phase-space, consisting of time, space, energy, and direction. 
+Radiation transport is commonly used in reactor physics, medical physics, radiation shielding, criticality safety applications, stellar atmospheres, as well as the general simulation of radiation in different environments. 
 
-Radiation transport can be solved stochasticly or deterministically.
+Radiation transport is described by the Boltzmann transport equation \cite{bell_glasstone,zweifel,davison,duderstadt} and can be solved stochastically or deterministically. 
 The Monte Carlo method is used for stochastic radiation transport by tracking the behavior of a finite number of particles from their ``birth'' (for example, a neutron source) until their ``death'' (getting absorbed or escaping through a problem boundary), and statistically evaluating relevant quantities of interest (for example, neutron flux in a detector) \cite{shultis_mc}.
 Codes such as MCNP \cite{MCNP} and SHIFT {\cite{shift} utilize the Monte Carlo method to perform high-fidelity radiation transport simulations for a variety of experiments and problems.
 
 Deterministic transport discretizes the time, spatial, energy, and angular variables, yielding an extremely large system of linear equations. This system is then solved iteratively to obtain a numerical solution to the transport equation.
-There are multiple methods to do this such as the method of characteristics and the transport sweeps, implemented by codes such as MPACT \cite{mpact}, Partisn \cite{partisn}, Denovo \cite{denovo}, and PDT \cite{mpadams2013,mpadams2015}.
+There are multiple methods to do this such as the method of characteristics and the transport sweep, implemented by codes such as MPACT \cite{mpact}, Partisn \cite{partisn}, Denovo \cite{denovo}, and PDT \cite{mpadams2013,mpadams2015}.
 
-The work presented in this dissertation utilizes the transport sweep, a technique that discretizes\jcr{not true. discretization can be achieved in various ways. however, sweeps rely on a certain type of discretization to be able to solve the problem iteratively IN A MATRIX-FREE FASHION. that's the key concept.} the Boltzmann\jcr{why was B not introduced earlier} transport equation \cite{bell_glasstone,zweifel,davison,duderstadt} down to a system of algebraic equations that can then be solved iteratively \cite{adams_larsen}.
-It is often desirable to split the full system so that the memory cost can be distributed across multiple processors.
-The smaller\jcr{no clue what small linear system you are referring to, from the point of view of a first-time reader. this is not polised} linear system matrices often exhibit a lower block triangular\jcr{not explained. this has to do with ordering of the DFEM+SN discretized equations. impossible to follow if you do not introduced this, in TEXT, not equations, first.} structure whose solutions are easy to obtain.
-With each block being thought of as a cell, the solution is obtained by following the flow of radiation, or ``marching'' through a mesh.
+The work presented in this dissertation utilizes the transport sweep, a technique that solves the Boltzmann transport equation while avoiding having to build a large global matrix.
+The discrete-ordinates method \cite{denovo} is used to turn the transport equation into a algebraic system (a transport equation for each direction and each energy group) that can be solved iteratively \cite{adams_larsen}.
+We then can mesh the domain and discretize the discrete-ordinates transport equation in space using finite difference \cite{fd}, finite volume \cite{fd}, or discontinuous finite element \cite{Reed}. 
+This allows us to solve small linear systems, which usually exhibit a lower block triangular structure, cell by cell in the direction of radiation flow by inverting the streaming operator in the transport equation. This inversion of the streaming operator and ``marching'' through the mesh is known as ``sweeping''. 
 
-This ``marching'' or ``sweeping'' through a mesh gains complexity for unstructured and/or distributed meshes. Partitioning meshes in a balanced (or near equivalent amount of work per processor) fashion that preserves mesh integrity can present challenges.
-In addition, maintaining sweep performance for massively parallel simulations has and continues to be a thriving research topic.
+It is often desirable to split the problem domain so that the memory cost can be distributed across multiple processors.
+Extensive research has been done in parallelizing the transport sweep \cite{KBA,partisn,denovo,mpadams2013,mpadams2015}, as the transport sweep gains complexity for distribute meshes. Maintaining sweep performance for massively parallel simulations has and continues to be a thriving research topic.
+
+Research on sweeping on unstructured meshes has come to prominence in recent years, as the need to simulate more complex problems has risen.
+Partitioning unstructured meshes in a balanced (or near equivalent amount of work per processor) fashion that preserves mesh integrity can present challenges.
 The following dissertation chapters will discuss a brief history of the transport sweep, parallel transport sweeps, load balancing unstructured meshes for transport, a time-to-solution estimator, and optimizing partitions for parallel transport.
 
 \noindent \textbf{The Deterministic Transport Sweep}

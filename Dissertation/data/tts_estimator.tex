@@ -289,7 +289,7 @@ n_y &= \Big(\frac{N_c}{A}\Big)^{1/2}\cdot L_y, \label{ny}
 where $A$ is the subset area. Equations \ref{cellspersubset}-\ref{ny} are exact for structured meshes.
 However, unstructured meshes do not necessarily have an easily integrable mesh density function to calculate the cells per subset.
 
-\subsubsection{Weighting the task dependence graphs for unstructured meshes}
+\subsubsection{Determining the cells per subset for unstructured meshes}
 To get the cells per subset for unstructured meshes we require the vertex data of the mesh, as well as which vertices form each cell in the mesh.
 With this data, we take advantage of Python's {\tt shapely} library \cite{shapely} to determine which cells lie in each subset. From the vertex and cell data of the mesh, we build a lightweight version of each cell as a {\tt shapely Polygon}.\\
 \noindent
@@ -380,7 +380,6 @@ The incoming edges to each node in each graph now reflect the time at which a no
 At this point in the time-to-solution estimation process, we have a graph per octant/quadrant per angleset, with each graph weighted on a universal time scale.
 For each node in every graph, the incoming edges to the node represent the time $t$ that it is ready to solve at.
 The time to solution is best summarized as a ``marching'' process:
-\jcr{FROM TAREK: You seem to really dislike when I say a graph is solving a node. While I understand that this physically might not make sense, I believe it is the best way to get the point across in our abstraction of the sweep process.}
 \begin{enumerate}
   \item Starting at time $t=0$, find the nodes that are ready to solve or already solving across all graphs.
   \item If at that time, multiple graphs are solving the same node, they are in conflict.
@@ -620,7 +619,6 @@ The following machine parameters were generated and used for the 1 group suite:
   \caption{The scaling suite parameters ran with 1 energy group, 80 directions, and $A_m = 10$.}
   \label{scaling_suite}
 \end{table}
-\jcr{previous comments. no Ax, Ay values?}
 
 Figure~\ref{scaling_stagecount} shows the stage counts of the scaling suite for PDT's performance model and the time-to-solution estimator are in perfect agreement.
 Figures \ref{weak_scaling_tts_sweep} and \ref{weak_scaling_tts} show the time per sweep and parallel efficiency for (1) PDT, (2) the PDT performance model, and (3) the time-to-solution estimator. Table \ref{scaling_percent_diff} tabulates the percent differences for (1) PDT and the performance model, (2) the performance model, and (3) the time-to-solution estimator, and PDT and the time-to-solution estimator.
@@ -704,7 +702,6 @@ More unknowns lead to better timing statistics for PDT, increasing the likelihoo
 \caption{The sweep times of the time-to-solution estimator and PDT for the unbalanced pin mesh for 2 to 10 subsets in each dimension with regular cuts.}
 \label{comp_reg_spiderweb}
 \end{figure}
-\jcr{TTS is a little all over the place. What do you think?}
 \begin{table}[!ht]
 \centering
 \caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig.~\ref{comp_reg_spiderweb}.}
@@ -764,7 +761,7 @@ Table \ref{diff_lbd_spiderweb} tabulates the percent difference between PDT and 
 The load-balanced-by-dimension cases for the unbalanced pin mesh have more consistent agreement than the regular cut and load-balanced cut cases.
 With load balancing by dimension, more cells are consistently created by slicing through cells in order to get more balanced partitions.
 By increasing the number of unknowns, we get better timing statistics for the solve time per sweep.
-In addition, with load-balanced-by-dimension partitions, PDT's first-come-first-serve scheduler is more likely to agree with the time-to-solution estimators.
+In addition, with load-balanced-by-dimension partitions, PDT's first-come-first-serve scheduler is more likely to agree with the time-to-solution estimator's.
 The communication dependencies inherently created by load-balanced-by-dimension partitions mitigate the likelihood of faster processors disrupting the expected schedule, as seen with the load-balanced cases.
 %%%spiderweb comp for lbd
 \begin{figure}[!ht]
