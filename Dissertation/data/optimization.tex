@@ -29,7 +29,6 @@ The time-to-solution estimator is not easily differentiable, and therefore not a
 Although utilizing a tested and documented optimizer would have been ideal, it is clear that we need a method more uniquely suited for our problem.
 
 \section{CDF Optimization}
-\jcr{here, I want to use the term CDF used. By the way, you need to make sure the mesh CDF's are defined way earlier, in a previous chapter, as appropriate...}
 
 The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers can function for very small parameter spaces.
 However, even with modestly large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing.

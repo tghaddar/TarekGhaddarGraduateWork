@@ -27,7 +27,7 @@ Before detailing the two load balancing algorithms PDT employs, a quick review o
 \end{itemize}
 Using cut lines/cut planes to partition unstructured meshes may preserve the provably optimal sweep partitioning \cite{mpadams2013,mpadams2015} of logically Cartesian grids if each partition has an equivalent number of cells.
 Subsets, rather than the cells, have $(i,j,k)$ indices and will become the base unit when aggregating spatial parameters. That is, $A_x$ and $A_y$ will now represent the number of subsets in $x$ and $y$ aggregated into a task.
-Generally, one subset is assigned per processor, as this minimizes the communication costs across processor boundaries, although this is not required. \jcr{FROM TAREK: processor connection shown here}\jcr{where?}
+Generally, one subset is assigned per processor, as this minimizes the communication costs across processor boundaries, although this is not required.
 Figure~\ref{partitioning_example} shows an example of an unstructured mesh partitioned into 100 subsets in PDT.
 \begin{figure}[H]
 \centering
@@ -177,8 +177,6 @@ Algorithm \ref{lbd} details the load-balancing-by-dimension algorithm.
   \STATE Calculate $f$.
 \end{algorithmic}
 \end{algorithm}
-
-\jcr{what’s the connection with the processor layout. at some point, it is good to loop back on that notion that was heavily present before and now has disappeared}
 
 Figure~\ref{alg_illustration} illustrates the behavior of both algorithms after 5 iterations. In Fig.~\ref{3x3_lb}, we see the partitions cutting across the entire domain, with the $x$ and $y$ cut lines moving into the denser geometric features in the corners to more evenly distribute cells. In Fig.~\ref{3x3_lbd}, we see the $x$ partitions cutting across the entire domain, but the $y$ partitions being redistributed by column. The $y$ partitions are moved into the respective geometric features in the appropriate columns in order to better balance the problem.
 
