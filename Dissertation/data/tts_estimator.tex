@@ -787,14 +787,47 @@ The communication dependencies inherently created by load-balanced-by-dimension 
 \end{tabular}
 \end{table}
 
-Figure~\ref{ubp_more_sparse} contains 
-
+\FloatBarrier
+Figure~\ref{ubp_more_sparse} shows a more refined version of the unbalanced pin mesh, containing 9656 cells as opposed to 420 cells. 
+Figure~\ref{comp_reg_sparse} shows the sweep times for PDT and the time-to-solution estimator for the unbalanced pin mesh with 2 to 10 subsets in each dimension with regular cuts.
+Table \ref{diff_reg_sparse} tabulates the percent difference between PDT and the time-to-solution estimator for each of the regular test cases run.
+%%%%
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.28]{../../figures/unbalanced_pins_more_sparse.png}
 \caption{A more refined version of the unbalanced pin mesh, containing 9656 cells as opposed to 420 cells.}
 \label{ubp_more_sparse}
 \end{figure}
+%%%
+\begin{figure}[h]
+\centering
+\includegraphics{../../figures/more_sparse_reg_pdtvtts.pdf}
+\caption{The sweep times of the time-to-solution estimator and PDT for the more refined unbalanced pin mesh for 2 to 10 subsets in each dimension with regular cuts}
+\label{comp_reg_sparse}
+\end{figure}
+%%%
+\begin{table}[h]
+\centering
+\caption{The percent difference in sweep times between the time-to-solution estimator and PDT for the sweep times shown in Fig.~\ref{comp_reg_sparse}.}
+\label{diff_reg_sparse}
+\begin{tabular}{c|c}
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline 
+2&21.14\%\\ \hline 
+3&15.87\%\\ \hline 
+4&10.96\%\\ \hline 
+5&9.3\%\\ \hline 
+6&1.47\%\\ \hline 
+7&0.41\%\\ \hline 
+8&3.68\%\\ \hline 
+9&2.85\%\\ \hline 
+10&6.62\%
+\end{tabular}
+\end{table}
+
+The 9656 cell unbalanced pin mesh time-to-solution estimator sweep times show more consistent agreement with PDT than the 420 cell unbalanced pin mesh.
+In addition, the behaviors of PDT and the time-to-solution estimator are more consistent with each other with more cells.
+The low core cases disagree once more, likely due to an overestimation of the latency by the time-to-solution estimator.
+Properly characterizing the latency for individual core counts is likely to improve agreement at low core counts. 
 
 \FloatBarrier
 \subsection{PDT vs. the Time-to-Solution Estimator for the Level 2 Experiment Mesh}
