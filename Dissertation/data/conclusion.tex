@@ -58,19 +58,22 @@ The first is to obtain allocation on a Blue-Gene/Q machine and rerun all problem
 Blue-Gene/Q machines tend to have more stable latencies than x86 machines (such as Quartz), and as such can be more easily characterized.
 The second solution to this problem is to attempt to generate latency information for different core counts for x86 machines, rather than have a flat multiplier regardless of core count.
 
-The third and final reason, the generation of machine parameters, also lends itself to subsequent investations.
+The third and final reason, the generation of machine parameters, also lends itself to subsequent investigations.
 Generating the empirical constants used in the time-to-solution estimator should be done with both structured and unstructured meshes to check if the constants' values change significantly.
 If they do, this could be a significant source of error in the time-to-solution estimator and optimization process.
 
 In addition to the agreement between PDT and the time-to-solution estimator being a significant source of future work, speeding up the time-to-solution estimator would allow for a much larger set of potential partitions to be run through the optimizer.
-Two paths forward come to mind: rewriting the time-to-solution estimator in a precompiled language rather than an interpreted language and modestly parallelizing the time-to-solution estimator.
-\jcr{I think machine learning should also play a part. Add some blurb for this too...}
+Three paths forward come to mind: rewriting the time-to-solution estimator in a precompiled language rather than an interpreted language, modestly parallelizing the time-to-solution estimator, and machine learning.
 
 Although Python's ease of use and vast number of libraries made it an extremely attractive option for graph algorithms ({\tt networkx}) and mesh manipulation ({\tt shapely}), larger problems can take a long time to finish sweeping in the time-to-solution estimator.
 This can severely hinder our ability to robustly optimize our problems.
 Our optimization method chooses natural boundaries as the basis for optimizing our partitions, but with a time-to-solution estimator that finishes sweeping in milliseconds rather than tens of seconds, we would be able to run thousands of sets of partitions rather than under 20.
 If possible, rewriting the time-to-solution estimator in C++ would inherently speed up the code, with the hope that there are similarly convenient graph and mesh manipulation libraries.
-Rewriting the time-to-solution estimator in C++ also potentially opens the door to
+Rewriting the time-to-solution estimator in C++ also potentially opens the door to a new set of black box tools that may be effective for functions that are not smooth like the time-to-solution estimator.
 
 Modest levels of parallelism implemented in the time-to-solution estimator could speed up the code enough to drive the time-to-solution estimator's time down significantly.
 This is not my personal preferred path forward, as only small portions of the code are embarrassingly parallel, and the Python's parallel overhead could mitigate the advantages.
+
+The field of machine learning lends itself to speeding up the time-to-solution estimation and partitioning optimization processes.
+With a robust training set, the time-to-solution estimator could be used to construct a model that can quickly predict the time-to-solution for a given set of partitioning parameters.
+By speeding up the estimation process, we can speed up the optimization process. 
