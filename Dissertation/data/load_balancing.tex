@@ -267,15 +267,15 @@ There is consistent improvement for both algorithms for all cases, and the impro
 \end{tabular}
 \end{table}
 
-The same parametric study was run on an experiment that PDT simulates, the Level 2 experiment, shown in Fig.~\ref{level2_nocut_lbchapter}.
+The same parametric study was run on an experiment that PDT simulates, the Level-2 experiment, shown in Fig.~\ref{level2_nocut_lbchapter}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.3]{../../figures/level2_nocut.png}
-\caption{The mesh for the Level 2 experiment.}
+\caption{The mesh for the Level-2 experiment.}
 \label{level2_nocut_lbchapter}
 \end{figure}
-The Level 2 mesh contains a relatively uniform geometry throughout the mesh with one denser feature in the middle of the top boundary.
-Fig.~\ref{level2_alg_illustration} shows the dense region of the level 2 mesh with 7 regular, load-balanced, and load-balanced-by-dimension cuts.
+The Level-2 mesh contains a relatively uniform geometry throughout the mesh with one denser feature in the middle of the top boundary.
+Fig.~\ref{level2_alg_illustration} shows the dense region of the Level-2 mesh with 7 regular, load-balanced, and load-balanced-by-dimension cuts.
 %zoomed in photos
 \begin{figure}[ht]
 \centering
@@ -297,7 +297,7 @@ Fig.~\ref{level2_alg_illustration} shows the dense region of the level 2 mesh wi
 \caption{5 load-balancing-by-dimension iterations.}
 \label{7_lbd}
 \end{subfigure}
-\caption{A demonstration of the original load balancing and load-balancing-by-dimension algorithms on the Level 2 mesh partitioned into 7x7 subsets.}
+\caption{A demonstration of the original load balancing and load-balancing-by-dimension algorithms on the Level-2 mesh partitioned into 7x7 subsets.}
 \label{level2_alg_illustration}
 \end{figure}
 Figure~\ref{level2_metric_study} shows the results of this parametric study, which are tabulated in Table \ref{level2_metric_study_table}.
@@ -305,12 +305,12 @@ Figure~\ref{level2_metric_study} shows the results of this parametric study, whi
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.7]{../figures/level2_metric_study.pdf}
-\caption{The results of the parametric study with no load balancing, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations for the Level 2 mesh.}
+\caption{The results of the parametric study with no load balancing, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations for the Level-2 mesh.}
 \label{level2_metric_study}
 \end{figure}
 \begin{table}[ht]
 \centering
-\caption{The tabulated results of the parametric study shown in Fig.~\ref{level2_metric_study} with no load balancing, 5 original load balancing iterations (LB), and 5 load-balancing-by-dimension (LBD) iterations for the Level 2 mesh.}
+\caption{The tabulated results of the parametric study shown in Fig.~\ref{level2_metric_study} with no load balancing, 5 original load balancing iterations (LB), and 5 load-balancing-by-dimension (LBD) iterations for the Level-2 mesh.}
 \label{level2_metric_study_table}
 \scalebox{0.8}{
 \begin{tabular}{c|c|c|c}
@@ -327,16 +327,16 @@ Figure~\ref{level2_metric_study} shows the results of this parametric study, whi
 \end{tabular}}
 \end{table}
 
-With regular cut lines going through the Level 2 mesh, $f_\text{reg}$ behaves more erratically than the two pin mesh in Fig.~\ref{partitioning_example}. The natural boundaries are not as uniform, and cells are added in a less consistent fashion. It is noticeable that even numbers of subsets take advantage of the problem's symmetry and consistently have a smaller $f_\text{reg}$ value.
+With regular cut lines going through the Level-2 mesh, $f_\text{reg}$ behaves more erratically than the two pin mesh in Fig.~\ref{partitioning_example}. The natural boundaries are not as uniform, and cells are added in a less consistent fashion. It is noticeable that even numbers of subsets take advantage of the problem's symmetry and consistently have a smaller $f_\text{reg}$ value.
 
-$f_\text{LB}$ and $f_\text{LBD}$ behave much less erratically than $f_\text{reg}$ for the Level 2 mesh.
+$f_\text{LB}$ and $f_\text{LBD}$ behave much less erratically than $f_\text{reg}$ for the Level-2 mesh.
 Table \ref{level2_metric_improvement} shows the percent decrease in $f$ with the original load-balancing algorithm and the load-balancing-by-dimension algorithm relative to no load balancing, and the percent decrease in $f$ with the load-balancing-by-dimension algorithm relative to the original load-balancing algorithm.
 Both algorithms can decrease $f$ up to 90\%, but what is notable is the smaller improvement in the load-balancing-by-dimension algorithm relative to the load-balancing-algorithm.
 With only one dense feature located in the middle of the mesh, moving the $y$ cut lines on a columnar basis is much less advantageous.
 %%%%%%%%%%%%%%
 \begin{table}[ht]
 \centering
-\caption{The percent decrease of $f$ with the original load balancing algorithm (LB) and the load-balancing-by-dimension algorithm (LBD) relative to no load balancing, and the percent decrease of $f$ with the load-balancing-by-dimension algorithm relative to the original load balancing algorithm for the Level 2 mesh.}
+\caption{The percent decrease of $f$ with the original load balancing algorithm (LB) and the load-balancing-by-dimension algorithm (LBD) relative to no load balancing, and the percent decrease of $f$ with the load-balancing-by-dimension algorithm relative to the original load balancing algorithm for the Level-2 mesh.}
 \label{level2_metric_improvement}
 \begin{tabular}{c|c|c|c}
 \textbf{$\sqrt{\text{Num Subsets}}$} & \bf LB v. Regular  & \bf LBD v. Regular & \bf LBD v. LB \\ \hline

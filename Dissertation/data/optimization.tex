@@ -31,11 +31,11 @@ Although utilizing a tested and documented optimizer would have been ideal, it i
 \section{CDF Optimization}
 
 The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers can function for very small parameter spaces.
-However, even with modestly large parameter spaces such as the one seen in the Level 2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing.
+However, even with modestly large parameter spaces such as the one seen in the Level-2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing.
 This lead to the development of an alternative method, the CDF optimization method.
 
 The CDF optimization method utilizes the geometrical information of the problem to attempt to find optimal cuts. This method prioritizes finding cut line locations that cut along a ``natural boundary'', and minimizing the total number of times the time-to-solution estimator needs to be run.
-The time-to-solution estimator for moderately sized problems (such as the Level 2 experiment) can take up to 20 seconds to run for one set of partitions.
+The time-to-solution estimator for moderately sized problems (such as the Level-2 experiment) can take up to 20 seconds to run for one set of partitions.
 This rules out a brute force method of running every possible set of partitions.
 Instead, we select our cut lines from the natural boundaries of the mesh.
 
@@ -84,11 +84,10 @@ In order to globalize the optimization of the cut lines per column, we set up a 
 \caption{A binary tree where each node represents the number of columns we are attempting to find a natural boundary through.}
 \label{binary_tree}
 \end{figure}
-\jcr{make sure the arrow tips are LARGE enough to see}
 
-Let's\jcr{no abbreviations please} consider the mesh of the Level 2 \jcr{hyphen this throughout: Level-2} experiment shown in Fig.~\ref{level2_nocut}.
+Let us consider the mesh of the Level-2 experiment shown in Fig.~\ref{level2_nocut}.
 We run this problem with 42 subsets in $x$ and 13 subsets in $y$.
-Fig.~\ref{opt_walkthrough} shows 3 stages of choosing partitions for the Level 2 mesh.
+Fig.~\ref{opt_walkthrough} shows 3 stages of choosing partitions for the Level-2 mesh.
 Fig.~\ref{42} shows the $x$ partitions, with the $y$ partitions optimized for all 42 columns.
 This means that we attempted to identify natural boundaries through all 42 columns.
 Fig.~\ref{21} shows the same $x$ partitions, but the $y$ partitions optimized for the first 21 columns independently from the second 21 columns.
@@ -98,7 +97,7 @@ We continue this process until we are optimizing $y$ partitions for each column.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.3]{../../figures/level2_nocut.png}
-\caption{The mesh for the Level 2 experiment.}
+\caption{The mesh for the Level-2 experiment.}
 \label{level2_nocut}
 \end{figure}
 
@@ -122,7 +121,7 @@ We continue this process until we are optimizing $y$ partitions for each column.
     \caption{The y-cuts chosen for independently for 10,11,10, and 11 columns.}
     \label{10}
   \end{subfigure}
-  \caption{The Level 2 Mesh partitions at three stages of the choosing the optimization cut process.}
+  \caption{The Level-2 Mesh partitions at three stages of the choosing the optimization cut process.}
   \label{opt_walkthrough}
 \end{figure}
 
@@ -132,7 +131,7 @@ With this method, we are also not running the time-to-solution estimator a large
 \FloatBarrier
 
 \section{Optimization Results}
-The CDF optimization method was run on the unbalanced pin mesh and the Level 2 experiment mesh.
+The CDF optimization method was run on the unbalanced pin mesh and the Level-2 experiment mesh.
 The unbalanced pin mesh was run through the optimization suite from 2 to 10 subsets in each dimension.
 Figure~\ref{ubp_opt} shows the time-to-solution for optimized, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.
 %%%%%%%%%%
@@ -144,14 +143,14 @@ Figure~\ref{ubp_opt} shows the time-to-solution for optimized, regular, load-bal
 \end{figure}
 %%%%%%%%%%%
 For low numbers of subsets, the load-balanced-by-dimension partitions outperform the regular, load-balanced, and optimized partitions.
-Due to the low number of communications, having partitions that are balanced by column doesn't incur a large communication penalty, and having a well-balanced problem is still more important.
+Due to the low number of communications, having partitions that are balanced by column does not incur a large communication penalty, and having a well-balanced problem is still more important.
 However, once we exceed 16 subsets, we can see the optimized partitions outperforming the other partition types, with the prioritization of not adding cells paying off.
 
-Figure~\ref{level2_opt} shows the sweep times on the Level 2 mesh from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts.
+Figure~\ref{level2_opt} shows the sweep times on the Level-2 mesh from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts.
 \begin{figure}[H]
 \centering
 \includegraphics{../../figures/level2_sweep_comp.pdf}
-\caption{The Level 2 mesh sweep times from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts. }
+\caption{The Level-2 mesh sweep times from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts. }
 \label{level2_opt}
 \end{figure}
 This problem shows us\jcr{remove us. This is written English. Take the time before writing down something. The opportunities for me to come after you and check are now very limited. Make sure that what you have added to tip top} that this optimization approach will at times not give us the best sweep times.
@@ -161,8 +160,8 @@ Thus the ``optimization suite'' should always have the cut types of previous wor
 In addition, spending the time to hand balance the mesh is potentially not worth it as the time per sweep only differed by 0.004 seconds.
 Depending on the total number of sweeps that need to be performed, this difference could be negligible in the total time to solution.
 
-The failure of the optimization process to provide better cuts for the Level 2 experiment highlights a few paths forward for future work.
-The time-to-solution estimator is computationally too slow (the Level 2 problem takes 20 seconds per run) to run a large number of partition sets.
+The failure of the optimization process to provide better cuts for the Level-2 experiment highlights a few paths forward for future work.
+The time-to-solution estimator is computationally too slow (the Level-2 problem takes 20 seconds per run) to run a large number of partition sets.
 With a faster time-to-solution estimator (down to milliseconds for modestly large problems), we could  run a much larger number of partitions to test their time-to-solution in a reasonable time, and our optimization process could be more robust.
 Combinations of natural boundaries could be selected instead of just the highest discontinuities in the CDF.
 For example, choosing 42 of the largest 50 cuts in the $x$ direction for the Level-2 problem alone would give us 14,190 potential cuts to try in just the $x$-direction.

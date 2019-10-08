@@ -33,7 +33,7 @@ G.add_edge(2,5)
 G.add_edge(2,6)
 
 plt.figure()
-nx.draw(G,pos=Q,with_labels=False,node_color='r')
+nx.draw(G,pos=Q,with_labels=False,node_color='r',arrowsize=20)
 nx.draw_networkx_labels(G,pos=Q,labels=labels,font_size=16,node_color='r')
 plt.savefig("../../figures/binary_tree.pdf")
 plt.close()

@@ -134,7 +134,7 @@ $\begin{pmatrix}
 
 \subsection{Building the directed acyclic graphs (DAGs)}
 
-The adjacency matrices give us directed connectivity information in order to build our graphs. This process differs slightly from 2D to 3D. Both processes use on networkx's DiGraph function to build the DAGs.
+The adjacency matrices give us directed connectivity information in order to build our graphs. This process differs slightly from 2D to 3D. Both processes use on {\tt networkx's DiGraph} function to build the DAGs.
 
 \subsubsection{Building the 2D graphs}
 In two dimensions, we build four graphs corresponding to four quadrants.
@@ -671,7 +671,7 @@ Figure~\ref{weak_scaling_tts} shows PDT's performance model and the time-to-solu
 \section{PDT vs. Time-to-Solution Estimator for Unstructured Meshes}
 
 The motivation to develop the time-to-solution estimator was born out of the desire to predict sweep time for unstructured meshes.
-To test how the time-to-solution estimator performs on unstructured problems, we use the meshes from our load balancing parametric study: the unbalanced pin mesh(Fig. \ref{partitioning_example}) and the Level 2 experiment mesh (Fig. \ref{level2_nocut_lbchapter}).
+To test how the time-to-solution estimator performs on unstructured problems, we use the meshes from our load balancing parametric study: the unbalanced pin mesh(Fig. \ref{partitioning_example}) and the Level-2 experiment mesh (Fig. \ref{level2_nocut_lbchapter}).
 
 All problems were run with one energy group, one subset per processor, and 144 angles with $A_m = 36$, or 36 angles per angleset. The machine parameters used for all problems are:
 \begin{itemize}
@@ -830,27 +830,27 @@ The low core cases disagree once more, likely due to an overestimation of the la
 Properly characterizing the latency for individual core counts is likely to improve agreement at low core counts. 
 
 \FloatBarrier
-\subsection{PDT vs. the Time-to-Solution Estimator for the Level 2 Experiment Mesh}
-Figures \ref{level2_42x13} and \ref{level2_42x13_balanced} show the mesh for the Level 2 experiment with 42 subsets in $x$, and 13 subsets in $y$ with evenly spaced cut lines and balanced cut lines.
+\subsection{PDT vs. the Time-to-Solution Estimator for the Level-2 Experiment Mesh}
+Figures \ref{level2_42x13} and \ref{level2_42x13_balanced} show the mesh for the Level-2 experiment with 42 subsets in $x$, and 13 subsets in $y$ with evenly spaced cut lines and balanced cut lines.
 The balanced mesh was ``hand-balanced'' by Marvin Adams and Jan Vermaak to achieve better load balancing than the automated load balancing algorithm was able to achieve.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.28]{../../figures/level2_42x13.png}
-\caption{The Level 2 experiment mesh evenly partitioned into 42 subsets in x and 13 subsets in y. $f = 32.616$.}
+\caption{The Level-2 experiment mesh evenly partitioned into 42 subsets in x and 13 subsets in y. $f = 32.616$.}
 \label{level2_42x13}
 \end{figure}
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.28]{../../figures/level2_42x13_balanced.png}
-\caption{The Level 2 experiment mesh partitioned and load balanced with 42 subsets in x and 13 subsets in y. $f = 2.386$.}
+\caption{The Level-2 experiment mesh partitioned and load balanced with 42 subsets in x and 13 subsets in y. $f = 2.386$.}
 \label{level2_42x13_balanced}
 \end{figure}
 
-Table \ref{level2_sweep_times} shows the sweep times for the regular cut and balanced cut Level 2 problems for PDT and the time-to-solution estimator. The minimum and maximum solve time per sweep values are also tabulated.
+Table \ref{level2_sweep_times} shows the sweep times for the regular cut and balanced cut Level-2 problems for PDT and the time-to-solution estimator. The minimum and maximum solve time per sweep values are also tabulated.
 Table \ref{level2_percent_diff} shows the percent difference between the PDT sweep time and the time-to-solution estimator sweep time.
 \begin{table}[ht]
 \centering
-\caption{The sweep times for the regular cut and balanced cut Level 2 problems for PDT and the time-to-solution estimator.}
+\caption{The sweep times for the regular cut and balanced cut Level-2 problems for PDT and the time-to-solution estimator.}
 \label{level2_sweep_times}
 \begin{tabular}{c|c|c|c|c}
 \bf Case & \bf PDT (s) & \bf TTS (s) & \bf PDT Min (s) & \bf PDT Max (s) \\ \hline
@@ -860,7 +860,7 @@ Balanced & 0.0531 & 0.0535 & 0.0522 & 0.0638
 \end{table}
 \begin{table}[ht]
 \centering
-\caption{The percent difference for the regular cut and balanced cut Level 2 problems between PDT and the time-to-solution estimator.}
+\caption{The percent difference for the regular cut and balanced cut Level-2 problems between PDT and the time-to-solution estimator.}
 \label{level2_percent_diff}
 \begin{tabular}{c|c}
 \textbf{Case} & \bf PDT vs. TTS \\ \hline
