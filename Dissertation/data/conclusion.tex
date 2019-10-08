@@ -30,6 +30,15 @@ The estimator was run through a benchmark case that mirrored the PDT scaling sui
 The time-to-solution estimator was within 4\% of PDT's performance model estimator for the sweep time for all problems in the scaling suite, and within 12\% of PDT's sweep time for all cases in the scaling suite (shown in Table \ref{scaling_percent_diff}).
 The time-to-solution estimator was also tested against unstructured meshes, with the majority of problems run within 10\% of PDT's sweep time. 
 
+Chapter \ref{cha:optimization} describes our method for optimizing partitions.
+It quickly became apparent that black box tools were not suitable for our problem, due to the time-to-solution estimator not being a smooth enough function.
+A secondary method, the CDF optimization method, relies on intuitively interpreting the geometric information in an attempt to find optimal cuts.
+The detailed vertex CDF is analyzed in each dimension, and jumps in the CDF correspond to locations where natural boundaries (where partition boundaries are the same as mesh boundaries) occur.
+Placing partitions at these locations minimizes the addition of cells to our mesh, which drives down the serial solution time.
+This method proved effective for the unbalanced pin mesh, as the optimized cuts mostly outperformed the regular, load-balanced, and load-balanced-by-dimension cuts (shown in Fig.~\ref{ubp_opt}).
+For the Level 2 mesh, the optimized cuts only outperformed the regular cuts.
+When optimizing partitions, we need to be sure to include regular, load-balanced, and load-balanced-by-dimension cuts in the optimization runs, as it is possible that adding cells with a more balanced partition will lead to a faster time-to-solution.
+
 \section{Future Work}
 
 The time-to-solution estimator allowed us to study the sweep time as a function of partitioning parameters.
