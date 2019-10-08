@@ -146,4 +146,25 @@ For low numbers of subsets, the load-balanced-by-dimension partitions outperform
 Due to the low number of communications, having partitions that are balanced by column doesn't incur a large communication penalty, and having a well-balanced problem is still more important.
 However, once we exceed 16 subsets, we can see the optimized partitions outperforming the other partition types, with the prioritization of not adding cells paying off.
 
+Figure~\ref{level2_opt} shows the sweep times on the Level 2 mesh from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts.
+\begin{figure}[H]
+\centering
+\includegraphics{../../figures/level2_sweep_comp.pdf}
+\caption{The Level 2 mesh sweep times from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts. }
+\label{level2_opt}
+\end{figure}
+This problem shows us that our method of optimization will at times not give us the best sweep times.
+While prioritizing not adding cells to the mesh is a solid theory, sometimes adding cells to achieve better balance will pay off.
+The importance of making sure to run the regular, load-balanced, and load-balanced-by-dimension cuts in addition to the optimized cuts is made clear by this problem.
+Thus the ``optimization suite'' should always have the cut types of previous work to test them.
+In addition, spending the time to hand-balance the mesh is potentially not worth it as the time per sweep only differed by 0.004 seconds.
+Depending on the total number of sweeps that need to be performed, this difference could be negligible in the total time to solution.
+
+The failure of the optimization process to provide better cuts for the Level 2 experiment highlights a few paths forward for future work.
+The time-to-solution estimator is too slow (the Level 2 problem takes 20 seconds per run) to run a large number of partition sets.
+With a sped up time-to-solution estimator (down to milliseconds for modestly large problems), we can run a much larger number of partitions to test their time-to-solution in a reasonable time, and our optimization process can become more robust.
+Combinations of natural boundaries could be selected instead of just the highest discontinuities in the CDF.
+For example, choosing 42 of the largest 50 cuts in the $x$ direction for the Level 2 problem alone would give us 14,190 potential cuts to try in just the $x$-direction.
+At 20 seconds per run, this would take approximately 79 hours, which is completely unfeasible.
+However, at 20 milliseconds per run, this would only take around 5 minutes, which is a reasonable amount of time to wait for balanced partitions.
 
