@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%  New template code for TAMU Theses and Dissertations starting Fall 2016.  
+%  New template code for TAMU Theses and Dissertations starting Fall 2016.
 %
 %
 %  Author: Sean Zachary Roberson
@@ -16,19 +16,19 @@
 
 \chapter{SUMMARY AND CONCLUSIONS \label{cha:Summary}}
 
-The transport sweep simplifies obtaining the solution to the Boltzmann transport equation by solving the transport equation one cell at a time.
-Parallelizing the transport sweep offers the ability to solve more memory-intensive and higher fidelity problems, and with parallel sweep algorithms such as KBA and PDT's hybrid KBA, it can be done efficiently.
+Transport sweep techniques enable fast and accurate solutions to the Boltzmann transport equation by employing discretization technqiues that allow for solving the transport equation one cell at a time.
+Parallelizing the transport sweep offers the ability to solve more memory-intensive problems with higher resolution. With parallel sweep algorithms such as KBA and PDT's hybrid KBA, this can be done efficiently.
 
 However, when unstructured meshes are used, these algorithms can lose effectiveness as unstructured meshes can introduce imbalanced partitions.
 We combat these imbalanced partitions by load balancing the meshes before sweeping them, attempting to obtain an equivalent amount of work per processor.
-In Chapter \ref{cha:lb}, we saw that our two load balancing algorithms, the original load balancing algorithm and the load-balancing-by-dimension algorithm can obtain close to a 90\% improvement in balance for imbalanced meshes. However, we noticed that just because a problem has better balance, doesn't mean that it will sweep faster, defeating the purpose of achieving balance.
+In Chapter \ref{cha:lb}, we saw that our two load-balancing algorithms, the original load-balancing algorithm and the load-balancing-by-dimension algorithm can obtain close to a 90\% improvement in balance for imbalanced meshes. However, we noticed that a balanced problem  does not signify that it will be swept faster, somewhat defeating the purpose of achieving load balance.
 
 Chapter \ref{cha:tts} details the time-to-solution estimator, a tool that predicts the sweep time for a given set of partitioning parameters.
 PDT has had a performance model that predicted the sweep time for structured, balanced meshes, but had no way to predict the sweep time for imbalanced partitions.
 The time-to-solution estimator has no restriction on mesh type, and can be used to predict the sweep time for balanced or imbalanced partitions.
 The estimator was run through a benchmark case that mirrored the PDT scaling suite from 1 to 16,384 cores.
 The time-to-solution estimator was within 4\% of PDT's performance model estimator for the sweep time for all problems in the scaling suite, and within 12\% of PDT's sweep time for all cases in the scaling suite (shown in Table \ref{scaling_percent_diff}).
-The time-to-solution estimator was also tested against unstructured meshes, with the majority of problems run within 10\% of PDT's sweep time. 
+The time-to-solution estimator was also tested against unstructured meshes, with the majority of problems run within 10\% of PDT's sweep time.
 
 Chapter \ref{cha:optimization} describes our method for optimizing partitions.
 It quickly became apparent that black box tools were not suitable for our problem, due to the time-to-solution estimator not being a smooth enough function.
@@ -43,33 +43,34 @@ When optimizing partitions, we need to be sure to include regular, load-balanced
 
 The time-to-solution estimator allowed us to study the sweep time as a function of partitioning parameters.
 Although we saw good agreement with PDT, particularly for problems with larger numbers of unknowns, we saw some discrepancies.
-We theorize this is due to three reasons:
+We hypothetize that this is due to the following three reasons:
 \begin{enumerate}
 \item PDT's first-come-first-serve schedule is not consistent with the time-to-solution estimator's schedule,
 \item The latency on Quartz is easy to mischaracterize,
-\item The machine parameters that are fed into the time-to-solution estimator are generated using structured meshes.
+\item The machine parameters that are fed to the time-to-solution estimator are generated using structured meshes.
 \end{enumerate}
 
-The first reason, the discrepancy between the two schedules, is remedied by feeding the time-to-solution estimator's schedule directly into PDT and having PDT use it.
+The first reason, the discrepancy between the two schedules, is remedied \jcr{present tense????} by feeding the time-to-solution estimator's schedule directly into PDT and having PDT use it.
 I believe this would be a fantastic project for a master's thesis in the future in order to study the effect on the results between PDT and the time-to-solution estimator.
 
 The second reason, the mischaracterization of Quartz's latency, has two potential solutions.
-The first is to obtain allocation on a Blue Gene/Q machine and rerun all problems in this dissertation.
-Blue Gene/Q machines tend to have more stable latencies than x86 machines (such as Quartz), and as such can be more easily characterized.
-The second solution to this problem is to attempt to generate latency information for different core counts for x86 machines, rather than have a flat multiplier regardless of core count. 
+The first is to obtain allocation on a Blue-Gene/Q machine and rerun all problems in this dissertation.
+Blue-Gene/Q machines tend to have more stable latencies than x86 machines (such as Quartz), and as such can be more easily characterized.
+The second solution to this problem is to attempt to generate latency information for different core counts for x86 machines, rather than have a flat multiplier regardless of core count.
 
-The third and final reason, the generation of machine parameters, also lends itself to a master's thesis project.
+The third and final reason, the generation of machine parameters, also lends itself to subsequent investations.
 Generating the empirical constants used in the time-to-solution estimator should be done with both structured and unstructured meshes to check if the constants' values change significantly.
 If they do, this could be a significant source of error in the time-to-solution estimator and optimization process.
 
 In addition to the agreement between PDT and the time-to-solution estimator being a significant source of future work, speeding up the time-to-solution estimator would allow for a much larger set of potential partitions to be run through the optimizer.
 Two paths forward come to mind: rewriting the time-to-solution estimator in a precompiled language rather than an interpreted language and modestly parallelizing the time-to-solution estimator.
+\jcr{I think machine learning should also play a part. Add some blurb for this too...}
 
 Although Python's ease of use and vast number of libraries made it an extremely attractive option for graph algorithms ({\tt networkx}) and mesh manipulation ({\tt shapely}), larger problems can take a long time to finish sweeping in the time-to-solution estimator.
-This severely hinders our ability to robustly optimize our problems.
-Our optimization method chooses natural boundaries as the basis for optimizing our partitions, but with a time-to-solution estimator that finishes sweeping in milliseconds rather than tens of seconds, we would be able to run thousands of sets of partitions rather than under 20. 
-If possible, rewriting the time-to-solution estimator in C++ would inherently speed up the code, with the hope that there are similarly convenient graph and mesh manipulation libraries. 
-Rewriting the time-to-solution estimator in C++ also potentially opens the door to 
+This can severely hinder our ability to robustly optimize our problems.
+Our optimization method chooses natural boundaries as the basis for optimizing our partitions, but with a time-to-solution estimator that finishes sweeping in milliseconds rather than tens of seconds, we would be able to run thousands of sets of partitions rather than under 20.
+If possible, rewriting the time-to-solution estimator in C++ would inherently speed up the code, with the hope that there are similarly convenient graph and mesh manipulation libraries.
+Rewriting the time-to-solution estimator in C++ also potentially opens the door to
 
 Modest levels of parallelism implemented in the time-to-solution estimator could speed up the code enough to drive the time-to-solution estimator's time down significantly.
-This is not my personal preferred path forward, as only small portions of the code are embarrassingly parallel, and the Python's parallel overhead could mitigate the advantages. 
+This is not my personal preferred path forward, as only small portions of the code are embarrassingly parallel, and the Python's parallel overhead could mitigate the advantages.
