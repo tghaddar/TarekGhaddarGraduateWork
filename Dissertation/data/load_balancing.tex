@@ -297,7 +297,7 @@ Fig.~\ref{level2_alg_illustration} shows the dense region of the level 2 mesh wi
 \caption{5 load-balancing-by-dimension iterations.}
 \label{7_lbd}
 \end{subfigure}
-\caption{A demonstration of the original load balancing and load-balancing-by-dimension algorithms on an unstructured mesh partitioned into 3x3 subsets.}
+\caption{A demonstration of the original load balancing and load-balancing-by-dimension algorithms on the Level 2 mesh partitioned into 7x7 subsets.}
 \label{level2_alg_illustration}
 \end{figure}
 Figure~\ref{level2_metric_study} shows the results of this parametric study, which are tabulated in Table \ref{level2_metric_study_table}.
@@ -358,5 +358,3 @@ The original load balancing and load-balancing-by-dimension algorithms allowed f
 However, PDT's performance model does not account for unstructured meshes or imbalanced partitions, but rather assumes a structured grid with an equivalent amount of cells per processor.
 In addition, theoretical studies showed that well balanced partitions when using the load-balancing-by-dimension algorithm did not always translate to a better sweep time.
 These two reasons motivated the development of a time-to-solution estimator that can estimate the sweep time for a problem given a partitioning scheme ($P_i, A_i$) regardless of mesh type. The time-to-solution estimator is described in Chapter \ref{cha:tts}.
-
-\jcr{can you add for level-2 plots with where the cut lines are placed for regular/LB/LBD?}
