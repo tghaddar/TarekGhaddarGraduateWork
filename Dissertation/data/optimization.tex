@@ -87,8 +87,13 @@ In order to globalize the optimization of the cut lines per column, we set up a 
 
 Let's consider the mesh of the Level 2 experiment shown in Fig.~\ref{level2_nocut}.
 We run this problem with 42 subsets in $x$ and 13 subsets in $y$.
-
-
+Fig.~\ref{opt_walkthrough} shows 3 stages of choosing partitions for the Level 2 mesh.
+Fig.~\ref{42} shows the $x$ partitions, with the $y$ partitions optimized for all 42 columns. 
+This means that we attempted to identify natural boundaries through all 42 columns. 
+Fig.~\ref{21} shows the same $x$ partitions, but the $y$ partitions optimized for the first 21 columns independently from the second 21 columns. 
+Fig.~\ref{10} shows the same $x$ partitions, with the $y$ partitions optimized independently for first 10 columns, then the next 11 columns, then the next 10 columns, then the next 11 columns. 
+We continue this process until we are optimizing $y$ partitions for each column.
+%%%%%%%%%%%%%%%
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.3]{../../figures/level2_nocut.png}
@@ -98,10 +103,30 @@ We run this problem with 42 subsets in $x$ and 13 subsets in $y$.
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=0.55]{../../figures/lvl2_suite_0.pdf}
-\includegraphics[scale=0.55]{../../figures/lvl2_suite_1.pdf}
-\includegraphics[scale=0.55]{../../figures/lvl2_suite_2.pdf}
+  \begin{subfigure}[t]{\textwidth}
+    \centering
+\includegraphics[scale=0.5]{../../figures/lvl2_suite_0.pdf}
+  \caption{The y-cuts chosen for all 42 columns.}
+    \label{42}
+  \end{subfigure}
+  \begin{subfigure}[b]{\textwidth}
+    \centering
+\includegraphics[scale=0.5]{../../figures/lvl2_suite_1.pdf}
+    \caption{The y-cuts chosen independently for the first 21 columns and the second 21 columns}.
+    \label{21}
+  \end{subfigure}
+  \begin{subfigure}[b]{\textwidth}
+    \centering
+\includegraphics[scale=0.5]{../../figures/lvl2_suite_2.pdf}
+    \caption{The y-cuts chosen for independently for 10,11,10, and 11 columns.} 
+    \label{10}
+  \end{subfigure}
+  \caption{The Level 2 Mesh partitions at three stages of the choosing the optimization cut process.}
+  \label{opt_walkthrough}
 \end{figure}
+
+This method of optimization allows us to select a set of partitions with an attempt to optimize over the global domain. 
+With this method, we are also not running the time-to-solution estimator a large number of times, instead choosing to using an intuitive automation process.
 
 \FloatBarrier
 
