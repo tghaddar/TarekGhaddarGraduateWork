@@ -275,6 +275,31 @@ The same parametric study was run on an experiment that PDT simulates, the Level
 \label{level2_nocut_lbchapter}
 \end{figure}
 The Level 2 mesh contains a relatively uniform geometry throughout the mesh with one denser feature in the middle of the top boundary.
+Fig.~\ref{level2_alg_illustration} shows the dense region of the level 2 mesh with 7 regular, load-balanced, and load-balanced-by-dimension cuts.
+%zoomed in photos
+\begin{figure}[ht]
+\centering
+\begin{subfigure}[t]{\textwidth}
+\centering
+\includegraphics[scale=0.3]{../figures/level2_7_reg_zoom.png}
+\caption{No load balancing.}
+\label{7_regular}
+\end{subfigure}
+\begin{subfigure}[b]{\textwidth}
+\centering
+\includegraphics[scale=0.3]{../figures/level2_7_lb_zoom.png}
+\caption{5 load balancing iterations.}
+\label{7_lb}
+\end{subfigure}
+\begin{subfigure}[b]{\textwidth}
+\centering
+\includegraphics[scale=0.3]{../figures/level2_7_lbd_zoom.png}
+\caption{5 load-balancing-by-dimension iterations.}
+\label{7_lbd}
+\end{subfigure}
+\caption{A demonstration of the original load balancing and load-balancing-by-dimension algorithms on an unstructured mesh partitioned into 3x3 subsets.}
+\label{level2_alg_illustration}
+\end{figure}
 Figure~\ref{level2_metric_study} shows the results of this parametric study, which are tabulated in Table \ref{level2_metric_study_table}.
 %%%%%%%
 \begin{figure}[H]
