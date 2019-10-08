@@ -69,23 +69,26 @@ for i in range(0,7):
   pdt_data_min[i] = np.min(pdt_data[i])
   pdt_data_max[i] = np.max(pdt_data[i])
   percent_diff[i] = abs(tts-median)/median*100
-  
-plt.figure()
-plt.xlabel(r'$\sqrt{\rm{Number\ of\ Subsets}}$')
-plt.ylabel("Sweep Time (s)")
-plt.plot(numrows,pdt_data_median,'-o',label="PDT")
-plt.plot(numrows,max_times,'-o',label="TTS")
-plt.plot(numrows,pdt_data_min,'x',label="PDT Min")
-plt.plot(numrows,pdt_data_max,'x',label="PDT Max")
-plt.legend(loc="best")
-plt.savefig("../../figures/spiderweb_lbd_pdtvtts.pdf")
 
-f = open("spiderweb_lbd_percent_diff.txt",'w')
-f.write("\\textbf{$\sqrt{\\text{Num Subsets}}$} & \\bf PDT vs. TTS \\\ \hline \n")
-for i in range(0,len(numrows)):
-  f.write( str(numrows[i])+'&'+str(np.round(percent_diff[i],2))+'\%')
-  if i < len(numrows)-1:
-    f.write("\\\ \hline \n")
-  else:
-    f.write("\n")
-f.close()
+np.savetxt("spiderweb_lbd_times.csv",max_times)
+
+  
+#plt.figure()
+#plt.xlabel(r'$\sqrt{\rm{Number\ of\ Subsets}}$')
+#plt.ylabel("Sweep Time (s)")
+#plt.plot(numrows,pdt_data_median,'-o',label="PDT")
+#plt.plot(numrows,max_times,'-o',label="TTS")
+#plt.plot(numrows,pdt_data_min,'x',label="PDT Min")
+#plt.plot(numrows,pdt_data_max,'x',label="PDT Max")
+#plt.legend(loc="best")
+#plt.savefig("../../figures/spiderweb_lbd_pdtvtts.pdf")
+#
+#f = open("spiderweb_lbd_percent_diff.txt",'w')
+#f.write("\\textbf{$\sqrt{\\text{Num Subsets}}$} & \\bf PDT vs. TTS \\\ \hline \n")
+#for i in range(0,len(numrows)):
+#  f.write( str(numrows[i])+'&'+str(np.round(percent_diff[i],2))+'\%')
+#  if i < len(numrows)-1:
+#    f.write("\\\ \hline \n")
+#  else:
+#    f.write("\n")
+#f.close()

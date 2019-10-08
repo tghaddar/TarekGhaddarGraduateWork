@@ -1,6 +1,7 @@
 import numpy as np
 import sys
-sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
+#sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
+sys.path.append(r'C:\Users\tghad\Documents\GitHub\TarekGhaddarGraduateWork\sweep_optimizer\3d')
 from sweep_solver import optimized_tts_numerical,unpack_parameters
 from mesh_processor import create_2d_cuts
 from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_highest_jumps
@@ -36,8 +37,8 @@ gxmax = 10.0
 gymin = 0.0
 gymax = 10.0
 
-numrows = [1,2,3,4,5,6,7,8,9,10]
-numcols = [1,2,3,4,5,6,7,8,9,10]
+numrows = [2,3,4,5,6,7,8,9,10]
+numcols = [2,3,4,5,6,7,8,9,10]
   
 f = open("sparse_pins_cell_verts",'r')
 sparse_pins_cell_data = [line.split() for line in f]
@@ -47,6 +48,7 @@ for i in range(0,len(sparse_pins_cell_data)):
 x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,10)
 
 max_times_case = {}
+max_times_case_time_only = []
 
 for i in range(0,len(numrows)):
   numrow = numrows[i]
@@ -68,17 +70,8 @@ for i in range(0,len(numrows)):
   x_cuts_min = x_values
   
   max_times_case[numrow] = (min(max_times),x_cuts_min,y_cuts_min)
+  max_times_case_time_only.append(min(max_times))
+  
+np.savetxt("spiderweb_opt_times.csv",max_times_case_time_only)
 
 
-
-
-#Trying optimizing the spiderweb.
-#x_cuts,y_cuts = create_2d_cuts(gxmin,gxmax,numcol,gymin,gymax,numrow)
-#
-#params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-#num_params = len(params)
-#
-#bounds = create_bounds(num_params,gxmin,gxmax,gymin,gymax,numrow,numcol)
-#constraints = create_constraints(gxmin,gxmax,gymin,gymax,numrow,numcol)
-#args = (points,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
-#max_time = basinhopping(optimized_tts_numerical,params,niter=200,stepsize=0.5,minimizer_kwargs={"method":"Nelder-Mead","bounds":bounds,"constraints":constraints,'args':args,'options':{'maxiter':1}})
