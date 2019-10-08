@@ -351,9 +351,9 @@ def get_cells_per_subset_3d_numerical_test2(points,boundaries,add_cells):
   cells_per_subset = [0]*num_subsets
   #Stores the number of boundary cells per subset.
   bdy_cells_per_subset = [0.0]*num_subsets
-  xpoints = points[0,:]
-  ypoints = points[1,:]
-  zpoints = points[2,:]
+  xpoints = points[:,0]
+  ypoints = points[:,1]
+  zpoints = points[:,2]
   
   #Looping through the subsets.
   for s in range(0,num_subsets):
@@ -395,6 +395,11 @@ def get_cells_per_subset_3d_numerical_test2(points,boundaries,add_cells):
     n_xz = pow((N/subset_vol),2.0/3.0)*Lx*Lz
     n_yz = pow((N/subset_vol),2.0/3.0)*Ly*Lz
     bdy_cells_per_subset[s] = [n_xy,n_xz,n_yz]
+    if add_cells:
+      cells_per_subset[s] += int(bdy_cells_per_subset[s][0]/2.0)
+      cells_per_subset[s] += int(bdy_cells_per_subset[s][1]/2.0)
+      cells_per_subset[s] += int(bdy_cells_per_subset[s][2]/2.0)
+
   
   return cells_per_subset,bdy_cells_per_subset
 def get_cells_per_subset_3d_numerical_test(points,boundaries):

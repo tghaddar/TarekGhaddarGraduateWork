@@ -183,8 +183,6 @@ def get_highest_jumps(points,gmin,gmax,numdim):
         values[i] = value+1e-04
       elif np.round(value - 1e-04,4) in points:
         values[i] = value-1e04
-      else:
-        print("still not catching")
   values = np.append(values,gmax)
   values = np.insert(values,0,gmin)
   for i in range(0,len(values)):
@@ -197,6 +195,147 @@ def get_highest_jumps(points,gmin,gmax,numdim):
       values[i] = np.round(value,5)
   
   return values
+
+def create_opt_cut_suite_3d(points,gxmin,gxmax,gymin,gymax,gzmin,gzmax,numcol,numrow,numplane):
+  
+  xpoints = points[:,0]
+  ypoints = points[:,1]
+  zpoints = points[:,2]
+  
+  z_values = get_highest_jumps(zpoints,gzmin,gzmax,numplane)
+  x_values = get_highest_jumps(xpoints,gxmin,gxmax,numcol)
+  y_values = get_highest_jumps(ypoints,gymin,gymax,numrow)
+  x_cut_suite = []
+  y_cut_suite = []
+  all_x_cuts = []
+  all_through_x = []
+  all_y_cuts = []
+  all_through_y = []
+  for plane in range(1,numplane+1):
+    zmin = z_values[plane-1]
+    zmax = z_values[plane]
+    z1 = np.argwhere(np.logical_and(zpoints>=zmin,zpoints<=zmax)).flatten()
+    #Pulling all points that are in this column. 
+    x1 = xpoints[z1]
+    #Getting the highest jumps for this column.
+    x_values_plane = get_highest_jumps(x1,gxmin,gxmax,numcol)
+    all_y_cuts_col = []
+    all_through_y_col = []
+    for col in range(1,numcol+1):
+      xmin = x_values_plane[col-1]
+      xmax = x_values_plane[col]
+      x1 = np.argwhere(np.logical_and(xpoints>=xmin,xpoints<=xmax)).flatten()
+      #Pulling all points that are in this column. 
+      y1 = ypoints[x1]
+      #Getting the highest jumps for this column.
+      y_values_col = get_highest_jumps(y1,gymin,gymax,numrow)
+      all_y_cuts_col.append(y_values_col)
+      all_through_y_col.append(y_values)
+      
+    all_x_cuts.append(x_values_plane)
+    all_through_x.append(x_values)
+    all_y_cuts.append(all_y_cuts_col)
+    all_through_y.append(all_through_y_col)
+    
+  x_cut_suite.append(all_through_x)
+  y_cut_suite.append(all_through_y)
+  #Doing a binary tree of the columns to get a full cut suite.
+  tree_bottom = False
+  num_children = 2
+  prev_z_limits = [numplane]
+  while(tree_bottom == False):
+  
+    z_limits = []
+    current_z_limit = int(0)
+    current_x_values = [[] for i in range(0,numplane)]
+    for i in range(0,len(prev_z_limits)):
+      z1_limit = int(np.floor(prev_z_limits[i]/2))
+      z_limits.append(z1_limit)
+      z2_limit = int(np.ceil(prev_z_limits[i]/2))
+      z_limits.append(z2_limit)
+      
+      plane0 = copy(current_z_limit)
+      zmin = z_values[plane0]
+      current_z_limit += z1_limit
+      plane1 = copy(current_z_limit)
+      zmax = x_values[plane1]
+      
+      zverts0 = np.argwhere(np.logical_and(zpoints>=zmin,zpoints<=zmax)).flatten()
+      x0 = xpoints[zverts0]
+      x_values0 = get_highest_jumps(x0,gxmin,gxmax,numcol)
+      for j in range(plane0,plane1):
+        current_x_values[j] = x_values0
+      #current_y_values[col0:col1] = [y_values0]
+      
+      zmin2 = zmax
+      current_z_limit += z2_limit
+      plane2 = copy(current_z_limit)
+      zmax2 = z_values[plane2]
+      
+      zverts1 = np.argwhere(np.logical_and(zpoints>=zmin2,zpoints<=zmax2)).flatten()
+      x1 = xpoints[zverts1]
+      x_values1 = get_highest_jumps(x1,gxmin,gxmax,numcol)
+      for j in range(plane1,plane2):
+        current_x_values[j] = x_values1
+      #current_y_values[col1:col2] = [y_values1]
+      
+    x_cut_suite.append(current_x_values)  
+    #Getting y_cut_suite going
+    prev_x_limits = [numcol]
+    tree_bottom_y = False
+    while(tree_bottom_y == False):
+    
+      x_limits = []
+      current_x_limit = int(0)
+      current_y_values = [[[] for i in range(0,numcol)] for j in range(0,numplane)]
+      for i in range(0,len(prev_x_limits)):
+        x1_limit = int(np.floor(prev_x_limits[i]/2))
+        x_limits.append(x1_limit)
+        x2_limit = int(np.ceil(prev_x_limits[i]/2))
+        x_limits.append(x2_limit)
+        
+        col0 = copy(current_x_limit)
+        xmin = current_x_values[plane0][col0]
+        current_x_limit += x1_limit
+        col1 = copy(current_x_limit)
+        xmax = current_x_values[plane0][col1]
+        
+        xverts0 = np.argwhere(np.logical_and(xpoints>=xmin,xpoints<=xmax)).flatten()
+        y0 = ypoints[xverts0]
+        y_values0 = get_highest_jumps(y0,gymin,gymax,numrow)
+        for plane in range(plane0,plane1):
+          for j in range(col0,col1):
+            current_y_values[plane][j] = y_values0
+        #current_y_values[col0:col1] = [y_values0]
+        
+        xmin2 = xmax
+        current_x_limit += x2_limit
+        col2 = copy(current_x_limit)
+        xmax2 = current_x_values[plane1][col2]
+        
+        xverts1 = np.argwhere(np.logical_and(xpoints>=xmin2,xpoints<=xmax2)).flatten()
+        y1 = ypoints[xverts1]
+        y_values1 = get_highest_jumps(y1,gymin,gymax,numrow)
+        for plane in range(plane1,plane2):
+          for j in range(col1,col2):
+            current_y_values[plane][j] = y_values1
+        #current_y_values[col1:col2] = [y_values1]
+        
+      y_cut_suite.append(current_y_values)  
+      print(x_limits)
+      num_children *= 2
+      prev_x_limits = x_limits
+      if (x_limits[0] <= 1.5):
+        tree_bottom_y = True
+    
+    num_children *= 2
+    prev_z_limits = z_limits
+    if (z_limits[0] <= 1.5):
+      tree_bottom = True
+    
+  x_cut_suite.append(all_x_cuts)
+  y_cut_suite.append(all_y_cuts)
+  return z_values, x_cut_suite, y_cut_suite
 
 def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
  
@@ -268,17 +407,6 @@ def create_opt_cut_suite(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
       #current_y_values[col1:col2] = [y_values1]
       
     y_cut_suite.append(current_y_values)  
-    #print(current_y_values)
-      
-#    for i in range(0,2):
-#      prev_x_limit = current_x_limit
-#      if i%2 == 0:
-#        current_x_limit += x1_limit
-#      else:
-#        current_x_limit += x2_limit
-#      print(num_children,current_x_limit)
-#      xmin = x_values[prev_x_limit]
-#      xmax = x_values[current_x_limit]
     print(x_limits)
     num_children *= 2
     prev_x_limits = x_limits

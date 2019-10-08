@@ -18,6 +18,7 @@ for p in range(0,num_points):
   points[p] = line
 
 f.close()
+np.savetxt("../../../Dissertation/python_scripts/im1_points",points)
 
 #Face data
 f = open("faces",'r')

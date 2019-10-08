@@ -1877,29 +1877,26 @@ def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_ma
   print(max_time) 
   return max_time
 
-def optimized_tts_3d_numerical(params,points,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,t_u,upc,upbc,t_comm,latency,m_l,num_angles,unweighted,test):
+def optimized_tts_3d_numerical(params,points,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,machine_params,num_angles,Am,Az,add_cells,unweighted,test):
   start = time.time() 
-  machine_params = (t_u,upc,upbc,t_comm,latency,m_l)
-  
   x_cuts,y_cuts,z_cuts = unpack_parameters_3d(params,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_col,num_row,num_plane)
-  x_cuts,y_cuts,z_cuts = tweak_parameters_3d(x_cuts,y_cuts,z_cuts,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_col,num_row,num_plane)
-  print(z_cuts,x_cuts,y_cuts)
   #Building the subset boundaries.
   subset_bounds = b3a.build_3d_global_subset_boundaries(num_col-1,num_row-1,num_plane-1,x_cuts,y_cuts,z_cuts)
   #Getting mesh information.
-  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_3d_numerical_test2(points,subset_bounds)
+  cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_3d_numerical_test2(points,subset_bounds,add_cells)
+  print(cells_per_subset)
   #Building the adjacency matrix.
   adjacency_matrix = b3a.build_adjacency_matrix(x_cuts,y_cuts,z_cuts,num_row,num_col,num_plane)
   #Building the graphs.
   graphs = b3a.build_graphs(adjacency_matrix,num_row,num_col,num_plane,num_angles)
   #Weighting the graphs based on cells per subset and boundary cells per subset.
-  graphs,time_to_solve = add_edge_cost_3d(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,test)
+  graphs,time_to_solve,time_to_solve_full = add_edge_cost_3d(graphs,subset_bounds,cells_per_subset,bdy_cells_per_subset,machine_params,num_row,num_col,num_plane,Am,Az,test)
   #Adjusting the graphs for multiple angles per octant.
   graphs= pipeline_offset(graphs,num_angles,time_to_solve)
   #Making the edges universal.
   graphs = make_edges_universal(graphs)
   #Adding delay weighting.
-  graphs = add_conflict_weights(graphs,time_to_solve,num_angles,unweighted)
+  graphs = add_conflict_weights(graphs,time_to_solve,time_to_solve_full,num_angles,unweighted,Az)
   solve_times,max_time = compute_solve_time(graphs)
   end = time.time()
   print(max_time, end-start)
