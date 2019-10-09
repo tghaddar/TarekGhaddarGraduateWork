@@ -1,5 +1,6 @@
 \pdfminorversion=4
-\documentclass[xcolor={usenames,dvipsnames,svgnames,table}]{beamer}
+\documentclass[xcolor={usenames,dvipsnames,svgnames,table},10pt]{beamer}
+\geometry{paperwidth=140mm,paperheight=105mm}
 
 \mode<presentation>
 \usetheme{Madrid}
@@ -100,11 +101,22 @@
 	\item Structured meshes are somewhat limiting when attempting to model more complex problems and experiments.
 	\item Unstructured meshes allow us to model realistic problems, but introduce unbalanced partitions. 
 	\item PDT (Texas A\&M's massively parallel transport code) introduced two load balancing algorithms that repartition the mesh in order to obtain a roughly equivalent amount of cells per processor. 
-	\item However, this can sacrifice the optimal sweep partitioning (cut lines all the way through the domain) in favor of balance. 
-	\item The method described will offset perfect load balancing with optimal sweep partitioning in order to achieve the best possible time to solution.
+	\item However, this may sacrifice the optimal sweep partitioning (partitioning with the lowest time per sweep) in favor of balance. 
 \end{itemize}
 \end{block}
 \end{frame}
+
+\begin{frame}[t]\frametitle{Motivation}
+\begin{block}{}
+\begin{itemize}
+  \item We need to be able to predict the time per sweep for a given set of partitioning parameters.
+  \item PDT has successfully done this for balanced structured meshes.
+  \item The time-to-solution estimator was developed to extend this capability to imbalanced, unstructured meshes.
+  \item With the ability to predict the time per sweep, optimal partitions can be chosen. 
+\end{itemize}
+\end{block}
+\end{frame}
+
 
 \begin{frame}[t]\frametitle{Transport Sweeps}
 \begin{block}{}
@@ -196,7 +208,7 @@
 \begin{frame}[t]\frametitle{Unstructured Meshing in PDT}
 \begin{block}{Partitioning for Unstructured Meshes}
 \begin{itemize}
-\item ``Cut lines" in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
+\item ``Cut lines'' in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
 \item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
 \item The subsets are distributed amongst the processor domain.
 \end{itemize}
@@ -205,7 +217,7 @@
 
 \begin{frame}[t]\frametitle{Partitioning Example}
 \centering
-\includegraphics[scale=0.45,trim={0.95in 0.64in 0.35in 0.44in},clip]{../figures/partitioning_example.pdf}
+\includegraphics[scale=0.125]{../figures/ubp_3x3_regular.png}
 \end{frame}
 
 
@@ -562,19 +574,32 @@ $\begin{pmatrix}
 \begin{frame}[t]\frametitle{Weighting the TDGs}
   \begin{block}{}
     \begin{itemize}
-    	\item In order to weight the graph properly, we need to have a mesh density function that we can calculate the cells (and then unknowns) per subset from.
-    	\item The weight of the edge between two nodes (subsets) in the graph represents the solve and communication time of the base node.
+    \item Graph edge weight = time to solve cells in subset \& communicate boundary values to downwind subsets.
+    \begin{align}
+      \text{weight} = T_{wu} + N_c\cdot (T_c+ A_m\cdot(T_m + T_g)) + N_{b}\cdot A_m\cdot T_{\text{comm}} + T_{\text{latency}}
+      \end{align}
+    \begin{footnotesize}
+    \begin{equation*}
+    \begin{aligned}[c]
+    N_c &= \text{number of cells}  \\
+    A_m &= \text{Number of angles per task}  \\
+    T_c &= \text{Time spent on cell-specific work}  \\
+    T_{\text{comm}} &= \text{Comm time per double} \\ 
+    \end{aligned}
+    \begin{aligned}[c]
+     N_b &=(\text{num boundary cells})\cdot \text{boundary unknowns per cell} \\
+     T_m &= \text{Time spent on angle-specific work} \\
+     T_g &= \text{Time spend on group-specific work} \\
+     T_{wu} &= \text{Time to get into sweep operator} \\
+     \end{aligned}
+    \end{equation*}
+    \end{footnotesize}
     \end{itemize}
   \end{block}
-  \begin{block}{}
-    \begin{align}
-    \text{cells per subset} &= \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz \\
-    \label{weight}
-    \text{weight} &= N_u\cdot T_u + N_b\cdot T_{\text{comm}} + \text{latency}\cdot M_L \\
-    N_u &= \text{num cells}\cdot \text{unknowns per cell} \\
-    N_b &\approx(\text{num boundary cells})\cdot \text{boundary unknowns per cell}
-    \end{align}
-  \end{block}
+
+For unstructured grids, we use a mesh density function to calculate the \# cells per subset and \# of boundary cells. \\
+\vspace{1cm}
+In practice, we use mesh cell centroids to build a discrete mesh density function.
 \end{frame}
 
 \begin{frame}[t]\frametitle{Weighting the TDGs}
@@ -787,8 +812,8 @@ $\begin{pmatrix}
   \begin{small}
     \begin{enumerate}
       \item 2x2 to 10x10 subsets in x and y with regular partitions and 1 to 6 angles per quadrant.
-	  \item 2x2 to 10x10 subsets in x and y with mildly random partitions and 1 to 6 angles per quadrant.
-	  \item  2x2 to 10x10 subsets in x and y with random partitions and 1 to 6 angles per quadrant.
+	  \item 2x2 to 10x10 subsets in x and y with ``mildly random'' partitions and 1 to 6 angles per quadrant.
+	  \item  2x2 to 10x10 subsets in x and y with ``random'' partitions and 1 to 6 angles per quadrant.
 	  \item  2x2 to 10x10 subsets in x and y with probable worst-case partitions and 1 to 6 angles per quadrant.
     \end{enumerate}
     \end{small}
@@ -820,7 +845,7 @@ $\begin{pmatrix}
   \includegraphics[scale=0.6]{../figures/regular_verification.pdf}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Mildly Random Partitions}
+\begin{frame}[t]\frametitle{``Mildly Random'' Partitions}
   \vspace{-.35cm}
    \begin{minipage}{0.49\textwidth}
     \centering
@@ -840,12 +865,12 @@ $\begin{pmatrix}
   \end{minipage}  
 \end{frame}
 
-\begin{frame}[t]\frametitle{Mildly Random Partitions}
+\begin{frame}[t]\frametitle{``Mildly Random'' Partitions}
   \centering
   \includegraphics[scale=0.6]{../figures/mild_random_verification.pdf}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Random Partitions}
+\begin{frame}[t]\frametitle{``Random'' Partitions}
   \vspace{-.35cm}
    \begin{minipage}{0.49\textwidth}
     \centering
@@ -865,7 +890,7 @@ $\begin{pmatrix}
   \end{minipage}  
 \end{frame}
 
-\begin{frame}[t]\frametitle{Random Partitions}
+\begin{frame}[t]\frametitle{``Random'' Partitions}
   \centering
   \includegraphics[scale=0.6]{../figures/random_verification.pdf}
 \end{frame}

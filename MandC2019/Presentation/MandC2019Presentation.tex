@@ -571,95 +571,6 @@ In the next slides, some details on items \#2-5.
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%\begin{frame}[t]\frametitle{Building the Adjacency Matrix}
-%\begin{block}{}
-%\begin{itemize}
-%  \item The adjacency matrix provides the crucial connectivity information necessary to build the Task Dependence Graphs (TDG's) in the time-to-solution estimator.
-%\end{itemize}
-%\end{block}
-%\begin{minipage}{0.49\textwidth}
-%\centering
-%\includegraphics[scale=0.4]{../../figures/base_adjacency_layout.pdf}
-%\end{minipage}
-%\begin{minipage}{0.49\textwidth}
-%\centering
-%$\begin{pmatrix}
-%0 & 1 & 1  & 0  \\
-%1 & 0 & 0 & 1 \\
-%1 & 0 & 0 & 1 \\ 
-%0 & 1 & 1 & 0 \\
-%\end{pmatrix}$
-%\end{minipage}
-%\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%\begin{frame}[t]\frametitle{Building the Task Dependence Graphs}
-%\begin{block}{}
-%\begin{itemize}
-%    \item Each quadrant/octant gets its own TDG.
-%    \item The opposing quadrant/octant pairs have opposing sweep orderings. 
-%    \item Each set of quadrant/octant pairs uses a different adjacency matrix. 
-%    \item Python package \textbf{networkx} is used for all graph operations.
-%\end{itemize}
-%\end{block}
-%\centering
-%\includegraphics[scale=0.45]{../../figures/quadrant_layout.pdf}
-%\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%\begin{frame}[t]\frametitle{Quadrants 0 and 3}
-%\begin{block}{}
-%\begin{itemize}
-%    \item We use the upper triangular portion of the adjacency matrix for quadrant 0.
-%    \item We use the lower triangular portion of the adjacency matrix for quadrant 3.
-%\end{itemize}
-%\end{block}
-%\begin{minipage}{0.49\textwidth}
-%  \centering
-%  \includegraphics[scale=0.35]{../../figures/q0_preweight.pdf}
-%\end{minipage}
-%\begin{minipage}{0.49\textwidth}
-%  \centering
-%  \includegraphics[scale=0.35]{../../figures/q3_preweight.pdf}
-%\end{minipage}
-%\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%\begin{frame}[t]\frametitle{Quadrants 1 and 2}
-%  \begin{block}{}
-%    \begin{itemize}
-%      \item Before building the graphs for these opposing quadrants, we have to alter the adjacency matrix slightly.
-%      \item The subsets get renumbered in a manner where subset 1 becomes subset 0, subset 0 becomes subset 1, etc. In short the column numbering is flipped, and a ``flipped'' adjacency matrix is built. 
-%    \end{itemize}
-%  \end{block}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.38]{../../figures/base_adjacency_layout.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.38]{../../figures/flipped_subset_layout.pdf}
-%  \end{minipage}
-%\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%\begin{frame}[t]\frametitle{Quadrants 1 and 2}
-%  \begin{block}{}
-%    \begin{itemize}
-%      \item We use the upper triangular portion of the ``flipped'' adjacency matrix for quadrant 1.
-%      \item We use the lower triangular portion of the ``flipped'' adjacency matrix for quadrant 2.
-%    \end{itemize}
-%  \end{block}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.35]{../../figures/q1_preweight.pdf}
-%  \end{minipage}
-%  \begin{minipage}{0.49\textwidth}
-%    \centering
-%    \includegraphics[scale=0.35]{../../figures/q2_preweight.pdf}
-%  \end{minipage}
-%\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \begin{frame}[t]\frametitle{Weighting the TDGs}
   \begin{block}{}
@@ -690,29 +601,6 @@ In the next slides, some details on items \#2-5.
 For unstructured grids, we use a mesh density function to calculate the \# cells per subset and \# of boundary cells. \\
 \vspace{1cm}
 In practice, we use mesh cell centroids to build a discrete mesh density function.
-%    	\item The weight of the edge between two nodes (subsets) in the graph represents the solve and communication time of the base node.
-%  \begin{block}{}
-%    \begin{align}
-%    \text{cells per subset} &= \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz \\
-%    \label{weight}
-%      \text{weight} &= T_{wu} + N_c\cdot (T_c+ A_m\cdot(T_m + T_g)) + N_{b}\cdot A_m\cdot T_{\text{comm}} + \text{latency}\\
-%      \end{align}
-%    \footnotesize
-%    \begin{equation*}
-%    \begin{aligned}[c]
-%    N_c &= \text{number of cells}  \\
-%    A_m &= \text{Number of angles per task}  \\
-%    T_c &= \text{Time spent on cell-specific work}  \\
-%    T_{\text{comm}} &= \text{Comm time per double} \\ 
-%    \end{aligned}
-%    \begin{aligned}[c]
-%     N_b &\approx(\text{num boundary cells})\cdot \text{boundary unknowns per cell} \\
-%     T_m &= \text{Time spent on angle-specific work} \\
-%     T_g &= \text{Time spend on group-specific work} \\
-%     T_{wu} &= \text{Time to get into sweep operator} \\
-%     \end{aligned}
-%    \end{equation*}
-%  \end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
