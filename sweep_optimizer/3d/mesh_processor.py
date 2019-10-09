@@ -223,6 +223,58 @@ def check_add_cell(polygon,int_bounds,bounds):
     
   return add_cell,add_bdy_cell
 
+def get_cells_per_subset_3d_robust(polygons,boundaries,numrow,numcol,numplane):
+  #Number of subsets.
+  num_subsets = len(boundaries)
+  #Stores the number of cells per subset.
+  cells_per_subset = [0]*num_subsets
+  #Stores the number of boundary cells per boundary per subset.
+  #The total number of subsets.
+  num_subsets = len(boundaries)  
+  #Stores the number of cells per subset.
+  cells_per_subset = [0]*num_subsets
+  #Stores the number of boundary cells per subset.
+  bdy_cells_per_subset = [0.0]*num_subsets
+  
+#  numcells = len(cell_verts)
+#  polygons = [None]*numcells
+#  #Building the cells.
+#  for i in range(0,numcells):
+#    current_cell = cell_verts[i]
+#    current_verts = []
+#    for p in current_cell:
+#      #current point
+#      p = int(p)
+#      cp = (vert_data[p][0],vert_data[p][1],vert_data[p][2])
+#      current_verts.append(cp)
+#    
+#    polygons[i] = MultiPoint(current_verts).convex_hull  
+  
+  #Looping through the subsets.
+  for s in range(0,num_subsets):
+    
+    subset_bounds = boundaries[s]
+    #neighbors = [n for n in range(0,num_subsets) if adjacency_matrix[s][n]==1]
+    xmin = subset_bounds[0]
+    xmax = subset_bounds[1]
+    ymin = subset_bounds[2]
+    ymax = subset_bounds[3]
+    zmin = subset_bounds[4]
+    zmax = subset_bounds[5]
+    
+    subset = MultiPoint([(xmin,ymin,zmin),(xmax,ymin,zmin),(xmax,ymax,zmin),(xmin,ymax,zmin),(xmin,ymin,zmax),(xmax,ymin,zmax),(xmax,ymax,zmax),(xmin,ymax,zmax)]).convex_hull
+    
+    for polygon in polygons:
+      if polygon.within(subset):
+        cells_per_subset[s] += 1
+      elif polygon.intersects(subset):
+        #Checking for natural boundaries. If the only intersection is a natural boundary on the exterior of the subset, then we don't add the cell to this subset.
+        if polygon.touches(subset):
+          continue
+        else:
+          cells_per_subset[s] += 1
+  
+  return cells_per_subset,bdy_cells_per_subset
 
 def get_cells_per_subset_2d_robust(cell_verts,vert_data,boundaries,adjacency_matrix,numrow,numcol):
   #Number of subsets.
