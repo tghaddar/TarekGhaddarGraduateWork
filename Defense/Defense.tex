@@ -617,7 +617,7 @@ $\begin{pmatrix}
 
 \begin{frame}[t]\frametitle{Conflict Detection and Resolution}
   \begin{block}{}
-    Best summarized as a ``marching" process. 
+    Best summarized as a ``marching'' process. 
     \begin{enumerate}
       \item Starting at time $t=0$, find the nodes that are ready to solve or already solving across all graphs.
       \item If at that time, multiple graphs are solving the same node, they are in conflict.
@@ -636,11 +636,6 @@ $\begin{pmatrix}
   \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant (same as PDT) wins the tie.
 \end{itemize}
 \end{block}
-  \begin{block}{Unweighted vs. Weighted Depth-of-Graph Remaining}
-    \begin{itemize}
-      \item There are two options for the depth-of-graph remaining. Unweighted does not take the weights into account, and weighted looks at the final time for the conflicting graphs on the universal time scale.
-    \end{itemize}
-  \end{block}
 \end{frame}
 
 \begin{frame}[t]\frametitle{$t=1$: Graphs 0,3 and Graphs 1,2 in Conflict}
@@ -724,16 +719,16 @@ $\begin{pmatrix}
   \begin{block}{}
     \begin{itemize}
       \item A verification study was run to verify the time-to-solution estimator for 2D partitioning schemes with perfectly balanced partitions. 
-      \item Verified against a code written by Dr. Ragusa that perfectly mimics PDT's scheduler in two dimensions. For consistency, the time-to-solution estimator utilized an unweighted depth-of-graph remaining conflict resolution.
+      \item Verified against a code written by Dr. Ragusa that uses depth-of-graph with an octant-priority tiebreaker conflict resolution in two dimensions. 
     \end{itemize}
   \end{block}
   \begin{block}{Problems}
   \begin{small}
     \begin{enumerate}
       \item 2x2 to 10x10 subsets in x and y with regular partitions and 1 to 6 angles per quadrant.
-	  \item 2x2 to 10x10 subsets in x and y with ``mildly random'' partitions and 1 to 6 angles per quadrant.
-	  \item  2x2 to 10x10 subsets in x and y with ``random'' partitions and 1 to 6 angles per quadrant.
-	  \item  2x2 to 10x10 subsets in x and y with probable worst-case partitions and 1 to 6 angles per quadrant.
+	    \item 2x2 to 10x10 subsets in x and y with ``mildly random'' partitions and 1 to 6 angles per quadrant.
+	    \item  2x2 to 10x10 subsets in x and y with ``random'' partitions and 1 to 6 angles per quadrant.
+	    \item  2x2 to 10x10 subsets in x and y with probable worst-case partitions and 1 to 6 angles per quadrant.
     \end{enumerate}
     \end{small}
   \end{block}
