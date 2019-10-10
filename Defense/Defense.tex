@@ -577,85 +577,9 @@ $\begin{pmatrix}
 \begin{itemize}
 	\item The first octant to arrive to a node will begin solving it, and the remaining octants will incur a delay (if applicable).
 	\item The delay is reflected in each remaining TDG by adding the corresponding delay as a weight to the applicable edge and applicable downstream edges.
-  \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant (same as PDT) wins the tie.
+  \item If two octants arrive to a node at the same time, the octant with the greater remaining depth-of-graph and priority octant wins the tie.
 \end{itemize}
 \end{block}
-\end{frame}
-
-\begin{frame}[t]\frametitle{$t=1$: Graphs 0,3 and Graphs 1,2 in Conflict}
- \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_1_0_1.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_1_0_3.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_1_0_0.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_1_0_2.pdf}
-  \end{minipage}
-\end{frame}
-
-\begin{frame}[t]\frametitle{$t=2$: Graphs 0 and 1 Won, Still in Conflict}
- \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_2_1_1.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_2_1_3.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_2_1_0.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_2_1_2.pdf}
-  \end{minipage}
-\end{frame}
-
-\begin{frame}[t]\frametitle{$t=3$: Graphs 2 and 3 Won, No More Conflict}
- \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_3_2_1.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_3_2_3.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_3_2_0.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_3_2_2.pdf}
-  \end{minipage}
-\end{frame}
-
-\begin{frame}[t]\frametitle{$t=4$, Done Sweeping!}
- \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_4_3_1.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_4_3_3.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_4_3_0.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/graph_4_3_2.pdf}
-  \end{minipage}
 \end{frame}
 
 \begin{frame}[t]\frametitle{2D Verification}
@@ -783,83 +707,58 @@ $\begin{pmatrix}
   \includegraphics[scale=0.6]{../figures/3d_verification.pdf}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 100 Points/Subset}
-   \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.35]{../figures/synthetic_lbd_cuts.pdf}
-    \begin{block}{}
-    \centering
-      $t = 1.335$
-    \end{block}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.35]{../figures/synthetic_opt_cuts.pdf}
-    \begin{block}{}
-    \centering
-    $t = 0.756$
-    \end{block}
-  \end{minipage}
-  \vspace{1cm}
-  \centering
-    Improvement: $\frac{0.756}{1.335} = 0.566$
+\begin{frame}[t]\frametitle{Comparison to the 2018 Quartz Scaling Suite}
+\begin{block}{}
+  \begin{itemize}
+    \item In 2018, PDT ran a scaling suite out to 90,112 cores on the Quartz supercomputer at LLNL.
+    \item We ran the time-to-solution estimator for all cases out to 16,384 cores for comparison with PDT's and the performance model's time-per-sweep.
+  \end{itemize}
+\end{block}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 10 Points/Subset}
-   \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.35]{../figures/synthetic_lbd_cuts_lighter.pdf}
-    \begin{block}{}
-    \centering
-      $t = 0.145$
-    \end{block}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.35]{../figures/synthetic_opt_cuts_lighter.pdf}
-    \begin{block}{}
-    \centering
-    $ t = 0.080$
-    \end{block}
-  \end{minipage}
-  \vspace{1cm}
-  \centering
-    Improvement: $\frac{0.080}{0.145} = 0.552$
+\begin{frame}[t]\frametitle{Stage count comparison to the 2018 Quartz scaling suite}
+\centering
+\includegraphics[scale=0.7]{../figures/scaling_stagecount.pdf}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Synthetic Probable-Worst Case with 1000 Points/Subset}
-   \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.35]{../figures/synthetic_lbd_cuts_heavy.png}
-    \begin{block}{}
-    \centering
-    $t = 12.499$
-    \end{block}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.35]{../figures/synthetic_opt_cuts_heavy.png}
-    \begin{block}{}
-    \centering
-    $t = 7.298$
-    \end{block}
-  \end{minipage}
-  \vspace{1cm}
-  \centering
-    Improvement: $\frac{7.289}{12.499} = 0.583$
+\begin{frame}[t]\frametitle{Sweep time comparison to the 2018 Quartz scaling suite}
+\begin{minipage}[c]{0.5\textwidth}
+\includegraphics[scale=0.45]{../figures/scaling_tts_sweep_times.pdf}
+\end{minipage}
+\begin{minipage}[c]{0.48\textwidth}
+\begin{table}[H]
+\centering
+\scalebox{0.75}{
+\begin{tabular}{c|c|c|c}
+\textbf{Cores} & \textbf{PDT v. Perf.} & \textbf{Perf. v. TTS} & \textbf{PDT v. TTS} \\ \hline
+1&8.82\%&0.68\%&9.44\% \\ \hline
+8&6.67\%&1.86\%&8.4\% \\ \hline
+64&2.22\%&2.04\%&4.22\% \\ \hline
+512&8.0\%&1.52\%&9.4\% \\ \hline
+1024&2.0\%&3.67\%&5.6\% \\ \hline
+2048&2.0\%&2.21\%&4.17\% \\ \hline
+4096&3.77\%&3.24\%&6.89\% \\ \hline
+8192&8.33\%&3.8\%&11.82\% \\ \hline
+16384&9.68\%&2.7\%&12.11\%
+\end{tabular}}
+\end{table}
+\end{minipage}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Unbalanced Pin Comparison Between PDT and TTS}
   \centering
-   \includegraphics[scale=0.2]{../figures/spiderweb_10x10_sparse.png}
+   \includegraphics[scale=0.13]{../figures/spiderweb_10x10_sparse.png}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Unbalanced Pin Comparison Between PDT and TTS}
 \begin{block}{}
  Using the mesh from the previous slide, PDT and the time-to-solution estimator were run on the following problems:
  \begin{itemize}
-   \item 2-10 subsets in each dimension with regular cuts, load-balanced, and load-balanced-by-dimension cuts.
+   \item 2-10 subsets in each dimension with regular cuts.
+   \item 2-10 subsets in each dimension with load-balanced cuts.
+   \item 2-10 subsets in each dimension with load-balanced-by-dimension cuts.
  \end{itemize}
+ Each case was run ten times in PDT to filter out outlying values.
 \end{block}
 \end{frame}
 
@@ -911,20 +810,6 @@ $\begin{pmatrix}
     \end{block}
   \end{minipage}  
 \end{frame}
-
-\begin{frame}[t]\frametitle{IM1C Experiment with 5 Subsets in Each Dimension}
-\centering
-\includegraphics[scale=0.15]{../figures/im1_228.png}
-\begin{block}{}
-\begin{table}
-\begin{tabular}{c|c} 
-\bf LBD &\bf Regular   \\ \hline \hline
- 0.5723& 0.364
-\end{tabular}
-\end{table}
-\end{block}
-\end{frame}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Partitioning Optimization}
