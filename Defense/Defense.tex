@@ -977,6 +977,39 @@ Once $x$ cut lines are selected, we choose $y$ cut lines for a series of column 
 \includegraphics[scale=0.4]{../figures/binary_tree.pdf}
 \end{frame}
 
+\begin{frame}[t]\frametitle{Example of selecting column-wise $y$ cut-lines on the Level-2 mesh}
+\begin{block}{}
+The selection of cut lines for 42 columns, 21 columns at a time, and 10,11,10, 11 columns at a time. 
+\end{block}
+\begin{figure}[h]
+\centering
+  \begin{subfigure}[c]{0.32\textwidth}
+    \centering
+\includegraphics[scale=0.28]{../figures/lvl2_suite_0.pdf}
+  \end{subfigure}
+  \begin{subfigure}[c]{0.32\textwidth}
+    \centering
+\includegraphics[scale=0.28]{../figures/lvl2_suite_1.pdf}
+   \end{subfigure}
+     \begin{subfigure}[c]{0.32\textwidth}
+    \centering
+\includegraphics[scale=0.28]{../figures/lvl2_suite_1.pdf}
+   \end{subfigure}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}[t]\frametitle{Unbalanced pin mesh with regular, load-balanced, load-balanced-by-dimension, and optimized partitions}
+\centering
+\includegraphics[scale=0.475]{../figures/unbalanced_pins_opt_comparison.pdf}
+\begin{block}{}
+\begin{itemize}
+  \item For low core counts with low numbers of communication, having LBD partitions does not incur a large comm. penalty.
+  \item Once we get to higher core counts, the prioritization of not adding cells pays off. 
+\end{itemize}
+\end{block}
+\end{frame}
+
 \section{Conclusions and Future Work}
 \subsection{}
 
