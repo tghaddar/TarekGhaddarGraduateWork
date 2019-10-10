@@ -907,23 +907,31 @@ $\begin{pmatrix}
 
 \begin{frame}[t]\frametitle{Unbalanced Pin Comparison Between PDT and TTS}
   \centering
-  \includegraphics[scale=0.25,trim={2cm 0cm 1cm 1.3cm},clip]{../figures/unbalanced_pins_refined.png}
+   \includegraphics[scale=0.2]{../figures/spiderweb_10x10_sparse.png}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Unbalanced Pin Comparison Between PDT and TTS}
 \begin{block}{}
  Using the mesh from the previous slide, PDT and the time-to-solution estimator were run on the following problems:
  \begin{itemize}
-   \item 2-6,8, and 9 subsets in each dimension with load balance by dimension and regular cuts.
-   \item The ratio of the solve time per sweep was taken between the LBD cuts and regular cuts for PDT and the time-to-solution estimator respectively.
-   \item The percent difference between the ratios was calculated: $\frac{R_{\text{PDT}} - R_{\text{TTS}}}{R_{PDT}}$.
+   \item 2-10 subsets in each dimension with regular cuts, load-balanced, and load-balanced-by-dimension cuts.
  \end{itemize}
 \end{block}
 \end{frame}
 
-\begin{frame}[t]\frametitle{PDT vs. TTS}
+\begin{frame}[t]\frametitle{Unbalanced Pins with Regular Cuts}
 \centering
-  \includegraphics[scale=0.6]{../figures/ratio_refined.pdf}
+\includegraphics[scale=0.7]{../figures/spiderweb_reg_pdtvtts.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Unbalanced Pins with LB Cuts}
+\centering
+\includegraphics[scale=0.7]{../figures/spiderweb_lb_pdtvtts.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Unbalanced Pins with LBD Cuts}
+\centering
+\includegraphics[scale=0.7]{../figures/spiderweb_lbd_pdtvtts.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Level 2 Experiment}
