@@ -19,6 +19,6 @@ lbd = np.genfromtxt("spiderweb_lbd_times.csv")
 plt.plot(num_subsets,lbd,'-o',label="LBD")
 plt.legend(loc='best')
 
-plt.ylabel("Sweep Time (s)")
+plt.ylabel("TTS (s)")
 plt.xlabel(r'$\sqrt{\rm{Number\ of\ Subsets}}$')
 plt.savefig("../../figures/unbalanced_pins_opt_comparison.pdf")
