@@ -130,8 +130,8 @@
 \end{itemize}
 \end{block}
 \centering
-\includegraphics[scale = 0.15]{../figures/UnstructureMesh.pdf}
-\includegraphics[scale = 0.15]{../figures/StructuredMesh.pdf}
+\includegraphics[scale = 0.4]{../figures/UnstructuredMesh.pdf}
+\includegraphics[scale = 0.4]{../figures/StructuredMesh.pdf}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Parallel Transport Sweeps}
@@ -150,6 +150,7 @@
 \begin{block}{}
 \begin{itemize}
 \item KBA limits the number of processors in $z$ to one ($P_z$), solves one group at a time ($G=1$), and does not aggregate in angle or group ($A_g = A_m = 1$).
+\item KBA is used for balanced, structured grids.
 \item KBA primarily uses a "successive in angle, successive in quadrant" approach.
 \item An octant pipelines its angular work, and once all directions are complete, the opposing octant pipelines them back.
 \item This is then done for all remaining octant pairs.
@@ -210,6 +211,7 @@
 \begin{itemize}
 \item ``Cut lines'' in 2D (cut planes for 3D) are used to slice through the mesh in the $x$, $y$, and $z$ dimensions.
 \item The cut planes form brick partitions, called subsets, that have unstructured meshes inside of them. 
+\item We cut the mesh this way to avoid inducing inter-subset cycles.
 \item The subsets are distributed amongst the processor domain.
 \end{itemize}
 \end{block}
@@ -300,7 +302,6 @@ Take a 3D mesh.
     \item  Then, for each layer, slice it in columns such that each column has about the same \# of cells.
     \item Then, for each column, slice it in blocks such that each block has about the same \# of cells. 
 \end{enumerate}
-In practice, we often achieve close to perfect load balance for truly unstructured 3D meshes. (typical imbalance is < 1\%)
 \end{block}
 \end{frame}
 
@@ -362,7 +363,7 @@ In practice, we often achieve close to perfect load balance for truly unstructur
 \end{itemize}
 \end{block}
 \begin{block}{IMPORTANT}
-The time-to-solution estimator is a graph-based method that uses graph algorithms that rely on an acyclic graph. The partitioning schemes used CANNOT induce cycles.
+The time-to-solution estimator is a graph-based method that uses graph algorithms that rely on an acyclic graph. The partitioning schemes used CANNOT induce inter-subset cycles.
 \end{block}
 \end{frame}
 
@@ -426,26 +427,30 @@ $\begin{pmatrix}
 \end{frame}
 
 \begin{frame}[t]\frametitle{The DAGs corresponding to the 3x3 partitioning scheme}
-\begin{figure}
-\centering
-\begin{subfigure}[t]{0.49\textwidth}
+\begin{minipage}[t]{0.32\textwidth}
 \centering
 \includegraphics[scale=0.3]{../figures/9_graph1.pdf}
-\end{subfigure}
-\begin{subfigure}[t]{0.49\textwidth}
+\end{minipage}
+\begin{minipage}[c]{0.32\textwidth}
+\centering
+\includegraphics[scale=0.2]{../figures/boundaries_worst.pdf}
+\end{minipage}
+\begin{minipage}[t]{0.32\textwidth}
 \centering
 \includegraphics[scale=0.3]{../figures/9_graph3.pdf}
-\end{subfigure}
+\end{minipage}
 
-\begin{subfigure}[t]{0.49\textwidth}
+\begin{minipage}[b]{0.32\textwidth}
 \centering
 \includegraphics[scale=0.3]{../figures/9_graph0.pdf}
-\end{subfigure}
-\begin{subfigure}[t]{0.49\textwidth}
+\end{minipage}
+\begin{minipage}[b]{0.32\textwidth}
+\hfill
+\end{minipage}
+\begin{minipage}[b]{0.32\textwidth}
 \centering
 \includegraphics[scale=0.3]{../figures/9_graph2.pdf}
-\end{subfigure}
-\end{figure}
+\end{minipage}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Weighting the DAGs}
