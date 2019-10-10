@@ -7,7 +7,7 @@ plt.figure()
 num_subsets = [2,3,4,5,6,7,8,9,10]
 opt = np.genfromtxt("spiderweb_opt_times.csv")
 reg = np.genfromtxt("spiderweb_regular_times.csv")
-plt.plot(num_subsets,opt,'-o',label="Opt")
+plt.plot(num_subsets,opt,'-o',label="Bin")
 plt.plot(num_subsets,reg,'-o',label="Reg")
 
 num_subsets = [2,3,4,5,6,7,9,10]
