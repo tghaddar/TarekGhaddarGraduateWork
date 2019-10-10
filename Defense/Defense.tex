@@ -271,9 +271,9 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 \begin{frame}[t]\frametitle{Redistribution}
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.3]{../figures/redistribute_before.pdf}
-\includegraphics[scale=0.3]{../figures/redistribute_after.pdf}
-\caption{The use of the CDF of triangles per column to redistribute the cut planes in X.}
+\includegraphics[scale=0.4]{../figures/spiderweb_redistribute_before_sparse.pdf}
+\includegraphics[scale=0.4]{../figures/spiderweb_redistribute_after_sparse.pdf}
+\caption{The use of the CDF of cells per column to redistribute the cut planes in X.}
 \label{redistribute}
 \end{figure}
 \end{frame}
@@ -394,14 +394,15 @@ The time-to-solution estimator is a graph-based method that uses graph algorithm
 
 \begin{frame}[t]\frametitle{Time To Solution Estimator}
 \begin{block}{}
+The time-to-solution estimator determines the time to sweep across a domain for a given partitioning scheme by:
 \begin{enumerate}
-    \item Given a partitioning scheme, build an adjacency matrix.
-    \item From the adjacency matrix, build Directed Acyclic Graphs (DAGs), one for each quadrant/octant.
-    \item Weight each DAG's edges based on the solve and communication time of each subset to its neighbors.
-     \item Add and adjust graphs based on how many angles are pipelined.
-    \item Adjust the weights of each graph to reflect a universal timescale.
-    \item Adjust the weights of each graph to reflect sweep conflicts between octants.
-    \item Obtain the time-to-solution.
+	\item Building an adjacency matrix,
+	\item Building Directed Acyclic Graphs (DAGs) from the adjacency matrix, one for each quadrant/octant,
+	\item Weighting the edges of each graph based on the solve time and communication time of each subset to its neighbors,
+  \item Adding and modifying graph weights based on how many anglesets are pipelined,
+	\item Modifying the weights of each graph to operate on the universal timescale,
+	\item Modifying the weights of each graph to reflect sweep conflicts between octants,
+	\item Calculating the time to solution.
 \end{enumerate}
 \end{block}
 \end{frame}
@@ -427,10 +428,10 @@ $\begin{pmatrix}
 \end{minipage}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Building the Task Dependence Graphs}
+\begin{frame}[t]\frametitle{Building the Directed Acyclic Graphs}
 \begin{block}{}
 \begin{itemize}
-    \item Each quadrant/octant gets its own TDG.
+    \item Each quadrant/octant gets its own DAG.
     \item The opposing quadrant/octant pairs have opposing sweep orderings. 
     \item Each set of quadrant/octant pairs uses a different adjacency matrix. 
     \item Python package \textbf{networkx} is used for all graph operations.
@@ -516,10 +517,6 @@ $\begin{pmatrix}
     \end{footnotesize}
     \end{itemize}
   \end{block}
-
-For unstructured grids, we use a mesh density function to calculate the \# cells per subset and \# of boundary cells. \\
-\vspace{1cm}
-In practice, we use mesh cell centroids to build a discrete mesh density function.
 \end{frame}
 
 \begin{frame}[t]\frametitle{Weighting the TDGs}
@@ -620,12 +617,14 @@ In practice, we use mesh cell centroids to build a discrete mesh density functio
 
 \begin{frame}[t]\frametitle{Conflict Detection and Resolution}
   \begin{block}{}
-    \begin{itemize}
-      \item Best summarized as a ``marching" process. 
-      \item Starting at time $t=0$, find the first interaction (recalling that the incoming weight to a node reflects the time it is ready to solve).
-      \item If at time $t$, multiple TDGs are solving the same node, this means there is a conflict. 
-      \item  ``Losing" TDGs modify their downstream weights according to how long they are delayed.
-    \end{itemize}
+    Best summarized as a ``marching" process. 
+    \begin{enumerate}
+      \item Starting at time $t=0$, find the nodes that are ready to solve or already solving across all graphs.
+      \item If at that time, multiple graphs are solving the same node, they are in conflict.
+      \item The graph that ``wins'' the conflict does not have its weights modified, while the graph(s) that lose the conflict modify their downstream weights according to how long they are delayed.
+      \item Update $t$ to the next interaction across all graphs.
+      \item Repeat steps 2, 3, and 4 until all graphs are finished sweeping.
+    \end{enumerate}
   \end{block}
 \end{frame}
 
