@@ -268,7 +268,7 @@ f_{J,i,k} &= \Big( \underset{j}{\text{max}}[ N_{ijk,k,i}]/\frac{N_{k,i}}{J} \Big
 \end{algorithm}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Redistribution}
+\begin{frame}[t]\frametitle{An example of redistributing cut lines}
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.4]{../figures/spiderweb_redistribute_before_sparse.pdf}
@@ -410,22 +410,33 @@ The time-to-solution estimator determines the time to sweep across a domain for 
 \begin{frame}[t]\frametitle{Building the Adjacency Matrix}
 \begin{block}{}
 \begin{itemize}
-  \item The adjacency matrix provides the crucial connectivity information necessary to build the Task Dependence Graphs (TDG's) in the time-to-solution estimator.
+  \item The adjacency matrix provides the connectivity and ordering information necessary to build the Directed Acyclic Graphs (DAG) in the time-to-solution estimator.
 \end{itemize}
 \end{block}
-\begin{minipage}{0.49\textwidth}
+\begin{figure}[H]
 \centering
-\includegraphics[scale=0.4]{../figures/base_adjacency_layout.pdf}
+\begin{minipage}[c]{0.49\textwidth}
+\centering
+\includegraphics[scale=0.4]{../figures/boundaries_worst.pdf}
 \end{minipage}
-\begin{minipage}{0.49\textwidth}
+\begin{minipage}[c]{0.49\textwidth}
 \centering
+\scalebox{0.85}{
 $\begin{pmatrix}
-0 & 1 & 1  & 0  \\
-1 & 0 & 0 & 1 \\
-1 & 0 & 0 & 1 \\ 
-0 & 1 & 1 & 0 \\
-\end{pmatrix}$
+0&1&0&1&0&0&0&0&0\\
+1&0&1&1&0&0&0&0&0\\
+0&1&0&1&1&1&0&0&0\\
+1&1&1&0&1&0&1&1&1\\
+0&0&1&1&0&1&0&0&1\\
+0&0&1&0&1&0&0&0&1\\
+0&0&0&1&0&0&0&1&0\\
+0&0&0&1&0&0&1&0&1\\
+0&0&0&1&1&1&0&1&0\\
+\end{pmatrix}$}
 \end{minipage}
+\caption{A 3x3 subset partitioning scheme and its corresponding adjacency matrix.}
+\label{25basematrix}
+\end{figure}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Building the Directed Acyclic Graphs}
@@ -433,7 +444,6 @@ $\begin{pmatrix}
 \begin{itemize}
     \item Each quadrant/octant gets its own DAG.
     \item The opposing quadrant/octant pairs have opposing sweep orderings. 
-    \item Each set of quadrant/octant pairs uses a different adjacency matrix. 
     \item Python package \textbf{networkx} is used for all graph operations.
 \end{itemize}
 \end{block}
@@ -441,61 +451,35 @@ $\begin{pmatrix}
 \includegraphics[scale=0.45]{../figures/quadrant_layout.pdf}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Quadrants 0 and 3}
-\begin{block}{}
-\begin{itemize}
-    \item We use the upper triangular portion of the adjacency matrix for quadrant 0.
-    \item We use the lower triangular portion of the adjacency matrix for quadrant 3.
-\end{itemize}
-\end{block}
-\begin{minipage}{0.49\textwidth}
-  \centering
-  \includegraphics[scale=0.35]{../figures/q0_preweight.pdf}
-\end{minipage}
-\begin{minipage}{0.49\textwidth}
-  \centering
-  \includegraphics[scale=0.35]{../figures/q3_preweight.pdf}
-\end{minipage}
+\begin{frame}[t]\frametitle{The DAGs corresponding to the 3x3 partitioning scheme}
+\begin{figure}
+\centering
+\begin{subfigure}[t]{0.49\textwidth}
+\centering
+\includegraphics[scale=0.3]{../figures/9_graph1.pdf}
+\end{subfigure}
+\begin{subfigure}[t]{0.49\textwidth}
+\centering
+\includegraphics[scale=0.3]{../figures/9_graph3.pdf}
+\end{subfigure}
+
+\begin{subfigure}[t]{0.49\textwidth}
+\centering
+\includegraphics[scale=0.3]{../figures/9_graph0.pdf}
+\end{subfigure}
+\begin{subfigure}[t]{0.49\textwidth}
+\centering
+\includegraphics[scale=0.3]{../figures/9_graph2.pdf}
+\end{subfigure}
+\end{figure}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Quadrants 1 and 2}
+\begin{frame}[t]\frametitle{Weighting the DAGs}
   \begin{block}{}
-    \begin{itemize}
-      \item Before building the graphs for these opposing quadrants, we have to alter the adjacency matrix slightly.
-      \item The subsets get renumbered in a manner where subset 1 becomes subset 0, subset 0 becomes subset 1, etc. In short the column numbering is flipped, and a ``flipped'' adjacency matrix is built. 
-    \end{itemize}
+    Now that we have Directed Acyclic Graphs, we weight them with the help of PDT's performance model. 
   \end{block}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.38]{../figures/base_adjacency_layout.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.38]{../figures/flipped_subset_layout.pdf}
-  \end{minipage}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Quadrants 1 and 2}
   \begin{block}{}
-    \begin{itemize}
-      \item We use the upper triangular portion of the ``flipped'' adjacency matrix for quadrant 1.
-      \item We use the lower triangular portion of the ``flipped'' adjacency matrix for quadrant 2.
-    \end{itemize}
-  \end{block}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.35]{../figures/q1_preweight.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.35]{../figures/q2_preweight.pdf}
-  \end{minipage}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Weighting the TDGs}
-  \begin{block}{}
-    \begin{itemize}
-    \item Graph edge weight = time to solve cells in subset \& communicate boundary values to downwind subsets.
+    Graph edge weight = time to solve cells in subset \& communicate boundary values to downwind subsets.
     \begin{align}
       \text{weight} = T_{wu} + N_c\cdot (T_c+ A_m\cdot(T_m + T_g)) + N_{b}\cdot A_m\cdot T_{\text{comm}} + T_{\text{latency}}
       \end{align}
@@ -515,11 +499,10 @@ $\begin{pmatrix}
      \end{aligned}
     \end{equation*}
     \end{footnotesize}
-    \end{itemize}
   \end{block}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Weighting the TDGs}
+\begin{frame}[t]\frametitle{Weighting the DAGs}
   \begin{minipage}{0.49\textwidth}
     \centering
     \includegraphics[scale=0.32]{../figures/q1_postweight.pdf}
@@ -536,83 +519,44 @@ $\begin{pmatrix}
     \centering
     \includegraphics[scale=0.32]{../figures/q2_postweight.pdf}
   \end{minipage}
- 
 \end{frame}
 
-\begin{frame}[t]\frametitle{Adjusting for Multiple Angles}
- \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q1_postpipeline.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q3_postpipeline.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q0_postpipeline.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q2_postpipeline.pdf}
-  \end{minipage}
+\begin{frame}[t]\frametitle{Adding graphs for multiple anglesets}
+\begin{figure}[H]
+\begin{minipage}[c]{0.49\textwidth}
+\centering
+\includegraphics[scale=0.4]{../figures/q0_postpipeline.pdf}
+\end{minipage}
+\begin{minipage}[c]{0.49\textwidth}
+\centering
+\includegraphics[scale=0.4]{../figures/q4_postpipeline.pdf}
+\end{minipage}
+\caption{The graphs for the first (left) and second (right) anglesets for quadrant 0.}
+\label{angular_pipeline}
+\end{figure}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Second Angleset}
- \begin{minipage}{0.49\textwidth}
+\begin{frame}[t]\frametitle{Modifying graph weights to reflect a universal timescale}
+\begin{block}{}
+  \begin{itemize}
+    \item Once graphs are weighted for solve and communication time, we need to know when each node in each graph is ready to be solved.
+    \item We calculate the sum of the longest weighted path to each node, and set all incoming edges of each node to this value.
+    \item The incoming edges to each node now represent the time each node is ready to solve.
+    \item The DAGs have now become Task Dependence Graphs (TDGs).
+  \end{itemize}
+\end{block}
+\begin{figure}[H]
+  \begin{minipage}[c]{0.49\textwidth}
     \centering
-    \includegraphics[scale=0.32]{../figures/q5_postpipeline.pdf}
+    \includegraphics[scale=0.35]{../figures/G_pre_universal.pdf}
   \end{minipage}
-  \begin{minipage}{0.49\textwidth}
+  \begin{minipage}[c]{0.49\textwidth}
     \centering
-    \includegraphics[scale=0.32]{../figures/q7_postpipeline.pdf}
+    \includegraphics[scale=0.35]{../figures/G_universal.pdf}
   \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q4_postpipeline.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q6_postpipeline.pdf}
-  \end{minipage}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Universal Edge Weighting}
- \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q1_postuniversal.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q3_postuniversal.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q0_postuniversal.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q2_postuniversal.pdf}
-  \end{minipage}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Second Angleset}
- \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q5_postuniversal.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q7_postuniversal.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q4_postuniversal.pdf}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/q6_postuniversal.pdf}
-  \end{minipage}
+  \caption{A TDG before (left) and after (right) universal edge weighting is applied.}
+   \label{universal}
+\end{figure}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Conflict Detection and Resolution}
