@@ -1,6 +1,6 @@
 import sys
 sys.path.append(r'C:\Users\tghad\Documents\GitHub\TarekGhaddarGraduateWork\sweep_optimizer\3d')
-from optimizer import create_parameter_space_3d,create_opt_cut_suite_3d,create_opt_cut_suite_3d_given_z
+from optimizer import create_parameter_space_3d,create_opt_cut_suite_3d,create_opt_cut_suite_3d_given_z,create_opt_cut_suite_3d_given_zx
 import numpy as np
 import sweep_solver as ss
 
@@ -40,16 +40,28 @@ numplane = 5
 im1points = np.genfromtxt("im1_cell_centers")
 points = np.genfromtxt("im1_points")
 z_cuts = np.genfromtxt("im1_lbd_z")
+x_cuts_lbd = np.genfromtxt("im1_lbd_x")
 x_cut_suite,y_cut_suite = create_opt_cut_suite_3d_given_z(points,z_cuts,gxmin,gxmax,gymin,gymax,gzmin,gzmax,numcol,numrow,numplane)
 
 max_times = []
-for i in range(0,len(x_cut_suite)):
-  for j in range(0,len(y_cut_suite)):
-    x_cuts = x_cut_suite[i]
-    y_cuts = y_cut_suite[j]
-    add_cells = False
-    params = create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane)
-    max_times.append(ss.optimized_tts_3d_numerical(params,im1points,gxmin,gxmax,gymin,gymax,gzmin,gzmax,numrow,numcol,numplane,machine_parameters,num_angles,Am,Az,add_cells,unweighted,test))
-    
+#for i in range(0,len(x_cut_suite)):
+#  for j in range(0,len(y_cut_suite)):
+#    x_cuts = x_cut_suite[i]
+#    y_cuts = y_cut_suite[j]
+#    add_cells = False
+#    params = create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane)
+#    max_times.append(ss.optimized_tts_3d_numerical(params,im1points,gxmin,gxmax,gymin,gymax,gzmin,gzmax,numrow,numcol,numplane,machine_parameters,num_angles,Am,Az,add_cells,unweighted,test))
+#    
+#
+#np.savetxt("max_times_im1_opt_given_z",max_times)
 
-np.savetxt("max_times_im1_opt",max_times)
+max_times = []
+
+y_cut_suite = create_opt_cut_suite_3d_given_zx(points,z_cuts,x_cuts_lbd,gymin,gymax,numcol,numrow,numplane)
+for i in range(0,len(y_cut_suite)):
+  x_cuts = x_cuts_lbd
+  y_cuts = y_cut_suite[i]
+  params = create_parameter_space_3d(x_cuts,y_cuts,z_cuts,numrow,numcol,numplane)
+  max_times.append(ss.optimized_tts_3d_numerical(params,im1points,gxmin,gxmax,gymin,gymax,gzmin,gzmax,numrow,numcol,numplane,machine_parameters,num_angles,Am,Az,add_cells,unweighted,test))
+  
+np.savetxt("max_times_im1_opt_given_zx",max_times)

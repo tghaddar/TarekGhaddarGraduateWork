@@ -84,7 +84,7 @@ for i in range(0,subsets):
   y_cuts[k][i][j+1] = ymax
   
 np.savetxt("im1_lbd_z",z_cuts)
-#np.savetxt("im1_lbd_x",x_cuts)
+np.savetxt("im1_lbd_x",x_cuts)
 #np.savetxt("im1_lbd_y",y_cuts)
 
 im1points = np.genfromtxt("im1_cell_centers")

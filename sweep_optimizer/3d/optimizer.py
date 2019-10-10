@@ -159,7 +159,6 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   
   #Getting the derivate to identify the highest jumps.
   grad_cdf = np.diff(cdf)/np.diff(bin_edges)
-  #grad_cdf = np.gradient(cdf,bin_edges)
   bin_edges_plot = np.delete(bin_edges,0)
   plt.figure()
   plt.plot(bin_edges_plot,grad_cdf)
@@ -242,6 +241,79 @@ def get_y_vals(xpoints,ypoints,x_values,gymin,gymax,numrow,numcol):
       tree_bottom = True
   
   return current_y_values
+
+def create_opt_cut_suite_3d_given_zx(points,z_values,x_values,gymin,gymax,numcol,numrow,numplane):
+
+  xpoints = points[:,0]
+  ypoints = points[:,1]
+  zpoints = points[:,2]
+  y_values = get_highest_jumps(ypoints,gymin,gymax,numrow)
+  y_cut_suite = []
+  all_y_cuts = []
+  all_through_y = []
+  for plane in range(0,numplane):
+    all_y_cuts_col = []
+    all_through_y_col = []
+    for col in range(1,numcol+1):
+      xmin = x_values[plane][col-1]
+      xmax = x_values[plane][col]
+      x1 = np.argwhere(np.logical_and(xpoints>=xmin,xpoints<=xmax)).flatten()
+      #Pulling all points that are in this column. 
+      y1 = ypoints[x1]
+      #Getting the highest jumps for this column.
+      y_values_col = get_highest_jumps(y1,gymin,gymax,numrow)
+      all_y_cuts_col.append(y_values_col)
+      all_through_y_col.append(y_values)
+      
+    all_y_cuts.append(all_y_cuts_col)
+    all_through_y.append(all_through_y_col)
+    
+  y_cut_suite.append(all_through_y)
+  #Doing a binary tree of the columns to get a full cut suite.
+  tree_bottom = False
+  num_children = 2
+  prev_z_limits = [numplane]
+  while(tree_bottom == False):
+  
+    z_limits = []
+    current_z_limit = int(0)
+    current_y_values = [[] for i in range(0,numplane)]
+    for i in range(0,len(prev_z_limits)):
+      z1_limit = int(np.floor(prev_z_limits[i]/2))
+      z_limits.append(z1_limit)
+      z2_limit = int(np.ceil(prev_z_limits[i]/2))
+      z_limits.append(z2_limit)
+      
+      plane0 = copy(current_z_limit)
+      zmin = z_values[plane0]
+      current_z_limit += z1_limit
+      plane1 = copy(current_z_limit)
+      zmax = z_values[plane1]
+      
+      for j in range(plane0,plane1):
+        x_values0 = x_values[j]
+        current_y_values[j] = get_y_vals(xpoints,ypoints,x_values0,gymin,gymax,numrow,numcol)
+        
+      zmin2 = zmax
+      current_z_limit += z2_limit
+      plane2 = copy(current_z_limit)
+      zmax2 = z_values[plane2]
+      
+      for j in range(plane1,plane2):
+        x_values1 = x_values[j]
+        current_y_values[j] = get_y_vals(xpoints,ypoints,x_values1,gymin,gymax,numrow,numcol)
+      
+    y_cut_suite.append(current_y_values)
+    num_children *= 2
+    prev_z_limits = z_limits
+    if (z_limits[0] <= 1.5):
+      tree_bottom = True
+    
+
+  y_cut_suite.append(all_y_cuts)
+
+  return y_cut_suite
+  
 
 def create_opt_cut_suite_3d_given_z(points,z_values,gxmin,gxmax,gymin,gymax,gzmin,gzmax,numcol,numrow,numplane):
   xpoints = points[:,0]
