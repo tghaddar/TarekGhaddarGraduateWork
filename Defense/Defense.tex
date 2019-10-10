@@ -764,7 +764,7 @@ $\begin{pmatrix}
    \item 2-10 subsets in each dimension with load-balanced cuts.
    \item 2-10 subsets in each dimension with load-balanced-by-dimension cuts.
  \end{itemize}
- Each case was run ten times in PDT to filter out outlying values.
+ Each case was run ten times in PDT, with ten transport sweeps each, to filter out outlying values.
 \end{block}
 \end{frame}
 
@@ -841,6 +841,48 @@ $\begin{pmatrix}
 \end{minipage}
 \end{frame}
 
+\begin{frame}[t]\frametitle{Conclusions drawn from the unbalanced pins suite}
+\begin{block}{}
+\begin{itemize}
+  \item PDT's performance model agrees better the more unknowns there are.
+  \item The unbalanced pin problem only contains 420 cells, which may explain why some of the larger discrepancies.
+  \item PDT's first-come-first-serve scheduler is not always equivalent to the time-to-solution estimator's schedule, and is likelier to agree for LBD cases, where communication dependencies drive better agreement between the two schedules.
+  \end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[t]\frametitle{``Heavier'' unbalanced pin mesh with 9,656 cells}
+\centering
+\includegraphics[scale=0.14]{../figures/unbalanced_pins_more_sparse.png}
+\end{frame}
+
+\begin{frame}\frametitle{``Heavier unbalanced pin mesh with regular cuts}
+\begin{minipage}[c]{0.5\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../figures/more_sparse_reg_pdtvtts.pdf}
+\end{minipage}
+\begin{minipage}[c]{0.48\textwidth}
+\centering
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c}
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline 
+2&21.14\%\\ \hline 
+3&15.87\%\\ \hline 
+4&10.96\%\\ \hline 
+5&9.3\%\\ \hline 
+6&1.47\%\\ \hline 
+7&0.41\%\\ \hline 
+8&3.68\%\\ \hline 
+9&2.85\%\\ \hline 
+10&6.62\%
+\end{tabular}
+\end{table}
+\end{minipage}
+\begin{block}{}
+With significantly more unknowns, we see better agreement numerically and in the trends of the two curves.
+\end{block}
+\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Partitioning Optimization}
