@@ -884,90 +884,72 @@ With significantly more unknowns, we see better agreement numerically and in the
 \end{block}
 \end{frame}
 
+\begin{frame}[c]\frametitle{The Level-2 experiment: 2,452 cells}
+\centering
+\includegraphics[scale=0.2]{../figures/level2_nocut.png}
+\end{frame}
+
+\begin{frame}[t]\frametitle{The Level-2 experiment partitioned into 42x13 subsets, regular and balanced}
+\centering
+\includegraphics[scale=0.15]{../figures/level2_42x13.png} \\
+\centering
+\includegraphics[scale=0.15]{../figures/level2_42x13_balanced.png}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Level-2 experiment: PDT vs. TTS}
+\begin{table}[ht]
+\centering
+\caption{The sweep times for the regular cut and balanced cut Level-2 problems for PDT and the time-to-solution estimator.}
+\label{level2_sweep_times}
+\begin{tabular}{c|c|c|c|c}
+\bf Case & \bf PDT (s) & \bf TTS (s) & \bf PDT Min (s) & \bf PDT Max (s) \\ \hline
+Regular & 0.07 & 0.0648 & 0.0686 & 0.0889\\ \hline
+Balanced & 0.0531 & 0.0535 & 0.0522 & 0.0638
+\end{tabular}
+\end{table}
+\begin{table}[ht]
+\centering
+\caption{The percent difference for the regular cut and balanced cut Level-2 problems between PDT and the time-to-solution estimator.}
+\label{level2_percent_diff}
+\begin{tabular}{c|c}
+\textbf{Case} & \bf PDT vs. TTS \\ \hline
+Regular & 7.52\% \\ \hline
+Balanced & 0.63\%
+\end{tabular}
+\end{table}
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Partitioning Optimization}
 \subsection{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[t]\frametitle{Optimizing the Cut Lines}
+\begin{frame}[t]\frametitle{Choosing optimal partitions}
 \begin{block}{}
   \begin{itemize}
-    \item The time-to-solution estimator provides us with the maximum time-to-solution given a set of cut lines/planes.
-    \item The estimator can be fed into an optimization function that minimizes the maximum time-to-solution using the cut lines/planes as the parameter space. 
-    \item This was attempted using \textbf{scipy.optimize.minimize}. 
+    \item The time-to-solution estimator provides us with the time-to-solution given a set of partitioning parameters.
+    \item The next step is to use the time-to-solution estimator to choose the optimal partitions.
+    \item This was initially attempted using the scipy.optimize.minimize library but after extensive trials, tests, and research into ``black box'' methods, it became clear that the time-to-solution estimator function is not smooth enough to be used with bounded and constrained optimization methods.
+    \item A method that is unique to our problem, which we have named the CDF method, was developed.
   \end{itemize}
 \end{block}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Brute Force Optimization}
+\begin{frame}[t]\frametitle{The CDF optimization method}
 \begin{block}{}
-  \begin{itemize}
-    \item  A brute force optimization study was run on analytical mesh density data picture below with 2x2 cut lines in x and y.
-    \item The global domain was from 0 to 10 cm in each dimension.
-    \item The cut lines were varied by 0.1 each, leading to the time to solution estimator being run 99\textsuperscript{3}= 970,299 times.
-  \end{itemize}
-\end{block}
-  \centering
-  \includegraphics[scale=0.35]{../figures/analytical_mesh_density.pdf}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Brute Force Optimization}
-  \centering
-  \includegraphics[scale=0.5]{../figures/brute_force_result.pdf}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Brute Force Optimization}
-\begin{block}{}
-  \begin{itemize}
-    \item The brute force optimization study took about 3 hours to run.
-    \item The same mesh run through \textbf{scipy.optimize.minimize} with the Sequential Quadratic Programming method took 6.85 seconds with only 491 TTS evaluations as opposed to 970,299.
-  \end{itemize}
-\end{block}
-\begin{table}[H]
-\centering
-\begin{tabular}{c|c|c} 
-\bf Params & \bf Brute Force & \bf SciPy   \\ \hline \hline
- x & 6.2& 6.180 \\
- y0 & 6.4 & 6.420 \\ 
- y1 & 5.9 & 5.922 \\ 
- tts & 18205  &  18045 \\ 
-\end{tabular}
-\end{table}
-\end{frame}
-
-
-\begin{frame}[t]\frametitle{Global Optimization Process}
-\begin{block}{}
-  \begin{itemize}
-   \item Methods in \textbf{scipy.optimize.minimze} find local minima only, and we needed to combine this with a global optimization routine.
-    \item From \textbf{scipy.optimize} we used basinhopping (a stochastic global minimization method) to call the local minimization method in order optimize over our global parameter space.
-  \end{itemize}
+\begin{itemize}
+\item This method prioritizes cut line locations that minimizes the addition of cells to a mesh. 
+\item We use the detailed vertex CDF to identify locations that coincide with ``natural boundaries'', or mesh boundaries that coincide with potential subset boundaries.
+\item For a mesh, the method will:
+\begin{enumerate}
+  \item Find the most suitable natural boundaries in the $x$ dimension,
+  \item For each set of columns, find the most suitable natural boundaries in the $y$ dimension,
+  \item Run all iterations of cut lines selected.
+\end{enumerate}
+\end{itemize}
 \end{block}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Sparse Spiderweb Optimization}
-\centering
-  \includegraphics[scale=0.25,trim={2cm 0cm 1cm 1.3cm},clip]{../figures/unbalanced_pins_refined.png}
-\end{frame}
+\begin{frame}[t]\frametitle{Finding natural boundaries}
 
-\begin{frame}[t]\frametitle{Sparse Spiderweb Optimization Results}
-\begin{block}{}
-  \begin{itemize}
-    \item Using LBD cuts as the initial guess, 10 global iterations, and 100 local iterations, the following results were obtained.
-  \end{itemize}
-\end{block}
-\begin{table}[H]
-\centering
-\begin{tabular}{c|c|c|c} 
-\bf N & \bf LBD & \bf Opt & \bf Ratio   \\ \hline \hline
- 2 & 0.734 & 0.611 & 0.832\\
- 3 & 0.742 & 0.678 & 0.914\\ 
- 4 & 0.586 & 0.507 & 0.865\\ 
- 5 & 0.561& 0.509 & 0.907\\
- 6 & 0.465  &  0.461 & 0.991\\
- 7 & 0.463 & 0.416 & 0.898\\
- 9& 0.373& 0.373 & 1.0\\
-\end{tabular}
-\end{table}
 \end{frame}
 
 \section{Conclusions and Future Work}
