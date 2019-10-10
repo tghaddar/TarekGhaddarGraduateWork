@@ -743,6 +743,12 @@ $\begin{pmatrix}
 \end{tabular}}
 \end{table}
 \end{minipage}
+\begin{block}{}
+\begin{itemize}
+\item The PDT performance model is consistently higher than the performance model, in part due to the performance model assuming an equivalent cost per stage. 
+\item In reality, not every processor communicates to 3 neighbors at every stage, and the final stage for each direction has no communication penalty. 
+\end{itemize}
+\end{block}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Unbalanced Pin Comparison Between PDT and TTS}
@@ -763,53 +769,78 @@ $\begin{pmatrix}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Unbalanced Pins with Regular Cuts}
+\begin{minipage}[c]{0.5\textwidth}
 \centering
-\includegraphics[scale=0.7]{../figures/spiderweb_reg_pdtvtts.pdf}
+\includegraphics[width=\textwidth]{../figures/spiderweb_reg_pdtvtts.pdf}
+\end{minipage}
+\begin{minipage}[c]{0.48\textwidth}
+\centering
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c}
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline
+2&19.93\%\\ \hline
+3&12.3\%\\ \hline
+4&1.75\%\\ \hline
+5&15.69\%\\ \hline
+6&2.71\%\\ \hline
+7&2.61\%\\ \hline
+8&4.45\%\\ \hline
+9&3.21\%\\ \hline
+10&11.38\%
+\end{tabular}
+\end{table}
+\end{minipage}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Unbalanced Pins with LB Cuts}
+\begin{minipage}[c]{0.5\textwidth}
 \centering
-\includegraphics[scale=0.7]{../figures/spiderweb_lb_pdtvtts.pdf}
+\includegraphics[width=\textwidth]{../figures/spiderweb_lb_pdtvtts.pdf}
+\end{minipage}
+\begin{minipage}[c]{0.48\textwidth}
+\centering
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c}
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline
+2&15.9\%\\ \hline
+3&23.52\%\\ \hline
+4&41.83\%\\ \hline
+5&6.15\%\\ \hline
+6&10.67\%\\ \hline
+7&8.43\%\\ \hline
+9&15.47\%\\ \hline
+10&7.88\%
+\end{tabular}
+\end{table}
+
+\end{minipage}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Unbalanced Pins with LBD Cuts}
+\begin{minipage}[c]{0.5\textwidth}
 \centering
-\includegraphics[scale=0.7]{../figures/spiderweb_lbd_pdtvtts.pdf}
+\includegraphics[width=\textwidth]{../figures/spiderweb_lbd_pdtvtts.pdf}
+\end{minipage}
+\begin{minipage}[c]{0.48\textwidth}
+\centering
+\begin{table}[!ht]
+\centering
+\begin{tabular}{c|c}
+\textbf{$\sqrt{\text{Num Subsets}}$} & \bf PDT vs. TTS \\ \hline
+2&6.5\%\\ \hline
+3&13.49\%\\ \hline
+4&4.04\%\\ \hline
+6&2.78\%\\ \hline
+7&3.5\%\\ \hline
+9&4.18\%\\ \hline
+10&12.01\%
+\end{tabular}
+\end{table}
+\end{minipage}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Level 2 Experiment}
-  \centering
-  \includegraphics[scale=0.35,trim={2cm 0cm 1cm 15cm},clip]{../figures/level2base.png}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Level 2 Experiment TTS}
-\begin{block}{}
-   \begin{itemize}
-   \item Using the Level 2 mesh, the time-to-solution estimator was run from 2-10 subsets in each dimension with regular cuts.
- \end{itemize}
- \end{block}
- \centering
-  \includegraphics[scale=0.4]{../figures/level2solutionsuite.pdf}
-\end{frame}
-
-\begin{frame}[t]\frametitle{Level 2 Experiment 42x13}
-   \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/lvl2regularcuts.pdf}
-    \begin{block}{}
-    \centering
-      $t = 0.314$
-    \end{block}
-  \end{minipage}
-  \begin{minipage}{0.49\textwidth}
-    \centering
-    \includegraphics[scale=0.32]{../figures/lvl2lbcuts.pdf}
-    \begin{block}{}
-    \centering
-      $t = 0.152$
-    \end{block}
-  \end{minipage}  
-\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Partitioning Optimization}
