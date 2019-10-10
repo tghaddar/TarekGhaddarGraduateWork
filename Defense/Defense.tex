@@ -63,7 +63,7 @@
 \title[Partitioning Optimization]{Partitioning Optimization for Massively Parallel Transport Sweeps on Unstructured Grids}
 \author[Ghaddar]{Tarek Habib Ghaddar \\ \small{Chair: Jean C. Ragusa \\ Committee: Marvin L. Adams, Nancy Amato, Jim E. Morel}}
 \institute[Texas A\&M]{Department of Nuclear Engineering \\ Texas A\&M University}
-\date[June 19, 2019]
+\date[October 14, 2019]
 
 \begin{document}
 
@@ -768,7 +768,7 @@ $\begin{pmatrix}
 \end{block}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Unbalanced Pins with Regular Cuts}
+\begin{frame}[c]\frametitle{Unbalanced Pins with Regular Cuts}
 \begin{minipage}[c]{0.5\textwidth}
 \centering
 \includegraphics[width=\textwidth]{../figures/spiderweb_reg_pdtvtts.pdf}
@@ -793,7 +793,7 @@ $\begin{pmatrix}
 \end{minipage}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Unbalanced Pins with LB Cuts}
+\begin{frame}[c]\frametitle{Unbalanced Pins with LB Cuts}
 \begin{minipage}[c]{0.5\textwidth}
 \centering
 \includegraphics[width=\textwidth]{../figures/spiderweb_lb_pdtvtts.pdf}
@@ -818,7 +818,7 @@ $\begin{pmatrix}
 \end{minipage}
 \end{frame}
 
-\begin{frame}[t]\frametitle{Unbalanced Pins with LBD Cuts}
+\begin{frame}[c]\frametitle{Unbalanced Pins with LBD Cuts}
 \begin{minipage}[c]{0.5\textwidth}
 \centering
 \includegraphics[width=\textwidth]{../figures/spiderweb_lbd_pdtvtts.pdf}
@@ -943,13 +943,38 @@ Balanced & 0.63\%
   \item Find the most suitable natural boundaries in the $x$ dimension,
   \item For each set of columns, find the most suitable natural boundaries in the $y$ dimension,
   \item Run all iterations of cut lines selected.
+  \item Run regular, load-balanced, load-balanced by dimension cuts.
+  \item Select minimum time-to-solution.
 \end{enumerate}
 \end{itemize}
 \end{block}
 \end{frame}
 
 \begin{frame}[t]\frametitle{Finding natural boundaries}
+\begin{block}{}
+Let's reconsider the unbalanced pin mesh, where there are natural boundaries at each centimeter in each dimension.
+\end{block}
+\centering
+\includegraphics[scale=0.11]{../figures/spiderweb_10x10_sparse.png}
+\end{frame}
 
+\begin{frame}[t]\frametitle{The x-vertex CDF of the unbalanced pin mesh}
+\centering
+\includegraphics[scale=0.325]{../figures/xvertexcdf.pdf} \\
+\includegraphics[scale=0.325]{../figures/gradcdf.pdf}
+\end{frame}
+
+\begin{frame}[t]\frametitle{Selection of cut lines}
+\begin{block}{}
+Once $x$ cut lines are selected, we choose $y$ cut lines for a series of column sets. \\
+\begin{enumerate}
+  \item Select highest $y$ jumps through all 4 columns of the mesh.
+  \item Select the highest $y$ jumps through the first two columns, then the second two columns.
+  \item Select the highest $y$ jumps for each column.
+\end{enumerate}
+\end{block}
+\centering
+\includegraphics[scale=0.4]{../figures/binary_tree.pdf}
 \end{frame}
 
 \section{Conclusions and Future Work}
