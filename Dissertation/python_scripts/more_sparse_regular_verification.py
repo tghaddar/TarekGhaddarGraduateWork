@@ -58,7 +58,7 @@ for i in range(0,len(numrows)):
   
   max_times.append( optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
 
-
+np.savetxt("more_sparse_reg_data",max_times)
 #np.savetxt("spiderweb_regular_times.csv", max_times)
 pdt_data = np.genfromtxt("more_sparse_data/regular_sweep_data.txt")
 pdt_data = np.reshape(pdt_data,(9,10))
