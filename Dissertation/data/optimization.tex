@@ -133,18 +133,28 @@ With this method, we are also not running the time-to-solution estimator a large
 \section{Optimization Results}
 The CDF optimization method was run on the unbalanced pin mesh and the Level-2 experiment mesh.
 The unbalanced pin mesh was run through the optimization suite from 2 to 10 subsets in each dimension.
-Figure~\ref{ubp_opt} shows the time-to-solution for optimized, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.
+Figure~\ref{ubp_opt} shows the time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.
 %%%%%%%%%%
 \begin{figure}[ht]
 \centering
   \includegraphics{../../figures/unbalanced_pins_opt_comparison.pdf}
-  \caption{The time-to-solution for optimized, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.}
+  \caption{The time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.}
   \label{ubp_opt}
 \end{figure}
 %%%%%%%%%%%
 For low numbers of subsets, the load-balanced-by-dimension partitions outperform the regular, load-balanced, and optimized partitions.
 Due to the low number of communications, having partitions that are balanced by column does not incur a large communication penalty, and having a well-balanced problem is still more important.
 However, once we exceed 16 subsets, we can see the optimized partitions outperforming the other partition types, with the prioritization of not adding cells paying off.
+
+Figure~\ref{ubp_opt_heavy} shows the time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.
+\begin{figure}[H]
+\centering
+\includegraphics{../../figures/more_sparse_comp.pdf}
+  \caption{The time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.}
+  \label{ubp_opt_heavy}
+\end{figure}
+%%
+With a very dense mesh that is inherently balanced, moving cuts to the heaviest natural boundaries may move cuts to less optimal locations than the regular or load-balanced cuts.
 
 Figure~\ref{level2_opt} shows the sweep times on the Level-2 mesh from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts.
 \begin{figure}[H]
@@ -160,7 +170,31 @@ Thus the ``optimization suite'' should always have the cut types of previous wor
 In addition, spending the time to hand balance the mesh is potentially not worthwhile as the time per sweep only differed by 0.004 seconds.
 Depending on the total number of sweeps that need to be performed, this difference could be negligible in the total time to solution.
 
-The failure of the optimization process to provide better cuts for the Level-2 experiment highlights a few paths forward for future work.
+Figure~\ref{im1c_opt} shows the results of the IM1C experiment mesh run through the time-to-solution estimator for regular, load-balanced-by-dimension, and binary tree cuts with 5 subsets in each dimension.
+\begin{figure}[H]
+\begin{minipage}[c]{0.65\textwidth}
+\centering
+\includegraphics[scale=0.3]{../figures/im1_mesh.png}
+\end{minipage}
+%
+\begin{minipage}[c]{0.33\textwidth}
+\centering
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c}
+\textbf{Type} & \bf TTS (s) \\ \hline
+Regular & 3.804 \\ \hline
+LBD & 1.836\\ \hline
+Bin. & 2.796 \\ \hline
+\end{tabular}
+\end{table}
+\end{minipage}
+\caption{The IM1C experiment mesh run through the time-to-solution estimator for regular, load-balanced-by-dimension, and binary tree cuts with 5 subsets in each dimension.}
+\label{im1c_opt}
+\end{figure}
+The binary tree cuts beat the regular cuts, but the load-balanced-by-dimension cuts remain the optimal partitioning for the IM1C mesh with 5 subsets in each dimension.
+
+The failure of the CDF optimization method to provide better cuts for the Level-2 experiment highlights a few paths forward for future work.
 The time-to-solution estimator is computationally too slow (the Level-2 problem takes 20 seconds per run) to run a large number of partition sets.
 With a faster time-to-solution estimator (down to milliseconds for modestly large problems), we could  run a much larger number of partitions to test their time-to-solution in a reasonable time, and our optimization process could be more robust.
 Combinations of natural boundaries could be selected instead of just the highest discontinuities in the CDF.
