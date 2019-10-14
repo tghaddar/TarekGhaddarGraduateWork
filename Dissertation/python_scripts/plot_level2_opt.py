@@ -13,13 +13,13 @@ for i in range(0,5):
   pdt_data_min[i] = np.min(pdt_data[i])
   pdt_data_max[i] = np.max(pdt_data[i])
   
-tts_data = np.genfromtxt("tts_level2_data")
+tts_data = np.genfromtxt("tts_level2_data_best")
 
 
 plt.figure()
-plt.plot([1,2,3,4,5],pdt_data_median,'-o',label="PDT")
+#plt.plot([1,2,3,4,5],pdt_data_median,'-o',label="PDT")
 plt.plot([1,2,3,4,5],tts_data,'-o',label="TTS")
 plt.legend(loc='best')
 plt.ylabel("Sweep Time (s)")
 plt.xticks([1,2,3,4,5],("Regular", "Balanced", "LB", "LBD", "Bin."))
-plt.savefig("../../figures/level2_sweep_comp.pdf")
+plt.savefig("../../figures/level2_sweep_comp_best.pdf")
