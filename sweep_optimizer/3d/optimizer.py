@@ -195,6 +195,86 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   
   return values
 
+def get_best_jumps(points,gmin,gmax,numdim):
+  numpoints = len(points)
+  num_steps = int((gmax - gmin)/1e-04)
+  #The number of bins in the CDF.
+  hist_range = (gmin,gmax)
+  #Building a histogram
+  hist,bin_edges = np.histogram(points,bins=num_steps,range=hist_range,normed=False)
+  bin_edges = np.round(bin_edges,4)
+  
+  cdf = np.cumsum(hist)
+  cdf = np.insert(cdf,0,0.0)
+  
+  #We want a roughly equivalent number of vertices per partition.
+  ideal_pts = float(numpoints/numdim)
+  x_vals = []
+  for i in range(1,numdim):
+    yval = i*ideal_pts
+    y = [yval]*len(cdf)
+    idx = np.argwhere(np.diff(np.sign(cdf-y))).flatten()
+    x_vals.append(bin_edges[idx])
+  
+  grad_cdf = np.diff(cdf)/np.diff(bin_edges)
+  #Normalizing the derivative of the CDF.
+  grad_cdf = grad_cdf/np.max(grad_cdf)
+  #Finding the discontinuities in the gradient of the cdf. This corresponds to jumps in the cdf.
+  c_max_index = argrelextrema(grad_cdf,np.greater,order = 5)[0]
+  bin_edges_jumps = bin_edges[c_max_index]
+  cdf_jumps = grad_cdf[c_max_index]
+  #Restricting the pool of jumps to jumps that only exceed 20% of the maximum value.
+  big_indices = np.argwhere(cdf_jumps > 0.2)
+  big_jumps = bin_edges_jumps[big_indices]
+  pool_jumps = cdf_jumps[big_indices]
+  if (big_jumps[0] == gmin):
+    big_jumps.pop(0)
+    pool_jumps.pop(0)
+  if (big_jumps[len(big_jumps-1)] == gmax):
+    big_jumps.pop(len(big_jumps-1))
+    pool_jumps.pop(len(big_jumps-1))
+  values = [None]*len(x_vals)
+  for i in range(0,len(x_vals)):
+    xstar = x_vals[i]
+    distances = []
+    for j in range(0,len(pool_jumps)):
+      xi = big_jumps[j]
+      Ji = pool_jumps[j]
+      distance = abs(xstar-xi)/Ji
+      distances.append(distance)
+    
+    min_distance = min(distances)
+    min_distance_idx = distances.index(min_distance)
+    
+    
+  
+    #Getting the jump with the minimum distance.
+    
+    
+  #The highest numdim jumps.
+  #highest_jumps = np.argsort(cdf_jumps)[-(numdim-1):]
+  #values = bin_edges_jumps[highest_jumps]  
+#  values = np.sort(values)
+#  for i in range(0,len(values)):
+#    value = values[i]
+#    if value not in points:
+#      if np.round(value + 1e-04,4) in points:
+#        values[i] = value+1e-04
+#      elif np.round(value - 1e-04,4) in points:
+#        values[i] = value-1e04
+#  values = np.append(values,gmax)
+#  values = np.insert(values,0,gmin)
+#  for i in range(0,len(values)):
+#    value = values[i]
+#    if np.round(value,3) in points:
+#      values[i] = np.round(value,3)
+#    elif np.round(value,4) in points:
+#      values[i] = np.round(value,4)
+#    elif np.round(value,5) in points:
+#      values[i] = np.round(value,5)
+  
+  return big_jumps,pool_jumps
+
 def get_y_vals(xpoints,ypoints,x_values,gymin,gymax,numrow,numcol):
   
   tree_bottom = False
