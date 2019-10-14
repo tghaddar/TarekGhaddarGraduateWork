@@ -72,23 +72,32 @@ To identify where the jumps in the CDF occur, we take the normalized derivative 
 \label{gradcdf}
 \end{figure}
 The largest discontinuities in Fig.~\ref{gradcdf} occur at the instances where there are natural boundaries all the way through the mesh, or at 1 cm intervals.
+We should note that although the global boundaries of the problem have discontinuities, these discontinuities are obviously not eligible to be chosen as potential partitions.
 
 The process to select the most suitable natural boundaries occurs in two steps.
 The first step is to to choose cuts that balance the number of vertices per dimension.
 This is done by finding the intersection of the CDF with an ideal number of vertices per partition, similar to what the redistribution function in the load balancing algorithms does in Fig.~\ref{redistribute}.
+Instead of using the cells per dimension CDF, we use the vertex per dimension CDF of Fig.~\ref{vert_cdf}.
 
 Once we have the cuts that balance the vertices of the mesh, we wish to move the cuts to locations that minimize the additions of cells to the mesh.
 For each balanced cut, we ``snap'' it to a location corresponding to a natural boundary.
-We choose where to snap the cut to in one of three ways:
+We explored choosing where to snap the cut to in one of two ways:
 \begin{enumerate}
   \item Snapping the balanced cuts to the largest discontinuities in the derivative of the CDF.
-  \item Snapping the balanced cuts to the closest discontinuity in the derivative of the CDF.
   \item Snapping the balanced cut to a discontinuity that takes into account how close a discontinuity is, as well as the magnitude of the discontinuity.
 \end{enumerate}
 
+The first snapping method does not take into account the location of the balanced cuts, and instead just chooses the largest discontinuities in the derivative of the CDF.
 
-
-We should note that although the global boundaries of the problem have discontinuities, these discontinuities are obviously not eligible to be chosen as optimized partitions.
+The second and third methods choose where to snap each balanced cut based on the distance of the balanced cuts from nearby natural boundaries. Eq.~\ref{distance} shows the calculation of the smallest weighted distance:
+\begin{equation}
+d = \underset{i \in \text{pool}}{\text{min}} \frac{|x^{*} - x_i|}{J_i}
+\label{distance}
+\end{equation}
+where $d$ is the distance, $x^*$ is a balanced cut, $x_i$ is a natural boundary we are testing, and $J_i$ is the magnitude of the derivative corresponding to $x_i$.
+The \text{pool} is a subset of the discontinuities in the derivative of the CDF.
+Rather than test against every possible natural boundary, we pull a subset of discontinuities whose magnitudes are over a certain value.
+This prevents from unnecessarily testing from small jumps that only have natural boundaries through a very small portion of the mesh.
 
 \FloatBarrier
 \subsection{Finding Natural Boundaries for Sets of Columns}
