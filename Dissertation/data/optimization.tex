@@ -54,7 +54,7 @@ The CDF optimization method will:
   \item Run all iterations of cut lines selected.
 \end{enumerate}
 
-\subsection{Finding Natural Boundaries}
+\subsection{Finding the Most Suitable Natural Boundaries}
 
 In order to identify natural boundaries, we analyze the detailed cumulative distribution function (CDF) of the vertices in each dimension. The jumps in the CDF correspond to natural boundaries. Figure~\ref{vert_cdf} shows the x-vertex CDF of the mesh in Fig.~\ref{natural_boundary_example}.
 \begin{figure}[h]
@@ -64,7 +64,7 @@ In order to identify natural boundaries, we analyze the detailed cumulative dist
 \label{vert_cdf}
 \end{figure}
 
-To identify where the jumps in the CDF occur, we take the derivative of the CDF and isolate the largest discontinuities in it. Figure~\ref{gradcdf} plots the derivative of the CDF shown in Fig.~\ref{vert_cdf}.
+To identify where the jumps in the CDF occur, we take the normalized derivative of the CDF and isolate the largest discontinuities in it. Figure~\ref{gradcdf} plots the derivative of the CDF shown in Fig.~\ref{vert_cdf}.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.75]{../figures/gradcdf.pdf}
@@ -72,6 +72,22 @@ To identify where the jumps in the CDF occur, we take the derivative of the CDF 
 \label{gradcdf}
 \end{figure}
 The largest discontinuities in Fig.~\ref{gradcdf} occur at the instances where there are natural boundaries all the way through the mesh, or at 1 cm intervals.
+
+The process to select the most suitable natural boundaries occurs in two steps.
+The first step is to to choose cuts that balance the number of vertices per dimension.
+This is done by finding the intersection of the CDF with an ideal number of vertices per partition, similar to what the redistribution function in the load balancing algorithms does in Fig.~\ref{redistribute}.
+
+Once we have the cuts that balance the vertices of the mesh, we wish to move the cuts to locations that minimize the additions of cells to the mesh.
+For each balanced cut, we ``snap'' it to a location corresponding to a natural boundary.
+We choose where to snap the cut to in one of three ways:
+\begin{enumerate}
+  \item Snapping the balanced cuts to the largest discontinuities in the derivative of the CDF.
+  \item Snapping the balanced cuts to the closest discontinuity in the derivative of the CDF.
+  \item Snapping the balanced cut to a discontinuity that takes into account how close a discontinuity is, as well as the magnitude of the discontinuity.
+\end{enumerate}
+
+
+
 We should note that although the global boundaries of the problem have discontinuities, these discontinuities are obviously not eligible to be chosen as optimized partitions.
 
 \FloatBarrier
@@ -137,26 +153,26 @@ Figure~\ref{ubp_opt} shows the time-to-solution for binary tree, regular, load-b
 %%%%%%%%%%
 \begin{figure}[ht]
 \centering
-  \includegraphics{../../figures/unbalanced_pins_opt_comparison.pdf}
+  \includegraphics{../../figures/unbalanced_pins_best_comparison.pdf}
   \caption{The time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.}
   \label{ubp_opt}
 \end{figure}
 %%%%%%%%%%%
 For low numbers of subsets, the load-balanced-by-dimension partitions outperform the regular, load-balanced, and optimized partitions.
 Due to the low number of communications, having partitions that are balanced by column does not incur a large communication penalty, and having a well-balanced problem is still more important.
-However, once we exceed 16 subsets, we can see the optimized partitions outperforming the other partition types, with the prioritization of not adding cells paying off.
+However, once we exceed 9 subsets, we can see the optimized partitions outperforming the other partition types, with the prioritization of not adding cells paying off.
 
 Figure~\ref{ubp_opt_heavy} shows the time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.
 \begin{figure}[H]
 \centering
-\includegraphics{../../figures/more_sparse_comp.pdf}
+\includegraphics{../../figures/more_sparse_best_comp.pdf}
   \caption{The time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.}
   \label{ubp_opt_heavy}
 \end{figure}
 %%
 With a very dense mesh that is inherently balanced, moving cuts to the heaviest natural boundaries may move cuts to less optimal locations than the regular or load-balanced cuts.
 
-Figure~\ref{level2_opt} shows the sweep times on the Level-2 mesh from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts.
+Figure~\ref{level2_opt} shows the sweep times on the Level-2 mesh from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) binary tree cuts.
 \begin{figure}[H]
 \centering
 \includegraphics{../../figures/level2_sweep_comp.pdf}

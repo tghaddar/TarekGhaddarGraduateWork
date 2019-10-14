@@ -219,6 +219,13 @@ def get_best_jumps(points,gmin,gmax,numdim):
   grad_cdf = np.diff(cdf)/np.diff(bin_edges)
   #Normalizing the derivative of the CDF.
   grad_cdf = grad_cdf/np.max(grad_cdf)
+  bin_edges_plot = np.delete(bin_edges,0)
+  plt.figure()
+  plt.plot(bin_edges_plot,grad_cdf)
+  plt.title("Derivative of the CDF in the x Dimension")
+  plt.xlabel("x (cm)")
+  plt.ylabel("Derivative of the CDF")
+  plt.plot(bin_edges_plot,grad_cdf)
   #Finding the discontinuities in the gradient of the cdf. This corresponds to jumps in the cdf.
   c_max_index = argrelextrema(grad_cdf,np.greater,order = 5)[0]
   bin_edges_jumps = bin_edges[c_max_index]

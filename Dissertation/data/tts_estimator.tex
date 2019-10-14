@@ -832,7 +832,7 @@ Properly characterizing the latency for individual core counts is likely to impr
 \FloatBarrier
 \subsection{PDT vs. the Time-to-Solution Estimator for the Level-2 Experiment Mesh}
 Figures \ref{level2_42x13} and \ref{level2_42x13_balanced} show the mesh for the Level-2 experiment with 42 subsets in $x$, and 13 subsets in $y$ with evenly spaced cut lines and balanced cut lines.
-The balanced mesh was ``hand-balanced'' by Marvin Adams and Jan Vermaak to achieve better load balancing than the automated load balancing algorithm was able to achieve.
+The balanced mesh was ``hand-balanced'' by Marvin Adams, Michael Adams, and Jan Vermaak to achieve better load balancing than the automated load balancing algorithm was able to achieve.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.28]{../../figures/level2_42x13.png}
@@ -869,7 +869,7 @@ Balanced & 0.63\%
 \end{tabular}
 \end{table}
 Both the regular and balanced cases have estimated sweep times within 8\% of PDT's sweep times.
-Because both of these problems have around 5,000 cells, the number of unknowns in the problem can mitigate the effects seen in the unbalanced pin cases.
+Because both of these problems have between 3,000 and 4,000 cells, the number of unknowns in the problem can mitigate the effects seen in the unbalanced pin cases.
 The difference in schedule in addition to latency instabilities at 546 cores are less significant with larger problems.
 
 In the future, the schedule from the time-to-solution estimator should be fed into PDT and see if the agreement improves.

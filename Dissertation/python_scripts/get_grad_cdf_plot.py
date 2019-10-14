@@ -12,7 +12,7 @@ sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer
 #sys.path.append(r'C:\Users\tghad\Documents\GitHub\TarekGhaddarGraduateWork\sweep_optimizer\3d')
 from sweep_solver import optimized_tts_numerical,unpack_parameters
 from mesh_processor import create_2d_cuts
-from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_highest_jumps
+from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_highest_jumps,get_best_jumps
 from scipy.optimize import basinhopping, minimize
 from scipy.signal import argrelextrema
 import matplotlib.pyplot as plt
@@ -49,4 +49,4 @@ gxmax = 10.0
 gymin = 0.0
 gymax = 10.0
 
-x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,10)
+x_values = get_best_jumps(verts[:,0],gxmin,gxmax,10)
