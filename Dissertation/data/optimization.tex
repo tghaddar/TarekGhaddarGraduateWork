@@ -94,7 +94,7 @@ The second and third methods choose where to snap each balanced cut based on the
 d = \underset{i \in \text{pool}}{\text{min}} \frac{|x^{*} - x_i|}{J_i}
 \label{distance}
 \end{equation}
-where $d$ is the distance, $x^*$ is a balanced cut, $x_i$ is a natural boundary we are testing, and $J_i$ is the magnitude of the derivative corresponding to $x_i$.
+where $d$ is the smallest weighted distance, $x^*$ is a balanced cut, $x_i$ is a natural boundary we are testing, and $J_i$ is the magnitude of the derivative corresponding to $x_i$.
 The \text{pool} is a subset of the discontinuities in the derivative of the CDF.
 Rather than test against every possible natural boundary, we pull a subset of discontinuities whose magnitudes are over a certain value.
 This prevents from unnecessarily testing from small jumps that only have natural boundaries through a very small portion of the mesh.
