@@ -3,7 +3,7 @@ import sys
 sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
 from sweep_solver import optimized_tts_numerical,unpack_parameters,plot_subset_boundaries_2d
 from mesh_processor import create_2d_cuts
-from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_highest_jumps
+from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_opt_cut_suite_best,get_highest_jumps
 from scipy.optimize import basinhopping, minimize
 import matplotlib.pyplot as plt
 from build_global_subset_boundaries import build_global_subset_boundaries
@@ -65,7 +65,7 @@ x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,numcol)
 y_values_test = get_highest_jumps(verts[:,1],gymin,gymax,numrow)
 
 
-x_values,y_cut_suite = create_opt_cut_suite(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
+x_values,y_cut_suite = get_opt_cut_suite_best(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
 
 #for i in range(0,len(y_cut_suite)):
 #  x_cuts = x_values
@@ -88,20 +88,20 @@ y_cuts_min = y_cut_suite[min_index]
 x_cuts_min = x_values
 
 #Writing the xml portions.
-f = open("level2_opt_cuts.xml",'w')
-f.write("<x_cuts>")
-for x in range(1,numcol):
-  f.write(str(x_cuts_min[x])+" ")
-
-f.write("</x_cuts>\n")
-
-f.write("<y_cuts_by_column>\n")
-for col in range(0,numcol):
-  f.write("  <column>")
-  for y in range(1,numrow):
-    f.write(str(y_cuts_min[col][y])+ " ")
-  
-  f.write("</column>\n")
-
-f.write("</y_cuts_by_column>\n")
-f.close()
+#f = open("level2_opt_cuts.xml",'w')
+#f.write("<x_cuts>")
+#for x in range(1,numcol):
+#  f.write(str(x_cuts_min[x])+" ")
+#
+#f.write("</x_cuts>\n")
+#
+#f.write("<y_cuts_by_column>\n")
+#for col in range(0,numcol):
+#  f.write("  <column>")
+#  for y in range(1,numrow):
+#    f.write(str(y_cuts_min[col][y])+ " ")
+#  
+#  f.write("</column>\n")
+#
+#f.write("</y_cuts_by_column>\n")
+#f.close()

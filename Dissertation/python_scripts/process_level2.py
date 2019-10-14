@@ -86,10 +86,10 @@ params = create_parameter_space(x_cuts_lbd,y_cuts_lbd,numrow,numcol)
 max_times.append(optimized_tts_numerical(params,level2_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
 
 
-x_cuts_opt = np.genfromtxt("level2_opt_x_cuts")
-y_cuts_opt = np.genfromtxt("level2_opt_y_cuts")
+x_cuts_opt = np.genfromtxt("level2_best_x_cuts")
+y_cuts_opt = np.genfromtxt("level2_best_y_cuts")
 params = create_parameter_space(x_cuts_opt,y_cuts_opt,numrow,numcol)
 max_times.append(optimized_tts_numerical(params,level2_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
 
-np.savetxt("tts_level2_data",max_times)
+np.savetxt("tts_level2_data_best",max_times)
 

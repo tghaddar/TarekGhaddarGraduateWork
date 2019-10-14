@@ -210,7 +210,6 @@ def get_best_jumps(points,gmin,gmax,numdim):
   #We want a roughly equivalent number of vertices per partition.
   ideal_pts = float(numpoints/numdim)
   x_vals = []
-  print(numdim)
   for i in range(1,numdim):
     yval = i*ideal_pts
     y = [yval]*len(cdf)
@@ -228,8 +227,6 @@ def get_best_jumps(points,gmin,gmax,numdim):
   big_indices = np.argwhere(cdf_jumps > 0.1)
   big_jumps = bin_edges_jumps[big_indices]
   pool_jumps = cdf_jumps[big_indices]
-  if len(pool_jumps) == 2:
-    print("debug stop")
   if (big_jumps[0] == gmin):
     big_jumps.pop(0)
     pool_jumps.pop(0)
@@ -287,7 +284,6 @@ def get_opt_cut_suite_best(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
     #Looping over columns to get the row-wise cdfs in each column.
   xpoints = points[:,0]
   x_values = get_best_jumps(xpoints,gxmin,gxmax,numcol)
-  print("HERE")
   ypoints = points[:,1]
   all_y_cuts = []
   for col in range(1,numcol+1):
@@ -297,7 +293,6 @@ def get_opt_cut_suite_best(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
     #Pulling all points that are in this column. 
     y1 = ypoints[x1]
     #Getting the highest jumps for this column.
-    print("COL: ", col)
     y_values_col = get_best_jumps(y1,gymin,gymax,numrow)
     all_y_cuts.append(y_values_col)
     
@@ -306,7 +301,6 @@ def get_opt_cut_suite_best(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
   num_children = 2
   prev_x_limits = [numcol]
   y_cut_suite = []
-  print("HERE 2")
   #Getting all the way through cuts.
   y_values_all_through = get_best_jumps(ypoints,gymin,gymax,numrow)
   all_through_vals = []
@@ -316,7 +310,7 @@ def get_opt_cut_suite_best(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
   y_cut_suite.append(all_through_vals)
   
   while(tree_bottom == False):
-    
+    print("next level")
     x_limits = []
     current_x_limit = int(0)
     current_y_values = [[] for i in range(0,numcol)]
