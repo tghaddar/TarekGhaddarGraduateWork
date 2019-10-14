@@ -76,8 +76,8 @@ x_values,y_cut_suite = get_opt_cut_suite_best(verts,gxmin,gxmax,gymin,gymax,numc
 
 max_times = []
 add_cells = False
-for i in range(0,len(y_cut_suite)):
-#for i in range(0,1):
+#for i in range(0,len(y_cut_suite)):
+for i in range(0,1):
   x_cuts = x_values
   y_cuts = y_cut_suite[i]
   params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
@@ -88,20 +88,20 @@ y_cuts_min = y_cut_suite[min_index]
 x_cuts_min = x_values
 
 #Writing the xml portions.
-#f = open("level2_opt_cuts.xml",'w')
-#f.write("<x_cuts>")
-#for x in range(1,numcol):
-#  f.write(str(x_cuts_min[x])+" ")
-#
-#f.write("</x_cuts>\n")
-#
-#f.write("<y_cuts_by_column>\n")
-#for col in range(0,numcol):
-#  f.write("  <column>")
-#  for y in range(1,numrow):
-#    f.write(str(y_cuts_min[col][y])+ " ")
-#  
-#  f.write("</column>\n")
-#
-#f.write("</y_cuts_by_column>\n")
-#f.close()
+f = open("level2_opt_cuts.xml",'w')
+f.write("<x_cuts>")
+for x in range(1,numcol):
+  f.write(str(x_cuts_min[x])+" ")
+
+f.write("</x_cuts>\n")
+
+f.write("<y_cuts_by_column>\n")
+for col in range(0,numcol):
+  f.write("  <column>")
+  for y in range(1,numrow):
+    f.write(str(y_cuts_min[col][y])+ " ")
+  
+  f.write("</column>\n")
+
+f.write("</y_cuts_by_column>\n")
+f.close()

@@ -3,7 +3,7 @@ import sys
 sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer/3d')
 from sweep_solver import optimized_tts_numerical,unpack_parameters
 from mesh_processor import create_2d_cuts
-from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_highest_jumps
+from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_opt_cut_suite_best,get_highest_jumps
 from scipy.optimize import basinhopping, minimize
 from scipy.signal import argrelextrema
 import matplotlib.pyplot as plt
@@ -56,7 +56,7 @@ for i in range(0,len(numrows)):
   numrow = numrows[i]
   numcol = numcols[i]
   
-  x_values,y_cut_suite = create_opt_cut_suite(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
+  x_values,y_cut_suite = get_opt_cut_suite_best(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
   
   max_times = []
   add_cells = False
