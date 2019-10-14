@@ -210,10 +210,11 @@ def get_best_jumps(points,gmin,gmax,numdim):
   #We want a roughly equivalent number of vertices per partition.
   ideal_pts = float(numpoints/numdim)
   x_vals = []
+  print(numdim)
   for i in range(1,numdim):
     yval = i*ideal_pts
     y = [yval]*len(cdf)
-    idx = np.argwhere(np.diff(np.sign(cdf-y))).flatten()
+    idx = np.argwhere(np.diff(np.sign(cdf-y))).flatten()[0]
     x_vals.append(bin_edges[idx])
   
   grad_cdf = np.diff(cdf)/np.diff(bin_edges)
@@ -224,15 +225,17 @@ def get_best_jumps(points,gmin,gmax,numdim):
   bin_edges_jumps = bin_edges[c_max_index]
   cdf_jumps = grad_cdf[c_max_index]
   #Restricting the pool of jumps to jumps that only exceed 20% of the maximum value.
-  big_indices = np.argwhere(cdf_jumps > 0.2)
+  big_indices = np.argwhere(cdf_jumps > 0.1)
   big_jumps = bin_edges_jumps[big_indices]
   pool_jumps = cdf_jumps[big_indices]
+  if len(pool_jumps) == 2:
+    print("debug stop")
   if (big_jumps[0] == gmin):
     big_jumps.pop(0)
     pool_jumps.pop(0)
-  if (big_jumps[len(big_jumps-1)] == gmax):
-    big_jumps.pop(len(big_jumps-1))
-    pool_jumps.pop(len(big_jumps-1))
+  if (big_jumps[len(big_jumps)-1] == gmax):
+    big_jumps.pop(len(big_jumps)-1)
+    pool_jumps.pop(len(big_jumps)-1)
   values = [None]*len(x_vals)
   for i in range(0,len(x_vals)):
     xstar = x_vals[i]
@@ -241,39 +244,121 @@ def get_best_jumps(points,gmin,gmax,numdim):
       xi = big_jumps[j]
       Ji = pool_jumps[j]
       distance = abs(xstar-xi)/Ji
+      #print(distance)
+      #print(xi,Ji,xstar)
       distances.append(distance)
     
+    #print("DONE WITH LOOP")
     min_distance = min(distances)
-    min_distance_idx = distances.index(min_distance)
+    try:
+      min_distance_idx = distances.index(min_distance)[0]
+    except:
+      min_distance_idx = distances.index(min_distance)
+    try:
+      values[i] = copy(big_jumps[min_distance_idx][0])
+    except:
+      values[i] = copy(big_jumps[min_distance_idx])
+    pool_jumps = np.delete(pool_jumps,min_distance_idx)
+    big_jumps = np.delete(big_jumps,min_distance_idx)
+     
     
-    
+  values = np.sort(values)
+  for i in range(0,len(values)):
+    value = values[i]
+    if value not in points:
+      if np.round(value + 1e-04,4) in points:
+        values[i] = value+1e-04
+      elif np.round(value - 1e-04,4) in points:
+        values[i] = value-1e04
+  values = np.append(values,gmax)
+  values = np.insert(values,0,gmin)
+  for i in range(0,len(values)):
+    value = values[i]
+    if np.round(value,3) in points:
+      values[i] = np.round(value,3)
+    elif np.round(value,4) in points:
+      values[i] = np.round(value,4)
+    elif np.round(value,5) in points:
+      values[i] = np.round(value,5)
   
-    #Getting the jump with the minimum distance.
+  return values
+
+def get_opt_cut_suite_best(points,gxmin,gxmax,gymin,gymax,numcol,numrow):
+    #Looping over columns to get the row-wise cdfs in each column.
+  xpoints = points[:,0]
+  x_values = get_best_jumps(xpoints,gxmin,gxmax,numcol)
+  print("HERE")
+  ypoints = points[:,1]
+  all_y_cuts = []
+  for col in range(1,numcol+1):
+    xmin = x_values[col-1]
+    xmax = x_values[col]
+    x1 = np.argwhere(np.logical_and(xpoints>=xmin,xpoints<=xmax)).flatten()
+    #Pulling all points that are in this column. 
+    y1 = ypoints[x1]
+    #Getting the highest jumps for this column.
+    print("COL: ", col)
+    y_values_col = get_best_jumps(y1,gymin,gymax,numrow)
+    all_y_cuts.append(y_values_col)
     
+  #Doing a binary tree of the columns to get a full cut suite.
+  tree_bottom = False
+  num_children = 2
+  prev_x_limits = [numcol]
+  y_cut_suite = []
+  print("HERE 2")
+  #Getting all the way through cuts.
+  y_values_all_through = get_best_jumps(ypoints,gymin,gymax,numrow)
+  all_through_vals = []
+  for i in range(0,numcol):
+    all_through_vals.append(y_values_all_through)
     
-  #The highest numdim jumps.
-  #highest_jumps = np.argsort(cdf_jumps)[-(numdim-1):]
-  #values = bin_edges_jumps[highest_jumps]  
-#  values = np.sort(values)
-#  for i in range(0,len(values)):
-#    value = values[i]
-#    if value not in points:
-#      if np.round(value + 1e-04,4) in points:
-#        values[i] = value+1e-04
-#      elif np.round(value - 1e-04,4) in points:
-#        values[i] = value-1e04
-#  values = np.append(values,gmax)
-#  values = np.insert(values,0,gmin)
-#  for i in range(0,len(values)):
-#    value = values[i]
-#    if np.round(value,3) in points:
-#      values[i] = np.round(value,3)
-#    elif np.round(value,4) in points:
-#      values[i] = np.round(value,4)
-#    elif np.round(value,5) in points:
-#      values[i] = np.round(value,5)
+  y_cut_suite.append(all_through_vals)
   
-  return big_jumps,pool_jumps
+  while(tree_bottom == False):
+    
+    x_limits = []
+    current_x_limit = int(0)
+    current_y_values = [[] for i in range(0,numcol)]
+    for i in range(0,len(prev_x_limits)):
+      x1_limit = int(np.floor(prev_x_limits[i]/2))
+      x_limits.append(x1_limit)
+      x2_limit = int(np.ceil(prev_x_limits[i]/2))
+      x_limits.append(x2_limit)
+      
+      col0 = copy(current_x_limit)
+      xmin = x_values[col0]
+      current_x_limit += x1_limit
+      col1 = copy(current_x_limit)
+      xmax = x_values[col1]
+      
+      xverts0 = np.argwhere(np.logical_and(xpoints>=xmin,xpoints<=xmax)).flatten()
+      y0 = ypoints[xverts0]
+      y_values0 = get_best_jumps(y0,gymin,gymax,numrow)
+      for j in range(col0,col1):
+        current_y_values[j] = y_values0
+      #current_y_values[col0:col1] = [y_values0]
+      
+      xmin2 = xmax
+      current_x_limit += x2_limit
+      col2 = copy(current_x_limit)
+      xmax2 = x_values[col2]
+      
+      xverts1 = np.argwhere(np.logical_and(xpoints>=xmin2,xpoints<=xmax2)).flatten()
+      y1 = ypoints[xverts1]
+      y_values1 = get_best_jumps(y1,gymin,gymax,numrow)
+      for j in range(col1,col2):
+        current_y_values[j] = y_values1
+      #current_y_values[col1:col2] = [y_values1]
+      
+    y_cut_suite.append(current_y_values)  
+    num_children *= 2
+    prev_x_limits = x_limits
+    if (x_limits[0] <= 1.5):
+      tree_bottom = True
+      
+  y_cut_suite.append(all_y_cuts)
+  return x_values,y_cut_suite
 
 def get_y_vals(xpoints,ypoints,x_values,gymin,gymax,numrow,numcol):
   

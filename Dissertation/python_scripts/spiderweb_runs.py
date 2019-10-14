@@ -4,7 +4,7 @@ sys.path.append('/Users/tghaddar/GitHub/TarekGhaddarGraduateWork/sweep_optimizer
 #sys.path.append(r'C:\Users\tghad\Documents\GitHub\TarekGhaddarGraduateWork\sweep_optimizer\3d')
 from sweep_solver import optimized_tts_numerical,unpack_parameters
 from mesh_processor import create_2d_cuts
-from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_highest_jumps,get_best_jumps
+from optimizer import create_parameter_space,create_bounds,create_constraints,get_column_cdf,create_opt_cut_suite,get_opt_cut_suite_best,get_highest_jumps,get_best_jumps
 from scipy.signal import argrelextrema
 import matplotlib.pyplot as plt
 plt.close("all")
@@ -44,33 +44,35 @@ sparse_pins_cell_data = [line.split() for line in f]
 for i in range(0,len(sparse_pins_cell_data)):
   sparse_pins_cell_data[i] = [int(x) for x in sparse_pins_cell_data[i]]
 
-grad_cdf,x_values = get_best_jumps(verts[:,0],gxmin,gxmax,2)
+#x_values = get_best_jumps(verts[:,0],gxmin,gxmax,5)
+#print(x_values)
 
-#max_times_case = {}
-#max_times_case_time_only = []
-#
-#for i in range(0,len(numrows)):
-#  numrow = numrows[i]
-#  numcol = numcols[i]
-#  
-#  #y_values_func = get_highest_jumps(verts[:,1],gymin,gymax,numcol)
-#  x_values,y_cut_suite = create_opt_cut_suite(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
-#  
-#  max_times = []
-#  add_cells = False
-#  for j in range(0,len(y_cut_suite)):
-#    x_cuts = x_values
-#    y_cuts = y_cut_suite[j]
-#    params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-#    max_times.append(optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
-#  
-#  min_index = max_times.index(min(max_times))
-#  y_cuts_min = y_cut_suite[min_index]
-#  x_cuts_min = x_values
-#  
-#  max_times_case[numrow] = (min(max_times),x_cuts_min,y_cuts_min)
-#  max_times_case_time_only.append(min(max_times))
-#  
-#np.savetxt("spiderweb_opt_times.csv",max_times_case_time_only)
+max_times_case = {}
+max_times_case_time_only = []
+
+for i in range(0,len(numrows)):
+  numrow = numrows[i]
+  numcol = numcols[i]
+  print("NUMROW: ", numrow)
+  
+  #y_values_func = get_highest_jumps(verts[:,1],gymin,gymax,numcol)
+  x_values,y_cut_suite = get_opt_cut_suite_best(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
+  
+  max_times = []
+  add_cells = False
+  for j in range(0,len(y_cut_suite)):
+    x_cuts = x_values
+    y_cuts = y_cut_suite[j]
+    params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+    max_times.append(optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+  
+  min_index = max_times.index(min(max_times))
+  y_cuts_min = y_cut_suite[min_index]
+  x_cuts_min = x_values
+  
+  max_times_case[numrow] = (min(max_times),x_cuts_min,y_cuts_min)
+  max_times_case_time_only.append(min(max_times))
+  
+np.savetxt("spiderweb_best_times.csv",max_times_case_time_only)
 
 

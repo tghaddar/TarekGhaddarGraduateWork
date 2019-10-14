@@ -5,7 +5,7 @@ plt.figure()
 
 
 num_subsets = [2,3,4,5,6,7,8,9,10]
-opt = np.genfromtxt("spiderweb_opt_times.csv")
+opt = np.genfromtxt("spiderweb_best_times.csv")
 reg = np.genfromtxt("spiderweb_regular_times.csv")
 plt.plot(num_subsets,opt,'-o',label="Bin")
 plt.plot(num_subsets,reg,'-o',label="Reg")
@@ -21,4 +21,4 @@ plt.legend(loc='best')
 
 plt.ylabel("TTS (s)")
 plt.xlabel(r'$\sqrt{\rm{Number\ of\ Subsets}}$')
-plt.savefig("../../figures/unbalanced_pins_opt_comparison.pdf")
+plt.savefig("../../figures/unbalanced_pins_best_comparison.pdf")
