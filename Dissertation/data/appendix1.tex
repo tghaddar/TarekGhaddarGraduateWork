@@ -15,13 +15,20 @@
 
 \phantomsection
 
-\chapter{\uppercase{First Appendix}}
+\chapter{\uppercase{Appendix}}\label{appendix1}
 
-Text for the Appendix follows.
-
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
-\includegraphics[scale=.50]{figures/Penguins.jpg}
-\caption{TAMU figure}
-\label{fig:tamu-fig5}
+  \includegraphics{../../figures/unbalanced_pins_opt_comparison.pdf}
+  \caption{The time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.}
+\end{figure}
+\begin{figure}[h]
+\centering
+\includegraphics{../../figures/more_sparse_comp.pdf}
+  \caption{The time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.}
+\end{figure}
+\begin{figure}[h]
+\centering
+\includegraphics{../../figures/level2_sweep_comp.pdf}
+\caption{The Level-2 mesh sweep times from the time-to-solution estimator for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts. }
 \end{figure}

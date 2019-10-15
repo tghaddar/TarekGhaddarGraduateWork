@@ -159,12 +159,13 @@ With this method, we are also not running the time-to-solution estimator a large
 
 The results reported utilize the second ``snapping'' method, where cuts are snapped to a discontinuity that takes into account how close a discontinuity is, as well as the magnitude of the discontinuity.
 This method always outperformed the first method of snapping cuts to the largest discontinuities in the derivative of the CDF.
+For completeness, the results utilizing the first snapping method can be found in Appendix~\ref{appendix1}.
 
 The CDF optimization method was run on the unbalanced pin mesh and the Level-2 experiment mesh.
 The unbalanced pin mesh was run through the optimization suite from 2 to 10 subsets in each dimension.
 Figure~\ref{ubp_opt} shows the time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.
 %%%%%%%%%%
-\begin{figure}[ht]
+\begin{figure}[h]
 \centering
   \includegraphics{../../figures/unbalanced_pins_best_comparison.pdf}
   \caption{The time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.}
@@ -176,7 +177,7 @@ Due to the low number of communications, having partitions that are balanced by 
 However, once we exceed 9 subsets, we can see the optimized partitions outperforming the other partition types, with the prioritization of not adding cells paying off.
 
 Figure~\ref{ubp_opt_heavy} shows the time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.
-\begin{figure}[ht]
+\begin{figure}[h]
 \centering
 \includegraphics{../../figures/more_sparse_best_comp.pdf}
   \caption{The time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.}
@@ -186,10 +187,24 @@ Figure~\ref{ubp_opt_heavy} shows the time-to-solution for binary tree, regular, 
 For the majority of cases run with this mesh, the binary tree cuts outperform the regular, load-balanced, and load-balanced-by-dimension cuts.
 
 Figure~\ref{level2_opt} shows the sweep times on the Level-2 mesh from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) binary tree cuts.
-\begin{figure}[ht]
+\begin{figure}[h]
+\begin{minipage}[c]{0.65\textwidth}
 \centering
-\includegraphics{../../figures/level2_sweep_comp_best.pdf}
-\caption{The Level-2 mesh sweep times from the time-to-solution estimator for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts. }
+\includegraphics[scale=0.775]{../../figures/level2_sweep_comp_best.pdf}
+\end{minipage}
+\begin{minipage}[c]{0.33\textwidth}
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c}
+\textbf{Type} & \bf $f$ \\ \hline
+Regular &  32.62 \\ \hline
+LBD & 5.01 \\ \hline
+LBD &  1.99\\ \hline
+Bin. & 8.746 \\ \hline
+\end{tabular}
+\end{table}
+\end{minipage}
+\caption{The Level-2 mesh sweep times from the time-to-solution estimator for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts. Additionally, the load-balance metric $f$ is reported for each partition type. }
 \label{level2_opt}
 \end{figure}
 The time to solution of the binary tree cuts is 1.5\% better than the hand-balanced cuts.
@@ -228,4 +243,9 @@ With a sped up time-to-solution estimator, we can run several more possible sets
 For example, combinations of natural boundaries could be run rather than choosing the most suitable every time.
 
 Additionally, exploring different formulations for Eq.~\ref{distance}, or the calculation of the smallest weighted distance, could yield interesting results.
-
+Eq.~\ref{mod_distance} shows a slightly modified version of Eq.~\ref{distance}:
+\begin{equation}
+d = \underset{i \in \text{pool}}{\text{min}} \frac{|x^{*} - x_i|^{\alpha}}{J_i}
+\label{mod_distance}
+\end{equation}
+where $\alpha$ is a parameter that can vary the importance of the distance between a balanced cut and a natural boundary relative to the magnitude. An $\alpha$ value that is less than one would weight the magnitude of the discontinuity in the derivative more heavily, and an $\alpha$ value greater than one would weight the distance between the two cuts more heavily than the magnitude.

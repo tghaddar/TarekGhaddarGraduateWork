@@ -25,6 +25,7 @@ A parallel sweep algorithm is defined by three properties \cite{mpadams2013} :
 \item aggregation: grouping cells, directions, and energy groups into tasks,
 \item scheduling: choosing which task to execute if more than one is available.
 \end{itemize}
+It is important to note that these properties apply after any cell-level cycles are broken, but partitioning can introduce cycles between processors.
 
 The basic concepts of parallel transport sweeps, partitioning, aggregation, and scheduling, are most easily described in the context of a  transport sweep that takes place on a structured Cartesian mesh. Furthermore, the work detailed in Chapters \ref{cha:lb} and \ref{cha:tts} utilize aspects of the structured transport sweep.
 
@@ -157,7 +158,7 @@ If we set Eq. \ref{large_p_kba} equal to Eq. \ref{large_p_opt}, we see that in t
 
 To aid in the selection of optimal processor and aggregation parameters, PDT uses a performance model to estimate the sweep time.
 This performance model is the basis for the cost function described in Chapter \ref{cha:tts}.
-Equation \ref{sweep_time} calculates the sweep time by multiplying the time it takes to solve each stage by the number of stages. This is then multiplied by a multi-core fudge factor that estimates the performance drop-off from 1 to 8 cores.
+Equation \ref{sweep_time} calculates the sweep time by multiplying the time it takes to solve each stage by the number of stages. This is then multiplied by a multi-core fudge factor that estimates the performance drop-off from 1 to 8 cores due to parallel overhead.
 \begin{equation}
 \text{Sweep Time} = \text{mcff}\cdot[\text{num stages}\cdot(T_{wu} + 3\cdot \text{latency}\cdot M_L + T_{\text{byte}}\cdot N_{\text{bytes}} + N_{\text{cells}}\cdot ( T_c +  A_m\cdot (T_m + T_g)))],
 \label{sweep_time}
