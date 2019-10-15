@@ -21,7 +21,7 @@
 
 \chapter{\uppercase {INTRODUCTION}}\label{cha:introduction}
 
-The field of radiation transport studies the distribution of radiation (particle/energy) throughout a six-dimensional phase-space consisting of time, space, energy, and direction. 
+The field of radiation transport studies the distribution of radiation (particle/energy) throughout a seven-dimensional phase-space consisting of time, space, energy, and direction. 
 Radiation transport is commonly used in reactor physics, medical physics, radiation shielding, criticality safety applications, stellar atmospheres, as well as the general simulation of radiation in different environments. 
 
 Radiation transport is described by the Boltzmann transport equation \cite{bell_glasstone,zweifel,davison,duderstadt} and can be solved stochastically or deterministically.
@@ -29,7 +29,7 @@ The Monte Carlo method is used for stochastic radiation transport by tracking th
 Codes such as MCNP \cite{MCNP} and SHIFT {\cite{shift} utilize the Monte Carlo method to perform high-fidelity radiation transport simulations for a variety of experiments and problems.
 
 Deterministic transport discretizes the time, spatial, energy, and angular variables, yielding an extremely large system of linear equations. This system is then solved iteratively to obtain a numerical solution to the transport equation.
-There are discretization various techniques to yield the linear system of equations; e.g., the method of characteristics, collision probabilities, discrete-ordinates, spectral methods etc.. Some of them are  implemented by codes such as MPACT \cite{mpact}, Partisn \cite{partisn}, Denovo \cite{denovo}, and PDT \cite{mpadams2013,mpadams2015}.
+There are various discretization techniques to yield the linear system of equations; e.g., the method of characteristics, collision probabilities, discrete-ordinates, spectral methods etc.. Some of them are  implemented by codes such as MPACT \cite{mpact}, PARTISN \cite{partisn}, Denovo \cite{denovo}, and PDT \cite{mpadams2013,mpadams2015}.
 
 The work presented in this dissertation deals with the transport equation discretized using multigroup in energy, discrete-ordinates (collocation) in angle, and discontinuous finite elements in space. The resulting discrete system of equations is amenable to iterative techniques whereby the streaming+total interaction operator need not to be assembled, generating large memory savings while being computationally very efficient.  Essentially, this allows for a matrix-free approach, termed ``transport sweeps'' in the radiation transport community, where small local system of equations are solved cell-by-cell, for each angular direction and energy group, in a fashion that follows the flow of radiation in the computational mesh.
 % The discrete-ordinates method \cite{denovo}\jcr{please, deno} is used to turn the transport equation into a algebraic system (a transport equation for each direction and each energy group) that can be solved iteratively \cite{adams_larsen}.

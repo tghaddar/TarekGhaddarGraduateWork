@@ -193,7 +193,7 @@ y = 1.8
 plt.text(x,y,'6',fontsize=20,fontweight='bold',color='c')
 x = 1.05
 y = 1.5
-plt.text(x,y,'6',fontsize=20,fontweight='bold',color='c')
+plt.text(x,y,'7',fontsize=20,fontweight='bold',color='k')
 #Arrow.
 plt.arrow(-0.4,-0.4,0.2,0.2,width=0.04,color='k')
 plt.savefig("UnstructuredMesh.pdf")
