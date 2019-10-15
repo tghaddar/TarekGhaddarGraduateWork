@@ -51,6 +51,8 @@ x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,10)
 
 max_times_case = {}
 max_times_case_time_only = []
+fs = []
+fs_case_only = []
 
 for i in range(0,len(numrows)):
   numrow = numrows[i]
@@ -64,7 +66,9 @@ for i in range(0,len(numrows)):
     x_cuts = x_values
     y_cuts = y_cut_suite[j]
     params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-    max_times.append(optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+    max_time,f = optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
+    max_times.append(max_time)
+    fs.append(f)
   
   min_index = max_times.index(min(max_times))
   y_cuts_min = y_cut_suite[min_index]
@@ -72,3 +76,4 @@ for i in range(0,len(numrows)):
   
   max_times_case[numrow] = (min(max_times),x_cuts_min,y_cuts_min)
   max_times_case_time_only.append(min(max_times))
+  fs_case_only.append(min(fs))

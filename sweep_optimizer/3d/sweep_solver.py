@@ -1832,8 +1832,10 @@ def optimized_tts_numerical(params,cell_verts,vert_data,global_xmin,global_xmax,
   adjacency_matrix = bam.build_adjacency(subset_bounds,num_col-1,num_row-1,y_cuts)
    #Getting mesh information.
   cells_per_subset, bdy_cells_per_subset = get_cells_per_subset_2d_robust(cell_verts,vert_data,subset_bounds,adjacency_matrix,num_row,num_col) 
+  num_cells = sum(cells_per_subset)
   print(cells_per_subset)
-  print("num_cells: ", sum(cells_per_subset))
+  print("num_cells: ", num_cells)
+  f = float(max(cells_per_subset)/float(num_cells/(num_row*num_col)))
   #Building the graphs.
   graphs = bam.build_graphs(adjacency_matrix,num_row,num_col,num_angles)
   #Weighting the graphs with the preliminary info of the cells per subset and boundary cells per subset. This will also return the time to solve each subset.
@@ -1848,7 +1850,7 @@ def optimized_tts_numerical(params,cell_verts,vert_data,global_xmin,global_xmax,
   end = time.time()
   print("Sweep Time: ", max_time)
   print("Solve time: ", end - start)
-  return max_time
+  return max_time,f
 
 def optimized_tts_3d(params,f,global_x_min,global_x_max,global_y_min,global_y_max,global_z_min,global_z_max,num_row,num_col,num_plane,machine_params,num_angles,Am,Az,unweighted,test):
     
