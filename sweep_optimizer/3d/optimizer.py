@@ -218,20 +218,20 @@ def get_best_jumps(points,gmin,gmax,numdim):
   
   grad_cdf = np.diff(cdf)/np.diff(bin_edges)
   #Normalizing the derivative of the CDF.
-  grad_cdf = grad_cdf/np.max(grad_cdf)
-  bin_edges_plot = np.delete(bin_edges,0)
-  plt.figure()
-  plt.plot(bin_edges_plot,grad_cdf)
-  plt.title("Derivative of the CDF in the x Dimension")
-  plt.xlabel("x (cm)")
-  plt.ylabel("Derivative of the CDF")
-  plt.plot(bin_edges_plot,grad_cdf)
+#  grad_cdf = grad_cdf/np.max(grad_cdf)
+#  bin_edges_plot = np.delete(bin_edges,0)
+#  plt.figure()
+#  plt.plot(bin_edges_plot,grad_cdf)
+#  plt.title("Derivative of the CDF in the x Dimension")
+#  plt.xlabel("x (cm)")
+#  plt.ylabel("Derivative of the CDF")
+#  plt.plot(bin_edges_plot,grad_cdf)
   #Finding the discontinuities in the gradient of the cdf. This corresponds to jumps in the cdf.
   c_max_index = argrelextrema(grad_cdf,np.greater,order = 5)[0]
   bin_edges_jumps = bin_edges[c_max_index]
   cdf_jumps = grad_cdf[c_max_index]
   #Restricting the pool of jumps to jumps that only exceed 20% of the maximum value.
-  big_indices = np.argwhere(cdf_jumps > 0.1)
+  big_indices = np.argwhere(cdf_jumps > 0.0)
   big_jumps = bin_edges_jumps[big_indices]
   pool_jumps = cdf_jumps[big_indices]
   if (big_jumps[0] == gmin):
@@ -385,7 +385,7 @@ def get_y_vals(xpoints,ypoints,x_values,gymin,gymax,numrow,numcol):
       
       xverts0 = np.argwhere(np.logical_and(xpoints>=xmin,xpoints<=xmax)).flatten()
       y0 = ypoints[xverts0]
-      y_values0 = get_highest_jumps(y0,gymin,gymax,numrow)
+      y_values0 = get_best_jumps(y0,gymin,gymax,numrow)
       for j in range(col0,col1):
         current_y_values[j] = y_values0
       
@@ -396,7 +396,7 @@ def get_y_vals(xpoints,ypoints,x_values,gymin,gymax,numrow,numcol):
       
       xverts1 = np.argwhere(np.logical_and(xpoints>=xmin2,xpoints<=xmax2)).flatten()
       y1 = ypoints[xverts1]
-      y_values1 = get_highest_jumps(y1,gymin,gymax,numrow)
+      y_values1 = get_best_jumps(y1,gymin,gymax,numrow)
       for j in range(col1,col2):
         current_y_values[j] = y_values1
         
@@ -580,9 +580,9 @@ def create_opt_cut_suite_3d(points,gxmin,gxmax,gymin,gymax,gzmin,gzmax,numcol,nu
   ypoints = points[:,1]
   zpoints = points[:,2]
   
-  z_values = get_highest_jumps(zpoints,gzmin,gzmax,numplane)
-  x_values = get_highest_jumps(xpoints,gxmin,gxmax,numcol)
-  y_values = get_highest_jumps(ypoints,gymin,gymax,numrow)
+  z_values = get_best_jumps(zpoints,gzmin,gzmax,numplane)
+  x_values = get_best_jumps(xpoints,gxmin,gxmax,numcol)
+  y_values = get_best_jumps(ypoints,gymin,gymax,numrow)
   x_cut_suite = []
   y_cut_suite = []
   all_x_cuts = []
@@ -596,7 +596,7 @@ def create_opt_cut_suite_3d(points,gxmin,gxmax,gymin,gymax,gzmin,gzmax,numcol,nu
     #Pulling all points that are in this column. 
     x1 = xpoints[z1]
     #Getting the highest jumps for this column.
-    x_values_plane = get_highest_jumps(x1,gxmin,gxmax,numcol)
+    x_values_plane = get_best_jumps(x1,gxmin,gxmax,numcol)
     all_y_cuts_col = []
     all_through_y_col = []
     for col in range(1,numcol+1):
@@ -606,7 +606,7 @@ def create_opt_cut_suite_3d(points,gxmin,gxmax,gymin,gymax,gzmin,gzmax,numcol,nu
       #Pulling all points that are in this column. 
       y1 = ypoints[x1]
       #Getting the highest jumps for this column.
-      y_values_col = get_highest_jumps(y1,gymin,gymax,numrow)
+      y_values_col = get_best_jumps(y1,gymin,gymax,numrow)
       all_y_cuts_col.append(y_values_col)
       all_through_y_col.append(y_values)
       
@@ -641,7 +641,7 @@ def create_opt_cut_suite_3d(points,gxmin,gxmax,gymin,gymax,gzmin,gzmax,numcol,nu
       
       zverts0 = np.argwhere(np.logical_and(zpoints>=zmin,zpoints<=zmax)).flatten()
       x0 = xpoints[zverts0]
-      x_values0 = get_highest_jumps(x0,gxmin,gxmax,numcol)
+      x_values0 = get_best_jumps(x0,gxmin,gxmax,numcol)
       for j in range(plane0,plane1):
         current_x_values[j] = x_values0
         current_y_values[j] = get_y_vals(xpoints,ypoints,x_values0,gymin,gymax,numrow,numcol)
@@ -653,7 +653,7 @@ def create_opt_cut_suite_3d(points,gxmin,gxmax,gymin,gymax,gzmin,gzmax,numcol,nu
       
       zverts1 = np.argwhere(np.logical_and(zpoints>=zmin2,zpoints<=zmax2)).flatten()
       x1 = xpoints[zverts1]
-      x_values1 = get_highest_jumps(x1,gxmin,gxmax,numcol)
+      x_values1 = get_best_jumps(x1,gxmin,gxmax,numcol)
       for j in range(plane1,plane2):
         current_x_values[j] = x_values1
         current_y_values[j] = get_y_vals(xpoints,ypoints,x_values1,gymin,gymax,numrow,numcol)

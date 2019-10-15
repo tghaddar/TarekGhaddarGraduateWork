@@ -21,12 +21,12 @@ Parallelizing the transport sweep offers the ability to solve more memory-intens
 
 However, when unstructured meshes are used, these algorithms can lose effectiveness as unstructured meshes can introduce imbalanced partitions.
 We combat these imbalanced partitions by load balancing the meshes before sweeping them, attempting to obtain an equivalent amount of work per processor.
-In Chapter \ref{cha:lb}, we saw that our two load-balancing algorithms, the original load-balancing algorithm and the load-balancing-by-dimension algorithm can obtain close to a 90\% improvement in balance for imbalanced meshes. However, we noticed that a balanced problem  does not signify that it will be swept faster, somewhat defeating the purpose of achieving load balance.
+In Chapter \ref{cha:lb}, we saw that our two load-balancing algorithms, the original load-balancing algorithm and the load-balancing-by-dimension algorithm, can obtain close to a 90\% improvement in balance for imbalanced meshes. However, we noticed that a balanced problem  does not signify that it will be swept faster, somewhat defeating the purpose of achieving load balance.
 
 Chapter \ref{cha:tts} details the time-to-solution estimator, a tool that predicts the sweep time for a given set of partitioning parameters.
 PDT has had a performance model that predicted the sweep time for structured, balanced meshes, but had no way to predict the sweep time for imbalanced partitions.
 The time-to-solution estimator has no restriction on mesh type, and can be used to predict the sweep time for balanced or imbalanced partitions.
-The estimator was run through a benchmark case that mirrored the PDT scaling suite from 1 to 16,384 cores.
+The estimator was run through a benchmark suite that mirrored the PDT scaling suite from 1 to 16,384 cores.
 The time-to-solution estimator was within 4\% of PDT's performance model estimator for the sweep time for all problems in the scaling suite, and within 12\% of PDT's sweep time for all cases in the scaling suite (shown in Table \ref{scaling_percent_diff}).
 The time-to-solution estimator was also tested against unstructured meshes, with the majority of problems run within 10\% of PDT's sweep time.
 
@@ -51,7 +51,7 @@ We hypothetize that this is due to the following three reasons:
 \end{enumerate}
 
 The first reason, the discrepancy between the two schedules, can be remedied by feeding the time-to-solution estimator's schedule directly into PDT and having PDT use it.
-I believe this would be a fantastic project for a master's thesis in the future in order to study the effect on the results between PDT and the time-to-solution estimator.
+I believe this would be a worthwile project for a master's thesis in the future in order to study the effect on the results between PDT and the time-to-solution estimator.
 
 The second reason, the mischaracterization of Quartz's latency, has two potential solutions.
 The first is to obtain allocation on a Blue-Gene/Q machine and rerun all problems in this dissertation.

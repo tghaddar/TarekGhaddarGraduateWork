@@ -381,13 +381,14 @@ The incoming edges to each node in each graph now reflect the time at which a no
 At this point in the time-to-solution estimation process, we have a graph per octant/quadrant per angleset, with each graph weighted on a universal time scale.
 For each node in every graph, the incoming edges to the node represent the time $t$ that it is ready to solve at.
 The time to solution is best summarized as a ``marching'' process:
-\begin{enumerate}
-  \item Starting at time $t=0$, find the nodes that are ready to solve or already solving across all graphs.
-  \item If at that time, multiple graphs are solving the same node, they are in conflict.
-  \item The graph that ``wins'' the conflict does not have its weights modified, while the graph(s) that lose the conflict modify their downstream weights according to how long they are delayed.
-  \item Update $t$ to the next interaction across all graphs.
-  \item Repeat steps 2, 3, and 4 until all graphs are finished sweeping.
-\end{enumerate}
+    \begin{enumerate}
+      \item Set $t = 0$.
+      \item At time $t$, find the nodes that are ready to solve or have been solving across all graphs.
+      \item If at time $t$, multiple graphs are solving the same node, they are in conflict.
+      \item The graph that ``wins'' the conflict does not have its weights modified, while the graph(s) that lose the conflict modify their downstream weights according to how long they are delayed.
+      \item Update $t$ to the time value of the next node that's ready to solve in any graph.
+      \item Repeat steps 2-5 until all graphs are finished sweeping.
+    \end{enumerate}
 
 When a conflict is detected, the time-to-solution estimator uses a first-come-first-serve conflict resolution method.
 The first graph to arrive to a node will begin solving it, and the remaining graphs that arrive while it is being solved will incur a delay.

@@ -35,7 +35,7 @@ Am = 10
 Az = 1
 unweighted=True
 test = False
-add_cells = True
+add_cells = False
 
 num_angles = 1
 num_row = 5

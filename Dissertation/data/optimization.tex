@@ -30,7 +30,7 @@ Although utilizing a tested and documented optimizer would have been ideal, it i
 
 \section{CDF Optimization}
 
-The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers can function for very small parameter spaces.
+The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers crashes except for very small parameter spaces.
 However, even with modestly large parameter spaces such as the one seen in the Level-2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing.
 This lead to the development of an alternative method, the CDF optimization method.
 
@@ -94,10 +94,10 @@ The second and third methods choose where to snap each balanced cut based on the
 d = \underset{i \in \text{pool}}{\text{min}} \frac{|x^{*} - x_i|}{J_i}
 \label{distance}
 \end{equation}
-where $d$ is the smallest weighted distance, $x^*$ is a balanced cut, $x_i$ is a natural boundary we are testing, and $J_i$ is the magnitude of the derivative corresponding to $x_i$.
+where $d$ is the smallest weighted distance, $x^*$ is a balanced cut, $x_i$ is a natural boundary we are testing, and $J_i$ is the magnitude of the normalized derivative corresponding to $x_i$.
 The \text{pool} is a subset of the discontinuities in the derivative of the CDF.
 Rather than test against every possible natural boundary, we pull a subset of discontinuities whose magnitudes are over a certain value.
-This prevents from unnecessarily testing from small jumps that only have natural boundaries through a very small portion of the mesh.
+This prevents from unnecessarily testing small jumps that only have natural boundaries through a very small portion of the mesh.
 
 \FloatBarrier
 \subsection{Finding Natural Boundaries for Sets of Columns}
@@ -156,6 +156,10 @@ With this method, we are also not running the time-to-solution estimator a large
 \FloatBarrier
 
 \section{Optimization Results}
+
+The results reported utilize the second ``snapping'' method, where cuts are snapped to a discontinuity that takes into account how close a discontinuity is, as well as the magnitude of the discontinuity.
+This method always outperformed the first method of snapping cuts to the largest discontinuities in the derivative of the CDF.
+
 The CDF optimization method was run on the unbalanced pin mesh and the Level-2 experiment mesh.
 The unbalanced pin mesh was run through the optimization suite from 2 to 10 subsets in each dimension.
 Figure~\ref{ubp_opt} shows the time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.
@@ -172,31 +176,28 @@ Due to the low number of communications, having partitions that are balanced by 
 However, once we exceed 9 subsets, we can see the optimized partitions outperforming the other partition types, with the prioritization of not adding cells paying off.
 
 Figure~\ref{ubp_opt_heavy} shows the time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
 \includegraphics{../../figures/more_sparse_best_comp.pdf}
   \caption{The time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.}
   \label{ubp_opt_heavy}
 \end{figure}
 %%
-With a very dense mesh that is inherently balanced, moving cuts to the heaviest natural boundaries may move cuts to less optimal locations than the regular or load-balanced cuts.
+For the majority of cases run with this mesh, the binary tree cuts outperform the regular, load-balanced, and load-balanced-by-dimension cuts.
 
 Figure~\ref{level2_opt} shows the sweep times on the Level-2 mesh from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) binary tree cuts.
-\begin{figure}[H]
+\begin{figure}[ht]
 \centering
-\includegraphics{../../figures/level2_sweep_comp.pdf}
-\caption{The Level-2 mesh sweep times from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts. }
+\includegraphics{../../figures/level2_sweep_comp_best.pdf}
+\caption{The Level-2 mesh sweep times from the time-to-solution estimator for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) optimized cuts. }
 \label{level2_opt}
 \end{figure}
-This problem shows that this optimization approach sometimes not give the best sweep times.
-While prioritizing not adding cells to the mesh is a sensible argument, sometimes adding cells to achieve better balance may pay off.
-The importance of making sure to run the regular, load-balanced, and load-balanced-by-dimension cuts in addition to the optimized cuts is made clear by this problem.
-Thus the ``optimization suite'' should always have the cut types of previous work to test.
-In addition, spending the time to hand balance the mesh is potentially not worthwhile as the time per sweep only differed by 0.004 seconds.
-Depending on the total number of sweeps that need to be performed, this difference could be negligible in the total time to solution.
+The time to solution of the binary tree cuts is 1.5\% better than the hand-balanced cuts.
+The binary cut suite for the Level-2 experiment mesh took about 2 minutes to find the minimum time to solution, while hand-balancing the mesh took at least an hour.
+Even though 1.5\% may seem like a negligible difference, the difference in time spent to get a similar time-to-solution should be taken into account and highlight the significance of the improvement.
 
 Figure~\ref{im1c_opt} shows the results of the IM1C experiment mesh run through the time-to-solution estimator for regular, load-balanced-by-dimension, and binary tree cuts with 5 subsets in each dimension.
-\begin{figure}[H]
+\begin{figure}[ht]
 \begin{minipage}[c]{0.65\textwidth}
 \centering
 \includegraphics[scale=0.3]{../figures/im1_mesh.png}
@@ -206,23 +207,25 @@ Figure~\ref{im1c_opt} shows the results of the IM1C experiment mesh run through 
 \centering
 \begin{table}[H]
 \centering
-\begin{tabular}{c|c}
-\textbf{Type} & \bf TTS (s) \\ \hline
-Regular & 3.804 \\ \hline
-LBD & 1.836\\ \hline
-Bin. & 2.796 \\ \hline
+\begin{tabular}{c|c|c}
+\textbf{Type} & \bf TTS (s) & \bf $f$ \\ \hline
+Regular & 3.804 & 12.329\\ \hline
+LBD & 1.836 & 1.008\\ \hline
+Bin. & 0.926 & 1.918\\ \hline
 \end{tabular}
 \end{table}
 \end{minipage}
-\caption{The IM1C experiment mesh run through the time-to-solution estimator for regular, load-balanced-by-dimension, and binary tree cuts with 5 subsets in each dimension.}
+\caption{The IM1C experiment mesh run through the time-to-solution estimator for regular, load-balanced-by-dimension, and binary tree cuts with 5 subsets in each dimension. Additionally, the load-balance metric $f$ is reported for each partition type.}
 \label{im1c_opt}
 \end{figure}
-The binary tree cuts beat the regular cuts, but the load-balanced-by-dimension cuts remain the optimal partitioning for the IM1C mesh with 5 subsets in each dimension.
+The binary tree cuts beat both the regular and load-balanced-by-dimension cuts by a large margin. In addition, the load-balancing data shows that just because a problem is more balanced, even by a large margin, does not mean the time-to-solution is better.
 
-The failure of the CDF optimization method to provide better cuts for the Level-2 experiment highlights a few paths forward for future work.
-The time-to-solution estimator is computationally too slow (the Level-2 problem takes 20 seconds per run) to run a large number of partition sets.
-With a faster time-to-solution estimator (down to milliseconds for modestly large problems), we could  run a much larger number of partitions to test their time-to-solution in a reasonable time, and our optimization process could be more robust.
-Combinations of natural boundaries could be selected instead of just the highest discontinuities in the CDF.
-For example, choosing 42 of the largest 50 cuts in the $x$ direction for the Level-2 problem would give us 14,190 unique combinations to try solely in the $x$ direction.
-At 20 seconds per run, this would take approximately 79 hours, which is unfeasible.
-However, at 20 milliseconds per run, this would only take around 5 minutes, which is a reasonable amount of time to wait for optimized partitions.
+The CDF optimization method provides a partitioning scheme with a time-to-solution that is better than regular, load-balanced, and load-balanced-by-dimension partitions for the majority of cases run.
+Choosing cuts that balance the vertices by dimension followed by snapping those cuts to locations less likely to add cells to the mesh proves to be quite effective.
+
+However, we two paths forward for improvement come to mind.
+With a sped up time-to-solution estimator, we can run several more possible sets of partitions.
+For example, combinations of natural boundaries could be run rather than choosing the most suitable every time.
+
+Additionally, exploring different formulations for Eq.~\ref{distance}, or the calculation of the smallest weighted distance, could yield interesting results.
+
