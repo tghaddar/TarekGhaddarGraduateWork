@@ -208,6 +208,8 @@ Figure~\ref{alg_illustration} illustrates the behavior of both algorithms after 
 To study the behavior and effectiveness of both the original load balancing and the load-balancing-by-dimension algorithm, a parametric study was run on the mesh shown in Fig.~\ref{partitioning_example}.
 This mesh was chosen because it is inherently imbalanced as there are two dense geometric features in opposing corners with a sparse region in between.
 
+\subsection{Parametric study on the unbalanced pin mesh}
+
 The study calculates $f$ for the mesh with no load balancing iterations, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations.
 The mesh is partitioned into 2 to 10 subsets in each dimension for all load balancing formats.
 Figure~\ref{metric_study} shows the results of this parametric study.
@@ -266,6 +268,9 @@ There is consistent improvement for both algorithms for all cases, and the impro
 10&45.85\%&84.65\%&71.66\%
 \end{tabular}
 \end{table}
+
+\FloatBarrier
+\subsection{Parametric study on the Level-2 experiment mesh}
 
 The same parametric study was run on an experiment that PDT simulates, the Level-2 experiment, shown in Fig.~\ref{level2_nocut_lbchapter}.
 \begin{figure}[ht]

@@ -58,7 +58,7 @@ for i in range(0,len(numrows)):
   print("NUMROW: ", numrow)
   
   #y_values_func = get_highest_jumps(verts[:,1],gymin,gymax,numcol)
-  x_values,y_cut_suite = get_opt_cut_suite_best(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
+  x_values,y_cut_suite = create_opt_cut_suite(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
   
   max_times = []
   fs = []

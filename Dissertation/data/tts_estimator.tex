@@ -322,7 +322,7 @@ Figure~\ref{ubp_7x7} shows the mesh in Fig.~\ref{partitioning_example} partition
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.15]{../figures/spiderweb_7x7_lbd.png}
-\caption{The mesh in Fig.~\ref{partitioning_example} partitioned into 7 subsets in each dimension with load-balanced-by-dimension cuts.}
+\caption{The mesh in Fig.~\ref{partitioning_example} partitioned into 7 subsets in each dimension with load-balanced-by-dimension cuts. $f = 1.49$}
 \label{ubp_7x7}
 \end{figure}
 \begin{figure}[H]
@@ -843,7 +843,7 @@ The balanced mesh was ``hand-balanced'' by Marvin Adams, Michael Adams, and Jan 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.28]{../../figures/level2_42x13_balanced.png}
-\caption{The Level-2 experiment mesh partitioned and load balanced with 42 subsets in x and 13 subsets in y. $f = 2.386$.}
+\caption{The Level-2 experiment mesh partitioned and manually load balanced with 42 subsets in x and 13 subsets in y. $f = 2.386$.}
 \label{level2_42x13_balanced}
 \end{figure}
 
@@ -851,22 +851,22 @@ Table \ref{level2_sweep_times} shows the sweep times for the regular cut and bal
 Table \ref{level2_percent_diff} shows the percent difference between the PDT sweep time and the time-to-solution estimator sweep time.
 \begin{table}[ht]
 \centering
-\caption{The sweep times for the regular cut and balanced cut Level-2 problems for PDT and the time-to-solution estimator.}
+\caption{The sweep times for the regular cut and manually balanced cut Level-2 problems for PDT and the time-to-solution estimator.}
 \label{level2_sweep_times}
 \begin{tabular}{c|c|c|c|c}
 \bf Case & \bf PDT (s) & \bf TTS (s) & \bf PDT Min (s) & \bf PDT Max (s) \\ \hline
 Regular & 0.07 & 0.0648 & 0.0686 & 0.0889\\ \hline
-Balanced & 0.0531 & 0.0535 & 0.0522 & 0.0638
+Manually Balanced & 0.0531 & 0.0535 & 0.0522 & 0.0638
 \end{tabular}
 \end{table}
 \begin{table}[ht]
 \centering
-\caption{The percent difference for the regular cut and balanced cut Level-2 problems between PDT and the time-to-solution estimator.}
+\caption{The percent difference for the regular cut and manually balanced cut Level-2 problems between PDT and the time-to-solution estimator.}
 \label{level2_percent_diff}
 \begin{tabular}{c|c}
 \textbf{Case} & \bf PDT vs. TTS \\ \hline
 Regular & 7.52\% \\ \hline
-Balanced & 0.63\%
+Manually Balanced & 0.63\%
 \end{tabular}
 \end{table}
 Both the regular and balanced cases have estimated sweep times within 8\% of PDT's sweep times.
