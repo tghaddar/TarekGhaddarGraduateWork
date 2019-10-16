@@ -27,8 +27,7 @@ The time-to-solution estimator is tested against PDT, Texas A\&M's massively det
 The time-to-solution estimator's sweep time is within 10\% of PDT's sweep time for the majority of problems tested.
 
 We use the time-to-solution estimator as the objective function in an optimization scheme to attempt to get the partitions that lead to the fastest sweep time for a given problem and partitioning scheme.
-Two optimization methods are discussed: using a black box tool (scipy's optimize library) and an intuitive method that relies on placing partitions in mesh locations that does not increase the number of cells (which we chose to name the CDF method).
-The time-to-solution estimator proved to not be smooth enough for a black box tool to work, so the geometry based optimization method became the primary method.
-The CDF method proved effective for our unbalanced pin test problem, improving the time to solution over previously used partitioning schemes.
-For our larger test problem, the optimized partitioning scheme improves the time to solution over one previously used partitioning scheme, but is not as effective relative to other previously used partitioning schemes.
+Two optimization methods are discussed: using a black box tool (scipy's optimize library) and an intuitive method that prioritizes placing partitions in mesh locations that does not increase the number of cells (which we chose to name the CDF method).
+The time-to-solution estimator proved to not be smooth enough for a black box tool to work, so the CDF optimization method became the primary method.
+The CDF method proved effective for the majority of problems run, improving the time to solution over previously used partitioning schemes.
 \pagebreak{}

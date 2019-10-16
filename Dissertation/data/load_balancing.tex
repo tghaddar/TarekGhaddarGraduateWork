@@ -25,7 +25,7 @@ Before detailing the two load balancing algorithms PDT employs, a quick review o
 \item Discontinuities along subset boundaries are fixed by ``stitching'' hanging nodes, creating degenerate polygons along subset boundaries.
 \item The subsets are distributed amongst the processor domain.
 \end{itemize}
-Using cut lines/cut planes to partition unstructured meshes may preserve the provably optimal sweep partitioning \cite{mpadams2013,mpadams2015} of logically Cartesian grids if each partition has an equivalent number of cells.
+Using cut lines/cut planes to partition unstructured meshes may preserve the provably optimal sweep partitioning \cite{mpadams2013,mpadams2015,mpadamsjcp} of logically Cartesian grids if each partition has an equivalent number of cells.
 Subsets, rather than the cells, have $(i,j,k)$ indices and will become the base unit when aggregating spatial parameters. That is, $A_x$ and $A_y$ will now represent the number of subsets in $x$ and $y$ aggregated into a task.
 Generally, one subset is assigned per processor, as this minimizes the communication costs across processor boundaries, although this is not required.
 Figure~\ref{partitioning_example} shows an example of an unstructured mesh partitioned into 100 subsets in PDT.
@@ -107,7 +107,7 @@ While the problem is not balanced:
 \end{itemize}
 
 The original load-balancing algorithm placed cut lines in all dimensions all the way through the mesh.
-This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the provably optimal sweep partitioning described by Adams et. al \cite{mpadams2013,mpadams2015}.
+This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the provably optimal sweep partitioning described by Adams et. al \cite{mpadams2013,mpadams2015,mpadamsjcp}.
 However, there are theoretical limits to load balancing in this fashion. Figure~\ref{2dgeneral} shows a simple 2D subset layout with $M$ unaligned patches with $N$ cells each.
 
 \begin{figure}[H]

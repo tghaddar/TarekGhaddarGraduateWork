@@ -267,7 +267,7 @@ where:
   \item $T_m$ = the time spent solving angle-specific work,
   \item $T_g$ = the time spent solving group-specific work.
 \end{itemize}
-The weighting function is based on PDT's performance model \cite{mpadams2013,mpadams2015}, which is specific to how PDT solves the transport sweep. The cost function can be modified based on different sweep methodologies if a user desires.
+The weighting function is based on PDT's performance model \cite{mpadams2013,mpadams2015,mpadamsjcp}, which is specific to how PDT solves the transport sweep. The cost function can be modified based on different sweep methodologies if a user desires.
 
 As shown in Eq. \ref{weight_function}, a crucial part of determining the weight of each edge is knowing the number of cells each subset has, and the amount of shared boundary cells with each neighbor. Given a mesh density, the number of cells per subset is given by Eq \ref{cellspersubset}:
 \begin{equation}
