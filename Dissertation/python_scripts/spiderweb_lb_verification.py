@@ -54,7 +54,8 @@ for i in range(0,len(numrows)):
   params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
   add_cells = True
   
-  max_times.append( optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+  max_time,f = optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
+  max_times.append(max_time)
   
 np.savetxt("spiderweb_lb_times.csv",max_times)
 pdt_data = np.genfromtxt("spiderweb_lb_sweep_data.txt")
@@ -71,15 +72,16 @@ for i in range(0,8):
   pdt_data_max[i] = np.max(pdt_data[i])
   percent_diff[i] = abs(tts-median)/median*100
   
-#plt.figure()
-#plt.xlabel(r'$\sqrt{\rm{Number\ of\ Subsets}}$')
-#plt.ylabel("Sweep Time (s)")
-#plt.plot(numrows,pdt_data_median,'-o',label="PDT")
-#plt.plot(numrows,pdt_data_min,'x',label="PDT Min")
-#plt.plot(numrows,pdt_data_max,'x',label="PDT Max")
-#plt.plot(numrows,max_times,'-o',label="TTS")
-#plt.legend(loc="best")
-#plt.savefig("../../figures/spiderweb_lb_pdtvtts.pdf")
+plt.figure()
+plt.grid(True,axis='y')
+plt.xlabel(r'$\sqrt{\rm{Number\ of\ Subsets}}$')
+plt.ylabel("Sweep Time (s)")
+plt.plot(numrows,pdt_data_median,'-o',label="PDT")
+plt.plot(numrows,pdt_data_min,'x',label="PDT Min")
+plt.plot(numrows,pdt_data_max,'x',label="PDT Max")
+plt.plot(numrows,max_times,'-o',label="TTS")
+plt.legend(loc="best")
+plt.savefig("../../figures/spiderweb_lb_pdtvtts.pdf")
 #
 #f = open("spiderweb_lb_percent_diff.txt",'w')
 #f.write("\\textbf{$\sqrt{\\text{Num Subsets}}$} & \\bf PDT vs. TTS \\\ \hline \n")

@@ -14,10 +14,12 @@ for i in range(0,5):
   pdt_data_max[i] = np.max(pdt_data[i])
   
 tts_data = np.genfromtxt("tts_level2_data_best")
+pdt_data_median[4] = 0.051
 
 
 plt.figure()
-#plt.plot([1,2,3,4,5],pdt_data_median,'-o',label="PDT")
+plt.grid(True,axis='y')
+plt.plot([1,2,3,4,5],pdt_data_median,'-o',label="PDT")
 plt.plot([1,2,3,4,5],tts_data,'-o',label="TTS")
 plt.legend(loc='best')
 plt.ylabel("TTS (s)")

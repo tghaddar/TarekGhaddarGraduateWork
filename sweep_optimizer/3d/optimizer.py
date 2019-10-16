@@ -150,6 +150,7 @@ def get_highest_jumps(points,gmin,gmax,numdim):
   #cdf = cdf/max(cdf)
   cdf = np.insert(cdf,0,0.0)
 #  plt.figure()
+#  plt.grid(True,axis='y')
 #  plt.title("The vertex CDF in the x dimension")
 #  plt.xlabel("x (cm)")
 #  plt.ylabel("x-vertex CDF")
@@ -206,6 +207,13 @@ def get_best_jumps(points,gmin,gmax,numdim):
   
   cdf = np.cumsum(hist)
   cdf = np.insert(cdf,0,0.0)
+#  plt.figure()
+#  plt.grid(True,axis='y')
+#  plt.title("The vertex CDF in the x dimension")
+#  plt.xlabel("x (cm)")
+#  plt.ylabel("x-vertex CDF")
+#  plt.plot(bin_edges,cdf)
+#  plt.savefig("../../figures/xvertexcdf.pdf")
   
   #We want a roughly equivalent number of vertices per partition.
   ideal_pts = float(numpoints/numdim)
