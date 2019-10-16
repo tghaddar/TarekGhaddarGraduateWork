@@ -167,8 +167,15 @@ Figure~\ref{ubp_opt} shows the time-to-solution for binary tree, regular, load-b
 %%%%%%%%%%
 \begin{figure}[h]
 \centering
-  \includegraphics{../../figures/unbalanced_pins_best_comparison.pdf}
-  \caption{The time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.}
+  \begin{subfigure}[t]{0.49\textwidth}
+    \centering
+  \includegraphics[scale=0.55]{../../figures/unbalanced_pins_best_comparison.pdf}
+  \end{subfigure}
+    \begin{subfigure}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.55]{../../figures/more_sparse_metric_comp.pdf}
+  \end{subfigure}  
+  \caption{The time-to-solution and load-balance metric for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the unbalanced pins mesh from 2 to 10 subsets in each dimension.}
   \label{ubp_opt}
 \end{figure}
 %%%%%%%%%%%
@@ -179,12 +186,19 @@ However, once we exceed 9 subsets, we can see the optimized partitions outperfor
 Figure~\ref{ubp_opt_heavy} shows the time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.
 \begin{figure}[h]
 \centering
-\includegraphics{../../figures/more_sparse_best_comp.pdf}
-  \caption{The time-to-solution for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.}
+  \begin{subfigure}[t]{0.49\textwidth}
+    \centering
+     \includegraphics[scale=0.55]{../../figures/more_sparse_best_comp.pdf}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.49\textwidth}
+    \centering
+    \includegraphics[scale=0.55]{../../figures/spiderweb_metric_study.pdf}
+  \end{subfigure}  
+  \caption{The time-to-solution and load-balance metric for binary tree, regular, load-balanced and load-balanced-by-dimension cuts on the ``heavier'' unbalanced pins mesh from 2 to 10 subsets in each dimension.}
   \label{ubp_opt_heavy}
 \end{figure}
 %%
-For the majority of cases run with this mesh, the binary tree cuts outperform the regular, load-balanced, and load-balanced-by-dimension cuts.
+For the majority of cases run with this mesh, the binary tree cuts outperform the regular, load-balanced, and load-balanced-by-dimension cuts. These cases also further prove that better balance does not necessarily mean a better time-to-solution.
 
 Figure~\ref{level2_opt} shows the sweep times on the Level-2 mesh from the time-to-solution estimator and PDT for (1) regular cuts, (2) hand-balanced cuts, (3) load-balanced cuts, (4) load-balanced-by-dimension cuts, and (5) binary tree cuts.
 \begin{figure}[h]

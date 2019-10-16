@@ -231,7 +231,7 @@ def get_best_jumps(points,gmin,gmax,numdim):
   bin_edges_jumps = bin_edges[c_max_index]
   cdf_jumps = grad_cdf[c_max_index]
   #Restricting the pool of jumps to jumps that only exceed 20% of the maximum value.
-  big_indices = np.argwhere(cdf_jumps > 0.0)
+  big_indices = np.argwhere(cdf_jumps > 0.1)
   big_jumps = bin_edges_jumps[big_indices]
   pool_jumps = cdf_jumps[big_indices]
   if (big_jumps[0] == gmin):

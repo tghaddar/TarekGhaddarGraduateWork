@@ -51,8 +51,9 @@ x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,10)
 
 max_times_case = {}
 max_times_case_time_only = []
-fs = []
+
 fs_case_only = []
+
 
 for i in range(0,len(numrows)):
   numrow = numrows[i]
@@ -61,6 +62,7 @@ for i in range(0,len(numrows)):
   x_values,y_cut_suite = get_opt_cut_suite_best(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
   
   max_times = []
+  fs = []
   add_cells = False
   for j in range(0,len(y_cut_suite)):
     x_cuts = x_values
@@ -76,4 +78,4 @@ for i in range(0,len(numrows)):
   
   max_times_case[numrow] = (min(max_times),x_cuts_min,y_cuts_min)
   max_times_case_time_only.append(min(max_times))
-  fs_case_only.append(min(fs))
+  fs_case_only.append(fs[min_index])

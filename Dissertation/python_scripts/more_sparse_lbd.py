@@ -47,6 +47,7 @@ gymax = 10.0
 numrows = [2,3,4,5,6,7,8,9,10]
 numcols = [2,3,4,5,6,7,8,9,10]
 max_times = []
+fs = []
 #Regular runs.
 for i in range(0,len(numrows)):
   numcol = numcols[i]
@@ -56,4 +57,6 @@ for i in range(0,len(numrows)):
   params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
   add_cells = True
   
-  max_times.append( optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+  max_time,f = optimized_tts_numerical(params,sparse_pins_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
+  max_times.append(max_times)
+  fs.append(f)
