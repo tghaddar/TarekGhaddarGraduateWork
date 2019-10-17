@@ -58,16 +58,14 @@ for col in range(0,numcol):
 params = create_parameter_space(x_cuts_lb,y_cuts_lb,numrow,numcol)
 num_params=len(params)
 add_cells = True
-#max_time_lb = optimized_tts_numerical(params,level2_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
+#max_time,f_balanced = optimized_tts_numerical(params,level2_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
 
 
-x_values = get_highest_jumps(verts[:,0],gxmin,gxmax,numcol)
-y_values_test = get_highest_jumps(verts[:,1],gymin,gymax,numrow)
 
 
-x_values,y_cut_suite = get_opt_cut_suite_best(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
+#x_values,y_cut_suite = get_opt_cut_suite_best(verts,gxmin,gxmax,gymin,gymax,numcol,numrow)
 
-#for i in range(0,len(y_cut_suite)):
+#for i in range(0,1):
 #  x_cuts = x_values
 #  y_cuts = y_cut_suite[i]
 #  boundaries = build_global_subset_boundaries(numcol-1,numrow-1,x_cuts,y_cuts)
@@ -76,32 +74,36 @@ x_values,y_cut_suite = get_opt_cut_suite_best(verts,gxmin,gxmax,gymin,gymax,numc
 
 max_times = []
 add_cells = False
-#for i in range(0,len(y_cut_suite)):
-for i in range(0,1):
-  x_cuts = x_values
-  y_cuts = y_cut_suite[i]
-  params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
-  max_times.append(optimized_tts_numerical(params,level2_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted))
+fs = []
 
-min_index = max_times.index(min(max_times))
-y_cuts_min = y_cut_suite[min_index]
-x_cuts_min = x_values
+#for i in range(0,len(y_cut_suite)):
+##for i in range(0,1):
+x_cuts = np.genfromtxt("level2_best_x_cuts")
+y_cuts = np.genfromtxt("level2_best_y_cuts")
+params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
+max_time_bin,f_bin = optimized_tts_numerical(params,level2_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
+#  max_times.append(max_time)
+#  fs.append(f)
+#
+#min_index = max_times.index(min(max_times))
+#y_cuts_min = y_cut_suite[min_index]
+#x_cuts_min = x_values
 
 #Writing the xml portions.
-f = open("level2_opt_cuts.xml",'w')
-f.write("<x_cuts>")
-for x in range(1,numcol):
-  f.write(str(x_cuts_min[x])+" ")
-
-f.write("</x_cuts>\n")
-
-f.write("<y_cuts_by_column>\n")
-for col in range(0,numcol):
-  f.write("  <column>")
-  for y in range(1,numrow):
-    f.write(str(y_cuts_min[col][y])+ " ")
-  
-  f.write("</column>\n")
-
-f.write("</y_cuts_by_column>\n")
-f.close()
+#f = open("level2_opt_cuts.xml",'w')
+#f.write("<x_cuts>")
+#for x in range(1,numcol):
+#  f.write(str(x_cuts_min[x])+" ")
+#
+#f.write("</x_cuts>\n")
+#
+#f.write("<y_cuts_by_column>\n")
+#for col in range(0,numcol):
+#  f.write("  <column>")
+#  for y in range(1,numrow):
+#    f.write(str(y_cuts_min[col][y])+ " ")
+#  
+#  f.write("</column>\n")
+#
+#f.write("</y_cuts_by_column>\n")
+#f.close()

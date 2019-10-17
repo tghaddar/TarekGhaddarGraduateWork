@@ -147,7 +147,7 @@ plt.plot(x,y,'k')
 #Stage 1.
 x = 0.3
 y = 0.2
-plt.text(x,y,'1',fontsize=20,fontweight='bold')
+plt.text(x,y,'2',fontsize=20,fontweight='bold',color='r')
 x = -0.1
 y = 0.45
 plt.text(x,y,'1',fontsize=20,fontweight='bold')
@@ -155,7 +155,7 @@ plt.text(x,y,'1',fontsize=20,fontweight='bold')
 #Stage 2.
 x = 0.73
 y = 0.45
-plt.text(x,y,'2',fontsize=20,fontweight='bold',color='r')
+plt.text(x,y,'3',fontsize=20,fontweight='bold',color='b')
 x = 0.1
 y = 0.77
 plt.text(x,y,'2',fontsize=20,fontweight='bold',color='r')
@@ -163,18 +163,18 @@ plt.text(x,y,'2',fontsize=20,fontweight='bold',color='r')
 #Stage 3.
 x = 0.5
 y = 0.75
-plt.text(x,y,'3',fontsize=20,fontweight='bold',color='b')
+plt.text(x,y,'4',fontsize=20,fontweight='bold',color='g')
 x = 0
 y = 1.3
 plt.text(x,y,'3',fontsize=20,fontweight='bold',color='b')
 x = 1.1
 y = 0.5
-plt.text(x,y,'3',fontsize=20,fontweight='bold',color='b')
+plt.text(x,y,'4',fontsize=20,fontweight='bold',color='g')
 
 #Stage 4.
 x = 0.77
 y = 1.1
-plt.text(x,y,'4',fontsize=20,fontweight='bold',color='g')
+plt.text(x,y,'5',fontsize=20,fontweight='bold',color='m')
 x = 0.4
 y = 1.5
 plt.text(x,y,'4',fontsize=20,fontweight='bold',color='g')
@@ -182,18 +182,18 @@ plt.text(x,y,'4',fontsize=20,fontweight='bold',color='g')
 #Stage 5.
 x = 0.6
 y = 1.5
-plt.text(x,y,'5',fontsize=20,fontweight='bold',color='m')
+plt.text(x,y,'6',fontsize=20,fontweight='bold',color='c')
 x = 1.1
 y = 1.1
-plt.text(x,y,'5',fontsize=20,fontweight='bold',color='m')
+plt.text(x,y,'6',fontsize=20,fontweight='bold',color='c')
 
 #Stage 6.
 x = 0.8
 y = 1.8
-plt.text(x,y,'6',fontsize=20,fontweight='bold',color='c')
+plt.text(x,y,'7',fontsize=20,fontweight='bold',color='k')
 x = 1.05
 y = 1.5
-plt.text(x,y,'7',fontsize=20,fontweight='bold',color='k')
+plt.text(x,y,'8',fontsize=20,fontweight='bold',color='r')
 #Arrow.
 plt.arrow(-0.4,-0.4,0.2,0.2,width=0.04,color='k')
 plt.savefig("UnstructuredMesh.pdf")
