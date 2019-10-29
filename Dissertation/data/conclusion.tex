@@ -66,7 +66,7 @@ If they do, this could be a significant source of error in the time-to-solution 
 In addition to the agreement between PDT and the time-to-solution estimator being a significant source of future work, speeding up the time-to-solution estimator would allow for a much larger set of potential partitions to be run through the optimizer.
 Three paths forward come to mind: rewriting the time-to-solution estimator in a precompiled language rather than an interpreted language, modestly parallelizing the time-to-solution estimator, and machine learning.
 
-Although Python's ease of use and vast number of libraries made it an extremely attractive option for graph algorithms ({\tt networkx}) and mesh manipulation ({\tt shapely}), larger problems can take a long time to finish sweeping in the time-to-solution estimator.
+Although Python's ease of use and vast number of libraries made it an extremely attractive option for graph algorithms (networkx) and mesh manipulation (shapely), larger problems can take a long time to finish sweeping in the time-to-solution estimator.
 This can severely hinder our ability to robustly optimize our problems.
 Our optimization method chooses natural boundaries as the basis for optimizing our partitions, but with a time-to-solution estimator that finishes sweeping in milliseconds rather than tens of seconds, we would be able to run thousands of sets of partitions rather than under 20.
 If possible, rewriting the time-to-solution estimator in C++ would inherently speed up the code, with the Boost library containing graph and mesh manipulation libraries.
