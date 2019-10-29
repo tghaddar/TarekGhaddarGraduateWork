@@ -271,7 +271,7 @@ The weighting function is based on PDT's performance model \cite{mpadams2013,mpa
 
 As shown in Eq. \ref{weight_function}, a crucial part of determining the weight of each edge is knowing the number of cells each subset has, and the amount of shared boundary cells with each neighbor. Given a mesh density, the number of cells per subset is given by Eq \ref{cellspersubset}:
 \begin{equation}
-   \text{cells per subset} = \int_{\tcr{x_i}}^{\tcr{x_{i+1}}} \int_{\tcr{y_j}}^{\tcr{y_{j+1}}} \int_{\tcr{z_k}}^{\tcr{z_{k+1}}} \text{mesh density } dx dy dz,
+   \text{cells per subset} = \int_{x_i}^{x_{i+1}} \int_{y_j}^{y_{j+1}} \int_{z_k}^{z_{k+1}} \text{mesh density } dx dy dz,
 \label{cellspersubset}
 \end{equation}
 where the integral bounds represent the cut plane coordinates that form the subset.
