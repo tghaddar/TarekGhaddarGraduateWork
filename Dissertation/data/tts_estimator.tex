@@ -421,7 +421,7 @@ A theoretical study in 2D is run to verify the time-to-solution estimator for 2D
 
 Figures \ref{regular_partitions}, \ref{mild_random_partitions}, \ref{random_partitions}, \ref{worst_partitions} show the four partitioning schemes and Figs. \ref{regular_verification}, \ref{mild_random_verification}, \ref{random_verification}, \ref{worst_verification} show the results of the verification study for each partitioning scheme. In the results, a stage is defined as the time it takes to solve all cells in a subset for an angle, and communicate the boundary information to neighboring subsets.
 
-\subsection{Regular Partitions}
+\subsection{Regular partitions}
 
 Figure~\ref{regular_partitions} shows four examples of the regular partitioning scheme used for the first part of the verification study. Cut lines in both dimensions go all the way across the domain. This reflects the partitioning scheme after the original load balancing algorithm described in Section \ref{sec:og_lb} is used.
 
@@ -463,7 +463,7 @@ Using regular partitions as shown in Fig.~\ref{regular_partitions}, the first po
 \label{regular_verification}
 \end{figure}
 
-\subsection{``Mildly Random'' Partitions}
+\subsection{``Mildly random'' partitions}
 Figure~\ref{mild_random_partitions} shows four examples of the ``mildly random'' partitioning scheme used for the second part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 
 %Mild random partitions
@@ -503,7 +503,7 @@ Using``mildly random'' partitions as shown in Fig.~\ref{mild_random_partitions},
 \label{mild_random_verification}
 \end{figure}
 
-\subsection{Random Partitions}
+\subsection{Random partitions}
 %Random partitions
 Figure~\ref{random_partitions} shows four examples of the ``random'' partitioning scheme used for the third part of the verification study. Cut lines in the x dimension go all the way across the domain, but are not necessarily uniformly distributed. The cut lines in y are randomly distributed in each column.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 \begin{figure}[H]
@@ -542,7 +542,7 @@ Using ``random'' partitions as shown in Fig.~\ref{random_partitions}, the third 
 \label{random_verification}
 \end{figure}
 
-\subsection{Probable Worst-Case Partitions}
+\subsection{Probable worst-case partitions}
 Figure~\ref{worst_partitions} shows four examples of the probable worst-case partitioning scheme used for the final part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. The cut lines in y are distributed on opposing ends of alternating columns.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 \begin{figure}[H]
 \centering
@@ -690,7 +690,7 @@ This allows us to filter out outlying values due to supercomputer noise by takin
 For each result in PDT, the median sweep time value, the maximum sweep time value, and the minimum sweep time value are plotted to showcase the outlying values that can occur.
 In order to minimize the effects of the sweep overhead on the timing statistics, the solve time per sweep is calculated from the mean time of ten transport sweeps for each case.
 
-\subsection{PDT vs. the Time-to-Solution Estimator for the Unbalanced Pin Mesh}
+\subsection{PDT vs. the time-to-solution estimator for the unbalanced pin mesh}
 Figure~\ref{comp_reg_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for the unbalanced pin mesh with 2 to 10 subsets in each dimension with regular cuts.
 Table \ref{diff_reg_spiderweb} tabulates the percent difference between PDT and the time-to-solution estimator for each of the regular test cases run.
 We notice that there is better agreement for cases where there are more unknowns.
@@ -831,7 +831,7 @@ The low core cases disagree once more, likely due to an overestimation of the la
 Properly characterizing the latency for individual core counts is likely to improve agreement at low core counts. 
 
 \FloatBarrier
-\subsection{PDT vs. the Time-to-Solution Estimator for the Level-2 Experiment Mesh}
+\subsection{PDT vs. the time-to-solution estimator for the Level-2 experiment mesh}
 Figures \ref{level2_42x13} and \ref{level2_42x13_balanced} show the mesh for the Level-2 experiment with 42 subsets in $x$, and 13 subsets in $y$ with evenly spaced cut lines and balanced cut lines.
 The balanced mesh was ``hand-balanced'' by Marvin Adams, Michael Adams, and Jan Vermaak to achieve better load balancing than the automated load balancing algorithm was able to achieve.
 \begin{figure}[H]

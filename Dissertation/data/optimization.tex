@@ -19,7 +19,7 @@ In Chapter \ref{cha:tts}, we have seen that we can estimate the time-to-solution
 We use the time-to-solution estimator as the objective function in two optimization methods.
 The first optimization method utilizes scipy's optimize library, and the second method utilizes knowledge of a problem's mesh layout to assist in partition placement.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Scipy optimize}
+\section{Scipy Optimize}
 The scipy optimize library \cite{scipy} provides many tools for optimizing an input function with local and global minimization techniques.
 Our usage of the optimize library relies on the minimize function, using the basinhopping \cite{basinhoppingwales} method as the global optimizer, and the constrained Nelder-Mead method as the local optimizer.
 We need a global optimization method for larger problem spaces to ensure that cut planes/lines are getting optimized over the entirety of the problem domain, rather than just moving the cut planes/lines close to our initial guess.
@@ -54,7 +54,7 @@ The CDF optimization method will:
   \item Run all iterations of cut lines selected.
 \end{enumerate}
 
-\subsection{Finding the Most Suitable Natural Boundaries}
+\subsection{Finding the most suitable natural boundaries}
 
 In order to identify natural boundaries, we analyze the detailed cumulative distribution function (CDF) of the vertices in each dimension. The jumps in the CDF correspond to natural boundaries. Figure~\ref{vert_cdf} shows the x-vertex CDF of the mesh in Fig.~\ref{natural_boundary_example}.
 \begin{figure}[h]
@@ -100,7 +100,7 @@ Rather than test against every possible natural boundary, we pull a subset of di
 This prevents from unnecessarily testing small jumps that only have natural boundaries through a very small portion of the mesh.
 
 \FloatBarrier
-\subsection{Finding Natural Boundaries for Sets of Columns}
+\subsection{Finding natural boundaries for sets of columns}
 In order to globalize the optimization of the cut lines per column, we set up a binary tree of test cases, such as the one shown in Fig.~\ref{binary_tree}. Each layer in the tree represents one set of $y$ cut lines. The first layer, or the root of the tree, represents the case where we try and find the natural boundaries in $y$ throughout all columns, in this case 4 columns. The next layer tries to find two sets of natural boundaries, one set of natural $y$ boundaries through the first two columns, and another set through the final 2 columns. Finally, the last case finds a set of natural $y$ boundaries in each individual column.
 
 \begin{figure}[h]
