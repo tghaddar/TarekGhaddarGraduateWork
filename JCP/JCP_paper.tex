@@ -69,9 +69,14 @@
 %\usepackage[normalem]{ulem}
 %\newcommand{\soutr}[1]{\jcr{\sout{#1}}}
 
+\usepackage{color}
+\newcommand{\tcr}[1]{\textcolor{red}{#1}}
+
 \journal{Journal of Computational Physics}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \verso{Given-name Surname \textit{etal}}
 
@@ -96,7 +101,9 @@
 \communicated{S. Sarkar}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%
 A concise and factual abstract is required. The abstract should state briefly the purpose of the research, the principal results and major conclusions. An abstract is often presented separately from the article, so it must be able to stand alone. For this reason, References should be avoided, but if essential, then cite the author(s) and year(s). Also, non-standard or uncommon abbreviations should be avoided, but if essential they must be defined at their first mention in the abstract itself.
 %%%%
@@ -114,32 +121,35 @@ A concise and factual abstract is required. The abstract should state briefly th
 
 %\linenumbers
 
-%% main text
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The field of radiation transport studies the distribution of radiation (particle/energy) throughout a six-dimensional phase-space consisting of time, space, energy, and direction. 
 Radiation transport is commonly used in reactor physics, medical physics, radiation shielding, criticality safety applications, stellar atmospheres, as well as the general simulation of radiation in different environments. 
 Radiation transport is described by the Boltzmann transport equation \cite{bell_glasstone,zweifel,davison,duderstadt} and can be solved stochastically or deterministically.
 
-The work presented in this paper deals with the transport equation discretized using multigroup in energy, discrete-ordinates (collocation) in angle, and discontinuous finite elements in space. 
-The resulting discrete system of equations is amenable to iterative techniques whereby the streaming+total interaction operator need not to be assembled, generating large memory savings while being computationally very efficient.  
-Essentially, this allows for a matrix-free approach, termed ``transport sweeps'' in the radiation transport community, where small local system of equations are solved cell-by-cell, for each angular direction and energy group, in a fashion that follows the flow of radiation in the computational mesh.
+The present papers deals with parallel solution techniques for the first-order form  of the $S_N$ transport equation. Hence, we consider the following discretizations of the transport equation: multigroup in energy, discrete-ordinates ($S_N$) in angle, and discontinuous finite elements in space. 
+The resulting discrete system of equations is amenable to iterative techniques, whereby the streaming+total interaction operator need not to be assembled, generating large memory savings while being computationally very efficient.  
+Essentially, this allows for a matrix-free approach, termed ``transport sweeps'' in the radiation transport community, where only small local systems of equations are solved cell-by-cell, for each angular direction and energy group, in a fashion that follows the flow of radiation in the computational mesh. After each transport sweep, the scattering source is updated and a new transport sweep is launched, an iterative process known as Source Iteration (SI). Alternatively to SI, the linear system can be recast of a sweep-preconditioned Krylov technique where, again, a transport sweep is necessary at each Krylov iteration.
 
-It is often desirable to split the problem domain so that the memory cost can be distributed across multiple processors.
-Extensive research has been done in parallelizing the transport sweep \cite{KBA,partisn,denovo,mpadams2013,mpadams2015}, as the transport sweep gains complexity for distributed meshes. Maintaining sweep performance for massively parallel simulations has and continues to be a thriving research topic.
+In the past, extensive research has been done in parallelizing transport sweeps for structured grids and good parallel performance was achieved \cite{KBA,partisn,denovo,mpadams2013,mpadams2015,adamsJCP2000}. \tcr{you should have a brief overview of prior work, including KBA, PDT}
+Partitioning unstructured grids for transport sweeps remains an open topic of research. \tcr{here, you should have a brief overview of prior unstructured grid work, including Pautz and your own MS work}. \tcr{These reviews are just provide the gyst of the ideas other researchers have followed. Like an elevator pitch, you need to go straight to the point, no digression, no details. If you elect to go deeper into prior methods, if they are important for your own work, this happens in early Sections, after the introduction}.
+%Recently \cite{yourMSwork}, partitioning unstructured grids in a balanced fashion (i.e., with equivalent amounts of work per processor) can present challenges.
 
-Research on sweeping on unstructured meshes has come to prominence in recent years, as the need to simulate more complex problems has risen.
-Partitioning unstructured meshes in a balanced (or near equivalent amount of work per processor) fashion that preserves mesh integrity can present challenges.
+In the present the creation of distributed partitions must be amenable to   
 
 The following sections will discuss a brief history of the transport sweep, parallel transport sweeps, load balancing unstructured meshes for transport, a time-to-solution estimator, and optimizing partitions for parallel transport.
 
 Section \ref{cha:transport_sweeps} introduces the steady-state neutron transport equation and the discretization process to obtain the discrete form of the transport equation. Section \ref{cha:transport_sweeps} also provides more details on the transport sweep.
 
-Massively parallel transport sweeps have been shown to scale up to 1.5 million cores on logically Cartesian grids using Texas A\&M's flagship deterministic transport code, PDT \cite{mpadams2013,mpadams2015}.
+Massively parallel transport sweeps have been shown to scale up to 1.5 million cores on logically Cartesian grids using Texas A\&M's flagship deterministic transport code, PDT \cite{mpadams2013,mpadams2015}. \tcr{this has no place here. but that information should be moved up a bit}
 Section \ref{cha:parallel_transport} describes the basics of a parallel sweep algorithm, and specifically describes the KBA algorithm \cite{KBA} and PDT's extension of the KBA algorithm.
 This section also describes PDT's performance model, which predicts the sweep time given a set of partitioning parameters.
 
-In order to solve a wider set of problems, an unstructured meshing capability was implemented in PDT.
+\tcr{OK, this is messed up. You cannot give a partial outline of the paper, then go back to talk about the backgroup, and then resume the outline. Please clean the introduction up}. In order to solve a wider set of problems, an unstructured meshing capability was implemented in PDT.
 However, unstructured meshes may lead to imbalanced partitions, or different numbers of mesh cells per processor subdomain.
 To address this, two load-balancing algorithms have been implemented in PDT, the original load-balancing algorithm and the load-balancing-by-dimension algorithm \cite{mastersthesis,mc2017}.
 
@@ -149,76 +159,68 @@ Section \ref{cha:tts} describes the time-to-solution estimator, a graph-based me
 The time-to-solution estimator described in Section \ref{cha:tts} is used to optimize the partitioning scheme.
 Section \ref{cha:optimization} details two optimization methods: a ``black box'' method that uses Python's scipy.optimize library and a ``human-intelligence'' method that prioritizes partition placement in locations that do not add cells to a mesh.
 
-\section{The transport sweep}\label{cha:transport_sweeps}
-The steady-state neutron transport equation describes the behavior of neutrons in a medium and is given by Eq.~\ref{continuous transport}:
-\begin{multline}
-\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo)  = \\
-\int_{0}^{\infty}dE' \int_{4\pi}d\Omega' \Sigma_s(\vr,E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')
-+ S_{ext}(\vr,E,\vo) ,
-\label{continuous transport}
-\end{multline}
-where $\vec{\Omega}\cdot \vec\nabla\psi$ is the leakage term and $\Sigma_t\psi$ is the total collision term (absorption, outscatter, and within group scattering). These represent the loss terms of the neutron transport equation. The right hand side of Eq.~\ref{continuous transport} represents the gain terms, where $S_{ext}$ is the external source of neutrons and $\int_{0}^{\infty}dE'\int_{4\pi}d\Omega'\Sigma_s(E'\to E, \Omega'\to\Omega)\psi(\vr,E',\vo')$ is the inscatter term, which represents all neutrons scattering from energy $E'$ and direction $\vo'$ into $dE$ about energy $E$ and $d\Omega$ about direction $\vo$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discretization of the transport equation}\label{cha:transport_sweeps}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Without loss of generality for the problem at hand, we assume isotropic scattering for simplicity. The double differential scattering cross section, $\Sigma_s(E'\to E, \Omega'\to\Omega)$, has its angular dependence present in the integral, and is divided by $4\pi$ to reflect isotropic behavior. This yields:
-\begin{align}
-\label{isotropic}
-  &\vo \cdot \vec \nabla \psi(\vr,E,\vo) +\Sigma_t(\vr,E) \psi(\vr,E,\vo) \nonumber \\
-& = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \int_{4\pi}d\Omega' \psi(\vr,E',\vo')  + S_{ext}(\vr,E,\vo) \nonumber \\
-& = \frac{1}{4\pi}\int_{0}^{\infty}dE' \Sigma_s(\vr,E'\to E) \phi(\vr,E')  + S_{ext}(\vr,E,\vo) ,
-\end{align}
-where we have introduced the scalar flux as the integral of the angular flux:
-\begin{equation}
-\label{def_scalar_flux}
-\phi(\vr,E') = \int_{4\pi}d\Omega' \psi(\vr,E',\vo').
-\end{equation}
-The next step to solving the transport equation is to discretize in energy, yielding Eq.~\ref{multigroup}, the multigroup transport equation:
+\tcr{this is a paper. there is no need such so many details. I am taking a crack at shortening this part.\\}
+The multigroup, steady-state neutron transport equation describing the distribution of neutral particles in a background medium is given by Eq.~\ref{multigroup}:
 \begin{equation}
 \vo \cdot \vec \nabla \psi_g(\vr,\vo) +\Sigma_{t,g}(\vr) \psi_g(\vr,\vo) = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g}(\vr,\vo), \quad \text{for } 1 \le g \le G
 \label{multigroup}
 \end{equation}
-where the multigroup transport equations now form a system of coupled equations.
-
-Next, we discretize in angle using the discrete ordinates method \cite{denovo}, whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of directions $\vo_m$:
+where $\vec{\Omega}\cdot \vec\nabla$ is the streaming operator and $\Sigma_{t,g}$ is the total interaction term in group $g$, $\psi_g(\vr,\vo)$ is the angular flux in group $g$. On the right-hand side, the scattering operator is present. Without loss of generality for the purpose of this paper, we limit ourselves to isotropic scattering for brevity. $S_{ext,g}$ is the external source. This forms a system of $G$ coupled transport equations. The scalar flux is defined as:
+\begin{equation}
+\label{def_scalar_flux}
+\phi_g(\vr) = \int_{4\pi}d\Omega' \psi_g(\vr,\vo').
+\end{equation}
+Next, Eq.\eqref{multigroup} discretized in angle using the discrete ordinates ($S_N$) method \cite{miller_book}, whereby an angular quadrature $\left( \vo_m, w_m \right)_{1 \le m \le M}$ is used to solve the above equations along a given set of directions $\vo_m$:
 \begin{equation}
 \vo_m \cdot \vec \nabla \psi_{g,m}(\vr) +\Sigma_{t,g}(\vr) \psi_{g,m}(\vr)  = \frac{1}{4\pi}\sum_{g^{\prime}}\Sigma_{s,g^{\prime}\to g}(\vr)\phi_{g^{\prime}}(\vr) + S_{ext,g,m}(\vr),
 \label{angle}
 \end{equation}
-where the subscript $m$ is introduced to denote the angular flux in direction $m$. In order to evaluate the scalar flux, we employ the angular weights $w_m$ and the angular flux solutions
-$\psi_m$ to numerically perform the angular integration:
+where the subscript $m$ is introduced to denote the angular flux in direction $m$. Angular integration is replaced by a numerical quadrature
 \begin{equation}
 \label{def_scalar_flux_2}
 \phi_g(\vr) \approx \sum_{m=1}^{m=M} w_m \psi_{g,m}(\vr).
 \end{equation}
-
-At this point, it is clear that we are solving a sequence of transport equations for one group and direction at a time. Therefore, all transport equations take the following form:
+If one lags the evaluation of the scattering term in the right-hand side of Eq.\eqref{multigroup} (as in done, for instance, in the source iteration technique \cite{SI}), then it is apparent that the fundamental unit of work in solving the transport equation consists in being able to solve efficiently advection/reaction-type equations of the following form:
 \begin{equation}
-\vo_m \cdot \vec \nabla \psi_{m}(\vr) +\Sigma_{t}(\vr) \psi_{m}(\vr)  = \frac{1}{4\pi}\Sigma_{s}(\vr)\phi(\vr) + q^{ext+inscat}_m(\vr) = q_m(\vr),
+\vo_m \cdot \vec \nabla \psi_{m}^{(\ell+1)}(\vr) +\Sigma_{t}(\vr) \psi_{m}^{(\ell+1)}(\vr)  = \frac{1}{4\pi}\Sigma_{s}(\vr)\phi^{(\ell)}(\vr) + q^{ext}_m(\vr) = q_m(\vr),
+\label{eq:one-group-transport}
 \end{equation}
-where the group index is omitted for brevity.
+with $\ell$ the source iteration index.
 
-In order to obtain the solution for this discrete form of the transport equation, an iterative process, source iteration, is introduced. This is shown in Eq. ~\ref{iteration}:
-\begin{equation}
-\vo_m \cdot \vec\nabla \psi_m^{(l+1)}(\vr) + \Sigma_t \psi_m^{(l+1)}(\vr) = q_m^{(l)}(\vr),
-\label{iteration}
-\end{equation}
-where the right hand side terms of Eq.~\ref{angle} have been combined into one general source term, $q_m$. The angular flux of iteration $(l+1)$ is calculated using the $(l^{th})$ value of the total source.
-
-After the angular and energy dependencies have been accounted for, Eq.~\ref{iteration} must be discretized in space as well. This is done by meshing the domain and utilizing one of three popular discretization techniques: finite difference \cite{fd}, finite volume \cite{fd}, or discontinuous finite element \cite{Reed}, allowing one cell at a time to be solved. The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Figure~\ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
-
+After the energy and angular discretizations, Eq.~\eqref{eq:one-group-transport} is discretized in space. Here we employ discontinuous finite elements, which enables solving the transport problem of Eq.~\eqref{eq:one-group-transport} one cell at a time, flowing the flow of radiation in each direction $\vo_m$ (note that finite differences and finite volume techniques allows for transport sweeps too).
+The solution across a cell interface is connected based on an upwind approach, where face outflow radiation becomes face inflow radiation for the downwind cells. Figure~\ref{sweeps} shows the sweep ordering for a given direction on both a structured and unstructured mesh.
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{../figures/UnstructuredMesh.pdf}
-\includegraphics[scale = 0.5]{../figures/StructuredMesh.pdf}
-\caption{A demonstration of a sweep on structured and unstructured meshes. }
+\includegraphics[scale=0.4]{../figures/UnstructuredMesh.pdf}
+\includegraphics[scale = 0.4]{../figures/StructuredMesh.pdf}
+\caption{A demonstration of a sweep on structured and unstructured meshes. The number in each cell represents the order in which the cells are solved.}
 \label{sweeps}
 \end{figure}
+% All cells must receive the solution from downwind cells before their solution can be obtained.
 
-The number in each cell represents the order in which the cells are solved.
-All cells must receive the solution from downwind cells before their solution can be obtained.
-
+\tcr{this should not be here in a paper but at the beginning of the next section}
 The transport sweep can be parallelized in order to mitigate memory costs and obtain solutions in a reasonable time for large problems. Chapter \ref{cha:parallel_transport} describes the basics of a parallel sweep algorithm and details two algorithms: The KBA algorithm \cite{KBA} and PDT's extension of the KBA algorithm \cite{mpadams2013,mpadams2015,mpadamsjcp}.
 
-\section{The parallel transport sweep}\label{cha:parallel_transport}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Parallel transport sweeps on structured grids}\label{cha:parallel_transport}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tcr{everything from here all the way to Section 3.3 included needs to be severely reduced. You need to give the essence of what KBA partition is and PDT's extensions. It should be a detailed description, but clearly not as heavy as the one you have. currently, you have about 4 pages of text and almost 1 full page of figures. I think this should be reduced in a cohesive fashion to 1-1.5 pages of text and maybe no figures. Formulas are OK and defining terms that you will be using later is OK and recommended here but nothing beyond that as it will be superfluous.
+Basically, I recommend the following sub-sections here:
+\begin{enumerate}
+\item General concepts that will make parallelization doable/feasible for transport sweeps. This is kind of a lay of the land and introduced+foreshadows the other subsections.
+\item Example of the KBA algo
+\item PDT's extension of KBA and comparison of both algos (similarities/improvements in PDT's). Maybe a bit of PDT's performance model.
+\end{enumerate}
+}
+
 As mentioned in Chapter \ref{cha:transport_sweeps}, a transport sweep is set up by overlaying a domain with a finite element mesh and solving the transport equation cell by cell using a discontinuous finite element approach. A transport sweep can be solved in parallel in order to obtain the solution faster, as well as distribute the problem across many processors for memory intensive problems.
 
 In PDT, a transport sweep can be performed on a structured Cartesian or arbitrary polyhedral mesh. Sweeping on an unstructured mesh presents two challenges: maintaining sweep efficiency on a massively parallel scale and keeping non-concave sub-domains to avoid cycles. PDT has already proven the ability to perform massively parallel transport sweeps on structured meshes. As part of previous efforts in PDT, researchers have outlined three important properties for parallel sweeps.
@@ -271,7 +273,9 @@ where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the
 
 Before expanding on the proposed method of partitioning and scheduling for parallel transport sweeps, a quick review of two parallel transport sweep algorithms is necessary. This dissertation's method will expand on PDT's sweep algorithm \cite{mpadams2013,mpadams2015,mpadamsjcp}, which is an extension of the popular KBA algorithm \cite{KBA}.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The KBA Algorithm}\label{sec:KBA}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Several parallel transport sweep codes use KBA partitioning in their sweeping, such as Denovo \cite{denovo} and PARTISN \cite{partisn}. The KBA partitioning scheme and algorithm was developed by Koch, Baker, and Alcouffe \cite{KBA}.
 
@@ -307,7 +311,9 @@ The KBA parallel efficiency for ``simultaneous in angle, successive in quadrant'
 \end{equation}
 For each octant-pair, the idle time is $P_x + P_y - 2$, and if the successive octant-pairs don't start until the previous octant pair finishes, then the total idle time is $4(P_x + P_y - 2)$.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{PDT's Extension of KBA}\label {pdt_extension}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 PDT's extension of KBA does not limit $P_z, A_m, G,$ or $A_g$. In addition, all 8 octants (4 quadrants in 2D) begin work immediately. Unlike KBA, PDT's scheduling requires conflict resolution in its algorithm, as the pipelines from all octants will end up colliding toward the middle of the processor domain.
 
@@ -358,7 +364,9 @@ Setting $A_m = A_g = 1$ to match traditional KBA aggregation parameters, Eq. \re
 
 If we set Eq. \ref{large_p_kba} equal to Eq. \ref{large_p_opt}, we see that in the limit of a large number of processors $P$, the optimal algorithm yields the same efficiency as KBA with 32 times as many processors \cite{mpadams2013, mpadams2015,mpadamsjcp}.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{PDT's Performance Model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 To aid in the selection of optimal processor and aggregation parameters, PDT uses a performance model to estimate the sweep time.
 This performance model is the basis for the cost function described in Chapter \ref{cha:tts}.
@@ -386,7 +394,18 @@ where:
 
 A comparison between this performance model and the time-to-solution estimator will be shown in Chapter \ref{cha:tts}. Before this, we motivate the need for the time-to-solution estimator in Chapter \ref{cha:lb} by describing unstructured meshes in PDT and how we load balance them.
 
-\subsection{Unstructured meshing and load balancing in PDT}\label{cha:lb}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Evaluation of existing partitioning strategies for parallel transport sweeps in unstructured grids}\label{cha:lb}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tcr{Starting here, I think you should started a new Section. It should have the following subsections:
+\begin{enumerate}
+\item General ideas of how PDT's does its unstructured grid partitioning. This is kind of a lay of the land and introduced+foreshadows the other subsections.
+\item Principle of mesh cutting for the purposes of parallel partitioning. 
+\item Current load balancing strategies (LB and LBD -due to issues with standard LB). You have some numerical examples so maybe a few can stay here.
+\end{enumerate}
+I think this should be no more than 5-6 pages. Currently, from 3.4 until section 4 (excluded), you have 11 pages.
+}
+ 
 Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions (or different amounts of cells per processor), causing longer and unmanageable runtimes.
 
 To combat imbalanced partitions, two load balancing algorithms were implemented, referred to in this thesis as the original load-balancing algorithm \cite{mastersthesis,mc2017} and the load-balancing-by-dimension algorithm.
@@ -445,8 +464,10 @@ f_{Z} = \frac{\underset{k}{\text{max}}[\sum_{i,j} N_{ijk}]}{\frac{N_{tot}}{K}},
 where $K$ is the total number of z-planes.
 Equation \ref{f_z} is a metric defining how imbalanced the problem's planes are. It calculates the maximum cells per plane divided by the average cells per plane. If $f_K$ is greater than a predefined tolerance, the z cut planes are redistributed using the process in Fig.~\ref{redistribute}.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Original Load-Balancing Algorithm}
 \label{sec:og_lb}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The initial approach to load balancing was implemented on 2D extruded meshes, meaning the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. The metrics for this algorithm are defined as follows:
 \begin{align}
@@ -495,8 +516,10 @@ f= \frac{N}{(MN+C)/M^2} \xrightarrow{N\to \infty} \frac{N}{N/M} = M.
 \end{equation}
 Due to this theoretical limit, the load-balancing-by-dimension algorithm was developed.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Load-Balancing-by-Dimension Algorithm}
 \label{sec:lbd}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The load-balancing-by-dimension by dimension (LBD) algorithm, similar to the original load-balancing algorithm, relies on the movement of cut lines/planes to redistribute mesh cells in a more balanced manner.
 However, cut lines are no longer required to go all the way through the mesh, and the load-balancing-by-dimension algorithm is fully extensible to 3 dimensions.
@@ -577,11 +600,15 @@ Figure~\ref{alg_illustration} illustrates the behavior of both algorithms after 
 \label{alg_illustration}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Parametric Study of the Original Load Balancing and the Load-Balancing-by-Dimension Algorithms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 To study the behavior and effectiveness of both the original load balancing and the load-balancing-by-dimension algorithm, a parametric study was run on the mesh shown in Fig.~\ref{partitioning_example}.
 This mesh was chosen because it is inherently imbalanced as there are two dense geometric features in opposing corners with a sparse region in between.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Parametric study on the unbalanced pin mesh}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The study calculates $f$ for the mesh with no load balancing iterations, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations.
 The mesh is partitioned into 2 to 10 subsets in each dimension for all load balancing formats.
@@ -643,7 +670,9 @@ There is consistent improvement for both algorithms for all cases, and the impro
 \end{table}
 
 \FloatBarrier
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Parametric study on the Level-2 experiment mesh}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The same parametric study was run on an experiment that PDT simulates, the Level-2 experiment, shown in Fig.~\ref{level2_nocut_lbchapter}.
 \begin{figure}[ht]
@@ -737,7 +766,22 @@ However, PDT's performance model does not account for unstructured meshes or imb
 In addition, theoretical studies showed that well balanced partitions when using the load-balancing-by-dimension algorithm did not always translate to a better sweep time.
 These two reasons motivated the development of a time-to-solution estimator that can estimate the sweep time for a problem given a partitioning scheme ($P_i, A_i$) regardless of mesh type. The time-to-solution estimator is described in Chapter \ref{cha:tts}.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The time-to-solution estimator}\label{cha:tts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tcr{You have 38 pages from here on out. Way too many... First, we need a new name for this Section. How about: A time-to-solution weighted approach to partitioning on unstructured grids.
+\begin{enumerate}
+\item General ideas of what we want to do. Again, it kind introduces the other subsections.
+\item Weighted task-dependent graphs for unstructured grid partitioning. Here, you first talk about the TDG and why/how to weight them. Then onto some of the details of the time-to-solution estimator. However, you say way too much. to guide you, I think the following figures need to be yanked out: 13, 14, 15, 16, (not sure about 17 but if we can convey the meaning without a visual aid, yes, remove it), 18, 19, 20, 21, 22. So that's a lot of figures out. This should tell you that a lot of condensing is to happen so extract the essence of the method, not every single detail as in a thesis/dissertation. I think Fig. 24 is not useful either, so out. Likewise for Fig. 25. Maybe 26 can stay. 
+\item So the previous section should have appropriate sub-sections. I didn't work them out. Please take a crack at those subsections.
+\item After that, you should have a Results subsection that discusses some of the results, before we move on tot he last Section (optimization strategies). Here are some result figures that are NOT necessary: 28, 30 (not all graphs in 29,31, 33 are needed either), 32, 34, 35. If you jsut state how that verification was done (uniformly weighted graph which should be exactly = tp PDT's perf model and it was; that's good enough. A sample of the grid types, not 4 graphs per type, is enough as well). result you should keep: fig 36--38. not sure about 39--43, maybe only 41--43 only?.  
+\end{enumerate}
+I think this should be no more than 5-6 pages. Currently, from 3.4 until section 4 (excluded), you have 11 pages.
+}
+
+
 With the introduction of unstructured meshes and imbalanced partitions in PDT, we need an expansion of the performance model to estimate the sweep time.
 In addition, before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme.
 The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This chapter will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies.
@@ -746,7 +790,9 @@ The time-to-solution estimator is written in Python 3. Python was chosen as the 
 This library gives us a wide variety of graph mathematics and is easy to use.
 Before detailing the time-to-solution estimator's methodology, a description of the applicable basic graph theory is necessary.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Graph Theory Applicable to the Time-to-Solution Estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Graph theory is a subset of mathematics that focuses on graphs, or structures containing a set of objects that are connected in a particular manner \cite{graphtheory}.
 These objects are called vertices (or nodes), and are connected by edges.
@@ -810,6 +856,7 @@ Now that the applicable graph theory has been reviewed, we detail the methodolog
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 The time-to-solution estimator determines the time to sweep across a domain for a given partitioning scheme by:
 \begin{enumerate}
 	\item Building an adjacency matrix,
@@ -821,7 +868,9 @@ The time-to-solution estimator determines the time to sweep across a domain for 
 	\item Calculating the time to solution.
 \end{enumerate}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Building the adjacency matrices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Before building the graph for each quadrant/octant, an adjacency matrix must be built for a given partitioning scheme. The partitioning scheme is the cut lines/planes that partition the mesh into subsets, which correspond to the processor layout.
 The adjacency matrix provides connectivity information for each subset to its neighboring subset.
@@ -854,7 +903,9 @@ $\begin{pmatrix}
 \label{25basematrix}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Building the directed acyclic graphs (DAGs)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The adjacency matrices give us directed connectivity information in order to build our graphs and are built using networkx's DiGraph function to build the DAGs.
 
@@ -965,7 +1016,9 @@ Upon inspection of these two DAGs, we see that they show the expected connectivi
 Quadrant 1 starts its sweep from subset 2, finishing at subset 6, and quadrant 2 starts its sweep from subset 6, finishing at subset 2.
 
 %Weighting the TDGS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Weighting the task dependence graphs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Each graph is weighted to reflect the solve time and communication time of each node to its neighbors. Explicitly, the edge weight between node A and node B represents the solve time of node A added to the time it takes to communicate boundary information from nod A to node B. Equation \ref{weight_function} shows how the weights are calculated:
 \begin{equation}
@@ -1057,7 +1110,9 @@ With confidence in the cell count per subset in the time-to-solution estimator m
 With this information, we compute all weights in each graph according to Eq. \ref{weight_function}.
 Once graphs are weighted, we add and modify edge weights for the number of angles pipelined per octant/quadrant.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Adding graphs for angular pipelining}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 If there are angles to be pipelined, the time-to-solution estimator adds a new set of graphs for each additional angle to be pipelined. For example, if there are two anglesets per octant, this would results in 16 graphs, or 1 graph per octant per angleset. Figure~\ref{angular_pipeline} shows the graphs for two anglesets for a quadrant. A ``dummy'' node with a value of -2 is added in order to have an incoming edge for the first subset's node. The value of this incoming edge represents when that angleset starts its sweep.
 \begin{figure}[H]
@@ -1073,7 +1128,9 @@ If there are angles to be pipelined, the time-to-solution estimator adds a new s
 \label{angular_pipeline}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Modifying the weights of each graph to reflect a universal timescale}\label{sec:universal}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Once we have our full set of graphs with angular pipelining accounted for, we set up each graph to reflect a universal timescale, with the goal of knowing when each node in each graph is ready to solve.
 For each node in each graph, we:
@@ -1096,7 +1153,9 @@ The incoming edges to each node in each graph now reflect the time at which a no
    \label{universal}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Modifying the weights of each graph to reflect conflict resolution}\label{sec:conflict}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 At this point in the time-to-solution estimation process, we have a graph per octant/quadrant per angleset, with each graph weighted on a universal time scale.
 For each node in every graph, the incoming edges to the node represent the time $t$ that it is ready to solve at.
@@ -1123,11 +1182,15 @@ In the case of a tie in the depth-of-graph remaining, the graph with the priorit
 \end{enumerate}
 The delay is once again added to the applicable edge's weight and all downstream edges' weights.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Estimating the final time-to-solution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Once all graphs have had their weights modified for conflicts, the graphs now reflect a schedule. The incoming edges to each node in each graph represent what time they are ready to solve. The final weight (the outgoing edge of the final subset) in each graph represents the time it takes for that graph to sweep across its domain. The maximum final weight across all graphs represents the estimate for the time-to-solution for the problem.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{2D Verification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 A theoretical study in 2D is run to verify the time-to-solution estimator for 2D partitioning schemes with perfectly balanced partitions. The test problems are verified against a code written by Jean Ragusa that uses a depth-of-graph with an octant priority tie breaker scheduler in two dimensions. The verification study consists of the following problems:
 \begin{enumerate}
@@ -1141,7 +1204,9 @@ A theoretical study in 2D is run to verify the time-to-solution estimator for 2D
 
 Figures \ref{regular_partitions}, \ref{mild_random_partitions}, \ref{random_partitions}, \ref{worst_partitions} show the four partitioning schemes and Figs. \ref{regular_verification}, \ref{mild_random_verification}, \ref{random_verification}, \ref{worst_verification} show the results of the verification study for each partitioning scheme. In the results, a stage is defined as the time it takes to solve all cells in a subset for an angle, and communicate the boundary information to neighboring subsets.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Regular partitions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Figure~\ref{regular_partitions} shows four examples of the regular partitioning scheme used for the first part of the verification study. Cut lines in both dimensions go all the way across the domain. This reflects the partitioning scheme after the original load balancing algorithm described in Section \ref{sec:og_lb} is used.
 
@@ -1183,7 +1248,9 @@ Using regular partitions as shown in Fig.~\ref{regular_partitions}, the first po
 \label{regular_verification}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{``Mildly random'' partitions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Figure~\ref{mild_random_partitions} shows four examples of the ``mildly random'' partitioning scheme used for the second part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 
 %Mild random partitions
@@ -1223,7 +1290,9 @@ Using``mildly random'' partitions as shown in Fig.~\ref{mild_random_partitions},
 \label{mild_random_verification}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Random partitions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Random partitions
 Figure~\ref{random_partitions} shows four examples of the ``random'' partitioning scheme used for the third part of the verification study. Cut lines in the x dimension go all the way across the domain, but are not necessarily uniformly distributed. The cut lines in y are randomly distributed in each column.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 \begin{figure}[H]
@@ -1262,7 +1331,9 @@ Using ``random'' partitions as shown in Fig.~\ref{random_partitions}, the third 
 \label{random_verification}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Probable worst-case partitions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Figure~\ref{worst_partitions} shows four examples of the probable worst-case partitioning scheme used for the final part of the verification study. Cut lines in the x dimension go all the way across the domain, and are uniformly distributed. The cut lines in y are distributed on opposing ends of alternating columns.This reflects a possible partitioning scheme after the load balancing by dimension algorithm described in Section \ref{sec:lbd} is used.
 \begin{figure}[H]
 \centering
@@ -1298,7 +1369,9 @@ Using probable worst-case partitions as shown in Fig.~\ref{worst_partitions}, th
 \label{worst_verification}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{3D Verification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 PDT's performance model is used to verify stage counts for 3D problems with regular grids.
 Figure~\ref{3d_verification} shows PDT's performance model stage counts are in perfect agreement with the time-to-solution estimator's stage counts for 2\textsuperscript{3} to 10\textsuperscript{3} subsets and from 1 to 6 angles per octant.
 
@@ -1310,7 +1383,9 @@ Figure~\ref{3d_verification} shows PDT's performance model stage counts are in p
 \end{figure}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{PDT's Performance Model vs. Time-to-Solution Estimator}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 PDT has run a scaling suite out to 90,112 cores on the Quartz supercomputer \cite{quartz} at Lawrence Livermore National Lab (LLNL).
 A smaller scaling suite, tabulated in Table \ref{scaling_suite} is the first benchmark case run for the time-to-solution estimator.
@@ -1345,7 +1420,7 @@ The following machine parameters were generated and used for the 1 group suite:
 Figure~\ref{scaling_stagecount} shows the stage counts of the scaling suite for PDT's performance model and the time-to-solution estimator are in perfect agreement.
 Figures \ref{weak_scaling_tts_sweep} and \ref{weak_scaling_tts} show the time per sweep and parallel efficiency for (1) PDT, (2) the PDT performance model, and (3) the time-to-solution estimator. Table \ref{scaling_percent_diff} tabulates the percent differences for (1) PDT and the performance model, (2) the performance model, and (3) the time-to-solution estimator, and PDT and the time-to-solution estimator.
 
-It is noteable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is certainly in part due to the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D).
+It is notable that the time-to-solution estimator consistently returns a smaller sweep time value than PDT's performance model. This is certainly in part due to the assumption from PDT's performance model that each processors at each stage communicate to the same amount of neighbors (three neighbors in 3D, 2 in 2D).
 In reality, this is not the case, as processors in the corners of the domain will communicate to fewer neighbors for certain directions, and the final processor for a direction does not communicate to any neighbors (as it has no successors).
 Because the stage counts for the performance model and time-to-solution estimator are in perfect agreement (as shown in Fig.~\ref{scaling_stagecount}), we know that this slight overestimation of the performance model is a reason for its consistently higher sweep times.
 Even given these differences, the time-to-solution estimator is consistently within 4\% of the performance model, as tabulated in Table \ref{scaling_percent_diff}.
@@ -1389,7 +1464,9 @@ Figure~\ref{weak_scaling_tts} shows PDT's performance model and the time-to-solu
 \end{tabular}
 \end{table}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{PDT vs. Time-to-Solution Estimator for Unstructured Meshes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The motivation to develop the time-to-solution estimator was born out of the desire to predict sweep time for unstructured meshes.
 To test how the time-to-solution estimator performs on unstructured problems, we use the meshes from our load balancing parametric study: the unbalanced pin mesh(Fig. \ref{partitioning_example}) and the Level-2 experiment mesh (Fig. \ref{level2_nocut_lbchapter}).
@@ -1410,7 +1487,10 @@ This allows us to filter out outlying values due to supercomputer noise by takin
 For each result in PDT, the median sweep time value, the maximum sweep time value, and the minimum sweep time value are plotted to showcase the outlying values that can occur.
 In order to minimize the effects of the sweep overhead on the timing statistics, the solve time per sweep is calculated from the mean time of ten transport sweeps for each case.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{PDT vs. the time-to-solution estimator for the unbalanced pin mesh}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 Figure~\ref{comp_reg_spiderweb} shows the sweep times for PDT and the time-to-solution estimator for the unbalanced pin mesh with 2 to 10 subsets in each dimension with regular cuts.
 Table \ref{diff_reg_spiderweb} tabulates the percent difference between PDT and the time-to-solution estimator for each of the regular test cases run.
 We notice that there is better agreement for cases where there are more unknowns.
@@ -1551,7 +1631,9 @@ The low core cases disagree once more, likely due to an overestimation of the la
 Properly characterizing the latency for individual core counts is likely to improve agreement at low core counts. 
 
 \FloatBarrier
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{PDT vs. the time-to-solution estimator for the Level-2 experiment mesh}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Figures \ref{level2_42x13} and \ref{level2_42x13_balanced} show the mesh for the Level-2 experiment with 42 subsets in $x$, and 13 subsets in $y$ with evenly spaced cut lines and balanced cut lines.
 The balanced mesh was ``hand-balanced'' by Marvin Adams, Michael Adams, and Jan Vermaak to achieve better load balancing than the automated load balancing algorithm was able to achieve.
 \begin{figure}[H]
@@ -1601,12 +1683,26 @@ The data generated for the scaling suite was done during dedicated access time, 
 Additionally, the machine parameters were generated empirically using a serial suite of structured mesh problems.
 In the future, obtaining machine parameters should be attempted using unstructured meshes, and agreement between PDT and the time-to-solution estimator restudied.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Choosing optimal partitions}\label{cha:optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tcr{
+\begin{enumerate}
+\item a short paragraph to introduce the rationale + the subsequent subsections.
+\item we need to organize the discourse (logical flow of information we give). I generally like the data but it needs to be shrunk. examples of figures I can live WITHOUT: 49--50.
+\item We have 9 pages here. I think 5-7 is better.
+\end{enumerate}
+}
 In Chapter \ref{cha:tts}, we have seen that we can estimate the time-to-solution for a sweep for different partitioning schemes.
 We use the time-to-solution estimator as the objective function in two optimization methods.
 The first optimization method utilizes scipy's optimize library, and the second method utilizes knowledge of a problem's mesh layout to assist in partition placement.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Scipy Optimize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 The scipy optimize library \cite{scipy} provides many tools for optimizing an input function with local and global minimization techniques.
 Our usage of the optimize library relies on the minimize function, using the basinhopping \cite{basinhoppingwales} method as the global optimizer, and the constrained Nelder-Mead method as the local optimizer.
 We need a global optimization method for larger problem spaces to ensure that cut planes/lines are getting optimized over the entirety of the problem domain, rather than just moving the cut planes/lines close to our initial guess.
@@ -1615,7 +1711,9 @@ The black box tools of scipy optimize are too dependent on the smoothness of the
 The time-to-solution estimator is not easily differentiable, and therefore not a smooth enough function even for the parameter spaces of a domain decomposed into 3 subsets in each dimension.
 Although utilizing a tested and documented optimizer would have been ideal, it is clear that we need a method more uniquely suited for our problem.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{CDF Optimization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The ``black box'' method using scipy optimize's basinhopping and constrained Nelder-Mead minimizers crashes except for very small parameter spaces.
 However, even with modestly large parameter spaces such as the one seen in the Level-2 experiment (Fig. \ref{level2_nocut}), the time-to-solution estimator function is not smooth enough for scipy optimize to honor the constraints or bounds of the problem, leading to the time-to-solution estimator crashing.
@@ -1641,7 +1739,9 @@ The CDF optimization method will:
   \item Run all iterations of cut lines selected.
 \end{enumerate}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Finding the most suitable natural boundaries}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In order to identify natural boundaries, we analyze the detailed cumulative distribution function (CDF) of the vertices in each dimension. The jumps in the CDF correspond to natural boundaries. Figure~\ref{vert_cdf} shows the x-vertex CDF of the mesh in Fig.~\ref{natural_boundary_example}.
 \begin{figure}[h]
@@ -1687,7 +1787,9 @@ Rather than test against every possible natural boundary, we pull a subset of di
 This prevents from unnecessarily testing small jumps that only have natural boundaries through a very small portion of the mesh.
 
 \FloatBarrier
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Finding natural boundaries for sets of columns}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 In order to globalize the optimization of the cut lines per column, we set up a binary tree of test cases, such as the one shown in Fig.~\ref{binary_tree}. Each layer in the tree represents one set of $y$ cut lines. The first layer, or the root of the tree, represents the case where we try and find the natural boundaries in $y$ throughout all columns, in this case 4 columns. The next layer tries to find two sets of natural boundaries, one set of natural $y$ boundaries through the first two columns, and another set through the final 2 columns. Finally, the last case finds a set of natural $y$ boundaries in each individual column.
 
 \begin{figure}[h]
@@ -1742,7 +1844,9 @@ With this method, we are also not running the time-to-solution estimator a large
 
 \FloatBarrier
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Optimization Results}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The results reported utilize the second ``snapping'' method, where cuts are snapped to a discontinuity that takes into account how close a discontinuity is, as well as the magnitude of the discontinuity.
 This method always outperformed the first method of snapping cuts to the largest discontinuities in the derivative of the CDF.
@@ -1852,12 +1956,19 @@ d = \underset{i \in \text{pool}}{\text{min}} \frac{|x^{*} - x_i|^{\alpha}}{J_i}
 \end{equation}
 where $\alpha$ is a parameter that can vary the importance of the distance between a balanced cut and a natural boundary relative to the magnitude. An $\alpha$ value that is less than one would weight the magnitude of the discontinuity in the derivative more heavily, and an $\alpha$ value greater than one would weight the distance between the two cuts more heavily than the magnitude.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\FloatBarrier
+\section{Conclusions and Outlook}
+\tcr{NEEDED}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \FloatBarrier
 \section*{Acknowledgments}
-Acknowledgments should be inserted at the end of the paper, before the
-references, not as a footnote to the title. Use the unnumbered
-Acknowledgements Head style for the Acknowledgments heading.
+\tcr{PSAAP AWARD \#}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{References}
 
 Please ensure that every reference cited in the text is also present in
@@ -1880,6 +1991,8 @@ references should be listed first alphabetically, then chronologically.
 \bibliographystyle{model1-num-names}
 \bibliography{myReference.bib}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%
