@@ -133,9 +133,13 @@ Radiation transport is described by the Boltzmann transport equation \cite{bell_
 
 The present papers deals with parallel solution techniques for the first-order form  of the $S_N$ transport equation. Hence, we consider the following discretizations of the transport equation: multigroup in energy, discrete-ordinates ($S_N$) in angle, and discontinuous finite elements in space. 
 The resulting discrete system of equations is amenable to iterative techniques, whereby the streaming+total interaction operator need not to be assembled, generating large memory savings while being computationally very efficient.  
-Essentially, this allows for a matrix-free approach, termed ``transport sweeps'' in the radiation transport community, where only small local systems of equations are solved cell-by-cell, for each angular direction and energy group, in a fashion that follows the flow of radiation in the computational mesh. After each transport sweep, the scattering source is updated and a new transport sweep is launched, an iterative process known as Source Iteration (SI). Alternatively to SI, the linear system can be recast of a sweep-preconditioned Krylov technique where, again, a transport sweep is necessary at each Krylov iteration.
+Essentially, this allows for a matrix-free approach, termed ``transport sweeps'' in the radiation transport community, where only small local systems of equations are solved cell-by-cell, for each angular direction and energy group, in a fashion that follows the flow of radiation in the computational mesh.
+After each transport sweep, the scattering source is updated and a new transport sweep is launched, an iterative process known as Source Iteration (SI).
+Alternatively to SI, the linear system can be recast as a sweep-preconditioned Krylov technique where, again, a transport sweep is necessary at each Krylov iteration.
 
-In the past, extensive research has been done in parallelizing transport sweeps for structured grids and good parallel performance was achieved \cite{KBA,partisn,denovo,mpadams2013,mpadams2015,adamsJCP2000}. \tcr{you should have a brief overview of prior work, including KBA, PDT}
+In the past, extensive research has been done in parallelizing transport sweeps for structured grids and good parallel performance was achieved \cite{KBA,partisn,denovo,mpadams2013,mpadams2015,mpadamsjcp}.
+The KBA algorithm \cite{KBA}  \cite{mpadams2013,mpadams2015,mpadamsjcp} 
+\tcr{you should have a brief overview of prior work, including KBA, PDT}
 Partitioning unstructured grids for transport sweeps remains an open topic of research. \tcr{here, you should have a brief overview of prior unstructured grid work, including Pautz and your own MS work}. \tcr{These reviews are just provide the gyst of the ideas other researchers have followed. Like an elevator pitch, you need to go straight to the point, no digression, no details. If you elect to go deeper into prior methods, if they are important for your own work, this happens in early Sections, after the introduction}.
 %Recently \cite{yourMSwork}, partitioning unstructured grids in a balanced fashion (i.e., with equivalent amounts of work per processor) can present challenges.
 
@@ -204,38 +208,35 @@ The solution across a cell interface is connected based on an upwind approach, w
 \end{figure}
 % All cells must receive the solution from downwind cells before their solution can be obtained.
 
-\tcr{this should not be here in a paper but at the beginning of the next section}
-The transport sweep can be parallelized in order to mitigate memory costs and obtain solutions in a reasonable time for large problems. Chapter \ref{cha:parallel_transport} describes the basics of a parallel sweep algorithm and details two algorithms: The KBA algorithm \cite{KBA} and PDT's extension of the KBA algorithm \cite{mpadams2013,mpadams2015,mpadamsjcp}.
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Parallel transport sweeps on structured grids}\label{cha:parallel_transport}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\tcr{everything from here all the way to Section 3.3 included needs to be severely reduced. You need to give the essence of what KBA partition is and PDT's extensions. It should be a detailed description, but clearly not as heavy as the one you have. currently, you have about 4 pages of text and almost 1 full page of figures. I think this should be reduced in a cohesive fashion to 1-1.5 pages of text and maybe no figures. Formulas are OK and defining terms that you will be using later is OK and recommended here but nothing beyond that as it will be superfluous.
-Basically, I recommend the following sub-sections here:
-\begin{enumerate}
-\item General concepts that will make parallelization doable/feasible for transport sweeps. This is kind of a lay of the land and introduced+foreshadows the other subsections.
-\item Example of the KBA algo
-\item PDT's extension of KBA and comparison of both algos (similarities/improvements in PDT's). Maybe a bit of PDT's performance model.
-\end{enumerate}
-}
+%\tcr{everything from here all the way to Section 3.3 included needs to be severely reduced. You need to give the essence of what KBA partition is and PDT's extensions. It should be a detailed description, but clearly not as heavy as the one you have. currently, you have about 4 pages of text and almost 1 full page of figures. I think this should be reduced in a cohesive fashion to 1-1.5 pages of text and maybe no figures. Formulas are OK and defining terms that you will be using later is OK and recommended here but nothing beyond that as it will be superfluous.
+%Basically, I recommend the following sub-sections here:
+%\begin{enumerate}
+%\item General concepts that will make parallelization doable/feasible for transport sweeps. This is kind of a lay of the land and introduced+foreshadows the other subsections.
+%\item Example of the KBA algo
+%\item PDT's extension of KBA and comparison of both algos (similarities/improvements in PDT's). Maybe a bit of PDT's performance model.
+%\end{enumerate}
+%}
 
-As mentioned in Chapter \ref{cha:transport_sweeps}, a transport sweep is set up by overlaying a domain with a finite element mesh and solving the transport equation cell by cell using a discontinuous finite element approach. A transport sweep can be solved in parallel in order to obtain the solution faster, as well as distribute the problem across many processors for memory intensive problems.
-
-In PDT, a transport sweep can be performed on a structured Cartesian or arbitrary polyhedral mesh. Sweeping on an unstructured mesh presents two challenges: maintaining sweep efficiency on a massively parallel scale and keeping non-concave sub-domains to avoid cycles. PDT has already proven the ability to perform massively parallel transport sweeps on structured meshes. As part of previous efforts in PDT, researchers have outlined three important properties for parallel sweeps.
-
+A transport sweep can be solved in parallel in order to obtain the solution faster, as well as distribute the problem across many processors to mitigate memory cost.
 A parallel sweep algorithm is defined by three properties \cite{mpadams2013} :
 \begin{itemize}
 \item partitioning: dividing the domain among available processors,
 \item aggregation: grouping cells, directions, and energy groups into tasks,
 \item scheduling: choosing which task to execute if more than one is available.
 \end{itemize}
-It is important to note that these properties apply after any cell-level cycles are broken, but partitioning can introduce cycles between processors.
 
-The basic concepts of parallel transport sweeps, partitioning, aggregation, and scheduling, are most easily described in the context of a  transport sweep that takes place on a structured Cartesian mesh. Furthermore, the work detailed in Chapters \ref{cha:lb} and \ref{cha:tts} utilize aspects of the structured transport sweep.
+These three properties are most easily described in the context of a  transport sweep that takes place on a structured Cartesian mesh.
+Furthermore, the work detailed in Chapters \ref{cha:lb} and \ref{cha:tts} utilize aspects of the structured transport sweep.
 
-In a regular grid, we have the  number of cells in each Cartesian direction: $N_x, N_y, N_z$. These cells are aggregated into ``cellsets'', using aggregation factors $A_x, A_y, A_z$. If $M$ is the number of angular directions per octant, $G$ is the total number of energy groups, and $N$ is the total number of cells, then the total fine-grain work units is $8MGN$. The factor of 8 is present as $M$ directions are swept for all 8 octants. We often discuss the directions in a sweep in terms of octant-pairs, or two octants that have opposing sweep ordering. This is an important concept that is discussed in Section \ref{sec:KBA}. The finest-grain work unit is the calculation of a single direction and energy group's unknowns in a single cell, or $\psi_{m,g}$ for a single cell.
+The number of cells in each Cartesian direction, $N_x, N_y, N_z$, are aggregated into ``cellsets'', using aggregation factors $A_x, A_y, A_z$.
+If $M$ is the number of angular directions per octant, $G$ is the total number of energy groups, and $N$ is the total number of cells, then the total fine-grain work units is $8MGN$.
+The factor of 8 is present as $M$ directions are swept for all 8 octants.
+The finest-grain work unit is the calculation of a single direction and energy group's unknowns in a single cell, or $\psi_{m,g}$ for a single cell.
 
 Fine-grain work units are aggregated into coarser-grained units called \textit{tasks}. A few terms are defined that describe how each variable is aggregated.
 \begin{itemize}
@@ -250,7 +251,9 @@ Fine-grain work units are aggregated into coarser-grained units called \textit{t
 
 It follows that each process owns $N_k$ cellsets (each of which is $A_z$ planes of $A_x A_y$ cells), $8N_m$ angle-sets, and $N_g$ group-sets for a total of $8N_m N_g N_k$ tasks.
 
-One task contains $A_x A_y A_z$ cells, $A_m$ directions, and $A_g$ groups. Equivalently, a task is the computation of one cellset, one groupset, and one angleset, with the completion of one task defined as a stage.  The stage is particularly important when assessing sweeps against analytical performance models.
+One task contains $A_x A_y A_z$ cells, $A_m$ directions, and $A_g$ groups.
+Equivalently, a task is the computation of one cellset, one groupset, and one angleset, with the completion of one task defined as a stage.
+The stage is particularly important when assessing sweeps against analytical performance models.
 Equation ~\ref{paralleleff} defines parallel sweep efficiency:
 \begin{equation}\label{paralleleff}
 \begin{split}
@@ -269,37 +272,27 @@ N_{\text{bytes}} &= (A_x A_y + A_x A_z + A_y A_z)A_g A_m upbc,
 T_{\text{task}} = A_x A_y A_z A_m A_g T_{\text{grind}},
 \label{Ttask}
 \end{equation}
-where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, $upbc$ is the unknowns per boundary cell (generally 2 for 2D and 4 for 3D) and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group. $M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency. Note that Eq. \ref{Ttask} is idealized as it does not take into account overhead in various parts of the sweep implementation.
-
-Before expanding on the proposed method of partitioning and scheduling for parallel transport sweeps, a quick review of two parallel transport sweep algorithms is necessary. This dissertation's method will expand on PDT's sweep algorithm \cite{mpadams2013,mpadams2015,mpadamsjcp}, which is an extension of the popular KBA algorithm \cite{KBA}.
+where $T_{\text{latency}}$ is the message latency time, $T_{\text{byte}}$ is the time required to send one byte of message, $N_{\text{bytes}}$ is the total number of bytes of information that a processor must communicate to its downstream neighbors at each stage, $upbc$ is the unknowns per boundary cell (generally 2 for 2D and 4 for 3D) and $T_{\text{grind}}$ is the time it takes to compute a single cell, direction, and energy group.
+$M_L$ is a latency parameter that is used to explore performance as a function of increased or decreased latency.
+Note that Eq. \ref{Ttask} is idealized as it does not take into account overhead in various parts of the sweep implementation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The KBA Algorithm}\label{sec:KBA}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Several parallel transport sweep codes use KBA partitioning in their sweeping, such as Denovo \cite{denovo} and PARTISN \cite{partisn}. The KBA partitioning scheme and algorithm was developed by Koch, Baker, and Alcouffe \cite{KBA}.
-
-The KBA algorithm traditionally chooses $P_z = 1, A_m = 1 \text{ (or 1 angle per angleset)}, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task. This partitions the domain into long, thin columns. With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks. The KBA algorithm traditionally solves a problem one energy group at a time, and uses a ``pipelining'' or assembly line approach. This allows for new angles in an octant to begin sweeping before old angles have fully swept across the spatial domain. Figure~\ref{pipeline_example} shows an example of pipelining the angular work of a quadrant.
-Figure~\ref{pipeline_example_3d} shows pipelining in the X-Z plane with $A_z = 1$.
-
-\begin{figure}[h]
-\centering
-\includegraphics[scale=0.7]{../figures/pipeline_example.pdf}
-\caption{An example showing the pipelining of angular work from the lower left quadrant.}
-\label{pipeline_example}
-\end{figure}
-\begin{figure}[h]
-\centering
-\includegraphics[scale=0.7,trim={0cm 1cm 0cm 0cm},clip]{../figures/pipeline_example_3d.pdf}
-\caption{An example showing pipelining in the X-Z plane with $A_z = 1$, $P_x = 2$ and $P_z = 1$.}
-\label{pipeline_example_3d}
-\end{figure}
-
-In Fig.~\ref{pipeline_example}, each square represents a processor that owns a group of $A_xA_y$ cells. We see that as soon as a processor is free to solve the next angle with the same sweep ordering, it begins immediately.
-Figure~\ref{pipeline_example_3d} shows us the X-Z plane of a processor layout with $P_x = 2$ and $P_z = 1$. We see $N_k=\frac{N_z = 5}{A_z = 1}=5$ planes in Z, and three angles pipelined. We notice as soon as a cellset of $A_xA_yA_z$ cells is free to solve the next angle with the same sweep ordering, it begins immediately.
+The KBA partitioning scheme and algorithm was developed by Koch, Baker, and Alcouffe \cite{KBA}.
+I traditionally chooses $P_z = 1, A_m = 1 \text{ (or 1 angle per angleset)}, G = A_g = 1, A_x = N_x/P_x, A_y = N_y/P_y$, with $A_z$ being the selectable number of z-planes to be aggregated into each task.
+This partitions the domain into long, thin columns.
+With $N_k = N_z/A_z$, each processor performs $N_{\text{tasks}} = 8MN_k$ tasks.
+The KBA algorithm traditionally solves a problem one energy group at a time, and uses a ``pipelining'' or assembly line approach.
+This allows for new angles in an octant to begin sweeping before old angles have fully swept across the spatial domain.
 KBA introduced pipelining in order to combat the inherent inefficiencies of waiting for all processors to complete a sweep in a direction before starting the next angle.
 
-There are two variants to the KBA algorithm, ``successive in angle, successive in quadrant", and ``simultaneous in angle, successive in quadrant".  With ``successive in angle, successive in quadrant", an octant pipelines its angular work, and once all directions are complete the opposing octant pipelines them back. This is then done for the remaining octant pairs. With ``simultaneous in angle, successive in quadrant", all angles from one octant are aggregated and solved rather than pipelined, and upon completion the opposing octant solves them. This is done either by aggregating angles, This is then done for the remaining octant pairs. The KBA parallel efficiency \cite{mpadams2013} for ``successive in angle, successive in quadrant" is:
+There are two variants to the KBA algorithm, ``successive in angle, successive in quadrant", and ``simultaneous in angle, successive in quadrant". 
+With ``successive in angle, successive in quadrant", an octant pipelines its angular work, and once all directions are complete the opposing octant pipelines them back.
+This is then done for the remaining octant pairs, or remaining octants that have opposing sweep ordering..
+With ``simultaneous in angle, successive in quadrant", all angles from one octant are aggregated and solved rather than pipelined, and upon completion the opposing octant solves them.
+This is done either by aggregating angles, This is then done for the remaining octant pairs. The KBA parallel efficiency \cite{mpadams2013} for ``successive in angle, successive in quadrant" is:
 \begin{equation}
   \epsilon_{KBA} = \frac{1}{[1 + \frac{4(P_x+P_y-2)}{8MN_k}][1 + \frac{T_{\text{comm}}}{T_{\text{{task}}}}]}.
   \label{eps_kba}
@@ -315,10 +308,11 @@ For each octant-pair, the idle time is $P_x + P_y - 2$, and if the successive oc
 \subsection{PDT's Extension of KBA}\label {pdt_extension}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-PDT's extension of KBA does not limit $P_z, A_m, G,$ or $A_g$. In addition, all 8 octants (4 quadrants in 2D) begin work immediately. Unlike KBA, PDT's scheduling requires conflict resolution in its algorithm, as the pipelines from all octants will end up colliding toward the middle of the processor domain.
+PDT's extension of KBA does not limit $P_z, A_m, G,$ or $A_g$. 
+In addition, all 8 octants (4 quadrants in 2D) begin work immediately.
+Unlike KBA, PDT's scheduling requires conflict resolution in its algorithm, as the pipelines from all octants will end up colliding toward the middle of the processor domain.
 
 If two or more tasks reach a processor at the same time, PDT employs a tie breaking strategy:
-
 \begin{enumerate}
 	\item The task with the greater depth-of-graph remaining (simply, more work remaining) goes first.
 	\item If the depth-of-graph remaining is tied, then octant-priority tie-breaking is used:
@@ -329,8 +323,9 @@ If two or more tasks reach a processor at the same time, PDT employs a tie break
 	\end{enumerate}
 \end{enumerate}
 
-Given these conflict resolution techniques, the minimum possible number of stages for given partitioning parameters $P_i$ and $A_j$ is $2N_{\text{fill}} + N_{\text{tasks}}$. $N_{\text{fill}}$ is both the minimum number of stages before a sweepfront can reach the center-most processors and the number needed to finish a direction's sweep after the center-most processors have finished. Equations \ref{nfill}, \ref{nidle}, and \ref{ntasks} define $N_{\text{fill}}, N_{\text{idle}}$, and $N_{\text{tasks}}$:
-
+Given these conflict resolution techniques, the minimum possible number of stages for given partitioning parameters $P_i$ and $A_j$ is $2N_{\text{fill}} + N_{\text{tasks}}$.
+$N_{\text{fill}}$ is both the minimum number of stages before a sweepfront can reach the center-most processors and the number needed to finish a direction's sweep after the center-most processors have finished.
+Equations \ref{nfill}, \ref{nidle}, and \ref{ntasks} define $N_{\text{fill}}, N_{\text{idle}}$, and $N_{\text{tasks}}$:
 \begin{align}
 N_\text{fill} = \frac{P_x + \delta_x}{2} - 1 + \frac{P_y + \delta_y}{2} - 1 + N_k (\frac{P_z + \delta_z}{2} - 1)\label{nfill} \\
 \delta_u = 0 \text{ or } 1 \text{ for $P_u$ even or odd, respectively} \nonumber
@@ -349,7 +344,6 @@ Plugging these definitions into Eq. \ref{paralleleff}, the PDT optimal parallel 
 	\label{eps_opt}
 \end{equation}
 
-Let us consider how many more processors the hybrid partitioning with optimal scheduling ($P_z = 2$) can use while yielding the same efficiency as KBA.
 Consider the limit of a large number of processors for both KBA and hybrid partioning with an optimal schedule.
 Equation \ref{large_p_kba} shows the KBA efficiency in the large-P limit with $P_x + P_y \approx 2P^{1/2}$.
 Setting $A_m = A_g = 1$ to match traditional KBA aggregation parameters, Eq. \ref{large_p_opt} shows the hybrid optimal efficiency in the large-P limit with $P_z = 2$ and $P_x + P_y \approx 2P^{1/2}$.
@@ -361,7 +355,6 @@ Setting $A_m = A_g = 1$ to match traditional KBA aggregation parameters, Eq. \re
   \epsilon_{opt,hybrid} \xrightarrow{\text{large P}} \frac{1}{[1 + \frac{\sqrt{2}P^{1/2}}{8MN_k}][ 1 +  \frac{T_{\text{comm}}}{T_{\text{task}}} ]}
   \label{large_p_opt}
 \end{equation}
-
 If we set Eq. \ref{large_p_kba} equal to Eq. \ref{large_p_opt}, we see that in the limit of a large number of processors $P$, the optimal algorithm yields the same efficiency as KBA with 32 times as many processors \cite{mpadams2013, mpadams2015,mpadamsjcp}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -370,7 +363,8 @@ If we set Eq. \ref{large_p_kba} equal to Eq. \ref{large_p_opt}, we see that in t
 
 To aid in the selection of optimal processor and aggregation parameters, PDT uses a performance model to estimate the sweep time.
 This performance model is the basis for the cost function described in Chapter \ref{cha:tts}.
-Equation \ref{sweep_time} calculates the sweep time by multiplying the time it takes to solve each stage by the number of stages. This is then multiplied by a multi-core fudge factor that estimates the performance drop-off from 1 to 8 cores due to parallel overhead.
+Equation \ref{sweep_time} calculates the sweep time by multiplying the time it takes to solve each stage by the number of stages.
+This is then multiplied by a multi-core fudge factor that estimates the performance drop-off from 1 to 8 cores due to parallel overhead.
 \begin{equation}
 \text{Sweep Time} = \text{mcff}\cdot[\text{num stages}\cdot(T_{wu} + 3\cdot \text{latency}\cdot M_L + T_{\text{byte}}\cdot N_{\text{bytes}} + N_{\text{cells}}\cdot ( T_c +  A_m\cdot (T_m + T_g)))],
 \label{sweep_time}
@@ -391,11 +385,10 @@ where:
   \item $T_m$ = the time spent solving angle-specific work,
   \item $T_g$ = the time spent solving group-specific work.
 \end{itemize}
-
-A comparison between this performance model and the time-to-solution estimator will be shown in Chapter \ref{cha:tts}. Before this, we motivate the need for the time-to-solution estimator in Chapter \ref{cha:lb} by describing unstructured meshes in PDT and how we load balance them.
+A comparison between this performance model and the time-to-solution estimator will be shown in Chapter \ref{cha:tts}. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Evaluation of existing partitioning strategies for parallel transport sweeps in unstructured grids}\label{cha:lb}
+\section{Evaluation of existing partitioning strategies for parallel transport sweeps in unstructured grids}\label{cha:lb}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \tcr{Starting here, I think you should started a new Section. It should have the following subsections:
 \begin{enumerate}
@@ -616,7 +609,8 @@ Figure~\ref{metric_study} shows the results of this parametric study.
 The results are tabulated in Table \ref{metric_study_table}.
 
 With regular cut lines going through the mesh, $f_\text{reg}$ generally increases as the number of subsets increases.
-As the number of cut lines increases, the number of cells added may also increase, driving up the maximum number of cells in each subset. It is important to note that in Eq. \ref{metric_def}, the average number of cells per subset used to calculate $f$ is the average number of cells per subset \textit{before} slicing through the mesh.
+As the number of cut lines increases, the number of cells added may also increase, driving up the maximum number of cells in each subset. 
+It is important to note that in Eq. \ref{metric_def}, the average number of cells per subset used to calculate $f$ is the average number of cells per subset \textit{before} slicing through the mesh.
 With more cut lines, the maximum number of cells per subset will increase while the average number of cells per subset will decrease, leading to an increase in $f$. There can be exceptions to this trend, as seen by ${f_\text{reg}}$ for 8 and 10 subsets in each dimension.
 The cut lines with 10 subsets in each dimension lie on natural boundaries when evenly distributed.
 A natural boundary is a mesh boundary that coincides with a subset boundary, adding no cells to the mesh.
@@ -796,7 +790,7 @@ Before detailing the time-to-solution estimator's methodology, a description of 
 
 Graph theory is a subset of mathematics that focuses on graphs, or structures containing a set of objects that are connected in a particular manner \cite{graphtheory}.
 These objects are called vertices (or nodes), and are connected by edges.
-Figure~\ref{basic_graph} shows an undirected graph of 4 nodes and 4 edges. The nodes are a mathematical abstraction that can be used to represent a variety of concepts. In this dissertation, they are used to represent the subsets described in Chapter \ref{cha:lb}.
+Figure~\ref{basic_graph} shows an undirected graph of 4 nodes and 4 edges. The nodes are a mathematical abstraction that can be used to represent a variety of concepts. In this paper, they are used to represent the subsets described in Chapter \ref{cha:lb}.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{../figures/undirected_graph.pdf}
@@ -811,7 +805,7 @@ If we add directional information to the edges of the graph in Fig.~\ref{basic_g
 \caption{A directed graph with 4 nodes and 4 edges. }
 \label{directed_graph}
 \end{figure}
-In this dissertation, we only use Directed Acyclic Graphs (DAGs), or a graph that has no cycles.  A cycle is defined as a path on a graph that starts and ends at the same vertex. Figure~\ref{cycle_example} shows a cycle between nodes 1 and 3.
+In this paper, we only use Directed Acyclic Graphs (DAGs), or a graph that has no cycles.  A cycle is defined as a path on a graph that starts and ends at the same vertex. Figure~\ref{cycle_example} shows a cycle between nodes 1 and 3.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{../figures/cycle_example.pdf}
