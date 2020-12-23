@@ -231,7 +231,7 @@ A parallel sweep algorithm is defined by three properties \cite{mpadams2013} :
 \end{itemize}
 
 These three properties are most easily described in the context of a  transport sweep that takes place on a structured Cartesian mesh.
-Furthermore, the work detailed in Chapters \ref{cha:lb} and \ref{cha:tts} utilize aspects of the structured transport sweep.
+Furthermore, the work detailed in Sections \ref{cha:lb} and \ref{cha:tts} utilize aspects of the structured transport sweep.
 
 The number of cells in each Cartesian direction, $N_x, N_y, N_z$, are aggregated into ``cellsets'', using aggregation factors $A_x, A_y, A_z$.
 If $M$ is the number of angular directions per octant, $G$ is the total number of energy groups, and $N$ is the total number of cells, then the total fine-grain work units is $8MGN$.
@@ -362,7 +362,7 @@ If we set Eq. \ref{large_p_kba} equal to Eq. \ref{large_p_opt}, we see that in t
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 To aid in the selection of optimal processor and aggregation parameters, PDT uses a performance model to estimate the sweep time.
-This performance model is the basis for the cost function described in Chapter \ref{cha:tts}.
+This performance model is the basis for the cost function described in Section \ref{cha:tts}.
 Equation \ref{sweep_time} calculates the sweep time by multiplying the time it takes to solve each stage by the number of stages.
 This is then multiplied by a multi-core fudge factor that estimates the performance drop-off from 1 to 8 cores due to parallel overhead.
 \begin{equation}
@@ -385,23 +385,17 @@ where:
   \item $T_m$ = the time spent solving angle-specific work,
   \item $T_g$ = the time spent solving group-specific work.
 \end{itemize}
-A comparison between this performance model and the time-to-solution estimator will be shown in Chapter \ref{cha:tts}. 
+A comparison between this performance model and the time-to-solution estimator will be shown in Section \ref{cha:tts}. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Evaluation of existing partitioning strategies for parallel transport sweeps in unstructured grids}\label{cha:lb}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\tcr{Starting here, I think you should started a new Section. It should have the following subsections:
-\begin{enumerate}
-\item General ideas of how PDT's does its unstructured grid partitioning. This is kind of a lay of the land and introduced+foreshadows the other subsections.
-\item Principle of mesh cutting for the purposes of parallel partitioning. 
-\item Current load balancing strategies (LB and LBD -due to issues with standard LB). You have some numerical examples so maybe a few can stay here.
-\end{enumerate}
-I think this should be no more than 5-6 pages. Currently, from 3.4 until section 4 (excluded), you have 11 pages.
-}
  
 Initially, PDT only swept on structured, logically Cartesian meshes. As the need to solve problems with more complex geometries arose, PDT added a support for arbitrary polyhedral unstructured meshes. However, this introduced imbalanced partitions (or different amounts of cells per processor), causing longer and unmanageable runtimes.
 
-To combat imbalanced partitions, two load balancing algorithms were implemented, referred to in this thesis as the original load-balancing algorithm \cite{mastersthesis,mc2017} and the load-balancing-by-dimension algorithm.
+To combat imbalanced partitions, two load balancing algorithms were implemented, referred to in this paper as the original load-balancing algorithm \cite{mastersthesis,mc2017} and the load-balancing-by-dimension algorithm.
+
+\subsection{Review of PDT's partitioning of unstructured meshes}
 
 Before detailing the two load balancing algorithms PDT employs, a quick review of partitioning unstructured meshes in PDT is necessary:
 \begin{itemize}
@@ -416,7 +410,7 @@ Generally, one subset is assigned per processor, as this minimizes the communica
 Figure~\ref{partitioning_example} shows an example of an unstructured mesh partitioned into 100 subsets in PDT.
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.2]{../figures/spiderweb_10x10_sparse.png}
+\includegraphics[scale=0.15]{../figures/spiderweb_10x10_sparse.png}
 \caption{An unstructured mesh partitioned into 100 subsets with cut lines at 1 cm intervals in both dimensions}
 \label{partitioning_example}
 \end{figure}
@@ -427,10 +421,12 @@ This node is stitched across the boundary to preserve geometric continuity, form
 PDT uses Piece-Wise Linear Discontinuous (PWLD) finite-element basis functions \cite{pwld_ragusa,pwld_teresa} that allow for solutions on arbitrary and degenerate polyhedra.
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.2]{../figures/hanging_node_spiderweb_example.png}
+  \includegraphics[scale=0.15,trim=0cm 0cm 8cm 8cm,clip]{../figures/hanging_node_spiderweb_example.png}
    \caption{A hanging node (circled in black) on a subset boundary (highlighted in blue).}
    \label{hanging_node}
 \end{figure}
+
+\subsection{Review of PDT's load balancing strategies}
 
 Both approaches to load balancing move cut lines in order to redistribute cells more evenly throughout subsets. We define a metric describing how imbalanced our problem is:
 \begin{equation}
@@ -457,11 +453,6 @@ f_{Z} = \frac{\underset{k}{\text{max}}[\sum_{i,j} N_{ijk}]}{\frac{N_{tot}}{K}},
 where $K$ is the total number of z-planes.
 Equation \ref{f_z} is a metric defining how imbalanced the problem's planes are. It calculates the maximum cells per plane divided by the average cells per plane. If $f_K$ is greater than a predefined tolerance, the z cut planes are redistributed using the process in Fig.~\ref{redistribute}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Original Load-Balancing Algorithm}
-\label{sec:og_lb}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 The initial approach to load balancing was implemented on 2D extruded meshes, meaning the mesh is balanced in the 2D plane and then extruded, yielding a balanced 3D mesh. The metrics for this algorithm are defined as follows:
 \begin{align}
 f &= \frac{\underset{ij}{\text{max}}(N_{ij})}{\frac{N_{tot}}{I\cdot J}}  \label{og_metric}\\
@@ -470,28 +461,28 @@ f_Y &= \frac{\underset{j}{\text{max}}[\sum_{i} N_{ij}] } {\frac{N_{tot}}{J}} \la
 \end{align}
 Equation \ref{og_metric} mirrors Eq. \ref{metric_def} for 2 dimensions, and Eqs. \ref{og_i_metric} and \ref{og_j_metric} define the column and row-wise metrics respectively.
 
- Algorithm \ref{initial_algorithm} summarizes the original approach to load balancing meshes in PDT.
-\begin{algorithm}[H]
-\caption{The original load-balancing algorithm.}
-\label{initial_algorithm}
-\begin{algorithmic}
-
-\WHILE{$f > 1 + \text{tol}_{\text{subset}}$}
-  \IF {$f_X > 1 + \text{tol}_{\text{col}}$}
-    \STATE Redistribute the X cut lines.
-  \ENDIF
-  \IF {$f_Y > 1 + \text{tol}_{\text{row}}$}
-  	\STATE Redistribute the Y cut lines.
-  \ENDIF
-\ENDWHILE
-\end{algorithmic}
-\end{algorithm}
-While the problem is not balanced:
-\begin{itemize}
+% Algorithm \ref{initial_algorithm} summarizes the original approach to load balancing meshes in PDT.
+%\begin{algorithm}[H]
+%\caption{The original load-balancing algorithm.}
+%\label{initial_algorithm}
+%\begin{algorithmic}
+%
+%\WHILE{$f > 1 + \text{tol}_{\text{subset}}$}
+%  \IF {$f_X > 1 + \text{tol}_{\text{col}}$}
+%    \STATE Redistribute the X cut lines.
+%  \ENDIF
+%  \IF {$f_Y > 1 + \text{tol}_{\text{row}}$}
+%  	\STATE Redistribute the Y cut lines.
+%  \ENDIF
+%\ENDWHILE
+%\end{algorithmic}
+%\end{algorithm}
+The process to load balance the mesh entails:
+\begin{enumerate}
   \item Check if the columns are balanced, and if not redistribute the X cut lines.
   \item Check if the rows are balanced, and if not redistribute the Y cut lines.
   \item Repeat until the mesh is balanced or until a maximum number of iterations is reached.
-\end{itemize}
+\end{enumerate}
 
 The original load-balancing algorithm placed cut lines in all dimensions all the way through the mesh.
 This created an orthogonal partitioning where each subset had an equivalent number of neighbors, which was done to preserve the provably optimal sweep partitioning described by Adams et. al \cite{mpadams2013,mpadams2015,mpadamsjcp}.
@@ -499,28 +490,22 @@ However, there are theoretical limits to load balancing in this fashion. Figure~
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.4]{../figures/theoretical_plot.png}
+\includegraphics[scale=0.3]{../figures/theoretical_plot.png}
  \caption{A 2D subset layout with $M$ unaligned patches of high mesh density $N$.}
 \label{2dgeneral}
 \end{figure}
-The subset layout is $M^2$, but only $M$ subset have significant work, leading to a theoretical limit for the load imbalance factor:
+The subset layout is $M^2$, but only $M$ subsets have significant work, leading to a theoretical limit for the load imbalance factor:
 \begin{equation}
 f= \frac{N}{(MN+C)/M^2} \xrightarrow{N\to \infty} \frac{N}{N/M} = M.
 \end{equation}
-Due to this theoretical limit, the load-balancing-by-dimension algorithm was developed.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Load-Balancing-by-Dimension Algorithm}
-\label{sec:lbd}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+To combat this theoretical limit, the load-balancing-by-dimension by dimension (LBD) algorithm was developed. It similarly relies on the movement of cut lines/planes to redistribute mesh cells in a more balanced manner, but cut lines are no longer required to go all the way through the mesh.
 
-The load-balancing-by-dimension by dimension (LBD) algorithm, similar to the original load-balancing algorithm, relies on the movement of cut lines/planes to redistribute mesh cells in a more balanced manner.
-However, cut lines are no longer required to go all the way through the mesh, and the load-balancing-by-dimension algorithm is fully extensible to 3 dimensions.
-The load-balancing-by-dimension algorithm is summarized by:
+The load-balancing-by-dimension algorithm entails:
 \begin{enumerate}
-  \item Slice the mesh in $z$ and redistribute cut planes until each plane has approximately an equivalent number of cells.
-  \item For each $z$ layer, slice the layer in columns and redistribute the $x$ cut lines until each column has an approximately equivalent number of cells.
-  \item For each column within each $z$ layer, slice the column in rows and redistribute the $y$ cut lines until each row has an approximately equivalent number of cells.
+  \item Slicing the mesh in $z$ and redistributing cut planes until each plane has approximately an equivalent number of cells,
+  \item For each $z$ layer, slicing the layer in columns and redistributing the $x$ cut lines until each column has an approximately equivalent number of cells,
+  \item For each column within each $z$ layer, slicing the column in rows and redistributing the $y$ cut lines until each row has an approximately equivalent number of cells.
 \end{enumerate}
 
 We once again use dimensional sub-metrics to determine whether or not a dimension's cut lines/planes need to be redistributed. The $z$ dimension's sub-metric is defined by Eq. \ref{f_z}. For the LBD algorithm, there are $K$ column-wise metrics, one for each $z$ layer:
@@ -539,33 +524,33 @@ f_{Y,k,i} = \frac{\underset{j}{\text{max}} N_{ijk} } {\frac{N_{tot,k,i}}{J}},
 where $N_{tot,k,i}$ is the number of cells in column $i$ in layer $k$.
 Equation \ref{lbd_y_metric} defines the row-wise metric for layer $k$ in column $i$, or the maximum number of cells per row in column $i$ in layer $k$ divided by the average number of cells per row in column $i$ in layer $k$.
 
-Algorithm \ref{lbd} details the load-balancing-by-dimension algorithm.
-\begin{algorithm}[H]
-\caption{The load-balancing-by-dimension algorithm.}
-\label{lbd}
-\begin{algorithmic}
-
-  \WHILE {$f_{Z} > 1 + \text{tol}_{\text{K}}$}
-    \STATE Redistribute the Z cut planes.
-  \ENDWHILE
-
-  \FOR {$k$ in $K$}
-    \WHILE {$f_{X,k} > 1 + \text{tol}_{\text{I}}$}
-      \STATE Redistribute the X cut lines within layer $k$.
-    \ENDWHILE
-  \ENDFOR
-
-  \FOR{$k$ in $K$}
-    \FOR{$i$ in $I$}
-      \WHILE {$f_{Y,k,i} > 1 +  \text{tol}_{\text{J}}$ }
-        \STATE Redistribute the Y cut lines in column $i$ in layer $k$.
-      \ENDWHILE
-    \ENDFOR
-  \ENDFOR
-
-  \STATE Calculate $f$.
-\end{algorithmic}
-\end{algorithm}
+%Algorithm \ref{lbd} details the load-balancing-by-dimension algorithm.
+%\begin{algorithm}[H]
+%\caption{The load-balancing-by-dimension algorithm.}
+%\label{lbd}
+%\begin{algorithmic}
+%
+%  \WHILE {$f_{Z} > 1 + \text{tol}_{\text{K}}$}
+%    \STATE Redistribute the Z cut planes.
+%  \ENDWHILE
+%
+%  \FOR {$k$ in $K$}
+%    \WHILE {$f_{X,k} > 1 + \text{tol}_{\text{I}}$}
+%      \STATE Redistribute the X cut lines within layer $k$.
+%    \ENDWHILE
+%  \ENDFOR
+%
+%  \FOR{$k$ in $K$}
+%    \FOR{$i$ in $I$}
+%      \WHILE {$f_{Y,k,i} > 1 +  \text{tol}_{\text{J}}$ }
+%        \STATE Redistribute the Y cut lines in column $i$ in layer $k$.
+%      \ENDWHILE
+%    \ENDFOR
+%  \ENDFOR
+%
+%  \STATE Calculate $f$.
+%\end{algorithmic}
+%\end{algorithm}
 
 Figure~\ref{alg_illustration} illustrates the behavior of both algorithms after 5 iterations. In Fig.~\ref{3x3_lb}, we see the partitions cutting across the entire domain, with the $x$ and $y$ cut lines moving into the denser geometric features in the corners to more evenly distribute cells. In Fig.~\ref{3x3_lbd}, we see the $x$ partitions cutting across the entire domain, but the $y$ partitions being redistributed by column. The $y$ partitions are moved into the respective geometric features in the appropriate columns in order to better balance the problem.
 
@@ -573,19 +558,19 @@ Figure~\ref{alg_illustration} illustrates the behavior of both algorithms after 
 \centering
 \begin{subfigure}[t]{\textwidth}
 \centering
-\includegraphics[scale=0.15]{../figures/ubp_3x3_regular.png}
+\includegraphics[scale=0.1]{../figures/ubp_3x3_regular.png}
 \caption{No load balancing, $f = 3.41$.}
 \label{3x3_regular}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}
 \centering
-\includegraphics[scale=0.13]{../figures/ubp_3x3_lb.png}
+\includegraphics[scale=0.1]{../figures/ubp_3x3_lb.png}
 \caption{5 load balancing iterations, $f = 2.58$.}
 \label{3x3_lb}
 \end{subfigure}
 \begin{subfigure}[b]{0.49\textwidth}
 \centering
-\includegraphics[scale=0.13]{../figures/ubp_3x3_lbd.png}
+\includegraphics[scale=0.1]{../figures/ubp_3x3_lbd.png}
 \caption{5 load-balancing-by-dimension iterations, $f = 1.49$.}
 \label{3x3_lbd}
 \end{subfigure}
@@ -597,16 +582,11 @@ Figure~\ref{alg_illustration} illustrates the behavior of both algorithms after 
 \subsection{Parametric Study of the Original Load Balancing and the Load-Balancing-by-Dimension Algorithms}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 To study the behavior and effectiveness of both the original load balancing and the load-balancing-by-dimension algorithm, a parametric study was run on the mesh shown in Fig.~\ref{partitioning_example}.
-This mesh was chosen because it is inherently imbalanced as there are two dense geometric features in opposing corners with a sparse region in between.
+This mesh was chosen due to its inherent imbalance, as there are two dense geometric features in opposing corners with a sparse region in between.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Parametric study on the unbalanced pin mesh}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The study calculates $f$ for the mesh with no load balancing iterations, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations.
+The study calculates $f$ for this mesh with no load balancing iterations, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations.
 The mesh is partitioned into 2 to 10 subsets in each dimension for all load balancing formats.
-Figure~\ref{metric_study} shows the results of this parametric study.
-The results are tabulated in Table \ref{metric_study_table}.
+Figure~\ref{metric_study} shows the results of this parametric study, and the results are tabulated in Table \ref{metric_study_table}.
 
 With regular cut lines going through the mesh, $f_\text{reg}$ generally increases as the number of subsets increases.
 As the number of cut lines increases, the number of cells added may also increase, driving up the maximum number of cells in each subset. 
@@ -643,7 +623,8 @@ For the load balanced and load-balanced-by-dimension cases, we see a similar inc
 \end{table}
 
 Table \ref{metric_improvement} shows the percent decrease in $f$ with the original load balancing algorithm and the load-balancing-by-dimension algorithm relative to no load balancing, and the percent decrease in $f$ with the load-balancing-by-dimension algorithm relative to the original load balancing algorithm.
-There is consistent improvement for both algorithms for all cases, and the improvement both load balancing algorithms relative to no algorithm generally increases as the number of subsets increases. The improvement of load-balancing-by-dimension over load balancing is notable, with a minimum improvement of 32.43\% and a maximum improvement of 71.66\%.
+There is consistent improvement using both algorithms for all cases, and the improvement generally increases as more partitions are used.
+The improvement of load-balancing-by-dimension over load balancing is notable, with a minimum improvement of 32.43\% and a maximum improvement of 71.66\%.
 \begin{table}[H]
 \centering
 \caption{The percent decrease of $f$ with the original load balancing algorithm (LB) and the load-balancing-by-dimension algorithm (LBD) relative to no load balancing, and the percent decrease of $f$ with the load-balancing-by-dimension algorithm relative to the original load balancing algorithm.}
@@ -664,102 +645,10 @@ There is consistent improvement for both algorithms for all cases, and the impro
 \end{table}
 
 \FloatBarrier
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Parametric study on the Level-2 experiment mesh}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The same parametric study was run on an experiment that PDT simulates, the Level-2 experiment, shown in Fig.~\ref{level2_nocut_lbchapter}.
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.25]{../figures/level2_nocut.png}
-\caption{The mesh for the Level-2 experiment.}
-\label{level2_nocut_lbchapter}
-\end{figure}
-The Level-2 mesh contains a relatively uniform geometry throughout the mesh with one denser feature in the middle of the top boundary.
-Fig.~\ref{level2_alg_illustration} shows the dense region of the Level-2 mesh with 7 regular, load-balanced, and load-balanced-by-dimension cuts.
-%zoomed in photos
-\begin{figure}[ht]
-\centering
-\begin{subfigure}[t]{\textwidth}
-\centering
-\includegraphics[scale=0.3]{../figures/level2_7_reg_zoom.png}
-\caption{No load balancing.}
-\label{7_regular}
-\end{subfigure}
-\begin{subfigure}[b]{\textwidth}
-\centering
-\includegraphics[scale=0.3]{../figures/level2_7_lb_zoom.png}
-\caption{5 load balancing iterations.}
-\label{7_lb}
-\end{subfigure}
-\begin{subfigure}[b]{\textwidth}
-\centering
-\includegraphics[scale=0.3]{../figures/level2_7_lbd_zoom.png}
-\caption{5 load-balancing-by-dimension iterations.}
-\label{7_lbd}
-\end{subfigure}
-\caption{A demonstration of the original load balancing and load-balancing-by-dimension algorithms on the Level-2 mesh partitioned into 7x7 subsets.}
-\label{level2_alg_illustration}
-\end{figure}
-Figure~\ref{level2_metric_study} shows the results of this parametric study, which are tabulated in Table \ref{level2_metric_study_table}.
-%%%%%%%
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.7]{../figures/level2_metric_study.pdf}
-\caption{The results of the parametric study with no load balancing, 5 original load balancing iterations, and 5 load-balancing-by-dimension iterations for the Level-2 mesh.}
-\label{level2_metric_study}
-\end{figure}
-\begin{table}[ht]
-\centering
-\caption{The tabulated results of the parametric study shown in Fig.~\ref{level2_metric_study} with no load balancing, 5 original load balancing iterations (LB), and 5 load-balancing-by-dimension (LBD) iterations for the Level-2 mesh.}
-\label{level2_metric_study_table}
-\scalebox{0.8}{
-\begin{tabular}{c|c|c|c}
-\textbf{$\sqrt{\text{Num Subsets}}$} & \bf $f_{\text{reg}}$ & \bf $f_{\text{LB}}$  & \bf $f_{\text{LBD}}$\\ \hline
-2&1.7&1.06&1.06\\ \hline
-3&5.31&1.35&1.26\\ \hline
-4&4.85&1.81&1.85\\ \hline
-5&12.83&2.4&1.86\\ \hline
-6&9.39&2.06&1.51\\ \hline
-7&20.78&2.13&1.74\\ \hline
-8&11.25&2.46&1.5\\ \hline
-9&21.53&2.37&1.61\\ \hline
-10&12.59&2.34&2.18
-\end{tabular}}
-\end{table}
-
-With regular cut lines going through the Level-2 mesh, $f_\text{reg}$ behaves more erratically than the two pin mesh in Fig.~\ref{partitioning_example}. The natural boundaries are not as uniform, and cells are added in a less consistent fashion. It is noticeable that even numbers of subsets take advantage of the problem's symmetry and consistently have a smaller $f_\text{reg}$ value.
-
-$f_\text{LB}$ and $f_\text{LBD}$ behave much less erratically than $f_\text{reg}$ for the Level-2 mesh.
-Table \ref{level2_metric_improvement} shows the percent decrease in $f$ with the original load-balancing algorithm and the load-balancing-by-dimension algorithm relative to no load balancing, and the percent decrease in $f$ with the load-balancing-by-dimension algorithm relative to the original load-balancing algorithm.
-Both algorithms can decrease $f$ up to 90\%, but what is notable is the smaller improvement in the load-balancing-by-dimension algorithm relative to the load-balancing-algorithm.
-With only one dense feature located in the middle of the mesh, moving the $y$ cut lines on a columnar basis is much less advantageous.
-%%%%%%%%%%%%%%
-\begin{table}[ht]
-\centering
-\caption{The percent decrease of $f$ with the original load balancing algorithm (LB) and the load-balancing-by-dimension algorithm (LBD) relative to no load balancing, and the percent decrease of $f$ with the load-balancing-by-dimension algorithm relative to the original load balancing algorithm for the Level-2 mesh.}
-\label{level2_metric_improvement}
-\begin{tabular}{c|c|c|c}
-\textbf{$\sqrt{\text{Num Subsets}}$} & \bf LB v. Regular  & \bf LBD v. Regular & \bf LBD v. LB \\ \hline
-2&37.88\%&37.88\%&0.0\%\\ \hline
-3&74.56\%&76.29\%&6.8\%\\ \hline
-4&62.74\%&61.95\%&-2.11\%\\ \hline
-5&81.3\%&85.51\%&22.53\%\\ \hline
-6&78.11\%&83.95\%&26.66\%\\ \hline
-7&89.74\%&91.62\%&18.33\%\\ \hline
-8&78.13\%&86.65\%&38.96\%\\ \hline
-9&88.99\%&92.51\%&31.96\%\\ \hline
-10&81.41\%&82.66\%&6.71\%
-\end{tabular}
-\end{table}
-
-\FloatBarrier
-The unstructured meshing capability in PDT allows the user to solve a wider variety of problems, without the need to conform a geometry to a logically Cartesian mesh.
 The original load balancing and load-balancing-by-dimension algorithms allowed for these unstructured problems to be run more efficiently on large numbers of processors.
 However, PDT's performance model does not account for unstructured meshes or imbalanced partitions, but rather assumes a structured grid with an equivalent amount of cells per processor.
 In addition, theoretical studies showed that well balanced partitions when using the load-balancing-by-dimension algorithm did not always translate to a better sweep time.
-These two reasons motivated the development of a time-to-solution estimator that can estimate the sweep time for a problem given a partitioning scheme ($P_i, A_i$) regardless of mesh type. The time-to-solution estimator is described in Chapter \ref{cha:tts}.
-
+These two reasons motivated the development of a time-to-solution estimator that can estimate the sweep time for a problem given a partitioning scheme ($P_i, A_i$) regardless of mesh type. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{The time-to-solution estimator}\label{cha:tts}
@@ -778,7 +667,7 @@ I think this should be no more than 5-6 pages. Currently, from 3.4 until section
 
 With the introduction of unstructured meshes and imbalanced partitions in PDT, we need an expansion of the performance model to estimate the sweep time.
 In addition, before optimization of the partitioning scheme can occur, it is necessary to have an estimation tool that gives the approximate sweep time for a given partitioning scheme.
-The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This chapter will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies.
+The time-to-solution estimator serves as the objective function that gets optimized, with the partitions serving as the parameter space. This section will detail the time-to-solution estimator, and showcase the results of 2D and 3D verification studies.
 
 The time-to-solution estimator is written in Python 3. Python was chosen as the language for its powerful graph library, networkx \cite{networkx}.
 This library gives us a wide variety of graph mathematics and is easy to use.
@@ -790,7 +679,7 @@ Before detailing the time-to-solution estimator's methodology, a description of 
 
 Graph theory is a subset of mathematics that focuses on graphs, or structures containing a set of objects that are connected in a particular manner \cite{graphtheory}.
 These objects are called vertices (or nodes), and are connected by edges.
-Figure~\ref{basic_graph} shows an undirected graph of 4 nodes and 4 edges. The nodes are a mathematical abstraction that can be used to represent a variety of concepts. In this paper, they are used to represent the subsets described in Chapter \ref{cha:lb}.
+Figure~\ref{basic_graph} shows an undirected graph of 4 nodes and 4 edges. The nodes are a mathematical abstraction that can be used to represent a variety of concepts. In this paper, they are used to represent the subsets described in Section \ref{cha:lb}.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{../figures/undirected_graph.pdf}
@@ -1689,7 +1578,7 @@ In the future, obtaining machine parameters should be attempted using unstructur
 \item We have 9 pages here. I think 5-7 is better.
 \end{enumerate}
 }
-In Chapter \ref{cha:tts}, we have seen that we can estimate the time-to-solution for a sweep for different partitioning schemes.
+In Section \ref{cha:tts}, we have seen that we can estimate the time-to-solution for a sweep for different partitioning schemes.
 We use the time-to-solution estimator as the objective function in two optimization methods.
 The first optimization method utilizes scipy's optimize library, and the second method utilizes knowledge of a problem's mesh layout to assist in partition placement.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -20,19 +20,24 @@ gymax = 54.994
 t_comm = 4.47e-09
 #The number of bytes to communicate per subset.
 #The message latency time.
-m_l = 90
+m_l = 80
 latency = 4110.0e-09
 #Solve time per cell..
-Tc = 1208.383e-09
+Tc = 1279.7325e-09
 upc = 4.0
 upbc = 2.0
-Twu = 147.0754e-09
-Tm = 65.54614e-09
-Tg = 175.0272e-09
+#Twu = 147.0754e-09
+Twu = 197.898e-09
+#Tm = 65.54614e-09
+Tm = 70.9439e-09
+#Tg = 175.0272e-09
+Tg = 173.193e-09
 mcff = 1.181
 machine_parameters = (Twu,Tc,Tm,Tg,upc,upbc,mcff,t_comm,latency,m_l)
-num_angles = 1
-Am = 36
+#num_angles_vec = [1,2,3,5,10]
+num_angles_vec = [1,2,3]
+#Am_vec = [90,45,30,18,9]
+Am_vec = [90,45,30]
 unweighted = True
 Ay = 1
 numcol = 42
@@ -49,13 +54,11 @@ y_cuts = np.genfromtxt("lvl2_13_reg_y_cuts")
 
 params = create_parameter_space(x_cuts,y_cuts,numrow,numcol)
 
-max_time_reg,f_reg = optimized_tts_numerical(params,level2_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
+max_times_reg = [None]*len(Am_vec)
+fs_reg = [None]*len(Am_vec)
 
-x_cuts_lb = [0.0,7.0,14.62,16.1565,17.16,18.1635,19.7,30.5,38.76,47.9,55.52,64.66,67.835,68.47,69.105,69.74,71.53,71.78,72.03,72.28,73.27,74.26,74.92,75.58,76.24,76.9,77.89,78.88,79.13,79.38,79.63,81.42,82.055,82.69,83.325,86.5,95.64,103.26,112.4,120.66,130.88,141.44,gxmax]
-y_cuts_lbd_col = [0.0,19.1775,31.228,43.8345,47.0373,48.0957,48.7307,49.7507,51.194,51.5273,52.024,53.014,54.04,54.994]
-y_cuts_lb = []
-for col in range(0,numcol):
-  y_cuts_lb.append(y_cuts_lbd_col)
-
-params = create_parameter_space(x_cuts_lb,y_cuts_lb,numrow,numcol)
-max_time_lb,f_lb = optimized_tts_numerical(params,level2_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
+for a in range(0, len(Am_vec)):
+    Am = Am_vec[a]
+    num_angles = num_angles_vec[a]
+    max_times_reg[a],fs_reg[a] = optimized_tts_numerical(params,level2_cell_data,verts,gxmin,gxmax,gymin,gymax,numrow,numcol,machine_parameters,num_angles,Am,Ay,add_cells,unweighted)
+  
